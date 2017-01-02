@@ -81,8 +81,10 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::pdf(file.name, width=width, height=height)
 }
 
-#' Some plotting routines for overlap statistics from
-#' \code{\link{getOverlapStats}}
+#' plot multiple cumulative distribution functions as in the result from
+#' overlap statistics from \code{\link{getOverlapStats}}
+#' @param CDF named list of cumulative distribution functions
+#' @param x x-values for which cumulative distribution functions are plotted
 #' @export
 plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ...) {
     
