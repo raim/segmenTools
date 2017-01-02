@@ -150,7 +150,10 @@ dir.create(file.path(out.path,testid),recursive=TRUE) # test set
 if ( verb>0 )
     cat(paste("LOADING TEST SETS:", testid, "-", target, "\n"))
 
-trgs <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char = "")
+trgs <- read.table(target,sep="\t",header=TRUE,
+                   stringsAsFactors=FALSE, comment.char = "")
+trgs <- coor2index(trgs,chrS) # map to continuous index!
+
 tpcol <- ttypcol
 cpcol <- tcolcol
 
