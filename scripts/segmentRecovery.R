@@ -353,7 +353,7 @@ for ( test.type in test.types ) {
                            paste(test.type,"_ratioTotal",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot.cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf", col=sgcols, lty=sgltys,
+    plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf", col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="ratio: query length/target length")
     legend("topleft",paste(test.type,"-",tnum))
@@ -364,7 +364,7 @@ for ( test.type in test.types ) {
                            paste(test.type,"_ratioTotal_clustered",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot.cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
+    plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
                 col=pm$clustering, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="ratio: query length/target length")
@@ -446,7 +446,7 @@ for ( test.type in test.types ) {
     file.name <- file.path(out.path,test,paste(test.type,"_jaccard_cdf_clustered",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot.cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
+    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
                 col=pm$clustering, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="cumulative jaccard: intersect/union")
@@ -457,7 +457,7 @@ for ( test.type in test.types ) {
     file.name <- file.path(out.path,test, paste(test.type,"_ratio",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot.cdfLst(x=seq(0,2,.05), CDF=CDF, type="rrcdf", col=sgcols, lty=sgltys,
+    plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rrcdf", col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="relative ratio: query length/target length")
     legend("topleft",paste(test.type,"-",tnum))
@@ -469,7 +469,7 @@ for ( test.type in test.types ) {
                           paste(test.type,"_totalCoverage",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot.cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf", col=sgcols, lty=sgltys,
+    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf", col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="coverage of test set")
     legend("topleft",paste(test.type,"-",tnum))
@@ -480,7 +480,7 @@ for ( test.type in test.types ) {
                           paste(test.type,"_totalCoverage_clustered",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot.cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
+    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
                 col=pm$clustering, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="coverage of test set")

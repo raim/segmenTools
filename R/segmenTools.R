@@ -84,7 +84,7 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
 #' Some plotting routines for overlap statistics from
 #' \code{\link{getOverlapStats}}
 #' @export
-plot.cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ...) {
+plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ...) {
     
     plot(x, CDF[[1]]$rcdf(x),type="l",col=NA,main=NA, ylim=c(0,1), ylab=ylab,
          ...)
