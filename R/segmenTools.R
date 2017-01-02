@@ -3,8 +3,9 @@
 #'@docType package
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
-#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text
+#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist
 #'@importFrom grDevices png dev.off rainbow gray xy.coords
+#'@importFrom stats ecdf loess predict qt quantile runmed sd var
 NULL # this just ends the global package documentation
 
 
