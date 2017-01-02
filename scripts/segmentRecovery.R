@@ -2,18 +2,18 @@
 
 ## TESTING SEGMENT LENGTH DIST AND AGAINST ANNOTATED GENES AND TRANSCRIPTS
 
-##library(segmenTools)
-segtools <- "~/programs/segmenTools/"
-source(file.path(segtools,"R/segmenTools.R")) # for segment analysis
-source(file.path(segtools,"R/coor2index.R")) # coor2index
+library(segmenTools)
+##segtools <- "~/programs/segmenTools/"
+##source(file.path(segtools,"R/segmenTools.R")) # for segment analysis
+##source(file.path(segtools,"R/coor2index.R")) # coor2index
 
 library(cluster) # for pam clustering
+library(optparse) # command-line options
 
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
 
 ### OPTIONS
-suppressPackageStartupMessages(library(optparse))
 option_list <- list(
     make_option(c("-i", "--infile"), type="character", default="", 
                 help="chromosome coordinates of primary segments as produced by clusterSegments.R but without header ('allsegs.csv')"),    
