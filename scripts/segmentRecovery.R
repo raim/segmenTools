@@ -291,7 +291,6 @@ for ( test.type in test.types ) {
     ## get cumulative hypergeometric distribution of clustering vs. segments
     for ( i in 1:K ) 
       for ( j in 1:ncol(sgcltab) ) {
-          ## genomeBrowser:
           clcl <-  clusterCluster(pm$clustering==i,sgcltab[,j],
                                   plot=FALSE,verbose=FALSE)
           cln <- colnames(sgcltab)[j]
