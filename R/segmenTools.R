@@ -1,3 +1,14 @@
+#' segmenTools : analysis of genome segmentations by segmenTier
+#'@author Rainer Machne \email{raim@tbi.univie.ac.at}
+#'@docType package
+#'@name segmenTools
+#'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
+#'@importFrom flowClust flowClust
+#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text
+#'@importFrom grDevices png dev.off rainbow gray xy.coords
+NULL # this just ends the global package documentation
+
+
 ### GENOME SEGMENT UTILS & ANALYSIS
 
 ### DATA STAT & TRANSFORMATION UTILS
@@ -19,6 +30,7 @@ get.fft <- function(x) {
 #' (compressing) effects on the extreme values (low and high values),
 #' and naturally handles negative numbers and 0
 #' @param x data to be transformed
+#' @export
 ash <- function(x) log(x+sqrt(x^2+1))
 #' log trafo handling zeros by adding 1
 #' @param x data to be transformed
@@ -211,18 +223,17 @@ getSegmentClasses <- function(sgtypes, sep="_", gsep=":") {
 
 ### WRAPPERS of segmentOverlap for specific purposes
 
-##' wrapper around \test{\code{segmentOverlap}}, used to 
-##' annotate the query set by a column in the target set
-##' @param query the query set of segments (genomic intervals)
-##' @param target the target set of segments (genomic intervals)
-##' @param col column names to copy from target to it's best match in query
+## wrapper around \test{\code{segmentOverlap}}, used to 
+## annotate the query set by a column in the target set
+## @param query the query set of segments (genomic intervals)
+## @param target the target set of segments (genomic intervals)
+## @param col column names to copy from target to it's best match in query
 annotateQuery <- function(query, target, col) {
     ## TODO: fix this, make real annotate query
 }
 
-#' wrapper around \test{\code{segmentOverlap}, used to 
-#' annotate the target set by a column in the query set;
-#' first calls \code{\link{annotateQuery}} to find the best hit
+#' wrapper around \test{\code{segmentOverlap}}, used to 
+#' annotate the target set by a column in the query set
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
 #' @param col column names to copy from target to it's best match in query
