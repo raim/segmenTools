@@ -247,7 +247,7 @@ for ( test.type in test.types ) {
                          ratio.low=height[,1], ratio.high=height[,2])
     
     ## write out table of segmentation characteristics
-    file.name <- file.path(out.path,paste("segmentRecovery_",test.type,
+    file.name <- file.path(out.path,testid,paste("segmentRecovery_",test.type,
                                           ".csv",sep=""))
     write.table(result,file=file.name, sep="\t",
                 col.names=TRUE,row.names=FALSE,quote=FALSE)
