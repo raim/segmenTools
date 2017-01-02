@@ -63,7 +63,9 @@ option_list <- list(
                 help="take mean ratio of each read time-series before calculating segment average"),
     make_option(c("--filter.reads"), action="store_true", default=FALSE,
                 help="use only reads with oscillation p.value < pval.thresh.sig for segment average caculation"),
-    ## SEGMENT TIME-SERIES PROCESSING
+    ## SEGMENT TIME-SERIES PROCESSING FOR CLUSTERING
+    make_option(c("--cluster"), action="store_true", default=FALSE,
+                help="use flowClust to cluster time series"),
     make_option(c("--trafo"), type="character", default="raw",
                 help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
     make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
@@ -274,7 +276,21 @@ for ( type in sgtypes ) {
     }
     avg <- t(apply(sgs,1,sgavg))
 
-    
+    ## write out phase, pval, and clusters
+    ## convert back to chromosome coordinates
+    seg <- index2coor(sgs,chrS)
+    file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
+    write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                sep="\t",col.names=TRUE,row.names=FALSE)
+
+    ## write out average timeseries
+    sgts <- data.frame(ID=sgs[,"ID"], avg)
+    file.name <- file.path(out.path,paste(fname,"_timeseries",sep=""))
+    write.table(sgts,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                sep="\t",col.names=TRUE,row.names=FALSE)
+
+    if ( !cluster ) next
+
     if ( verb>0 )
         cat(paste("\tclustering average segment time series\t",time(),"\n"))
 
@@ -324,18 +340,12 @@ for ( type in sgtypes ) {
     ## convert back to chromosome coordinates
     seg <- index2coor(sgs,chrS)
 
-    ## write out phase, pval, and clusters
-    file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
+    ## write out clusters
+    file.name <- file.path(out.path,paste(fname,"_clusters",sep=""))
     write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
 
-    ## write out average timeseries
-    sgts <- data.frame(ID=sgs[,"ID"], avg)
-    file.name <- file.path(out.path,paste(fname,"_timeseries",sep=""))
-    write.table(sgts,file=paste(file.name,".csv",sep=""),quote=FALSE,
-                sep="\t",col.names=TRUE,row.names=FALSE)
-
-    ## save all as RDaata
+    ## save all as RData
     if ( save ) {
         save(seg, tset, fcset, file=paste(fname,".RData",sep=""))
     }
@@ -394,18 +404,20 @@ for ( type in sgtypes ) {
     dev.off()
 }
 
-if ( verb>0 )
-    cat(paste("saving clustering results\t",time(),"\n"))
-## write out summary
-clnum <- cbind(ID=rownames(clnum), clnum)
-if ( out.name == "" ) {
-    file.name <- "clustering"
-} else {
-    file.name <- paste(out.name,"clustering",sep="_")
+if ( cluster ) {
+    if ( verb>0 )
+        cat(paste("saving clustering results\t",time(),"\n"))
+    ## write out summary
+    clnum <- cbind(ID=rownames(clnum), clnum)
+    if ( out.name == "" ) {
+        file.name <- "clustering"
+    } else {
+        file.name <- paste(out.name,"clustering",sep="_")
 }
-file.name <- file.path(out.path,file.name)
-write.table(clnum,file=paste(file.name,".csv",sep=""),quote=FALSE,
-            sep="\t",col.names=TRUE,row.names=FALSE)
+    file.name <- file.path(out.path,file.name)
+    write.table(clnum,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                sep="\t",col.names=TRUE,row.names=FALSE)
+}
 
 if ( !interactive() ) quit(save="no")
 
