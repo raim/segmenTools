@@ -66,6 +66,8 @@ option_list <- list(
     ## SEGMENT TIME-SERIES PROCESSING FOR CLUSTERING
     make_option(c("--cluster"), action="store_true", default=FALSE,
                 help="use flowClust to cluster time series"),
+    make_option(c("--missing"), action="store_true", default=FALSE,
+                help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
     make_option(c("--trafo"), type="character", default="raw",
                 help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
     make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
