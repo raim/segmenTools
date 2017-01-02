@@ -504,7 +504,7 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
         ##if ( sum(duplicates(qrank))>0 ) {
         if ( sum(qrank==1)>1 ) {
             cat(paste("WARNING:",sum(qrank==1),
-                      "with qrank 1 (highest target coverage) for target",
+                      "with qrank 1 (max. jaccard=intersect/union) for target",
                       tids[k],":", paste(qids[idx[qrank==1]],collapse=";")))
             if ( untie ) {
                 cat(paste(" - un-tieing by order"))
