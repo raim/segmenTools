@@ -182,7 +182,7 @@ for ( type in sgtypes ) {
     legend("topright",legend=c(nrow(sgs),paste("fuse",sum(sgs[,"fuse"]))),
            col=c(sgcols[type],NA),pch=c(sgpchs[type],NA),lty=c(sgpchs[type],NA))
     #legend("topright",legend=type)
-    lines(x, get_gamma(x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
+    lines(xy$x, get_gamma(x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
     legend("right", paste(c("a","mu"),":", signif(sggam[type,],3)),
            lty=c(1,NA),col=4)
     #high <- which(tmp$counts>ymax)
