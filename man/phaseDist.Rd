@@ -14,7 +14,7 @@ phaseDist(phs, w)
 \arguments{
 \item{phs}{vector of phases in degrees}
 
-\item{w:}{optional weights for weighted mean}
+\item{w}{optional weights for weighted mean}
 }
 \description{
 Calculates phase distributions in segments, i.e., the circular mean and

@@ -3,7 +3,6 @@
 #'@docType package
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
-#'@importFrom flowClust flowClust
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text
 #'@importFrom grDevices png dev.off rainbow gray xy.coords
 NULL # this just ends the global package documentation
@@ -61,21 +60,6 @@ ci95 <- function(x,na.rm=FALSE) {
     return(error)
 }
 
-## shape : alpha
-## rate: beta 
-## scale : 1/beta
-## mean = shape * scale = alpha/beta
-#' calculates gamma distribution for given parameters
-#' @param x vector of x values for which the gamma distribution will
-#' be calculated
-#' @param start list containing gamma distribution parameters:
-#' \code{a} (shape) and \code{b} (rate=1/scale)
-#' @export
-gamma.cdf <-  function(x, start) {
-    a <- start$a # shape
-    b <- start$b # rate = 1/scale
-    b^a*x^(a-1)*exp(-x*b)/gamma(a)
-}
 
 
 ### PLOT UTILS
@@ -112,7 +96,7 @@ plot.cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image.matrix <- function(dat, text, axis, axis1.col, axis2.col, ...) {
+image_matrix <- function(dat, text, axis, axis1.col, axis2.col, ...) {
 
     ## reverse columns and transpose
     imgdat <- t(apply(dat, 2, rev))
@@ -164,7 +148,7 @@ whichSegment <- function(pos, seg)
 #' splits a list of strings by a separator and constructs
 #' a table from the entries.
 #' @param sgtypes a list of strings, that is converted to a table
-#' of classes based on a string separator (\ode{sep})
+#' of classes based on a string separator (\code{sep})
 #' @param sep the separator for classes in the string
 #' @param gsep a separator within classes
 #' to be used as classification ID (column header of the produces
@@ -203,7 +187,7 @@ getSegmentClassTable <- function(sgtypes, sep="_", gsep=":") {
 
 #' specifically tailored to segment strings in segmenTier
 #' @param sgtypes a list of strings, that is converted to a table
-#' of classes based on a string separator (\ode{sep})
+#' of classes based on a string separator (\code{sep})
 #' @param sep the separator for classes in the string
 #' @param gsep currently not used, a separator within classes
 #' to be used as classification ID (column header of the produces
@@ -223,7 +207,7 @@ getSegmentClasses <- function(sgtypes, sep="_", gsep=":") {
 
 ### WRAPPERS of segmentOverlap for specific purposes
 
-## wrapper around \test{\code{segmentOverlap}}, used to 
+## wrapper around \code{\link{segmentOverlap}}, used to 
 ## annotate the query set by a column in the target set
 ## @param query the query set of segments (genomic intervals)
 ## @param target the target set of segments (genomic intervals)
@@ -232,7 +216,7 @@ annotateQuery <- function(query, target, col) {
     ## TODO: fix this, make real annotate query
 }
 
-#' wrapper around \test{\code{segmentOverlap}}, used to 
+#' wrapper around \code{\link{segmentOverlap}}, used to 
 #' annotate the target set by a column in the query set
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
@@ -241,6 +225,8 @@ annotateQuery <- function(query, target, col) {
 #' @param details set to \code{TRUE} to add details of the used
 #' match, i.e., union and intersect, and relative position of the query
 #' to the matching targets
+#' @param duplicates how to handle multiple matches; if "collapse" the
+#' multiple hits are collapsed into ;-separated strings
 #' @export
 annotateTarget <- function(query, target, col, prefix, details=FALSE,
                            duplicates="collapse") {
@@ -380,6 +366,7 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' If both \code{add.na} and \code{collapse} are set to TRUE the resulting
 #' overlap matrix will be of the same dimension as the input target, i.e.,
 #' it will contain one row for each target.
+#' @param sort sort query hits by their \code{rank}
 #' @export
 segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FALSE, collapse=FALSE, sort=FALSE) {
 
@@ -551,7 +538,7 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
 #' @param tid ID for the target set, just passed on to results and used in plot
 #' @param qid ID for the query set, just passed on to results and used in plot
 #' @export
-getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid=NA, tid=NA, verb=0) {
+getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid=NA, tid=NA) {
 
     ## returning NULL if no query had been found
     if ( !any(!is.na(ovl[,"query"])) )
@@ -685,7 +672,7 @@ getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid
 #' https://en.wikipedia.org/wiki/Mean_of_circular_quantities
 #' TODO: recognize bimodal?
 #' @param phs vector of phases in degrees
-#' @param w: optional weights for weighted mean
+#' @param w optional weights for weighted mean
 #' @export
 phaseDist <- function(phs, w) {
   avg <- c(mean=NA, r=NA, na=sum(is.na(phs))/length(phs))
@@ -740,6 +727,7 @@ readDist <- function(rds) {
 #' that the diverse attempts to smooth or filter read-counts before
 #' taking the averages did not give good results, and we remained using
 #' avg="mean" and no other transformations.
+#' @param rds matrix of read-count time-series
 #' @param avg function to use as average statistics, \code{mean} or
 #' \code{median}
 #' @param mean.ratio calculate the mean ratio over time of each read-count

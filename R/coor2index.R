@@ -14,6 +14,7 @@
 #' @param strandCol name of the column that gives forward/reverse strand
 #' information
 #' @param reverse a vector of possible reverse strand indicators
+#' @param circular suppresses re-sorting to start < end for circular chromosomes
 #' @export
 coor2index <- function(features, chrS,
                        cols=c("start","end","coor"),

@@ -349,7 +349,7 @@ for ( test.type in test.types ) {
                            paste(test.type,"_segmentationClusters",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(1,.7,.1,.1),mgp=c(1.75,.5,0))
-    image.matrix(-log2(pval) ,text=enum, axis=1:2,
+    image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
                  axes=FALSE,xlab=NA,ylab=NA)
@@ -371,7 +371,7 @@ for ( test.type in test.types ) {
     abline(v=.2,lty=2)
     abline(h=.8,lty=2)
     par(mai=c(1,.7,.1,.1))
-    image.matrix(-log2(pval) ,text=enum, axis=1:2,
+    image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
                  axes=FALSE,xlab=NA,ylab=NA)
@@ -441,7 +441,7 @@ for ( test.type in test.types ) {
     legend("bottomright","good",bty="n")
     points(jaccard,numhit,col=pm$clustering,pch=sgpchs[nms])
     par(mai=c(1,.7,.1,.1))
-    image.matrix(-log2(pval) ,text=enum, axis=1:2,
+    image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
                  axes=FALSE,xlab=NA,ylab=NA)
@@ -475,7 +475,7 @@ for ( test.type in test.types ) {
          xlab="fraction: 0.8 < ratio < 1.2")#,
     imgdat <- t(apply(-log2(pval), 2, rev))
     par(mai=c(1,.7,.1,.1))
-    image.matrix(-log2(pval) ,text=enum, axis=1:2,
+    image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
                  axes=FALSE,xlab=NA,ylab=NA)

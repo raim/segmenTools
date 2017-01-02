@@ -35,6 +35,8 @@ into a single row, with ;-separated strings in the respective fields.
 If both \code{add.na} and \code{collapse} are set to TRUE the resulting
 overlap matrix will be of the same dimension as the input target, i.e.,
 it will contain one row for each target.}
+
+\item{sort}{sort query hits by their \code{rank}}
 }
 \description{
 Simple sweeping algorithm to find overlapping intervals. Both

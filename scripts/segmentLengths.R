@@ -18,6 +18,22 @@ source(file.path(segtools,"R/coor2index.R")) # coor2index
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
 
+## shape : alpha
+## rate: beta 
+## scale : 1/beta
+## mean = shape * scale = alpha/beta
+#' calculates gamma distribution for given parameters
+#' @param x vector of x values for which the gamma distribution will
+#' be calculated
+#' @param start list containing gamma distribution parameters:
+#' \code{a} (shape) and \code{b} (rate=1/scale)
+#' @export
+get_gamma <-  function(x, start) {
+    a <- start$a # shape
+    b <- start$b # rate = 1/scale
+    b^a*x^(a-1)*exp(-x*b)/gamma(a)
+}
+
 ### OPTIONS
 suppressPackageStartupMessages(library(optparse))
 option_list <- list(
@@ -172,7 +188,7 @@ for ( type in sgtypes ) {
     legend("topright",legend=c(nrow(sgs),paste("fuse",sum(sgs[,"fuse"]))),
            col=c(sgcols[type],NA),pch=c(sgpchs[type],NA),lty=c(sgpchs[type],NA))
     #legend("topright",legend=type)
-    lines(x, gamma.cdf(x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
+    lines(x, get_gamma(x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
     legend("right", paste(c("a","mu"),":", signif(sggam[type,],3)),
            lty=c(1,NA),col=4)
     #high <- which(tmp$counts>ymax)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{annotateTarget}
 \alias{annotateTarget}
-\title{wrapper around \test{\code{segmentOverlap}}, used to 
+\title{wrapper around \code{\link{segmentOverlap}}, used to 
 annotate the target set by a column in the query set}
 \usage{
 annotateTarget(query, target, col, prefix, details = FALSE,
@@ -20,9 +20,12 @@ annotateTarget(query, target, col, prefix, details = FALSE,
 \item{details}{set to \code{TRUE} to add details of the used
 match, i.e., union and intersect, and relative position of the query
 to the matching targets}
+
+\item{duplicates}{how to handle multiple matches; if "collapse" the
+multiple hits are collapsed into ;-separated strings}
 }
 \description{
-wrapper around \test{\code{segmentOverlap}}, used to 
+wrapper around \code{\link{segmentOverlap}}, used to 
 annotate the target set by a column in the query set
 }
 

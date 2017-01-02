@@ -26,6 +26,8 @@ to continuous index}
 information}
 
 \item{reverse}{a vector of possible reverse strand indicators}
+
+\item{circular}{suppresses re-sorting to start < end for circular chromosomes}
 }
 \description{
 convert chromosome coordinates to continuous index

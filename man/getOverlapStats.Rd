@@ -5,7 +5,7 @@
 \title{Statistics of overlaps between two segment sets.}
 \usage{
 getOverlapStats(ovl, ovlth = 0.8, hrng = c(0.8, 1.2), tnum = NA,
-  qnum = NA, qid = NA, tid = NA, verb = 0)
+  qnum = NA, qid = NA, tid = NA)
 }
 \arguments{
 \item{ovl}{overlap table from \code{\link{segmentOverlap}}}

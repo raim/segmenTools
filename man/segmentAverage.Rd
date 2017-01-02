@@ -11,6 +11,8 @@ segmentAverage(rds, avg = "mean", mean.ratio = FALSE, rm.extreme = FALSE,
   endcut = 0, k = 1, endrule = "median")
 }
 \arguments{
+\item{rds}{matrix of read-count time-series}
+
 \item{avg}{function to use as average statistics, \code{mean} or
 \code{median}}
 

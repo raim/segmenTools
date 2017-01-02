@@ -10,7 +10,7 @@ getSegmentClassTable(sgtypes, sep = "_", gsep = ":")
 }
 \arguments{
 \item{sgtypes}{a list of strings, that is converted to a table
-of classes based on a string separator (\ode{sep})}
+of classes based on a string separator (\code{sep})}
 
 \item{sep}{the separator for classes in the string}
 
