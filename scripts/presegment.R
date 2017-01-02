@@ -3,7 +3,7 @@
 ## cut time-series into primary segments based on level
 ## of expression
 
-library("segmenTier")
+library("segmenTier") ## coor2index - TODO: mv index&presegment to segmenTools
 
 ### OPTIONS
 suppressPackageStartupMessages(library(optparse))
