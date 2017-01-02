@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-library("segmenTier")
+library("segmenTier") # TODO: load segmenTools for index2coor
 suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
 suppressPackageStartupMessages(library("colorRamps")) # matlab-like colors
 #library("Rcpp")
