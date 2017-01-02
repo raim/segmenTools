@@ -25,8 +25,14 @@ option_list <- list(
                 help="use FUSE tag from clusterSegments to fuse adjacent segments"),
     make_option(c("-t", "--test"), type="character", default="transcripts", 
                 help="testset to compare the clustering with; available are transcripts, features, clgenes, cltranscripts"),
+    make_option(c("--target"), type="character", default="", 
+              help="target set of chromosomal segments"),    
     make_option(c("--ttypes"), type="character", default="", 
                 help="sub-set testset in column 'type'"),
+    make_option(c("--ttypcol"), type="character", default="type", 
+              help="name of column with sub-set annotation"),
+    make_option(c("--tcolcol"), type="character", default="", 
+              help="name of column with sub-set colors for plots"),
     make_option("--ovlth", default=0.8,
                 help="overlap threshold (mutual coverage) to be counted as a direct hit; at least ovlth*length must be reached for both query (segments) and targets (test set) [default %default]"),
     ## OUTPUT OPTIONS
@@ -142,60 +148,11 @@ dir.create(file.path(out.path,test),recursive=TRUE) # test set
 ### TEST AGAINST OTHER DATA SETS
 
 if ( verb>0 )
-    cat(paste("LOADING TEST SETS. Test:",test, "\n"))
+    cat(paste("LOADING TEST SETS. Test:",target, "\n"))
 
-## LOAD TEST SETS
-testIDs <- c("transcripts","annotation")
-dataSets <- loadData(testIDs, data.path=browser.data)
-
-## TODO - switch all to genomeData
-
-## SGD TRANSCRIPTS
-## for plots and tests
-transcripts <- dataSets[["transcripts"]]$data
-transcripts <- coor2index(transcripts,chrS)
-
-## SGD ANNOTATION
-feats <- dataSets[["annotation"]]$data
-feats <- coor2index(feats,chrS)
-
-## reduce to certain feature types,
-## TODO: required?
-fttypes <- c("gene_cassette","gene","five_prime_UTR_intron","intron","dubious","rRNA","tRNA","tRNA.intron","ncRNA","snRNA","snoRNA","telomere","centromere","ARS","transposable_element_gene","LTR_retrotransposon","repeat_region")
-feats <- feats[feats[,"type"]%in%fttypes,]
-
-## ONLY GENES
-## TODO - via cmdline type filter
-genes <- feats[feats[,"type"]=="gene",]
-
-## classify reported transcripts by their cluster
-clorf <- transcripts[transcripts[,"type"]=="ORF",]
-## annotate feat - using function from genomeBrowser_utils.R
-clorf <- annotateTarget(query=genes,target=clorf, col=c("CL_rdx","CL_rdx_col"))
-
-## REPORTED TRANSCRIPTS
-cpcol <- NA
-if ( test=="transcripts" ) {
-    trgs <- transcripts
-    tpcol <- "type"
-}
-## CLUSTER ORFS
-if ( test == "clgenes" ) {
-    trgs <- genes
-    tpcol <- "CL_rdx"
-    cpcol <- "CL_rdx_col"
-}
-## REPORTED TRANSCRIPTS BY CLUSTER
-if ( test == "cltranscripts" ) {
-    trgs <- clorf
-    tpcol <- "CL_rdx"
-    cpcol <- "CL_rdx_col"
-}
-## ANNOTATED FEATURES
-if ( test == "features" ) {
-    trgs <- feats
-    tpcol <- "type"
-}
+trgs <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char = "")
+tpcol <- ttypcol
+cpcol <- tcolcol
 
 ## test types
 ttypes <- ttypes[ttypes!=""]
@@ -210,7 +167,7 @@ if ( length(ttypes)==0 ) {
 }
 test.types <- sort(names(table(ttypes))) # sort by number
 
-if ( is.na(cpcol)) {
+if ( cpcol=="" ) {
     # TODO: rgb range1:length(test.types)
     tcols <- sub("00$","",rainbow(length(test.types),alpha=0))
     names(tcols) <- test.types
