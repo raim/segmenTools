@@ -1072,3 +1072,225 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
     rownames(all) <- NULL
     all[order(all[,"target"]),]
 }
+
+
+#' pre-segmentation of whole-genome data into chunks that can
+#' be handle by segmenTier.
+#' @param ts the time-series of readcounts for the complete chromosome,
+#' rows are chromosomal positions and columns are time-points; reverse
+#' strand rows at the bottom of the matrix. Option \code{chrS} can be
+#' used to handle chromosome ends and to optionally (\code{map2chrom})
+#' map the resulting primary segment coordinates to chromosome coordinates.
+#' @param chrS a chromosome index, indicating at wich positions
+#' chromosomes start; this is required for handling chromosome ends
+#' and forward and reverse strand values, but can be omitted.
+#' @param avg the broad moving average of read-count presence
+#' (number of time-points with >0 reads) for a first broad segmentation
+#' @param minrd the minimal number of time-points with reads in the broad
+#' moving average used as cutoff between segments
+#' @param favg as \code{avg}, but a narrower moving average used in
+#' end scanning that can result in fusing back segments w/o good separation
+#' @param minds minimum distance between two segments (will be fused otherwise)
+#' @param map2chrom if true, argument \code{chrS} is required to map
+#' the segment coordinates to chromosomal coordinates
+#' @param fig.path a directory path for plots of the segment end scanning;
+#' no figures will be plotted if \code{fig.path} is not provided.
+#' @param fig.type image type, "png" or "pdf"
+#' @param seg.path a directory path where individual segments' data will
+#' be written to as tab-delimited .csv files; no files will be written if
+#' \code{seg.path} is not provided.
+#' @export
+presegment <- function(ts, chrS, avg=1000, favg=100, minrd=8, minds=250,
+                       map2chrom=FALSE,
+                       seg.path, fig.path, fig.type="png", verb=1) {
+
+    if ( verb> 0 )
+        cat(paste("Calculating total read-counts and moving averages.\n"))
+    
+    ## total time series
+    numts <- rowSums(ts > 0) ## timepoints with reads
+    
+    ## moving averages of read-count presence 
+    avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg
+    avgfn <- ma(numts,n=favg,circular=TRUE) # short mov.avg
+
+    ## main primary segment definition! 
+    segs <- avgts > minrd # smoothed total read number is larger then threshold
+    
+    ## set chromosome ends to FALSE as well
+    if ( !missing(chrS) )
+        segs[c(chrS[2:length(chrS)],chrS+1)] <- FALSE
+
+    ## areas below expression threshold
+    empty <- which(!segs) 
+
+    ## distance between empty areas
+    emptycoor <- empty
+    if ( !missing(chrS) ) # accounts for chromosome ends - TODO: could be faster
+        emptycoor <- idx2coor(empty, chrS)[,"coor"]
+    distn <- diff(emptycoor) 
+
+    ## PRE-SEGMENTS: ALL WHERE DISTANCE BETWEEN EMPTY AREAS IS >1
+    start <- empty[which(distn>1)]+1
+    end <- start + distn[which(distn>1)]-2
+
+    ## fuse close segments, < minds
+    close <- start[2:length(end)] - end[2:length(end)-1] < minds
+
+    if ( verb>0 )
+        cat(paste("Fusing", sum(close), "segments with distance <",minds,"\n"))
+
+    start <- start[c(TRUE,!close)]
+    end <- end[c(!close,TRUE)]
+    ## remove too small segments
+    small <- end-start < minds
+    start <- start[!small]
+    end <- end[!small]
+    primseg <- cbind(start,end)
+
+
+    ## (2) expand ends in both directions until mov.avg. (n=10) of signal is 0
+    ## TODO: analyze gradients and minima, and add to appropriate segments
+    if ( verb>0 )
+        cat(paste("Scanning borders.\n"))
+    fused <- 0
+    for ( sg in 2:nrow(primseg) ) {
+        rng <- primseg[sg-1,2]:primseg[sg,1]
+        ## scan from both sides, and if overlapping
+        ## take minimum between
+        k <- j <- min(rng)
+        i <- max(rng)
+        while ( k<(i-1) ) { # expand left segment to right
+            if ( avgfn[k]==0 ) break
+            k <- k+1
+        }
+        while ( i>(j+1) ) { # expand right segment to left
+            if ( avgfn[i]==0 ) break
+            i <- i-1
+        }
+        primseg[sg-1,2] <- k
+        primseg[sg,1] <- i
+        
+        if ( i <= k )  {
+            if (  verb > 1 )
+                cat(paste("segment #",sg,i-k,
+                          "overlap, will be fused with",sg-1,"\n"))
+            fused <- fused +1
+        }
+        
+        if ( missing(fig.path) ) next
+    
+        ## plot borders
+        bord <- range(rng)
+        rng<- max(rng[1]-1000,1):(rng[length(rng)]+1000)
+        file.name <-file.path(fig.path,
+                              ifelse(i<=k,
+                                     paste("fused_",fused,sep=""),
+                                     paste("border_",sg-1-fused,sep="")))
+        plotdev(file.name,width=4,height=4,type=fig.type)
+        plot(rng,numts[rng],type="l",ylim=c(-2,24),main=ifelse(i<=k,"fuse",""))
+        lines(rng,avgts[rng],col=3)
+        lines(rng,avgfn[rng],col=2);
+        graphics::abline(h=8,col=3)
+        if ( bord[1]==bord[2] ) {
+            #cat(paste(sg, "borders equal\n"))
+            graphics::abline(v=bord[1],col=3)
+        }else
+            graphics::arrows(x0=bord[1],x1=bord[2],y0=-2,y1=-2,col=3)
+        if ( k==i ) {
+            #cat(paste(sg, "k==i equal\n"))
+            graphics::abline(v=k,col=3)
+        } else
+            graphics::arrows(x0=k,x1=i,y0=-1,y1=-1,col=2)
+        dev.off()
+    }
+
+    ## (3) fuse primary segments with distance <=1, incl.
+    ## those where ends where swapped in end extension
+    start <- primseg[,1]
+    end <- primseg[,2]
+    close <- start[2:length(end)] - end[2:length(end)-1] < 2
+
+    if ( verb>0 )
+        cat(paste("Fusing", sum(close), "more segments\n"))
+    
+    start <- start[c(TRUE,!close)]
+    end <- end[c(!close,TRUE)]
+    
+    ## (4) split chromosome ends!
+    ## TODO: why is multiple chromosome end handling required?
+    ## 
+    ## get chromosomes of starts and ends via chrS
+    if ( !missing(chrS) ) {
+        
+        if ( verb>0 )
+            cat(paste("Splitting segments that still span chromosome ends.\n"))
+
+        schr <- idx2chr(start,chrS) # forward strand
+        echr <- idx2chr(end,chrS) # reverse strand
+        splt <- which(echr!=schr) # which are spanning chromosome ends?
+    
+        ## split chromosome-spanning segments, and fuse with rest
+        old <- cbind(start[-splt], end[-splt])
+        
+        str <- idx2str(start,chrS)[splt]
+        ## (str==-1)*max(chrS) adds minus strand to end
+        new<-rbind(cbind(start[splt],chrS[schr[splt]+1] + (str==-1)*max(chrS)),
+                   cbind(chrS[schr[splt]+1]+1 + (str==-1)*max(chrS) ,end[splt]))
+        seg <- rbind(old,new)
+        start <- seg[,1] # re-assign start/end of segments
+        end <- seg[,2]
+        
+        ## re-order
+        end <- end[order(start)]
+        start <- sort(start)
+
+        ## remove too small segments again
+        small <- end-start < minds
+        start <- start[!small]
+        end <- end[!small]
+    }
+    
+    primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENTS v3 DEFINED!
+
+    ## write out data for each segment, if requested
+    if ( !missing(seg.path) ) {
+        if ( verb>0 )
+            cat(paste("Writing segment data to single files.\n"))
+        writeSegments(data=ts, segments=primseg, name="primseg", path=seg.path)
+    }
+    
+    ## map back to original chromosome coordinates
+    if ( !missing(chrS) & map2chrom ) {
+        #primseg <-cbind(start=primseg[,1], end=primseg[,2])
+        primseg <- index2coor(primseg,chrS)
+    }
+    primseg
+}
+
+#' writing out data for segments to files, used for writing the primary
+#' segments by \code{\link{presegment}} to single files that are
+#' then further processed by segmenTier.
+#' @param data a data matrix to which coordinates in \code{segments}
+#' refer to
+#' @param segments a matrix that must contain "start" and "end" (columns)
+#' of segments; these coordinates will be extracted from \code{data}
+#' and written to individual files, numbered by the row number in segments.
+#' @param path optional output path where files will be written, if not supplied
+#' files will end up in the current working directory (`getwd`)
+#' @export
+writeSegments <- function(data, segments, name, path) {
+
+    if ( missing(name) ) name <- "segment"
+    for ( i in 1:nrow(segments) ) {
+        rng <- segments[i,"start"]:segments[i,"end"]
+        if ( length(rng) < 100 )
+            cat(paste("segment",i, length(rng),"\n"))
+        dat <- data[rng,]
+        id <- ifelse("ID"%in%colnames(segments), segments[i,"ID"], i)
+        file.name <- paste(name, "_",id,".csv",sep="")
+        if ( !missing(path) )
+            file.name <- file.path(path, file.name)
+        utils::write.table(dat,file.name,row.names=FALSE,sep="\t")
+    }
+ }
