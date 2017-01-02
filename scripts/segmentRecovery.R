@@ -23,8 +23,6 @@ option_list <- list(
     ## SEGMENT TEST SETTINGS
     make_option(c("--fuse.segs"), action="store_true", default=FALSE,
                 help="use FUSE tag from clusterSegments to fuse adjacent segments"),
-    make_option(c("-t", "--test"), type="character", default="transcripts", 
-                help="testset to compare the clustering with; available are transcripts, features, clgenes, cltranscripts"),
     make_option(c("--target"), type="character", default="", 
               help="target set of chromosomal segments"),    
     make_option(c("--ttypes"), type="character", default="", 
@@ -38,6 +36,8 @@ option_list <- list(
     ## OUTPUT OPTIONS
     make_option(c("--out.path"), type="character", default=".", 
                 help="directory path for output data (figures, csv files)"),
+    make_option(c("--testid"), type="character", default="testset", 
+                help="ID of the testset, used for folder and file names"),
     make_option(c("-v", "--verb"), type="integer", default=1, 
                 help="0: silent, 1: main messages, 2: warning messages"),
     make_option(c("--fig.type"), type="character", default="png",
@@ -142,13 +142,13 @@ sgcltab <- getSegmentClassTable(sgtypes, sep="_")
 ## output dirs - generate locally in cwd
 dir.create(out.path) # length distributions
 ## output dir
-dir.create(file.path(out.path,test),recursive=TRUE) # test set
+dir.create(file.path(out.path,testid),recursive=TRUE) # test set
 
 
 ### TEST AGAINST OTHER DATA SETS
 
 if ( verb>0 )
-    cat(paste("LOADING TEST SETS. Test:",target, "\n"))
+    cat(paste("LOADING TEST SETS:", testid, "-", target, "\n"))
 
 trgs <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char = "")
 tpcol <- ttypcol
@@ -223,7 +223,7 @@ for ( test.type in test.types ) {
 }
 
 if ( save ) 
-  save.image(file.path(out.path,test,"overlaps.RData"))
+  save.image(file.path(out.path,testid,"overlaps.RData"))
 
 ## COLLECT DATA AND WRITE OUT RESULTS
 ## export hitnum, jaccard, numhit and ratio thresholds 
@@ -301,7 +301,7 @@ for ( test.type in test.types ) {
           }
       }
 
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_segmentationClusters",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(1,.7,.1,.1),mgp=c(1.75,.5,0))
@@ -316,7 +316,7 @@ for ( test.type in test.types ) {
 
     ## new lower and upper threshold of ratio
     ## OPT: uppler left, 
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal_lh_clustered",sep=""))
     plotdev(file.name,width=10,height=5,type=fig.type)
     par(mfcol=c(1,2),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
@@ -334,7 +334,7 @@ for ( test.type in test.types ) {
     axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
     dev.off()
 
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal_lh",sep=""))
     plotdev(file.name,width=10,height=5,type=fig.type)
     par(mfcol=c(1,2),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
@@ -349,7 +349,7 @@ for ( test.type in test.types ) {
     dev.off()
     
     ## CDF of absolute best hit CDF (rcdf)
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
@@ -360,7 +360,7 @@ for ( test.type in test.types ) {
     dev.off()
 
     ## CDF of absolute best hit CDF (rcdf)  - cluster colors
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal_clustered",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
@@ -372,7 +372,7 @@ for ( test.type in test.types ) {
     dev.off()
       
     ## MAX vs. MIN: jaccard of best hits vs. num hits per target 
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_jaccard_fragmentation",sep=""))
     plotdev(file.name,width=10,height=4,type=fig.type)
     par(mfcol=c(1,2),mai=c(1,1,.1,.1))
@@ -387,7 +387,7 @@ for ( test.type in test.types ) {
     dev.off()
 
     ## MAX vs. MIN CLUSTERS - JACCARD
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                      paste(test.type,"_jaccard_fragmentation_clustered",sep=""))
     plotdev(file.name,width=10,height=4,type=fig.type)
     par(mfcol=c(1,2),mai=c(1,1,.1,.1))
@@ -405,7 +405,7 @@ for ( test.type in test.types ) {
     dev.off()
 
     ## MAX vs. MIN: ratio heights vs. num hits per target
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratio_fragmentation",sep=""))
     plotdev(file.name,width=10,height=4,type=fig.type)
     par(mfcol=c(1,2),mai=c(1,1,.1,.1))
@@ -420,7 +420,7 @@ for ( test.type in test.types ) {
     dev.off()
     
     ## MAX vs. MIN CLUSTERS - good hits per target vs. num hits per target 
-    file.name <-file.path(out.path,test,
+    file.name <-file.path(out.path,testid,
                           paste(test.type,"_ratio_fragmentation_clustered",
                                 sep=""))
     plotdev(file.name,width=10,height=4,type=fig.type)
@@ -443,7 +443,7 @@ for ( test.type in test.types ) {
     ## CDF PLOTS
 
     ## CDF of jaccard (jcdf)
-    file.name <- file.path(out.path,test,paste(test.type,"_jaccard_cdf_clustered",sep=""))
+    file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf_clustered",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
@@ -454,7 +454,7 @@ for ( test.type in test.types ) {
     dev.off()
 
     ## CDF of relative best hit CDF (rrcdf)
-    file.name <- file.path(out.path,test, paste(test.type,"_ratio",sep=""))
+    file.name <- file.path(out.path,testid, paste(test.type,"_ratio",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rrcdf", col=sgcols, lty=sgltys,
@@ -465,7 +465,7 @@ for ( test.type in test.types ) {
 
 
     ## CDF of best hit target coverage
-    file.name <-file.path(out.path,test,
+    file.name <-file.path(out.path,testid,
                           paste(test.type,"_totalCoverage",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
@@ -476,7 +476,7 @@ for ( test.type in test.types ) {
     dev.off()
    
      ## CDF of best hit target coverage - cluster colors
-    file.name <-file.path(out.path,test,
+    file.name <-file.path(out.path,testid,
                           paste(test.type,"_totalCoverage_clustered",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
@@ -489,7 +489,7 @@ for ( test.type in test.types ) {
     
     ## SUMMARY OF CDF of absolute best hit ratio
     ## fraction of mutual coverage between 0.8 and 1.2
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal_rng_clustered",sep=""))
     plotdev(file.name,width=2+.2*length(CDF),height=6,type=fig.type)
     par(mai=c(3.3,.75,.1,.1))
@@ -512,7 +512,7 @@ for ( test.type in test.types ) {
     dev.off()
    
     ## MAX vs. MIN: good hits per target vs. num hits per target
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_coverage_fragmentation",sep=""))
     plotdev(file.name,width=10,height=4,type=fig.type)
     par(mfcol=c(1,2),mai=c(1,1,.1,.1))
@@ -528,7 +528,7 @@ for ( test.type in test.types ) {
 
     ## MAXIMIZE COVERAGE: good hits per target
     cvg <- hitnum/tnum
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_coverage",sep=""))
     plotdev(file.name,,width=2+.2*length(CDF),height=6,type=fig.type)
     par(mai=c(3.3,.75,.1,.1),mgp=c(1.75,.5,0))
@@ -539,7 +539,7 @@ for ( test.type in test.types ) {
     dev.off()
     
     ## MAXIMIZE JACCARD: good hits per target
-    file.name <- file.path(out.path,test,
+    file.name <- file.path(out.path,testid,
                            paste(test.type,"_jaccard",sep=""))
     plotdev(file.name,,width=2+.2*length(CDF),height=6,type=fig.type)
     par(mai=c(3.3,.75,.1,.1),mgp=c(1.75,.5,0))
@@ -551,7 +551,7 @@ for ( test.type in test.types ) {
 
     ## MINIMIZE FRAGMENTATION: num hits per target 
     nmh <- numhit
-    file.name <-file.path(out.path,test,
+    file.name <-file.path(out.path,testid,
                           paste(test.type,"_fragmentation",sep=""))
     plotdev(file.name,,width=2+.2*length(CDF),height=6,type=fig.type)
     par(mai=c(3.3,.75,.1,.1),mgp=c(1.75,.5,0))
@@ -563,7 +563,7 @@ for ( test.type in test.types ) {
 }
 
 
-dir.create(file.path(out.path,test,"segtypes"))
+dir.create(file.path(out.path,testid,"segtypes"))
 ### PLOT BY SEGMENT TYPES
 for ( type in sgtypes ) {
 
@@ -583,7 +583,7 @@ for ( type in sgtypes ) {
     }
     
     ## plot
-    file.name <- file.path(out.path,test,"segtypes",
+    file.name <- file.path(out.path,testid,"segtypes",
                            paste(type,"_ratioTotal",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
     par(mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
@@ -603,12 +603,12 @@ for ( type in sgtypes ) {
         leg <- c(leg, CDF[[i]]$name) # todo: tid
       }
     }
-    mtext(paste(test,"recovery by segments"),3,0,cex=1.5)
+    mtext(paste(testid,"recovery by segments"),3,0,cex=1.5)
     legend("bottomright",leg,col=tcols[leg],lty=1,lwd=2,bty="n")
     legend("topleft",paste(type))
     dev.off()
 
-    file.name <- file.path(out.path,test,"segtypes",
+    file.name <- file.path(out.path,testid,"segtypes",
                            paste(type,"_ratioTotal_rng",sep=""))
     plotdev(file.name,width=2+.2*length(CDF),height=6,type=fig.type)
     par(mai=c(3.3,.75,.1,.1))
