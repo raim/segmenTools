@@ -1,6 +1,6 @@
 Package: segmenTools
 Title: analysis of genome segmentations by segmenTier
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: person("Rainer", "Machne", email = "raim@tbi.univie.ac.at", role = c("aut", "cre"))
 Description: tools for segmenTier
 Depends:
