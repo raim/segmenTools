@@ -4,12 +4,16 @@
 
 ## genomeBrowser utils
 ## TODO: move coor2index functions to genomeBrowser
-browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
-browser.data <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
-browser.data <- file.path(browser.data,"yeast")
-source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for coor2index
-source(file.path(browser.path,"src/segmenTools.R")) # for segment analysis
-source(file.path(browser.path,"src/genomeBrowser.R")) ## for chrS
+#browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
+#browser.data <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
+#browser.data <- file.path(browser.data,"yeast")
+#source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for coor2index
+#source(file.path(browser.path,"src/genomeBrowser.R")) ## for chrS
+
+#library(segmenTools)
+segtools <- "~/programs/segmenTools/"
+source(file.path(segtools,"R/segmenTools.R")) # for segment analysis
+source(file.path(segtools,"R/coor2index.R")) # coor2index
 
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
