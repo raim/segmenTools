@@ -2,12 +2,10 @@
 
 ## ANNOTATING SEGMENTS BY GENOMIC FEATURES THEY COVER
 
-## genome annotation is loaded via the genomeBrowser/genomeData project
-browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
-browser.data <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
-browser.data <- file.path(browser.data,"yeast")
-source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for coor2index
-source(file.path(browser.path,"src/segmenTools.R")) # for segment analysis
+library(segmenTools)
+##segtools <- "~/programs/segmenTools/"
+##source(file.path(segtools,"R/segmenTools.R")) # for segment analysis
+##source(file.path(segtools,"R/coor2index.R")) # coor2index
 
 ## required options:
 ## 1: input segments 'allsegs.csv'
