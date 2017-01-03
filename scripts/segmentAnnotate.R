@@ -22,7 +22,6 @@ library(segmenTools)
 ## number
 
 
-
 suppressPackageStartupMessages(library(optparse))
 option_list <- list(
   make_option(c("--chrfile"), type="character", default="",
@@ -95,6 +94,11 @@ if ( verb>0 ) cat(paste("Loading query:", query, "\n"))
 query <- read.table(query,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
 if ( verb>0 ) cat(paste("Loading target:", target, "\n"))
+
+if ( target=="" ) {
+    target <- file("stdin")
+}
+
 target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
 ## filter by type
