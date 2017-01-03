@@ -79,6 +79,7 @@ for ( i in 1:length(opt) ) {
     assign(arg, opt[[arg]])
 }
 
+cat(paste("HALLO", outfile, "\n"))
 if ( outfile=="" ) {
     outfile <- file("stdout")
     msgfile <- file("stderr")
@@ -97,8 +98,6 @@ for ( i in 1:length(opt) ) {
     if ( verb>0 )
         msg(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
                   paste(opt[[i]],collapse=", "), "\n"))
-
-
 if ( verb>0 )
     msg(paste("\n"))
 
