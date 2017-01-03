@@ -87,6 +87,7 @@ if ( outfile=="" ) {
     msgfile <- file("stdout")
 }
 
+cat(paste("HALLO2", outfile, "\n"))
 ## messages
 msg <- function(x)
     cat(x, file=msgfile)
