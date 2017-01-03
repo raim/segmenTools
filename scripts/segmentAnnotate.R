@@ -111,6 +111,9 @@ if ( length(qtypes)>0 )
 if ( length(ttypes)>0 )
   target <- target[target[,ttypcol]%in%ttypes,]
 
+if ( nrow(query)==0 | nrow(target)==0 )
+    stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
+
 ## converting both to continuous index
 query <- coor2index(query, chrS)
 target <- coor2index(target, chrS)
