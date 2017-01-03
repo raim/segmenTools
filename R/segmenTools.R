@@ -249,16 +249,18 @@ annotateQuery <- function(query, target, col) {
 #' @param duplicates how to handle multiple matches; if "collapse" the
 #' multiple hits are collapsed into ;-separated strings
 #' @export
-annotateTarget <- function(query, target, col, prefix, details=FALSE,
+annotateTarget <- function(query, target,
+                           qcol=colnames(query), tcol=colnames(target),
+                           prefix, details=FALSE,
                            duplicates="collapse") {
 
     ## TODO: use details flag to also bind details of overlap (left/right)
-    #cltr <- annotateQuery(query, target, col)
+    #cltr <- annotateQuery(query, target, qcol)
     cltr <- segmentOverlap(query=query,target=target,
                            add.na=TRUE,details=details,sort=FALSE)
 
     ## bind query column to overlap table
-    cltr <- cbind(cltr, query[cltr[,"query"],col,drop=FALSE])
+    cltr <- cbind(cltr, query[cltr[,"query"],qcol,drop=FALSE])
 
     ## reduce to top-ranking query hit
     best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
@@ -288,11 +290,11 @@ annotateTarget <- function(query, target, col, prefix, details=FALSE,
 
     ## e.g., details = c("qpos", "intersect", "union")
     if ( details )
-        col <- c(col, "qpos", "qlen", "intersect", "union")
+        qcol <- c(qcol, "qpos", "qlen", "intersect", "union")
     
     ## get and optionally rename requested columns
     idx <- match(best[,"target"],1:nrow(target))
-    addcol <- best[idx,col, drop=FALSE]
+    addcol <- best[idx,qcol, drop=FALSE]
 
     ## add prefix to column ids
     if ( !missing(prefix) )
