@@ -241,7 +241,10 @@ annotateQuery <- function(query, target, col) {
 #' annotate the target set by a column in the query set
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
-#' @param col column names to copy from target to it's best match in query
+#' @param qcol column names to copy from target to it's best match in query,
+#' defaults to all columns
+#' @param tcol column names of target to include in the returned table,
+#' defaults to none
 #' @param prefix column name prefix for the copied columns
 #' @param details set to \code{TRUE} to add details of the used
 #' match, i.e., union and intersect, and relative position of the query
@@ -249,8 +252,7 @@ annotateQuery <- function(query, target, col) {
 #' @param duplicates how to handle multiple matches; if "collapse" the
 #' multiple hits are collapsed into ;-separated strings
 #' @export
-annotateTarget <- function(query, target,
-                           qcol=colnames(query), tcol=colnames(target),
+annotateTarget <- function(query, target, qcol=colnames(query), tcol,
                            prefix, details=FALSE,
                            duplicates="collapse") {
 
@@ -301,9 +303,13 @@ annotateTarget <- function(query, target,
         if ( prefix!="" )
             colnames(addcol) <- paste(prefix,"_",colnames(addcol),sep="")
 
-    ## bind to target
-    target <- cbind(target, addcol)
-
+    ## filter target columns
+    if ( !missing(tcol) ) {
+        target <- target[,tcol,drop=FALSE]
+        colnames(target) <- tcol
+        addcol <- cbind(target, addcol)
+    }
+    addcol
     ## add index to column ID if already present
     ## TODO: this is from clustering in segmenTier, adapt
     ## and make smarter: count existing indexes
@@ -317,8 +323,6 @@ annotateTarget <- function(query, target,
     ##    }
     ##    colnames(target) <- sub("\\.1$","",sel)
     ##}
-
-    target
 }
 
 #' Collect stats from a nested list of overlap statistics in lists
