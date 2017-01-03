@@ -81,13 +81,12 @@ for ( i in 1:length(opt) ) {
 
 cat(paste("HALLO", outfile, "\n"))
 if ( outfile=="" ) {
-    outfile <- file("stdout")
-    msgfile <- file("stderr")
+    outfile <- stdout()
+    msgfile <- stderr()
 } else {
-    msgfile <- file("stdout")
+    msgfile <- stdout()
 }
 
-cat(paste("HALLO2", outfile, "\n"))
 ## messages
 msg <- function(x)
     cat(x, file=msgfile)
