@@ -98,7 +98,7 @@ if ( verb>0 ) cat(paste("Loading target:", target, "\n"))
 target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
 ## filter by type
-if ( length(ttypes)>0 )
+if ( length(qtypes)>0 )
   query <- query[query[,qtypcol]%in%qtypes,]
 if ( length(ttypes)>0 )
   target <- target[target[,ttypcol]%in%ttypes,]
