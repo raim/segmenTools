@@ -79,7 +79,7 @@ for ( i in 1:length(opt) ) {
     assign(arg, opt[[arg]])
 }
 
-cat(paste("HALLO", outfile, "\n"))
+## select file pointer for output and messages
 if ( outfile=="" ) {
     outfile <- stdout()
     msgfile <- stderr()
