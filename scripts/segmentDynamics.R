@@ -171,7 +171,7 @@ load(datafile)
 ## oscillation parameters (for first two cycles only)
 phase <- osc[,"phase" ]
 pval <- osc[,"rpval"]
-phase[pval >= c(min(1,pval.thresh))] <- NA # this rm 360° artefact in osci set
+phase[pval >= c(min(1,pval.thresh))] <- NA # =1 rm 360° artefact in osci set
 logit <- function(p) log(p/(1-p))
 lpvl <- logit(pval)
 lpvl[is.infinite(lpvl)] <- NA
