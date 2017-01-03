@@ -96,7 +96,7 @@ if ( verb>0 )
     msg(paste("SETTINGS:\n"))
 for ( i in 1:length(opt) ) {
     if ( verb>0 )
-        msg(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
+        cat(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
                   paste(opt[[i]],collapse=", "), "\n"))
 if ( verb>0 )
     msg(paste("\n"))
