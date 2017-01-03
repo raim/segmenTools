@@ -38,6 +38,9 @@ option_list <- list(
               help="optional name prefix for copied columns"),
   make_option(c("--details"), action="store_true", default=FALSE,
               help="add details of the overlap"),
+  make_option(c("--dcol"), type="character",
+              default=c("query,intersect,qlen,qpos"), 
+              help="overlap statistics to copy to best matching target if details is set to TRUE"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
   make_option(c("-t", "--target"), type="character", default="", 
@@ -46,9 +49,8 @@ option_list <- list(
               help="sub-sets of testset to annotate"),
   make_option(c("--ttypcol"), type="character", default="type", 
               help="name of column with sub-set annotation"),
-  make_option(c("--tcol"), type="character",
-              default=c("query,intersect,qlen,qpos"), 
-              help="overlap statistics to copy to best matching target"),
+  make_option(c("--tcol"), type="character", default="", 
+              help="columns in targets to write to result table"),
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
   make_option(c("-v", "--verb"), type="integer", default=1, 
@@ -61,6 +63,7 @@ opt <- parse_args(OptionParser(option_list=option_list))
 lst.args <- c(qtypes="character",
               ttypes="character",
               qcol="character",
+              dcol="character",
               tcol="character")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
@@ -102,7 +105,7 @@ if ( target=="" ) {
 target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
 if ( verb>0 )
-    cat(paste("LOADED\t", nrow(target), "TARGETS, and\n",
+    cat(paste("LOADED\t", nrow(target), "TARGETS &\n",
               "\t", nrow(query), "QUERIES\n"))
 
 ## filter by type
@@ -126,20 +129,47 @@ if ( antisense )
 
 ## TODO: reverse upstream-downstream relative positions?
 ## TODO: allow upstream/downstream ranges
-target <- annotateTarget(query=query, target=target, col=qcol,
+result <- annotateTarget(query=query, target=target, qcol=qcol,
                          prefix=prefix, details=details)
 
+## TODO: QUALITY FILTERS FOR RESULT?
 
+## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
 ## convert back to chromosome coordinates
+resCol <- colnames(result) # store requested query/result columns
+
+## TODO: reduce tmp to coordinate columns and add these to options
 ## TODO: handle strands better here! Expecting +/- factors
+tmp <- cbind(target,result) 
 if ( details ) {
-    relcol <- ifelse(prefix=="", "qpos",
+    relCol <- ifelse(prefix=="", "qpos",
                      paste(paste(prefix,"qpos",sep="_")))
-    target <- index2coor(target, chrS, strands=c("+","-"), relCol=relcol) 
+    tmp <- index2coor(tmp, chrS, strands=c("+","-"), relCol=relCol) 
+    ## TRANSLATE RELATIVE POSITION TO TARGET POSITION
+    orig <- strsplit(tmp[,relCol],";")
+    new <- unlist(lapply(orig, function(x) {
+        new <- x
+        new[x=="inside"] <- "covers"
+        new[x=="covers"] <- "inside"
+        new[x=="upstream"] <- "downstream"
+        new[x=="downstream"] <- "upstream"
+        paste(new,collapse=";")}))
+    new[new=="NA"] <- NA
+    tmp[,relCol] <- new
+
 } else {
-    target <- index2coor(target, chrS, strands=c("+","-"))
+    tmp <- index2coor(tmp, chrS, strands=c("+","-"))
 }
 
+
+## FINAL RESULT TABLE
+## select target columns
+if ( length(tcol)==0 )
+    tcol <- colnames(target)
+## and bind selected target and selected query/result columns
+result <- cbind(target[,tcol], tmp[,resCol])
+
+
 if ( verb>0 )
-    cat(paste("Writing target:", outfile, "\n"))
-write.table(target, file=outfile, sep="\t",quote=FALSE,row.names=FALSE)
+    cat(paste("Writing result:", outfile, "\n"))
+write.table(result, file=outfile, sep="\t",quote=FALSE,row.names=FALSE)
