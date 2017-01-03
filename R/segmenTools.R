@@ -251,15 +251,18 @@ annotateQuery <- function(query, target, col) {
 #' to the matching targets
 #' @param duplicates how to handle multiple matches; if "collapse" the
 #' multiple hits are collapsed into ;-separated strings
+#' @param msgfile file pointer for progress messages and warnings, defaults to
+#' stdout, useful when using in context of command line pipes
 #' @export
 annotateTarget <- function(query, target, qcol=colnames(query), tcol,
                            prefix, details=FALSE,
-                           duplicates="collapse") {
+                           duplicates="collapse", msgfile=file("stdout")) {
 
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
     cltr <- segmentOverlap(query=query,target=target,
-                           add.na=TRUE,details=details,sort=FALSE)
+                           add.na=TRUE,details=details,sort=FALSE,
+                           msgfile=msgfile)
 
     ## bind query column to overlap table
     cltr <- cbind(cltr, query[cltr[,"query"],qcol,drop=FALSE])
@@ -270,7 +273,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ## collapse or remove duplicated with qrank==1
     if ( sum(duplicated(best[,"target"])) )
         cat(paste("handling", sum(duplicated(best[,"target"])), "duplicated:",
-                  duplicates, "\n"))
+                  duplicates, "\n"),file=msgfile)
     dups <- which(duplicated(best[,"target"]))
     if ( duplicates=="collapse" ) {
         for ( d in dups ) {
@@ -394,8 +397,10 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' overlap matrix will be of the same dimension as the input target, i.e.,
 #' it will contain one row for each target.
 #' @param sort sort query hits by their \code{rank}
+#' @param msgfile file pointer for progress messages and warnings, defaults to
+#' stdout, useful when using in context of command line pipes
 #' @export
-segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FALSE, collapse=FALSE, sort=FALSE) {
+segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FALSE, collapse=FALSE, sort=FALSE, msgfile=file("stdout")) {
 
     ## get target and query ID - only required for messages
     if ( "ID" %in% colnames(target) ) {
@@ -513,14 +518,16 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
         if ( sum(qrank==1)>1 ) {
             cat(paste("WARNING:",sum(qrank==1),
                       "with qrank 1 (max. jaccard=intersect/union) for target",
-                      tids[k],":", paste(qids[idx[qrank==1]],collapse=";")))
+                      tids[k],":", paste(qids[idx[qrank==1]],collapse=";")),
+                file=msgfile)
             if ( untie ) {
-                cat(paste(" - un-tieing by order"))
+                cat(paste(" - un-tieing by order"),file=msgfile)
                 ## NOTE: assignment of first hit to rank 1
                 qrank[order(qrank)] <- 1:length(qrank)
-                cat(paste(":",paste(qids[idx[qrank==1]],collapse=";")))
+                cat(paste(":",paste(qids[idx[qrank==1]],collapse=";")),
+                    file=msgfile)
             }
-            cat(paste(".\n"))
+            cat(paste(".\n"),file=msgfile)
         }
         
         rownames(ovl) <- NULL

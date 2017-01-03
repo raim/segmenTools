@@ -73,30 +73,46 @@ for ( i in 1:length(lst.args) ) {
     }
     mode(opt[[idx]]) <- lst.args[i]
 }
-## promote options to main environment and print all arguments
-if ( opt$verb>0 )
-    cat(paste("SETTINGS:\n"))
+## promote options to main environment 
 for ( i in 1:length(opt) ) {
-    if ( opt$verb>0 )
-        cat(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
-                  paste(opt[[i]],collapse=", "), "\n"))
     arg <- names(opt)[i]
     assign(arg, opt[[arg]])
 }
+
+if ( outfile=="" ) {
+    outfile <- file("stdout")
+    msgfile <- file("stderr")
+} else {
+    msgfile <- file("stdout")
+}
+
+## messages
+msg <- function(x)
+    cat(x, file=msgfile)
+
+## print out arguments
 if ( verb>0 )
-    cat(paste("\n"))
+    msg(paste("SETTINGS:\n"))
+for ( i in 1:length(opt) ) {
+    if ( verb>0 )
+        msg(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
+                  paste(opt[[i]],collapse=", "), "\n"))
+
+
+if ( verb>0 )
+    msg(paste("\n"))
 
 ## load chromosome index - DOESNT WORK WITHOUT
 if ( verb>0 )
-    cat(paste("Loading chromosome index file:", chrfile, "\n"))
+    msg(paste("Loading chromosome index file:", chrfile, "\n"))
 cf <- read.table(chrfile,sep="\t",header=FALSE)
 chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 
 ## READ SEGMENTS TO BE TESTED 
-if ( verb>0 ) cat(paste("Loading query:", query, "\n"))
+if ( verb>0 ) msg(paste("Loading query:", query, "\n"))
 query <- read.table(query,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
-if ( verb>0 ) cat(paste("Loading target:", target, "\n"))
+if ( verb>0 ) msg(paste("Loading target:", target, "\n"))
 
 if ( target=="" ) {
     target <- file("stdin")
@@ -105,7 +121,7 @@ if ( target=="" ) {
 target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
 if ( verb>0 )
-    cat(paste("LOADED\t", nrow(target), "TARGETS &\n",
+    msg(paste("LOADED\t", nrow(target), "TARGETS &\n",
               "\t", nrow(query), "QUERIES\n"))
 
 ## filter by type
@@ -130,7 +146,7 @@ if ( antisense )
 ## TODO: reverse upstream-downstream relative positions?
 ## TODO: allow upstream/downstream ranges
 result <- annotateTarget(query=query, target=target, qcol=qcol,
-                         prefix=prefix, details=details)
+                         prefix=prefix, details=details, msgfile=msgfile)
 
 ## TODO: QUALITY FILTERS FOR RESULT?
 
@@ -171,5 +187,5 @@ result <- cbind(target[,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
 
 if ( verb>0 )
-    cat(paste("Writing result:", outfile, "\n"))
-write.table(result, file=outfile, sep="\t",quote=FALSE,row.names=FALSE)
+    msg(paste("Writing result:", outfile, "\n"))
+write.table(result, file=outfile, sep="\t",quote=FALSE,row.names=FALSE, na="")
