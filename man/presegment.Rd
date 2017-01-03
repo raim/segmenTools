@@ -41,6 +41,8 @@ be written to as tab-delimited .csv files; no files will be written if
 no figures will be plotted if \code{fig.path} is not provided.}
 
 \item{fig.type}{image type, "png" or "pdf"}
+
+\item{verb}{integer level of verbosity, 0: no messages, 1: show messages}
 }
 \description{
 pre-segmentation of whole-genome data into chunks that can

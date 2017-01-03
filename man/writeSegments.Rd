@@ -6,7 +6,7 @@
 segments by \code{\link{presegment}} to single files that are
 then further processed by segmenTier.}
 \usage{
-writeSegments(data, segments, name, path)
+writeSegments(data, segments, name = "segment", path)
 }
 \arguments{
 \item{data}{a data matrix to which coordinates in \code{segments}
@@ -15,6 +15,8 @@ refer to}
 \item{segments}{a matrix that must contain "start" and "end" (columns)
 of segments; these coordinates will be extracted from \code{data}
 and written to individual files, numbered by the row number in segments.}
+
+\item{name}{name used as prefix in file names}
 
 \item{path}{optional output path where files will be written, if not supplied
 files will end up in the current working directory (`getwd`)}

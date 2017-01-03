@@ -2,19 +2,21 @@
 % Please edit documentation in R/segmenTools.R
 \name{plot_cdfLst}
 \alias{plot_cdfLst}
-\title{plot multiple cumulative distribution functions as in the result from
-overlap statistics from \code{\link{getOverlapStats}}}
+\title{plot multiple cumulative distribution functions of overlap statistics, as
+provided by function \code{\link{getOverlapStats}}}
 \usage{
 plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", col, lty, h = c(0.2,
   0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.", ...)
 }
 \arguments{
-\item{x}{x-values for which cumulative distribution functions are plotted}
+\item{x}{x-values for which cumulative distribution functions of overlap characteristics are plotted}
 
 \item{CDF}{named list of cumulative distribution functions}
+
+\item{type}{character indicating the type of the overlap CDF}
 }
 \description{
-plot multiple cumulative distribution functions as in the result from
-overlap statistics from \code{\link{getOverlapStats}}
+plot multiple cumulative distribution functions of overlap statistics, as
+provided by function \code{\link{getOverlapStats}}
 }
 
