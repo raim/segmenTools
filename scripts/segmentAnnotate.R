@@ -44,7 +44,7 @@ option_list <- list(
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
   make_option(c("-t", "--target"), type="character", default="", 
-              help="target set of chromosomal segments"),    
+              help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
   make_option(c("--ttypes"), type="character", default="", 
               help="sub-sets of testset to annotate"),
   make_option(c("--ttypcol"), type="character", default="type", 
@@ -164,10 +164,10 @@ if ( details ) {
 
 ## FINAL RESULT TABLE
 ## select target columns
-if ( length(tcol)==0 )
+if ( length(tcol)=="all" )
     tcol <- colnames(target)
 ## and bind selected target and selected query/result columns
-result <- cbind(target[,tcol], tmp[,resCol])
+result <- cbind(target[,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
 
 if ( verb>0 )
