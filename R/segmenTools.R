@@ -3,8 +3,9 @@
 #'@docType package
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
+#'@importFrom utils write.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot
-#'@importFrom grDevices png dev.off rainbow gray xy.coords
+#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
 #'@importFrom stats ecdf loess predict qt quantile runmed sd var phyper heatmap
 NULL # this just ends the global package documentation
 
@@ -81,10 +82,11 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::pdf(file.name, width=width, height=height)
 }
 
-#' plot multiple cumulative distribution functions as in the result from
-#' overlap statistics from \code{\link{getOverlapStats}}
+#' plot multiple cumulative distribution functions of overlap statistics, as
+#' provided by function \code{\link{getOverlapStats}}
+#' @param x x-values for which cumulative distribution functions of overlap characteristics are plotted
 #' @param CDF named list of cumulative distribution functions
-#' @param x x-values for which cumulative distribution functions are plotted
+#' @param type character indicating the type of the overlap CDF
 #' @export
 plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ...) {
     
@@ -816,6 +818,43 @@ segmentAverage <- function(rds, avg="mean", mean.ratio=FALSE,
 
 ## CLUSTER ANALYSIS
 
+## copied from gplots to avoid dependency just for this
+my.colorpanel <- function (n, low, mid, high) 
+{
+    odd <- function (x) x%%2 == 1 # from gtools
+    if (missing(mid) || missing(high)) {
+        low <- col2rgb(low)
+        if (missing(high)) 
+            high <- col2rgb(mid)
+        else high <- col2rgb(high)
+        red <- seq(low[1, 1], high[1, 1], length = n)/255
+        green <- seq(low[3, 1], high[3, 1], length = n)/255
+        blue <- seq(low[2, 1], high[2, 1], length = n)/255
+    }
+    else {
+        isodd <- odd(n)
+        if (isodd) {
+            n <- n + 1
+        }
+        low <- col2rgb(low)
+        mid <- col2rgb(mid)
+        high <- col2rgb(high)
+        lower <- floor(n/2)
+        upper <- n - lower
+        red <- c(seq(low[1, 1], mid[1, 1], length = lower), seq(mid[1, 
+            1], high[1, 1], length = upper))/255
+        green <- c(seq(low[3, 1], mid[3, 1], length = lower), 
+            seq(mid[3, 1], high[3, 1], length = upper))/255
+        blue <- c(seq(low[2, 1], mid[2, 1], length = lower), 
+            seq(mid[2, 1], high[2, 1], length = upper))/255
+        if (isodd) {
+            red <- red[-(lower + 1)]
+            green <- green[-(lower + 1)]
+            blue <- blue[-(lower + 1)]
+        }
+    }
+    rgb(red, blue, green)
+}
 #' mututal overlaps between two clusterings of the same data set;
 #' calculates hypergeometric distribution statistics for significantly
 #' enriched or deprived mutual overlaps
@@ -989,7 +1028,7 @@ clusterCluster <- function(cl1, cl2, bonferroni=FALSE, store.data=FALSE,
             #cat(paste(coords, cluster.text, collapse=","))
             #cat(paste(coords, collapse=","))
 
-      colramp <- gplots::colorpanel(length(heat.data), "black","yellow")
+        colramp <- my.colorpanel(length(heat.data), "black","yellow")
                                         # revert for pvalue!
       if ( plot.type=="p.value" ) colramp <- rev(colramp)
       
@@ -1005,7 +1044,7 @@ clusterCluster <- function(cl1, cl2, bonferroni=FALSE, store.data=FALSE,
     
   }
   
-  class(result) <- "hypergeoTable"
+  class(result) <- "hypergeoTables"
   return(result)
 }
 
@@ -1099,6 +1138,7 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' @param seg.path a directory path where individual segments' data will
 #' be written to as tab-delimited .csv files; no files will be written if
 #' \code{seg.path} is not provided.
+#' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
 presegment <- function(ts, chrS, avg=1000, favg=100, minrd=8, minds=250,
                        map2chrom=FALSE,
@@ -1278,10 +1318,10 @@ presegment <- function(ts, chrS, avg=1000, favg=100, minrd=8, minds=250,
 #' and written to individual files, numbered by the row number in segments.
 #' @param path optional output path where files will be written, if not supplied
 #' files will end up in the current working directory (`getwd`)
+#' @param name name used as prefix in file names 
 #' @export
-writeSegments <- function(data, segments, name, path) {
+writeSegments <- function(data, segments, name="segment", path) {
 
-    if ( missing(name) ) name <- "segment"
     for ( i in 1:nrow(segments) ) {
         rng <- segments[i,"start"]:segments[i,"end"]
         if ( length(rng) < 100 )
@@ -1291,6 +1331,6 @@ writeSegments <- function(data, segments, name, path) {
         file.name <- paste(name, "_",id,".csv",sep="")
         if ( !missing(path) )
             file.name <- file.path(path, file.name)
-        utils::write.table(dat,file.name,row.names=FALSE,sep="\t")
+        write.table(dat,file.name,row.names=FALSE,sep="\t")
     }
  }
