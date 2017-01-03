@@ -101,6 +101,10 @@ if ( target=="" ) {
 
 target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
+if ( verb>0 )
+    cat(paste("LOADED\t", nrow(target), "TARGETS, and\n",
+              "\t", nrow(query), "QUERIES\n"))
+
 ## filter by type
 if ( length(qtypes)>0 )
   query <- query[query[,qtypcol]%in%qtypes,]
