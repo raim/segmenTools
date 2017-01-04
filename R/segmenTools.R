@@ -295,17 +295,18 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
             best[idx[1],] <- covl
             rdups <- rdups[!rdups%in%idx]
         }
+    
+        if ( length(dups)>0 )
+            best <- best[-dups,]
     }
-    if ( length(dups)>0 )
-        best <- best[-dups,]
-
+    
     ## e.g., details = c("qpos", "intersect", "union")
     if ( details )
         qcol <- c(qcol, "qpos", "qrank", "qlen", "intersect", "union")
     
     ## get and optionally rename requested columns
     idx <- match(best[,"target"],1:nrow(target))
-    addcol <- best[idx,qcol, drop=FALSE]
+    addcol <- best[idx,c("target",qcol), drop=FALSE]
 
     ## add prefix to column ids
     if ( !missing(prefix) )
