@@ -276,7 +276,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ## collapse or remove duplicated with qrank==1
     if ( sum(duplicated(best[,"target"])) )
         cat(paste("handling", sum(duplicated(best[,"target"])), "duplicated:",
-                  ifelse(collapse,"collapse",split), "\n"),file=msgfile)
+                  ifelse(collapse,"collapse","split"), "\n"),file=msgfile)
     dups <- rdups <- which(duplicated(best[,"target"]))
     if ( collapse ) {
         while ( length(rdups)>0 ) {
