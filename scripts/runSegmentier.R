@@ -178,9 +178,8 @@ outname <- file.path(outdir,"primseg")
 ## TESTSETS
 
 ## primseg3 tests
-
 tests <- list(known=c(srg1=436,gdh3=4),
-              nonsplit=c(3133,16,39),
+              nonsplit=c(3133,16,39,100),
               long5utr=c(34),
               short3utr=c(38),
               splitgene=c(37),
