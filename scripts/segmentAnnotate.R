@@ -48,7 +48,9 @@ option_list <- list(
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
   make_option(c("--only.best"), action="store_true", default=FALSE,
-              help="include only the top-ranking query hit (highest jaccard=intersect/union)"),
+              help="include only the top-ranking query hit (highest jaccard=intersect/union); if FALSE all matching queries will be collapsed into ;-separated lists; multiple best hits for one target will always be collapsed into ;-separated lists"),
+  make_option(c("--each.hit"), action="store_true", default=FALSE,
+              help="multiple query hit will be exported as separate rows instead of collapsing them into ;-separated lists"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
@@ -59,7 +61,7 @@ option_list <- list(
   make_option(c("--tcol"), type="character", default="", 
               help="columns in targets to write to result table"),
   make_option(c("--include.empty"), action="store_true", default=FALSE,
-              help="include targets without query hits from result table; if TRUE the result table will have matching rows with the target table"),
+              help="include targets without query hits from result table; if TRUE and each.hit is FALSE, the result table will have matching rows with the target table"),
   ## OUTPUT
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
@@ -158,10 +160,12 @@ if ( antisense )
 
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
+
 ## TODO: allow upstream/downstream ranges
-## TODO: allow collapse as argument / requires to add ID
-## to tcol="ID" and use merge
-result <- annotateTarget(query=query, target=target, collapse=TRUE,
+## TODO: allow collapse as argument / requires to add row number
+## of target and use merge
+result <- annotateTarget(query=query, target=target,
+                         collapse=!each.hit, 
                          details=details, only.best=only.best,
                          qcol=qcol, prefix=prefix, msgfile=msgfile)
 
@@ -176,7 +180,11 @@ resCol <- colnames(result) # store requested query/result columns
 
 ## TODO: reduce tmp to coordinate columns and add these to options
 ## TODO: handle strands better here! Expecting +/- factors
-tmp <- cbind(target,result) 
+tCol <-  ifelse(prefix=="", "target",
+                paste(paste(prefix,"target",sep="_")))
+tidx <- result[,tCol]
+
+tmp <- cbind(target[tidx,],result[,-which(colnames(result)==tCol)]) 
 if ( details ) {
     relCol <- ifelse(prefix=="", "qpos",
                      paste(paste(prefix,"qpos",sep="_")))
@@ -203,7 +211,7 @@ if ( details ) {
 if ( length(tcol)=="all" )
     tcol <- colnames(target)
 ## and bind selected target and selected query/result columns
-result <- cbind(target[,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
+result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
 ## include empty?
 if ( !include.empty ) {
