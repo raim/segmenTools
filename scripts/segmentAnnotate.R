@@ -154,7 +154,7 @@ if ( antisense )
 
 
 if ( verb>0 )
-    msg(paste("CALCULATING OVERLAPS\t",time(),",\n"))
+    msg(paste("CALCULATING OVERLAPS\t",time(),"\n"))
 ## TODO: allow upstream/downstream ranges
 result <- annotateTarget(query=query, target=target, 
                          details=details, only.best=only.best,
@@ -163,7 +163,7 @@ result <- annotateTarget(query=query, target=target,
 ## TODO: QUALITY FILTERS FOR RESULT?
 
 if ( verb>0 )
-    msg(paste("TRANSLATE MATCH COORDINATES\t",time(),",\n"))
+    msg(paste("TRANSLATE MATCH COORDINATES\t",time(),"\n"))
 
 ## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
 ## convert back to chromosome coordinates
