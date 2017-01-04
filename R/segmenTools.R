@@ -305,8 +305,8 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
         qcol <- c(qcol, "qpos", "qrank", "qlen", "intersect", "union")
     
     ## get and optionally rename requested columns
-    idx <- match(best[,"target"],1:nrow(target))
-    addcol <- best[idx,c("target",qcol), drop=FALSE]
+    #idx <- match(best[,"target"],1:nrow(target))
+    addcol <- best[,c("target",qcol), drop=FALSE]
 
     ## add prefix to column ids
     if ( !missing(prefix) )
@@ -315,7 +315,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
 
     ## filter target columns
     if ( !missing(tcol) ) {
-        target <- target[,tcol,drop=FALSE]
+        target <- target[best[,"target"],tcol,drop=FALSE]
         colnames(target) <- tcol
         addcol <- cbind(target, addcol)
     }

@@ -221,6 +221,7 @@ if ( !include.empty ) {
                    paste(paste(prefix,"qlen",sep="_")))
     result <- result[result[,qCol]!=0,]
 }
+
 ## final coordinate mapping
 ## NOTE: without relCol !!
 ## TODO: only required if coordinates are in tcol!
