@@ -106,26 +106,26 @@ if ( verb>0 )
     msg(paste("SETTINGS:\n"))
 for ( i in 1:length(opt) ) {
     if ( verb>0 )
-        msg(paste("\t",names(opt)[i], ":", 
-                  paste(opt[[i]],collapse=", "), "\n"))
+        msg(paste(names(opt)[i], "\t", 
+                  paste(opt[[i]],collapse=", "), "\n",sep=""))
 }
 if ( verb>0 )
     msg(paste("\n"))
 
 if ( verb>0 )
-    msg(paste("LOADING DATA FILES\t",time(),"\n"))
+    msg(paste("LOADING DATA FILES\t",time(),"\n",sep=""))
 
 ## load chromosome index - DOESNT WORK WITHOUT
 if ( verb>0 )
-    msg(paste("Loading chromosome index file:", chrfile, "\n"))
+    msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
 cf <- read.table(chrfile,sep="\t",header=FALSE)
 chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 
 ## READ SEGMENTS TO BE TESTED 
-if ( verb>0 ) msg(paste("Loading query:", query, "\n"))
+if ( verb>0 ) msg(paste("Loading query:", query, "\t\n"))
 query <- read.table(query,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
-if ( verb>0 ) msg(paste("Loading target:", target, "\n"))
+if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 
 if ( target=="" ) {
     target <- file("stdin")
@@ -140,8 +140,8 @@ if ( length(ttypes)>0 )
   target <- target[target[,ttypcol]%in%ttypes,]
 
 if ( verb>0 )
-    msg(paste("Loaded\t", nrow(target), "TARGETS &\n",
-              "\t", nrow(query), "QUERIES\n"))
+    msg(paste("Loaded", nrow(target), "TARGETS &\t\n",
+              "      ", nrow(query), "QUERIES\t\n"))
 
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
@@ -157,7 +157,7 @@ if ( antisense )
 
 
 if ( verb>0 )
-    msg(paste("CALCULATE OVERLAPS\t",time(),"\n"))
+    msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 ## TODO: allow upstream/downstream ranges
 result <- annotateTarget(query=query, target=target, 
                          details=details, only.best=only.best,
@@ -166,7 +166,7 @@ result <- annotateTarget(query=query, target=target,
 ## TODO: QUALITY FILTERS FOR RESULT?
 
 if ( verb>0 )
-    msg(paste("TRANSLATE COORDINATES\t",time(),"\n"))
+    msg(paste("TRANSLATE COORDINATES\t",time(),"\n",sep=""))
 
 ## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
 ## convert back to chromosome coordinates
@@ -211,8 +211,8 @@ if ( !include.empty ) {
 }
 
 if ( verb>0 )
-    msg(paste("DONE. WRITING RESULTS\t",time(),"\n"))
+    msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
 
 if ( verb>0 )
-    msg(paste("Writing result:", outfile, "\n"))
+    msg(paste("Writing result:", outfile, "\t\n"))
 write.table(result, file=outfile, sep="\t",quote=FALSE,row.names=FALSE, na="")
