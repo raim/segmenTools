@@ -143,7 +143,7 @@ if ( length(ttypes)>0 )
 
 if ( verb>0 )
     msg(paste("TARGETS\t", nrow(target), "\n",
-              "QUERIES\t", nrow(query), "\n"),sep="")
+              "QUERIES\t", nrow(query), "\n",sep=""))
 
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
@@ -232,7 +232,7 @@ if ( any(colnames(result)%in%coorCols) )
 if ( verb>0 )
     msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
 if ( verb>0 )
-    msg(paste("RESULTS\t", nrow(result), "\n"),sep="")
+    msg(paste("RESULTS\t", nrow(result), "\n",sep=""))
 
 if ( verb>0 )
     msg(paste("Writing result:", outfile, "\t\n"))
