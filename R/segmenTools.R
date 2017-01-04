@@ -261,7 +261,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
     cltr <- segmentOverlap(query=query, target=target,
-                           untie=FALSE, collapse=FALSE,
+                           collapse=FALSE,
                            add.na=TRUE, sort=TRUE,untie=FALSE,
                            details=details, msgfile=msgfile)
 
