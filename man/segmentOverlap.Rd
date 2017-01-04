@@ -12,7 +12,8 @@ It loops over targets and collects all queries that match;
 optionally adds NA lines for non-matched targets}
 \usage{
 segmentOverlap(query, target, details = FALSE, add.na = FALSE,
-  untie = FALSE, collapse = FALSE, sort = FALSE)
+  untie = FALSE, collapse = FALSE, sort = FALSE,
+  msgfile = file("stdout"))
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}
@@ -37,6 +38,9 @@ overlap matrix will be of the same dimension as the input target, i.e.,
 it will contain one row for each target.}
 
 \item{sort}{sort query hits by their \code{rank}}
+
+\item{msgfile}{file pointer for progress messages and warnings, defaults to
+stdout, useful when using in context of command line pipes}
 }
 \description{
 Simple sweeping algorithm to find overlapping intervals. Both

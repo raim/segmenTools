@@ -5,15 +5,20 @@
 \title{wrapper around \code{\link{segmentOverlap}}, used to 
 annotate the target set by a column in the query set}
 \usage{
-annotateTarget(query, target, col, prefix, details = FALSE,
-  duplicates = "collapse")
+annotateTarget(query, target, qcol = colnames(query), tcol, prefix,
+  details = FALSE, only.best = TRUE, collapse = TRUE,
+  msgfile = file("stdout"))
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}
 
 \item{target}{the target set of segments (genomic intervals)}
 
-\item{col}{column names to copy from target to it's best match in query}
+\item{qcol}{column names to copy from target to it's best match in query,
+defaults to all columns}
+
+\item{tcol}{column names of target to include in the returned table,
+defaults to none}
 
 \item{prefix}{column name prefix for the copied columns}
 
@@ -21,8 +26,11 @@ annotateTarget(query, target, col, prefix, details = FALSE,
 match, i.e., union and intersect, and relative position of the query
 to the matching targets}
 
-\item{duplicates}{how to handle multiple matches; if "collapse" the
-multiple hits are collapsed into ;-separated strings}
+\item{collapse}{if \code{TRUE} multiple query hits are collapsed
+into a single row, with ;-separated strings in the respective fields.}
+
+\item{msgfile}{file pointer for progress messages and warnings, defaults to
+stdout, useful when using in context of command line pipes}
 }
 \description{
 wrapper around \code{\link{segmentOverlap}}, used to 
