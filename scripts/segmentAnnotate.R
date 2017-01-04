@@ -26,6 +26,7 @@ suppressPackageStartupMessages(library(optparse))
 option_list <- list(
   make_option(c("--chrfile"), type="character", default="",
               help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
+  ## QUERY OPTIONS
   make_option(c("-q", "--query"), type="character", default="", 
               help="query set of chromosomal segments"),    
   make_option(c("--qtypes"), type="character", default="", 
@@ -38,11 +39,14 @@ option_list <- list(
               help="optional name prefix for copied columns"),
   make_option(c("--details"), action="store_true", default=FALSE,
               help="add details of the overlap"),
-  make_option(c("--dcol"), type="character",
-              default=c("query,intersect,qlen,qpos"), 
-              help="overlap statistics to copy to best matching target if details is set to TRUE"),
+#  make_option(c("--dcol"), type="character",
+#              default=c("query,intersect,qlen,qpos"), 
+#              help="overlap statistics to copy to best matching target if details is set to TRUE"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
+  make_option(c("--only.best"), action="store_true", default=FALSE,
+              help="include only the top-ranking query hit (highest jaccard=intersect/union)"),
+  ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
   make_option(c("--ttypes"), type="character", default="", 
@@ -51,6 +55,9 @@ option_list <- list(
               help="name of column with sub-set annotation"),
   make_option(c("--tcol"), type="character", default="", 
               help="columns in targets to write to result table"),
+  make_option(c("--include.empty"), action="store_true", default=FALSE,
+              help="include targets without query hits from result table; if TRUE the result table will have matching rows with the target table"),
+  ## OUTPUT
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
   make_option(c("-v", "--verb"), type="integer", default=1, 
@@ -63,7 +70,7 @@ opt <- parse_args(OptionParser(option_list=option_list))
 lst.args <- c(qtypes="character",
               ttypes="character",
               qcol="character",
-              dcol="character",
+#              dcol="character", # TODO: implement?
               tcol="character")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
@@ -145,8 +152,9 @@ if ( antisense )
 
 ## TODO: reverse upstream-downstream relative positions?
 ## TODO: allow upstream/downstream ranges
-result <- annotateTarget(query=query, target=target, qcol=qcol,
-                         prefix=prefix, details=details, msgfile=msgfile)
+result <- annotateTarget(query=query, target=target, 
+                         details=details, only.best=only.best,
+                         qcol=qcol, prefix=prefix, msgfile=msgfile)
 
 ## TODO: QUALITY FILTERS FOR RESULT?
 
@@ -185,6 +193,12 @@ if ( length(tcol)=="all" )
 ## and bind selected target and selected query/result columns
 result <- cbind(target[,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
+## include empty?
+if ( !include.empty ) {
+    qCol <- ifelse(prefix=="", "qlen",
+                   paste(paste(prefix,"qlen",sep="_")))
+    result <- result[result[,qCol]!=0,]
+}
 
 if ( verb>0 )
     msg(paste("Writing result:", outfile, "\n"))

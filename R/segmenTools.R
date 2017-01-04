@@ -255,28 +255,31 @@ annotateQuery <- function(query, target, col) {
 #' stdout, useful when using in context of command line pipes
 #' @export
 annotateTarget <- function(query, target, qcol=colnames(query), tcol,
-                           prefix, details=FALSE,
+                           prefix, details=FALSE, only.best=TRUE,
                            duplicates="collapse", msgfile=file("stdout")) {
 
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
     cltr <- segmentOverlap(query=query,target=target,
-                           add.na=TRUE,details=details,sort=FALSE,
+                           add.na=TRUE,details=details,sort=TRUE,untie=FALSE,
                            msgfile=msgfile)
 
     ## bind query column to overlap table
     cltr <- cbind(cltr, query[cltr[,"query"],qcol,drop=FALSE])
 
-    ## reduce to top-ranking query hit
-    best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
+    ## REDUCE TO TOP-RANKING QUERY HIT
+    best <- cltr
+    if ( only.best )
+        best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
     
     ## collapse or remove duplicated with qrank==1
     if ( sum(duplicated(best[,"target"])) )
         cat(paste("handling", sum(duplicated(best[,"target"])), "duplicated:",
                   duplicates, "\n"),file=msgfile)
-    dups <- which(duplicated(best[,"target"]))
+    dups <- rdups <- which(duplicated(best[,"target"]))
     if ( duplicates=="collapse" ) {
-        for ( d in dups ) {
+        while ( length(rdups)>0 ) {
+            d <- rdups[1]
             id <- best[d,"target"]
             idx <- which(best[,"target"]==id) ## find all 
             ovl <- best[idx,]
@@ -286,8 +289,10 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
                 covl[j] <- paste(ovl[,j],collapse=";")
             covl["target"] <- ovl[1,"target"]
             covl["tlen"] <- ovl[1,"tlen"]
-            covl["qrank"] <- ovl[1,"qrank"]
+            if ( only.best ) 
+                covl["qrank"] <- ovl[1,"qrank"]
             best[idx[1],] <- covl
+            rdups <- rdups[!rdups%in%idx]
         }
     }
     if ( length(dups)>0 )
