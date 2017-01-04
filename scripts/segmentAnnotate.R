@@ -224,8 +224,10 @@ if ( !include.empty ) {
 
 ## final coordinate mapping
 ## NOTE: without relCol !!
-## TODO: only required if coordinates are in tcol!
-result <- index2coor(result, chrS, strands=c("+","-"))
+## TODO: allow coorCols as option!
+coorCols <- c("start", "end", "coor", chrCol = "chr", strandCol = "strand")
+if ( any(colnames(result)%in%coorCols) )
+    result <- index2coor(result, chrS, strands=c("+","-"))
 
 if ( verb>0 )
     msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
