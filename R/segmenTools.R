@@ -300,7 +300,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
 
     ## e.g., details = c("qpos", "intersect", "union")
     if ( details )
-        qcol <- c(qcol, "qpos", "qlen", "intersect", "union")
+        qcol <- c(qcol, "qpos", "qrank", "qlen", "intersect", "union")
     
     ## get and optionally rename requested columns
     idx <- match(best[,"target"],1:nrow(target))
