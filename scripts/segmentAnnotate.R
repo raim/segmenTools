@@ -176,15 +176,18 @@ if ( verb>0 )
 
 ## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
 ## convert back to chromosome coordinates
+
+## bind coordinates and results to map coordinates and overlaps
 resCol <- colnames(result) # store requested query/result columns
+trgCol <-  ifelse(prefix=="", "target", paste(paste(prefix,"target",sep="_")))
+resCol <- resCol[resCol!=trgCol]
+tidx <- as.numeric(result[,trgCol])
 
+## TODO: only required if details
 ## TODO: reduce tmp to coordinate columns and add these to options
-## TODO: handle strands better here! Expecting +/- factors
-tCol <-  ifelse(prefix=="", "target",
-                paste(paste(prefix,"target",sep="_")))
-tidx <- result[,tCol]
+tmp <- cbind(target[tidx,], result[,-which(colnames(result)==trgCol)]) 
 
-tmp <- cbind(target[tidx,],result[,-which(colnames(result)==tCol)]) 
+## TODO: handle strands better here! Expecting +/- factors
 if ( details ) {
     relCol <- ifelse(prefix=="", "qpos",
                      paste(paste(prefix,"qpos",sep="_")))
@@ -200,7 +203,6 @@ if ( details ) {
         paste(new,collapse=";")}))
     new[new=="NA"] <- NA
     tmp[,relCol] <- new
-
 } else {
     tmp <- index2coor(tmp, chrS, strands=c("+","-"))
 }
