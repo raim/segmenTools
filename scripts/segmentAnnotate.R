@@ -210,7 +210,7 @@ if ( details ) {
 
 ## FINAL RESULT TABLE
 ## select target columns
-if ( length(tcol)=="all" )
+if ( length(tcol)==0 )
     tcol <- colnames(target)
 ## and bind selected target and selected query/result columns
 result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
@@ -221,6 +221,10 @@ if ( !include.empty ) {
                    paste(paste(prefix,"qlen",sep="_")))
     result <- result[result[,qCol]!=0,]
 }
+## final coordinate mapping
+## NOTE: without relCol !!
+## TODO: only required if coordinates are in tcol!
+result <- index2coor(result, chrS, strands=c("+","-"))
 
 if ( verb>0 )
     msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
