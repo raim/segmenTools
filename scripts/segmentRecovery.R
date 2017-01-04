@@ -212,8 +212,12 @@ for ( test.type in test.types ) {
         devel <- FALSE
         if ( devel )
             sgs <- sgs[1:1000,]
+
         
-        ovl <- segmentOverlap(query=sgs,target=target, add.na=TRUE,details=TRUE)
+        ovl <- segmentOverlap(query=sgs, target=target,
+                              add.na=TRUE, details=TRUE,
+                              untie=FALSE, collapse=FALSE, sort=FALSE,
+                              msgfile=file("stdout"))
         if ( !any(!is.na(ovl[,"query"])) ) next
         sts <- getOverlapStats(ovl,ovlth=ovlth, hrng=c(.8,1.2),
                                tnum=nrow(target),qnum=nrow(sgs),
@@ -637,7 +641,7 @@ quit(save="no")
 
 
 ### TEST-SET ANALYSES
-#### TODO; make separate file in tataProject or $GENBRO/data/yeast/ 
+#### TODO; allow segmentRevery to work with transcripts vs features
 
 ## ORF recovery by transcripts!
 trcl <- segmentOverlap(query=clorf,target=genes,

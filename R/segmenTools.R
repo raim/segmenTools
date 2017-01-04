@@ -249,20 +249,21 @@ annotateQuery <- function(query, target, col) {
 #' @param details set to \code{TRUE} to add details of the used
 #' match, i.e., union and intersect, and relative position of the query
 #' to the matching targets
-#' @param duplicates how to handle multiple matches; if "collapse" the
-#' multiple hits are collapsed into ;-separated strings
+#' @param collapse  if \code{TRUE} multiple query hits are collapsed
+#' into a single row, with ;-separated strings in the respective fields.
 #' @param msgfile file pointer for progress messages and warnings, defaults to
 #' stdout, useful when using in context of command line pipes
 #' @export
 annotateTarget <- function(query, target, qcol=colnames(query), tcol,
                            prefix, details=FALSE, only.best=TRUE,
-                           duplicates="collapse", msgfile=file("stdout")) {
+                           collapse=TRUE, msgfile=file("stdout")) {
 
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
-    cltr <- segmentOverlap(query=query,target=target,
-                           add.na=TRUE,details=details,sort=TRUE,untie=FALSE,
-                           msgfile=msgfile)
+    cltr <- segmentOverlap(query=query, target=target,
+                           untie=FALSE, collapse=FALSE,
+                           add.na=TRUE, sort=TRUE,untie=FALSE,
+                           details=details, msgfile=msgfile)
 
     ## bind query column to overlap table
     cltr <- cbind(cltr, query[cltr[,"query"],qcol,drop=FALSE])
@@ -275,9 +276,9 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ## collapse or remove duplicated with qrank==1
     if ( sum(duplicated(best[,"target"])) )
         cat(paste("handling", sum(duplicated(best[,"target"])), "duplicated:",
-                  duplicates, "\n"),file=msgfile)
+                  ifelse(collapse,"collapse",split), "\n"),file=msgfile)
     dups <- rdups <- which(duplicated(best[,"target"]))
-    if ( duplicates=="collapse" ) {
+    if ( collapse ) {
         while ( length(rdups)>0 ) {
             d <- rdups[1]
             id <- best[d,"target"]

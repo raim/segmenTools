@@ -159,7 +159,9 @@ if ( antisense )
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 ## TODO: allow upstream/downstream ranges
-result <- annotateTarget(query=query, target=target, 
+## TODO: allow collapse as argument / requires to add ID
+## to tcol="ID" and use merge
+result <- annotateTarget(query=query, target=target, collapse=TRUE,
                          details=details, only.best=only.best,
                          qcol=qcol, prefix=prefix, msgfile=msgfile)
 
