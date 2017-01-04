@@ -113,7 +113,7 @@ if ( verb>0 )
     msg(paste("\n"))
 
 if ( verb>0 )
-    msg(paste("LOADING DATA\t",time(),"\n"))
+    msg(paste("LOADING DATA FILES\t",time(),"\n"))
 
 ## load chromosome index - DOESNT WORK WITHOUT
 if ( verb>0 )
@@ -140,7 +140,7 @@ if ( length(ttypes)>0 )
   target <- target[target[,ttypcol]%in%ttypes,]
 
 if ( verb>0 )
-    msg(paste("LOADED\t", nrow(target), "TARGETS &\n",
+    msg(paste("Loaded\t", nrow(target), "TARGETS &\n",
               "\t", nrow(query), "QUERIES\n"))
 
 if ( nrow(query)==0 | nrow(target)==0 )
@@ -157,7 +157,7 @@ if ( antisense )
 
 
 if ( verb>0 )
-    msg(paste("CALCULATING OVERLAPS\t",time(),"\n"))
+    msg(paste("CALCULATE OVERLAPS\t",time(),"\n"))
 ## TODO: allow upstream/downstream ranges
 result <- annotateTarget(query=query, target=target, 
                          details=details, only.best=only.best,
@@ -166,7 +166,7 @@ result <- annotateTarget(query=query, target=target,
 ## TODO: QUALITY FILTERS FOR RESULT?
 
 if ( verb>0 )
-    msg(paste("TRANSLATE MATCH COORDINATES\t",time(),"\n"))
+    msg(paste("TRANSLATE COORDINATES\t",time(),"\n"))
 
 ## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
 ## convert back to chromosome coordinates
