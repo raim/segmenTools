@@ -112,6 +112,9 @@ for ( i in 1:length(opt) ) {
 if ( verb>0 )
     msg(paste("\n"))
 
+if ( verb>0 )
+    msg(paste("LOADING DATA\t",time(),"\n"))
+
 ## load chromosome index - DOESNT WORK WITHOUT
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\n"))
@@ -206,6 +209,9 @@ if ( !include.empty ) {
                    paste(paste(prefix,"qlen",sep="_")))
     result <- result[result[,qCol]!=0,]
 }
+
+if ( verb>0 )
+    msg(paste("DONE. WRITING RESULTS\t",time(),"\n"))
 
 if ( verb>0 )
     msg(paste("Writing result:", outfile, "\n"))
