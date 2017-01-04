@@ -7,6 +7,9 @@ library(segmenTools)
 ##source(file.path(segtools,"R/segmenTools.R")) # for segment analysis
 ##source(file.path(segtools,"R/coor2index.R")) # coor2index
 
+## nicer timestamp
+time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
+
 ## required options:
 ## 1: input segments 'allsegs.csv'
 ## 2: annotation, use a keyword from genomeData 'annotation' or load table/bed;
@@ -150,13 +153,17 @@ if ( antisense )
 
 
 
-## TODO: reverse upstream-downstream relative positions?
+if ( verb>0 )
+    msg(paste("CALCULATING OVERLAPS\t",time(),",\n"))
 ## TODO: allow upstream/downstream ranges
 result <- annotateTarget(query=query, target=target, 
                          details=details, only.best=only.best,
                          qcol=qcol, prefix=prefix, msgfile=msgfile)
 
 ## TODO: QUALITY FILTERS FOR RESULT?
+
+if ( verb>0 )
+    msg(paste("TRANSLATE MATCH COORDINATES\t",time(),",\n"))
 
 ## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
 ## convert back to chromosome coordinates
