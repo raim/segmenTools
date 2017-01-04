@@ -120,15 +120,15 @@ if ( target=="" ) {
 
 target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
 
-if ( verb>0 )
-    msg(paste("LOADED\t", nrow(target), "TARGETS &\n",
-              "\t", nrow(query), "QUERIES\n"))
-
 ## filter by type
 if ( length(qtypes)>0 )
   query <- query[query[,qtypcol]%in%qtypes,]
 if ( length(ttypes)>0 )
   target <- target[target[,ttypcol]%in%ttypes,]
+
+if ( verb>0 )
+    msg(paste("LOADED\t", nrow(target), "TARGETS &\n",
+              "\t", nrow(query), "QUERIES\n"))
 
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
