@@ -131,7 +131,7 @@ if ( opt$verb>0 )
     cat(paste("SETTINGS:\n"))
 for ( i in 1:length(opt) ) {
     if ( opt$verb>0 )
-        cat(paste("\t",names(opt)[i], "\t", #typeof(opt[[i]]),
+        cat(paste(names(opt)[i], "\t", #typeof(opt[[i]]),
                   paste(opt[[i]],collapse=", "), "\n",sep=""))
     arg <- names(opt)[i]
     assign(arg, opt[[arg]])
