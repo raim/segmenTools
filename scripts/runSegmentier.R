@@ -337,8 +337,8 @@ cat(paste("PLOTTING SEGMENTATIONS\t",time(),"\n"))
 
 browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
 #source(file.path(browser.path,"src/segment.R"))
-source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for plotHeat
-#source(file.path(browser.path,"src/genomeBrowser.R")) ## for chrS
+#source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for plotHeat
+source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
 
 ### LOCAL PATHS
 
