@@ -457,7 +457,7 @@ for ( i in sets ) {
         text(1,1,"no segments",cex=2)
     }
     tmp <- segment.plotFeatures(dataSets[["annotation"]]$data, coors=coors,
-                                strand=strand,xaxis=TRUE,
+                                strand=strand, axis1=TRUE,
                                 typord=TRUE, cuttypes=TRUE, ylab=NA,names=TRUE,
                                 columns=fcolumns, types=ftypes)
     axis(1)
