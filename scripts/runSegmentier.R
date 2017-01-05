@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+
 library("segmenTools") # coor2index
 library("segmenTier")  # main segmentation algorithm
 suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
@@ -9,6 +10,11 @@ suppressPackageStartupMessages(library("colorRamps")) # matlab-like colors
 #source("~/programs/segmenTier/R/segment.R")
 #sourceCpp("~/programs/segmenTier/src/cluster.cpp")
 #sourceCpp("~/programs/segmenTier/src/segment.cpp")
+
+## nicer timestamp
+time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
+## messages
+msg <- function(x) cat(x, file=stdout()) # until piping is implemented
 
 ### PARSE OPTIONS
 suppressPackageStartupMessages(library(optparse))
@@ -125,15 +131,15 @@ if ( opt$verb>0 )
     cat(paste("SETTINGS:\n"))
 for ( i in 1:length(opt) ) {
     if ( opt$verb>0 )
-        cat(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
-                  paste(opt[[i]],collapse=", "), "\n"))
+        cat(paste("\t",names(opt)[i], "\t", #typeof(opt[[i]]),
+                  paste(opt[[i]],collapse=", "), "\n",sep=""))
     arg <- names(opt)[i]
     assign(arg, opt[[arg]])
 }
 
 
 ### START
-cat(paste("LOADING SEQUENCING DATA\n"))
+cat(paste("LOADING SEQUENCING DATA\t", time(), "\n",sep=""))
 
 ## TODO: move this out and pre-write primary segment data
 ## via a separate function writing out primarySegments
@@ -143,13 +149,13 @@ cat(paste("LOADING SEQUENCING DATA\n"))
 ## only "ts", the original time-series and "coor", the corresponding
 ## chromosome coordinates are used here!
 if ( chrfile != "" ) {
-    cat(paste("USING CHROMOSOME INDEX FILE",chrfile, "\n"))
+    cat(paste("Using chromosome index file:",chrfile, "\n"))
     ## file.path(yeast.path,"chromosomes/sequenceIndex_R64-1-1_20110208.csv")
     cf <- read.table(chrfile, sep="\t",header=FALSE)
     chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 } else {
     ##file.path(data.path,"genomeData/Sacchromyces.cerevisiae.clean.S288C_oscillation.RData")
-    cat(paste("USING FULL DATA FILE", datafile, "\n"))
+    cat(paste("Using full data file:", datafile, "\n"))
     load(datafile) 
     
     chr <- unique(coor[,"chr"])
@@ -166,7 +172,7 @@ if ( chrfile != "" ) {
 
 
 ## LOAD SELECTED PRIMARY SEGMENTS
-cat(paste("LOADING PRIMARY SEGMENTS",infile,"\n"))
+cat(paste("Loading primary segments:",infile,"\n"))
 
 primseg <- read.table(infile, sep="\t",header=TRUE)
 primseg <- coor2index(primseg, chrS)[,c("start","end")]
@@ -190,14 +196,15 @@ alltests <- unique(unlist(tests)) # new primseg3 20161115
 if ( length(segs)==0 ) {
     sets <- order(prdf) # rev(order(prdf)) ) #
     if ( do.test ) {
-        cat(paste("CALCULATING TESTSETS\n"))
+        cat(paste("DEVEL OPTION: CALCULATING TESTSETS\n"))
         sets <- alltests
     }
 } else { ## command-line
     sets <- segs
 } 
 
-cat(paste("CALCULATING", length(sets), "SETS\n"))
+cat(paste("CALCULATING SEGMENTS\t", time(), "\n",sep=""))
+cat(paste("TESTSETS\t", length(sets), "\n",sep=""))
 
 ### RUN SEGMENTATION
 for ( i in sets ) { 
@@ -208,7 +215,7 @@ for ( i in sets ) {
     if ( idsuffix!="" )
         segid <- paste(segid, idsuffix, sep="_")
     
-    cat(paste("CALCULATING SEGMENT", segid, ",", which(sets==i), "of",
+    cat(paste("Calculating segment", segid, ",", which(sets==i), "of",
               length(sets),"\n"))
 
     rng <- primseg[i,"start"]:primseg[i,"end"]
@@ -331,7 +338,7 @@ cat(paste("PLOTTING SEGMENTATIONS\n"))
 
 browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
 #source(file.path(browser.path,"src/segment.R"))
-##source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for coor2index
+source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for plotHeat
 source(file.path(browser.path,"src/genomeBrowser.R")) ## for chrS
 
 ### LOCAL PATHS
