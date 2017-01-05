@@ -214,7 +214,7 @@ for ( i in sets ) {
     if ( idsuffix!="" )
         segid <- paste(segid, idsuffix, sep="_")
     
-    cat(paste("PRIMARY SEGMENT ID\t", segid, "\t", which(sets==i), "of",
+    cat(paste("PRIMARY SEGMENT\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
 
     rng <- primseg[i,"start"]:primseg[i,"end"]
@@ -334,7 +334,7 @@ for ( i in sets ) {
 
 if ( !plot ) next
 
-cat(paste("PLOTTING SEGMENTATIONS\t",time(),"\n"))
+cat(paste("PLOTTING\t",time(),"\n"))
 
 ## LOAD GENOME BROWSER
 
@@ -382,7 +382,7 @@ for ( i in sets ) {
     if ( idsuffix!="" )
         segid <- paste(segid, idsuffix, sep="_")
     
-    cat(paste("Plot segmentation\t", segid, "\t", which(sets==i), "of",
+    cat(paste("Primary segment\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
 
     out <- file.path(paste(outname,"_",segid,sep=""))
