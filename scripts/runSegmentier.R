@@ -150,7 +150,6 @@ cat(paste("LOADING SEQUENCING DATA\t", time(), "\n",sep=""))
 ## chromosome coordinates are used here!
 if ( chrfile != "" ) {
     cat(paste("Using chromosome index file:",chrfile, "\n"))
-    ## file.path(yeast.path,"chromosomes/sequenceIndex_R64-1-1_20110208.csv")
     cf <- read.table(chrfile, sep="\t",header=FALSE)
     chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 } else {
@@ -339,11 +338,10 @@ cat(paste("PLOTTING SEGMENTATIONS\t",time(),"\n"))
 browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
 #source(file.path(browser.path,"src/segment.R"))
 source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for plotHeat
-source(file.path(browser.path,"src/genomeBrowser.R")) ## for chrS
+#source(file.path(browser.path,"src/genomeBrowser.R")) ## for chrS
 
 ### LOCAL PATHS
 
-yeast.path <- sub("YEASTDAT=","",system("env|grep YEASTDAT",intern=TRUE))
 data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
 data.path <- file.path(data.path,"yeast")
 
