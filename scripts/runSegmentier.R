@@ -471,6 +471,10 @@ for ( i in sets ) {
     dev.off()
 }
 
+cat(paste("DONE AT  \t",time(),"\n",sep=""))
+quit(save="no")
+
+## OLD TODO - keep until checked
 segmentData <- function(segment=primseg[1,],data,kmax=30) {
   ### cluster DFT 
   ## get data
