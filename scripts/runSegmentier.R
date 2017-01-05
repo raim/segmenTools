@@ -349,7 +349,6 @@ columns <- c(name="name", chr="chr", strand="strand",
              start="start", end="end", type="type", color="CL")
 fcolumns <- columns
 fcolumns["color"] <- "CL_rdx_col"
-# features: col="CL_rdx_col" in columns, xaxis=TRUE,
 ftypes <- c( "gene_cassette"       , "gene",           
             "five_prime_UTR_intron", "intron",                   
             "dubious"              , "pseudogene",               
@@ -458,7 +457,7 @@ for ( i in sets ) {
         text(1,1,"no segments",cex=2)
     }
     tmp <- segment.plotFeatures(dataSets[["annotation"]]$data, coors=coors,
-                                strand=strand,
+                                strand=strand,xaxis=TRUE,
                                 typord=TRUE, cuttypes=TRUE, ylab=NA,names=TRUE,
                                 columns=fcolumns, types=ftypes)
     axis(1)
