@@ -274,6 +274,8 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
         best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
     
     ## collapse or remove duplicated with qrank==1
+    ## TODO: is this necessary, or can we just use collapse=TRUE
+    ## in call to segment overlap and strsplit required columns?
     if ( sum(duplicated(best[,"target"])) )
         cat(paste("handling", sum(duplicated(best[,"target"])), "duplicated:",
                   ifelse(collapse,"collapse","split"), "\n"),file=msgfile)
@@ -305,6 +307,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
         qcol <- c(qcol, "qpos", "qrank", "qlen", "intersect", "union")
     
     ## get and optionally rename requested columns
+    ## TODO: why was match used? use dplyr::join !
     #idx <- match(best[,"target"],1:nrow(target))
     addcol <- best[,c("target",qcol), drop=FALSE]
 
