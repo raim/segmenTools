@@ -345,7 +345,6 @@ source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for plotHeat
 data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
 data.path <- file.path(data.path,"yeast")
 
-chrS <- getChrS(data.path=data.path)
 
 ## LOAD DATA SETS
 cat(paste("Loading annotation data\n"))
@@ -431,8 +430,8 @@ for ( i in sets ) {
     lines(1:N,tot)
     axis(2); axis(1)
     mtext("total signal", 2, 2)
-    plotHeat(tsd,coors=c(chr=1,start=1,end=N),chrS=0,colors=colors0,
-             colnorm=TRUE)
+    segment.plotHeat(tsd,coors=c(chr=1,start=1,end=N),chrS=0,colors=colors0,
+                     colnorm=TRUE)
     if ( !is.null(allsegs) ) {
         
         segcols <- columns; segcols["color"] <- "CL"
@@ -447,11 +446,13 @@ for ( i in sets ) {
         plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
         text(1,1,"no segments",cex=2)
     }
-    tmp <- plotFeatures(dataSets[["annotation"]]$data, coors=coors,
-                        strand=strand, args=dataSets[["annotation"]]$settings)
+    tmp <- segment.plotFeatures(dataSets[["annotation"]]$data, coors=coors,
+                                strand=strand,
+                                args=dataSets[["annotation"]]$settings)
     axis(1)
-    tpy <- plotFeatures(dataSets[["transcripts"]]$data, coors=coors,
-                        strand=strand, args=dataSets[["transcripts"]]$settings)
+    tpy <- segment.plotFeatures(dataSets[["transcripts"]]$data, coors=coors,
+                                strand=strand,
+                                args=dataSets[["transcripts"]]$settings)
     
     dev.off()
 }
