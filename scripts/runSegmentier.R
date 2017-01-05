@@ -334,7 +334,7 @@ for ( i in sets ) {
 
 if ( !plot ) next
 
-cat(paste("PLOTTING\t",time(),"\n"))
+cat(paste("PLOTTING\t",time(),"\n",sep=""))
 
 ## LOAD GENOME BROWSER
 
