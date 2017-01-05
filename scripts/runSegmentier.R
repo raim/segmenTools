@@ -203,7 +203,7 @@ if ( length(segs)==0 ) {
     sets <- segs
 } 
 
-cat(paste("CALCULATING SEGMENTS\t", time(), "\n",sep=""))
+cat(paste("CALCULATING SEGMENTATIONS\t", time(), "\n",sep=""))
 cat(paste("TESTSETS\t", length(sets), "\n",sep=""))
 
 ### RUN SEGMENTATION
@@ -215,8 +215,8 @@ for ( i in sets ) {
     if ( idsuffix!="" )
         segid <- paste(segid, idsuffix, sep="_")
     
-    cat(paste("Calculating segment", segid, ",", which(sets==i), "of",
-              length(sets),"\n"))
+    cat(paste("SEGMENTATION\t", segid, "\t", which(sets==i), "of",
+              length(sets),"\n",sep=""))
 
     rng <- primseg[i,"start"]:primseg[i,"end"]
     strand <- idx2str(primseg[i,"start"],chrS)
@@ -266,7 +266,7 @@ for ( i in sets ) {
                               use.fft=use.fft, dft.range=dft.range,
                               use.snr=use.snr, low.thresh=low.thresh)
     ## cluster time series
-    cset <- clusterTimeseries(tset,K=K, iter.max=iter.max, nstart=nstart, nui.thresh=nui.thresh)
+    cset <- clusterTimeseries(tset,K=K, iter.max=iter.max, nstart=nstart, nui.thresh=nui.thresh, verb=1)
     
     ## segment all clusterings for different scoring functions
     allsegs <- NULL
