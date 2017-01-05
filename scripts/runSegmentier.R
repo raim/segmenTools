@@ -41,7 +41,9 @@ option_list <- list(
     make_option(c("--do.test"), action="store_true", default=FALSE,
                 help="only do testsets"),
     make_option(c("--redo"), action="store_true", default=FALSE,
-                help="overwrite existing segmentations"),
+                help="overwrite existing segmentations; leave FALSE if you merely want to plot existing segmentations"),
+    make_option(c("--save.matrix"), action="store_true", default=FALSE,
+                help="NOT IMPLEMENTED: store the total score matrix S(i,c) and the backtracing matrix K(i,c) in the RData file"),
     make_option(c("--plot"), action="store_true", default=FALSE,
                 help="plot segment figures"),
     make_option(c("--idsuffix"), type="character", default="",
@@ -281,7 +283,7 @@ for ( i in sets ) {
                                         multi=multi,multib=multib, 
                                         ncpu=1, verb=1,
                                         id=segid, short.name=short.name,
-                                        save.mat="")
+                                        save.matrix=save.matrix)
         if ( is.null(allsegs) )
           cat(paste("no segments\n"))
         else {
@@ -463,7 +465,7 @@ for ( i in sets ) {
                                 strand=strand, axis1=TRUE,
                                 typord=TRUE, cuttypes=TRUE, ylab=NA,names=TRUE,
                                 columns=fcolumns, types=ftypes)
-    axis(1)
+    #axis(1)
     tpy <- segment.plotFeatures(dataSets[["transcripts"]]$data, coors=coors,
                                 typord=TRUE, cuttypes=TRUE, ylab=NA,
                                 strand=strand)
