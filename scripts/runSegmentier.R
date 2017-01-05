@@ -332,7 +332,7 @@ for ( i in sets ) {
 
 if ( !plot ) next
 
-cat(paste("PLOTTING SEGMENTATIONS\n"))
+cat(paste("PLOTTING SEGMENTATIONS\t",time(),"\n"))
 
 ## LOAD GENOME BROWSER
 
@@ -350,7 +350,7 @@ data.path <- file.path(data.path,"yeast")
 chrS <- getChrS(data.path=data.path)
 
 ## LOAD DATA SETS
-cat(paste("LOADING ANNOTATION DATA\n"))
+cat(paste("Loading annotation data\n"))
 testIDs <- c("transcripts","annotation")
 dataSets <- loadData(testIDs, data.path=data.path)
 
@@ -372,8 +372,8 @@ for ( i in sets ) {
     if ( idsuffix!="" )
         segid <- paste(segid, idsuffix, sep="_")
     
-    cat(paste("PLOTTING SEGMENT", segid, ",", which(sets==i), "of",
-              length(sets),"\n"))
+    cat(paste("Plot segmentation\t", segid, "\t", which(sets==i), "of",
+              length(sets),"\n",sep=""))
 
     out <- file.path(paste(outname,"_",segid,sep=""))
 
