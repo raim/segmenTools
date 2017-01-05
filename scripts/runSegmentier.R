@@ -335,16 +335,30 @@ cat(paste("PLOTTING SEGMENTATIONS\t",time(),"\n"))
 
 ## LOAD GENOME BROWSER
 
+## for genome data and plots - todo - skip this!
 browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
-#source(file.path(browser.path,"src/segment.R"))
-#source(file.path(browser.path,"src/genomeBrowser_utils.R")) # for plotHeat
 source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
-
-### LOCAL PATHS
-
 data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
 data.path <- file.path(data.path,"yeast")
 
+### LOCAL PATHS
+
+## TODO: load data from files to make independent of genomeBrowser/genomeData
+## PLOT SETTINGS FOR TESTSETS
+columns <- c(name="name", chr="chr", strand="strand",
+             start="start", end="end", type="type", color="CL")
+fcolumns <- columns
+fcolumns["color"] <- "CL_rdx_col"
+# features: col="CL_rdx_col" in columns, xaxis=TRUE,
+ftypes <- c( "gene_cassette"       , "gene",           
+            "five_prime_UTR_intron", "intron",                   
+            "dubious"              , "pseudogene",               
+            "rRNA"                 , "tRNA",              
+            "tRNA.intron"          , "ncRNA",                    
+            "snRNA"                , "snoRNA",                   
+            "telomere"             , "centromere",               
+            "ARS"                  , "transposable_element_gene",
+            "LTR_retrotransposon"  , "repeat_region")
 
 ## LOAD DATA SETS
 cat(paste("Loading annotation data\n"))
@@ -356,9 +370,6 @@ dataSets[["annotation"]]$settings$names <- FALSE
 ## for data heatmaps
 colors0 <- matlab.like(100)  ## read count 
 colors0[1] <- "#FFFFFF" ## replace minimal by white
-
-columns <- c(name="name", chr="chr", strand="strand",
-             start="start", end="end", type="type", color="CL")
 
 ### PLOTTING
 
@@ -448,11 +459,12 @@ for ( i in sets ) {
     }
     tmp <- segment.plotFeatures(dataSets[["annotation"]]$data, coors=coors,
                                 strand=strand,
-                                args=dataSets[["annotation"]]$settings)
+                                typord=TRUE, cuttypes=TRUE, ylab=NA,names=TRUE,
+                                columns=fcolumns, types=ftypes)
     axis(1)
     tpy <- segment.plotFeatures(dataSets[["transcripts"]]$data, coors=coors,
-                                strand=strand,
-                                args=dataSets[["transcripts"]]$settings)
+                                typord=TRUE, cuttypes=TRUE, ylab=NA,
+                                strand=strand)
     
     dev.off()
 }
