@@ -214,7 +214,7 @@ for ( i in sets ) {
     if ( idsuffix!="" )
         segid <- paste(segid, idsuffix, sep="_")
     
-    cat(paste("SEGMENTATION\t", segid, "\t", which(sets==i), "of",
+    cat(paste("PRIMARY SEGMENT ID\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
 
     rng <- primseg[i,"start"]:primseg[i,"end"]
@@ -256,6 +256,9 @@ for ( i in sets ) {
     ## both strands are handled in direction of transcription!
     if ( strand==-1 )
         tsd <- tsd[nrow(tsd):1,]
+
+    if ( verb>0 )
+        cat(paste("CLUSTERING\t",time(),"\n",sep=""))
 
     ## process time series, get DFT etc.
     ## TODO: add processing info to tset
