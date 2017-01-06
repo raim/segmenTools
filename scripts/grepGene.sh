@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-## TODO: parse arguments
+## TODO: parse more arguments, and allow for multiple genes!
 
 ## gene: standard gene name, IME4, IME1
 gene=$1 
 plot=$2
-allseg=$YEASTSEQ/segmentation/20161228/allsegs.csv
+primsegs=$YEASTSEQ/segmentation/primarysegments/primseg.csv
 features=/data/yeast/feature_R64-1-1_20110208_withclusters.csv
 sgtype=$YEASTSEQ/segmentation/segmentTest/20161228/annotation/T.ash_D.dcash_K.16_S.icor_E.3_M.175_
 
@@ -31,7 +31,8 @@ if  [ "$plot" = "plot" ]; then
     out=primseg_$primseg
 
     # GREP COORDINATES
-    coor=`grep $sid $allseg | cut -f 4,5,6 | sed 's/\s/,/;s/\s/:/'`
+    primsg=`echo $primseg | sed 's/^0*//g'`
+    coor=`grep -P "\t$primsg\t" $primsegs | cut -f 1,3,4 | sed 's/\s/,/;s/\s/:/'`
     cmd="$GENBRO/src/plotFeature.R -i $genome --coor $coor -r $range  -s $selection -S $settings  -f png -v -o $primseg"
     echo $cmd
 $cmd 
