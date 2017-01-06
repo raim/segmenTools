@@ -120,7 +120,7 @@ write.table(emcoors,file.name,row.names=FALSE,sep="\t",quote=FALSE)
 
 ### PLOTTING
 if ( !plot.summary )
-    quite(save="no")
+    quit(save="no")
 if ( verb>0 )
     cat(paste("Constructing summary plot.\n"))
 
