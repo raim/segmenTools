@@ -88,7 +88,8 @@ if ( plot.borders ) {
 }
 
 ## todo: add primseg IDs explicitly
-primseg <- cbind(ID=1:nrow(primseg),primseg)
+## column chr will be filled by index2coor
+primseg <- cbind(ID=1:nrow(primseg),chr=rep(NA,nrow(primseg)),primseg)
 
 ## write out segments!
 if ( write.segments ) {
