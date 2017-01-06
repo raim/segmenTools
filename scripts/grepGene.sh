@@ -12,7 +12,7 @@ sas=${sgtype}antisense.csv
 id=`sed 's/"//g' $features|grep gene | grep -P "\t${gene}\t"| cut -f 2`
 sid=`grep $id $seg | cut -f 1|sed 's/.*\://'`
 primseg=`echo $sid|sed s/_.*//`
-asid=`grep $sid $sas| cut -f 2`
+asid=`grep -P "^$sid\t" $sas| cut -f 2`
 asprimseg=`echo $asid|sed s/_.*//`
 
 
