@@ -33,7 +33,7 @@ if  [ "$plot" = "plot" ]; then
     # GREP COORDINATES
     primsg=`echo $primseg | sed 's/^0*//g'`
     coor=`grep -P "\t$primsg\t" $primsegs | cut -f 1,3,4 | sed 's/\s/,/;s/\s/:/'`
-    cmd="$GENBRO/src/plotFeature.R -i $genome --coor $coor -r $range  -s $selection -S $settings  -f png -v -o $primseg"
+    cmd="$GENBRO/src/plotFeature.R -i $genome --coor $coor -r $range  -s $selection -S $settings  -f png -v -o $gene"
     echo $cmd
 $cmd 
 fi
