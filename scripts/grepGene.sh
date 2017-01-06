@@ -9,12 +9,12 @@ sgtype=$YEASTSEQ/segmentation/segmentTest/20161228/annotation/T.ash_D.dcash_K.16
 
 seg=${sgtype}genes.csv
 sas=${sgtype}antisense.csv
-id=`grep $gene $features | grep gene | cut -f 2 | sed 's/"//g'`
-sid=`grep $id $seg | cut -f 1`
+id=`sed 's/"//g' $features|grep gene | grep -P "\t${gene}\t"| cut -f 2`
+sid=`grep $id $seg | cut -f 1|sed 's/.*\://'`
 primseg=`echo $sid|sed s/_.*//`
 asid=`grep $sid $sas| cut -f 2`
 asprimseg=`echo $asid|sed s/_.*//`
 
 echo GENE $gene 
 echo SEGMENT $sid PRIMSEG $primseg
-echo ANTISENSE $asid PRIMSEG $ asprimseg
+echo ANTISENSE $asid PRIMSEG $asprimseg
