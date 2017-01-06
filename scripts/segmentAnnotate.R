@@ -9,6 +9,8 @@ library(segmenTools)
 
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
+## messages
+msg <- function(x) cat(x, file=msgfile)
 
 ## required options:
 ## 1: input segments 'allsegs.csv'
@@ -99,9 +101,6 @@ if ( outfile=="" ) {
     msgfile <- stdout()
 }
 
-## messages
-msg <- function(x)
-    cat(x, file=msgfile)
 
 ## print out arguments
 if ( verb>0 )
@@ -148,6 +147,8 @@ if ( verb>0 )
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
+## TODO: convert to function in R/segmenTools from here:
+
 ## converting both to continuous index
 query <- coor2index(query, chrS)
 target <- coor2index(target, chrS)
@@ -155,8 +156,6 @@ target <- coor2index(target, chrS)
 ## search on other strand 
 if ( antisense ) 
     query <- switchStrand(query, chrS)
-
-
 
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
@@ -203,10 +202,7 @@ if ( details ) {
         paste(new,collapse=";")}))
     new[new=="NA"] <- NA
     tmp[,relCol] <- new
-} else {
-    tmp <- index2coor(tmp, chrS, strands=c("+","-"))
-}
-
+} 
 
 ## FINAL RESULT TABLE
 ## select target columns
@@ -215,11 +211,11 @@ if ( length(tcol)==0 )
 ## and bind selected target and selected query/result columns
 result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
-## include empty?
+## remove empty targets (no hit)
 if ( !include.empty ) {
     qCol <- ifelse(prefix=="", "qlen",
                    paste(paste(prefix,"qlen",sep="_")))
-    result <- result[result[,qCol]!=0,]
+    result <- result[as.character(result[,qCol])!="0",] # char allows collapse
 }
 
 ## final coordinate mapping
@@ -232,8 +228,9 @@ if ( any(colnames(result)%in%coorCols) )
 if ( verb>0 )
     msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
 if ( verb>0 )
-    msg(paste("RESULTS\t", nrow(result), "\n",sep=""))
+    msg(paste("Writing result:", outfile, "\t\n"))
+
+write.table(result, file=outfile, sep="\t",quote=FALSE,row.names=FALSE, na="")
 
 if ( verb>0 )
-    msg(paste("Writing result:", outfile, "\t\n"))
-write.table(result, file=outfile, sep="\t",quote=FALSE,row.names=FALSE, na="")
+    msg(paste("RESULTS\t", nrow(result), "\n",sep=""))
