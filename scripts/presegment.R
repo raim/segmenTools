@@ -108,13 +108,13 @@ if ( verb>0 )
 sgcoors <- index2coor(primseg,chrS)
 
 file.name <- file.path(outdir,"primseg.csv")
-write.table(sgcoors,file.name,row.names=FALSE,sep="\t")
+write.table(sgcoors,file.name,row.names=FALSE,sep="\t",quote=FALSE)
 
 emcoors <-cbind(start=emptyseg[,1],
                 end=emptyseg[,2]) 
 emcoors <- index2coor(emcoors,chrS)
 file.name <- file.path(outdir,"primseg_interseg.csv")
-write.table(emcoors,file.name,row.names=FALSE,sep="\t")
+write.table(emcoors,file.name,row.names=FALSE,sep="\t",quote=FALSE)
 
 
 ### PLOTTING

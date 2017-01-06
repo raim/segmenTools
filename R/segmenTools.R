@@ -1354,6 +1354,6 @@ writeSegments <- function(data, segments, name="segment", path) {
         file.name <- paste(name, "_",id,".csv",sep="")
         if ( !missing(path) )
             file.name <- file.path(path, file.name)
-        write.table(dat,file.name,row.names=FALSE,sep="\t")
+        write.table(dat,file.name,row.names=FALSE,sep="\t",quote=FALSE)
     }
  }
