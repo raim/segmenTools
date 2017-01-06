@@ -15,6 +15,7 @@ primseg=`echo $sid|sed s/_.*//`
 asid=`grep $sid $sas| cut -f 2`
 asprimseg=`echo $asid|sed s/_.*//`
 
+
 echo GENE $gene 
-echo SEGMENT $sid PRIMSEG $primseg
-echo ANTISENSE $asid PRIMSEG $asprimseg
+echo PRIMSEG $primseg SEGMENT $sid 
+echo ANTISENSE $asprimseg SEGMENT $asid 
