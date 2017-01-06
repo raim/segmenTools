@@ -4,6 +4,8 @@
 
 ## gene: standard gene name, IME4, IME1
 gene=$1 
+plot=$2
+allseg=$YEASTSEQ/segmentation/20161228/allsegs.csv
 features=/data/yeast/feature_R64-1-1_20110208_withclusters.csv
 sgtype=$YEASTSEQ/segmentation/segmentTest/20161228/annotation/T.ash_D.dcash_K.16_S.icor_E.3_M.175_
 
@@ -19,3 +21,18 @@ asprimseg=`echo $asid|sed s/_.*//`
 echo GENE $gene 
 echo PRIMSEG $primseg SEGMENT $sid 
 echo ANTISENSE $asprimseg SEGMENT $asid 
+
+## use genomeBrowser to plot the primary segment
+if  [ "$plot" = "plot" ]; then
+    range=1500
+    settings=$GENBRO/data/selections.R
+    genome=$GENDAT/yeast
+    selection=gene
+    out=primseg_$primseg
+
+    # GREP COORDINATES
+    coor=`grep $sid $allseg | cut -f 4,5,6 | sed 's/\s/,/;s/\s/:/'`
+    cmd="$GENBRO/src/plotFeature.R -i $genome --coor $coor -r $range  -s $selection -S $settings  -f png -v -o $primseg"
+    echo $cmd
+$cmd 
+fi
