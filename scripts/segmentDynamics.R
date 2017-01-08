@@ -230,7 +230,7 @@ for ( type in sgtypes ) {
     fname <- gsub(":",".",type) # FOR FILENAMES
     
     sgs <- lst[[type]]
-    
+    len <- sgs[,"end"]-sgs[,"start"]+1    
     ## following code original from tataproject/yeast/scripts/segmentseq.r
     ## CALCULATE OSCI PARAMETERS FOR SEGMENTS
     
@@ -304,7 +304,9 @@ for ( type in sgtypes ) {
 
     ## filter for at least one significant pvalue
     dat <- avg 
-    rmvals <- sgs[,"p.signif"] == 0
+    unsig <- sgs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
+    short <- len < 150             # LONGER THEN 150
+    rmvals <- unsig #|short #|     # TODO: does short filter help?
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
 
     ## get DFT, use time series processing from segmenTier:
