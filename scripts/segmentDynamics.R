@@ -76,6 +76,8 @@ option_list <- list(
                 help="DC component transformation function, see --trafo [default %default]"),
     make_option("--smooth.time", type="integer", default=3, # so far best! 
                 help="span of the moving average for smoothing of individual read time-series"),
+##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
+##                help="as smooth.time but only for plotting clusters not used of analysis"),
     ## FLOWCLUST PARAMETERS
     make_option("--ncpu", type="integer", default=1, 
                 help="number of available cores for flowClust"),
@@ -358,7 +360,17 @@ for ( type in sgtypes ) {
     if ( verb>0 )
         cat(paste("\tplotting time series clustering\t",time(),"\n"))
 
+    ##if ( smooth.time!=smooth.time.plot )
+    ##    tset <- processTimeseries(dat,smooth.time=smooth.time.plot, trafo=trafo,
+    ##                              dft.range=dft.range, dc.trafo=dc.trafo,
+    ##                              use.snr=TRUE,low.thresh=-Inf,
+    ##                              keep.zeros=FALSE)
     
+    ## plot time-courses
+    ## if no smoothing was done, smooth for plots
+    ndat <- tset$ts # avg # 
+    navg <- log2(ndat/apply(ndat,1,mean,na.rm=T))
+
     ## plot BIC
     file.name <- file.path(out.path,paste(fname,"_BIC",sep=""))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
@@ -377,10 +389,6 @@ for ( type in sgtypes ) {
            legend=c("BIC","ICL","failed","max. BIC"),pt.cex=c(1,.5,1,1.5))
     dev.off()
      
-    ## plot time-courses
-    ## if no smoothing was done, smooth for plots
-    ndat <- tset$ts # avg # 
-    navg <- log2(ndat/apply(ndat,1,mean,na.rm=T))
 
     ## plot merged
     file.name <- file.path(out.path,paste(fname, "_osc_K",mselected,sep=""))
