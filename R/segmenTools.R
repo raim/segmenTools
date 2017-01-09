@@ -891,7 +891,7 @@ my.colorpanel <- function (n, low, mid, high)
 clusterCluster <- function(cl1, cl2, bonferroni=FALSE, store.data=FALSE,
                            req.vals=c("greater"), na.rm=FALSE,
                            verbose=TRUE, pval=0.01, plot=FALSE,
-                           xlab="cluster 1", ylab="cluster 2",
+                           xlab="cluster 1", ylab="cluster 2",na.string="na",
                            plot.type="spine", plot.ppoor=FALSE, plot.prich=TRUE,
                            name1, name2, cl1.max=100, cl2.max=100,
                            cl1.sorting, cl2.sorting) {
@@ -909,14 +909,14 @@ clusterCluster <- function(cl1, cl2, bonferroni=FALSE, store.data=FALSE,
     cl2 <- cl2[!remove]
   } else { # add NA cluster
     if ( sum(is.na(cl1)) )
-      cl1[is.na(cl1)] <- "na"
+      cl1[is.na(cl1)] <- na.string
     if ( sum(is.na(cl2)) )
-      cl2[is.na(cl2)] <- "na"
+      cl2[is.na(cl2)] <- na.string
     ## also rename empty strings!
     if ( sum(cl1=="") )
-      cl1[cl1==""] <- "na"
+      cl1[cl1==""] <- na.string
     if ( sum(cl2=="") )
-      cl2[cl2==""] <- "na"
+      cl2[cl2==""] <- na.string
   }
 
     
@@ -929,7 +929,8 @@ clusterCluster <- function(cl1, cl2, bonferroni=FALSE, store.data=FALSE,
   ## TODO : name p.value result matrices if both are requested!
   do.prich <- sum(req.vals=="greater")>0
   do.ppoor <- sum(req.vals=="less")>0
-  do.ppoor <- do.prich <- sum(req.vals=="two.sided")>0
+    if ( sum(req.vals=="two.sided")>0 )
+        do.ppoor <- do.prich <- TRUE
   
   ## get clusters
   f1 = levels(as.factor(cl1));
