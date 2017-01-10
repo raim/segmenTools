@@ -49,6 +49,12 @@ option_list <- list(
 #              help="overlap statistics to copy to best matching target if details is set to TRUE"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
+  make_option(c("--qrange"), type="character", default="", 
+              help="instead of start:end coordinates, use a range around
+either start (start;-1000:100) or end (end;-1000:100) coordinates"),
+  ## divergent can be done with a range on target
+#  make_option(c("--divergent"), type="integer", default=0,
+#              help="if divergent > 0: search matches on reverse strand transcribed in divergent direction, with maximal distance between pairs set by the argument (>0); can be combined with argument shift to include overlapping divergent pairs [default: %default]"),
   make_option(c("--only.best"), action="store_true", default=FALSE,
               help="include only the top-ranking query hit (highest jaccard=intersect/union); if FALSE all matching queries will be collapsed into ;-separated lists; multiple best hits for one target will always be collapsed into ;-separated lists"),
   make_option(c("--each.hit"), action="store_true", default=FALSE,
@@ -192,7 +198,7 @@ if ( details ) {
                      paste(paste(prefix,"qpos",sep="_")))
     tmp <- index2coor(tmp, chrS, strands=c("+","-"), relCol=relCol) 
     ## TRANSLATE RELATIVE POSITION TO TARGET POSITION
-    orig <- strsplit(tmp[,relCol],";")
+    orig <- strsplit(as.character(tmp[,relCol]),";")
     new <- unlist(lapply(orig, function(x) {
         new <- x
         new[x=="inside"] <- "covers"
