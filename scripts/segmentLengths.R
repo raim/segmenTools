@@ -196,10 +196,15 @@ for ( type in sgtypes ) {
 x <- sglen[[1]]$mids
 
 for ( i in 1:ncol(sgcltab) ) {
+
     scl <- colnames(sgcltab)[i]
     if ( verb>0 )
         cat(paste("class", scl, "distribution\t",time(),"\n"))
+
     classes <- as.character(unique(sgcltab[,i]))
+
+    ## convert stored histograms and cumulative dist. functions (CDF)
+    ## to matrices of mean and sd values for segment classes
     tot <- rep(NA, length(classes))
     means <- matrix(NA,nrow=length(x),ncol=length(classes))
     names(tot) <- colnames(means) <- classes
@@ -215,16 +220,16 @@ for ( i in 1:ncol(sgcltab) ) {
             cdfs[,type] <- sgcdf[[type]](x)
         }
         ## mean distributions of this class
-        means[,class] <- apply(lens,1,mean)
-        ci[,class] <- apply(lens,1,sd)
-        cdfmeans[,class] <- apply(cdfs,1,mean)
-        cdfci[,class] <- apply(cdfs,1,sd)
+        means[,class] <- apply(lens,1,mean) # MEAN
+        ci[,class] <- apply(lens,1,sd)      # STANDARD DEVIATION
+        cdfmeans[,class] <- apply(cdfs,1,mean) # MEAN CDF
+        cdfci[,class] <- apply(cdfs,1,sd)      # SD of CDF
         ## total segment number
         tot[class] <- mean(segnum[types])
         totsd[class] <- sd(segnum[types])
     }
 
-    ## plot
+    ## plot mean/sd of histograms and of CDF
     file.name <- file.path(out.path,paste("length_class_",scl,sep=""))
     plotdev(file.name,width=9,height=4.5,type=fig.type)
     par(mfcol=c(1,2),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
