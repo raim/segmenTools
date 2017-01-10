@@ -48,8 +48,8 @@ option_list <- list(
     ## OSCILLATION SETTINGS
     make_option("--pval.thresh", default=1,
                 help="phases above this thresh will be set to NA [default %default]"),
-    make_option("--phase.weight", type="character", default="no",
-                help="weight for calculating average phases of segments; raw: 1-p.value, log: -log2(p.value) [default %default]"),
+    make_option("--phase.weight", action="store_true", default=FALSE,
+                help="use weight for calculating average phases of segments: 1-p.value [default %default]"),
     make_option("--pval.thresh.sig", default=1,
                 help="pvals above will be counted as non-significant [default %default]"),
     make_option("--read.rng", type="character", default="",
@@ -180,9 +180,9 @@ lpvl[is.infinite(lpvl)] <- NA
 
 ## PHASE WEIGHTS by p-values
 ## TODO: use weights? seems to have little effect
-wght <- rep(1,length(pval)) # phase.weight default
-if ( phase.weight=="log" ) wght <- -log2(pval)
-if ( phase.weight=="raw" ) wght <-  1-pval 
+wght <- rep(1,length(pval)) # phase.weight default equiv. to no weight
+if ( phase.weight ) wght <-  1-pval 
+##if ( phase.weight=="log" ) wght <- -log2(pval) # TODO: fix infinite weights!
 
 ## LOAD SEGMENTS
 
@@ -242,7 +242,7 @@ for ( type in sgtypes ) {
     ## add phase distribution, weighted by p-values!
     phs <- t(apply(sgs,1,function(x)
         phaseDist(phase[x["start"]:x["end"]],w=wght[x["start"]:x["end"]])))
-
+    
     sgs <- cbind(sgs,phs)
 
     ## raw pvalue distribution
