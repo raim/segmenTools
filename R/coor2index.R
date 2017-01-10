@@ -160,8 +160,8 @@ index2coor <- function(features, chrS,
         ## relative position mapping left/right -> upstream/downstream
         if ( !missing(relCol) ) {
             tmpcol <- orig[current,relCol]
-            tmpcol <- sub("left","upstream", tmpcol)
-            tmpcol <- sub("right","downstream", tmpcol)
+            tmpcol <- gsub("left","upstream", tmpcol)
+            tmpcol <- gsub("right","downstream", tmpcol)
             features[current,relCol] <- tmpcol
         }
 
@@ -175,8 +175,8 @@ index2coor <- function(features, chrS,
         ## relative position mapping left/right -> downstream/upstream
         if ( !missing(relCol) ) {
             tmpcol <- orig[current,relCol]
-            tmpcol <- sub("left","downstream", tmpcol)
-            tmpcol <- sub("right","upstream", tmpcol)
+            tmpcol <- gsub("left","downstream", tmpcol)
+            tmpcol <- gsub("right","upstream", tmpcol)
             features[current,relCol] <- tmpcol
         }
     }
