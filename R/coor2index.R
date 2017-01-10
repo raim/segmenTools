@@ -128,10 +128,16 @@ index2coor <- function(features, chrS,
     ## add relative position column:
     ## left -> upstream/downstream, right -> downstream/upstream
     cpcols <- cols
+    rel2factor <- FALSE # stores wether a relative position column was factor
     if ( !missing(relCol) ) {
-        if ( relCol%in%colnames(features) ) 
+        if ( relCol%in%colnames(features) )  {
             cpcols <- c(cpcols, relCol)
-        else
+            ## CONVERT TO CHARACTER
+            if ( class(features[,relCol])=="factor" ) {
+                features[,relCol] <- as.character(features[,relCol])
+                rel2factor <- TRUE                
+            }
+        } else
             warning("relative position column 'relCol' passed as, ",relCol,
                     "but not present in columns.")
     }
@@ -153,7 +159,7 @@ index2coor <- function(features, chrS,
         features[current,strandCol] <- strands[1]
         ## relative position mapping left/right -> upstream/downstream
         if ( !missing(relCol) ) {
-            tmpcol <- orig[current,relCol] 
+            tmpcol <- orig[current,relCol]
             tmpcol <- sub("left","upstream", tmpcol)
             tmpcol <- sub("right","downstream", tmpcol)
             features[current,relCol] <- tmpcol
@@ -168,12 +174,14 @@ index2coor <- function(features, chrS,
         features[current,strandCol] <- strands[2]
         ## relative position mapping left/right -> downstream/upstream
         if ( !missing(relCol) ) {
-            tmpcol <- orig[current,relCol] 
+            tmpcol <- orig[current,relCol]
             tmpcol <- sub("left","downstream", tmpcol)
             tmpcol <- sub("right","upstream", tmpcol)
             features[current,relCol] <- tmpcol
         }
     }
+    if ( rel2factor)
+         features[,relCol] <- factor(features[,relCol])
     features
 }
 
