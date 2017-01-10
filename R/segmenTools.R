@@ -711,7 +711,7 @@ getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid
 
 #' Calculates phase distributions in segments, i.e., the circular mean and
 #' standard deviation and the R statistics, copied from from package
-#' \code{circstats} and after
+#' \code{CircStats} and after
 #' http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
 #' https://en.wikipedia.org/wiki/Mean_of_circular_quantities
 #' TODO: recognize bimodal?
@@ -719,27 +719,30 @@ getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid
 #' @param w optional weights for weighted mean
 #' @export
 phaseDist <- function(phs, w) {
-  avg <- c(mean=NA, r=NA, na=sum(is.na(phs))/length(phs))
-  if ( !missing(w) ) w <- w[!is.na(phs)]
-  phs <- phs[!is.na(phs)] * pi/180
     
-  if ( length(phs)>0 ) {
-    if ( !missing(w) ) {
-      c <- sum(cos(phs)*w)
-      s <- sum(sin(phs)*w)
-      n <- sum(w)
-    }else {
-      c <- sum(cos(phs))
-      s <- sum(sin(phs))
-      n <- length(phs)
+    avg <- c(mean=NA, r=NA, na=sum(is.na(phs))/length(phs))
+
+    ## removing NA
+    if ( !missing(w) ) w <- w[!is.na(phs)]
+    phs <- phs[!is.na(phs)] * pi/180 # convert degree to radian
+    
+    if ( length(phs)>0 ) {
+        if ( !missing(w) ) {
+            c <- sum(cos(phs)*w)
+            s <- sum(sin(phs)*w)
+            n <- sum(w)
+        }else {
+            c <- sum(cos(phs))
+            s <- sum(sin(phs))
+            n <- length(phs)
+        }
+        r <- sqrt(c^2 + s^2)/n
+        mean <- atan2(s, c) *180/pi # convert back to degree
+        mean <- ifelse(mean<=  0,mean + 360, mean)
+        avg[1:2] <- c(mean=mean, r=r)
     }
-    r <- sqrt(c^2 + s^2)/n
-    mean <- atan2(s, c) *180/pi
-    mean <- ifelse(mean<=  0,mean + 360, mean)
-    avg[1:2] <- c(mean=mean, r=r)
-  }
-  if ( !missing(w) ) names(avg) <- paste("w",names(avg),sep=".")
-  avg
+    if ( !missing(w) ) names(avg) <- paste("w",names(avg),sep=".")
+    avg
 }
 #' calculates the mean of p-values and number of significant
 #' p-values (<\code{threshold}) and number of NA values
