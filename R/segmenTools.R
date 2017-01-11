@@ -117,17 +117,20 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(dat, text, axis=1:2, axis1.col, axis2.col, ...) {
+image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ...) {
 
     ## reverse columns and transpose
     imgdat <- t(apply(dat, 2, rev))
     image(x=1:ncol(dat), y=1:nrow(dat), z=imgdat, axes=FALSE, ...)
 
     ## add text
-    if ( !missing(text) )
+    if ( !missing(text) ) {
+        if ( missing(text.col) )
+            text.col <- rep(1, length(c(text)))
         text(x=rep(1:ncol(dat),nrow(dat)), y=rep(nrow(dat):1,each=ncol(dat)),
-             paste(t(text)))
-
+             paste(t(text)),col=t(text.col))
+    }
+    
     ## add axes
     ## TODO : handle axes=FALSE
     if ( !missing(axis) ) {
