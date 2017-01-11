@@ -315,7 +315,7 @@ for ( test.type in test.types ) {
     image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
-                 axes=FALSE,xlab=NA,ylab=NA)
+                 xlab=NA,ylab=NA)
     axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
     dev.off()
    
@@ -337,7 +337,7 @@ for ( test.type in test.types ) {
     image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
-                 axes=FALSE,xlab=NA,ylab=NA)
+                 xlab=NA,ylab=NA)
     axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
     dev.off()
 
@@ -407,7 +407,7 @@ for ( test.type in test.types ) {
     image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
-                 axes=FALSE,xlab=NA,ylab=NA)
+                 xlab=NA,ylab=NA)
     axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
     dev.off()
 
@@ -441,7 +441,7 @@ for ( test.type in test.types ) {
     image_matrix(-log2(pval) ,text=enum, axis=1:2,
                  col=c("#FFFFFF",rev(grey.colors(20))),
                  axis2.col=1:nrow(pval),
-                 axes=FALSE,xlab=NA,ylab=NA)
+                 xlab=NA,ylab=NA)
     axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
     dev.off()
 

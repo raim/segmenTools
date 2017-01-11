@@ -117,11 +117,11 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(dat, text, axis, axis1.col, axis2.col, ...) {
+image_matrix <- function(dat, text, axis=1:2, axis1.col, axis2.col, ...) {
 
     ## reverse columns and transpose
     imgdat <- t(apply(dat, 2, rev))
-    image(x=1:ncol(dat), y=1:nrow(dat), z=imgdat , ...)
+    image(x=1:ncol(dat), y=1:nrow(dat), z=imgdat, axes=FALSE, ...)
 
     ## add text
     if ( !missing(text) )
@@ -129,21 +129,22 @@ image_matrix <- function(dat, text, axis, axis1.col, axis2.col, ...) {
              paste(t(text)))
 
     ## add axes
+    ## TODO : handle axes=FALSE
     if ( !missing(axis) ) {
         if ( 1 %in% axis ) 
             if ( !missing(axis1.col) ) # colored ticks
-                for ( i in 1:nrow(dat) )
+                for ( i in 1:ncol(dat) )
                     axis(1, at=i,colnames(dat)[i],
                          col.axis=axis1.col[i], col=axis1.col[i],
-                         las=2,cex.axis=1.5, lwd=4)
+                         las=2, cex.axis=1.5, lwd=2)
             else
-                axis(1, at=1:ncol(dat), colnames(dat),las=2)
+                axis(1, at=1:ncol(dat), labels=colnames(dat), las=2)
         if ( 2 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
                 for ( i in 1:nrow(dat) )
-                        axis(2, at=nrow(dat)-i+1,rownames(dat)[i],
+                        axis(2, at=nrow(dat)-i+1, rownames(dat)[i],
                              col.axis=axis2.col[i], col=axis2.col[i],
-                             las=2,cex.axis=1.5, lwd=4)
+                             las=2, cex.axis=1.5, lwd=2)
             else
                 axis(2, at=nrow(dat):1, rownames(dat),las=2)        
     }
