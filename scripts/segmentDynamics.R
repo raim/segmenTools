@@ -307,6 +307,7 @@ for ( type in sgtypes ) {
     ## filter for at least one significant pvalue
     dat <- avg 
     unsig <- sgs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
+    lowex <- rds[,"t.0"]>.3    # MINIMAL FRACTION OF READ COUNTS>0
     short <- len < 150             # LONGER THEN 150
     rmvals <- unsig #|short #|     # TODO: does short filter help?
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
