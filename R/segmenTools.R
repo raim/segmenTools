@@ -80,6 +80,8 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::postscript(file.name, width=width, height=height,paper="special")
   if ( type == "pdf" )
     grDevices::pdf(file.name, width=width, height=height)
+  if ( type == "svg" )
+    grDevices::svg(file.name, width=width, height=height)
 }
 
 #' plot multiple cumulative distribution functions of overlap statistics, as
@@ -120,7 +122,10 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ...) {
 
     ## reverse columns and transpose
-    imgdat <- t(apply(dat, 2, rev))
+    if ( nrow(dat)>1 )
+        imgdat <- t(apply(dat, 2, rev))
+    else
+        imgdat <- t(dat)
     image(x=1:ncol(dat), y=1:nrow(dat), z=imgdat, axes=FALSE, ...)
 
     ## add text
@@ -770,7 +775,8 @@ readDist <- function(rds) {
            r.var=var(rds,na.rm=TRUE),
            r.min=min(rds,na.rm=TRUE),
            r.max=max(rds,na.rm=TRUE),
-           r.na=sum(is.na(rds)))
+           t.0=sum(rds==0,na.rm=TRUE)/length(rds),
+           r.na=sum(is.na(rds))/length(rds))
   avg
 }
 
