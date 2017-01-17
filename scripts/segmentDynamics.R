@@ -63,19 +63,22 @@ option_list <- list(
                 help="take mean ratio of each read time-series before calculating segment average"),
     make_option(c("--filter.reads"), action="store_true", default=FALSE,
                 help="use only reads with oscillation p.value < pval.thresh.sig for segment average caculation"),
-    ## SEGMENT TIME-SERIES PROCESSING FOR CLUSTERING
+    ## SEGMENT TIME-SERIES PROCESSING 
+  make_option(c("--trafo"), type="character", default="raw",
+                help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
+  make_option(c("--dc.trafo"), type="character", default="raw", 
+                help="DC component transformation function, see --trafo [default %default]"),
+    make_option("--perm", type="integer", default=0,
+                help="number of permutations used to calculate p-values for all DFT components"),
+    make_option("--smooth.time", type="integer", default=1, # best for clustering was 3
+                help="span of the moving average for smoothing of individual read time-series"),
+    ## SEGMENT CLUSTERING
     make_option(c("--cluster"), action="store_true", default=FALSE,
                 help="use flowClust to cluster time series"),
     make_option(c("--missing"), action="store_true", default=FALSE,
                 help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
-    make_option(c("--trafo"), type="character", default="raw",
-                help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
     make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
                 help="DFT components to use, comma-separated [default %default]"),
-    make_option(c("--dc.trafo"), type="character", default="raw", 
-                help="DC component transformation function, see --trafo [default %default]"),
-    make_option("--smooth.time", type="integer", default=3, # so far best! 
-                help="span of the moving average for smoothing of individual read time-series"),
 ##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
 ##                help="as smooth.time but only for plotting clusters not used of analysis"),
     ## FLOWCLUST PARAMETERS
@@ -280,7 +283,7 @@ for ( type in sgtypes ) {
     }
     avg <- t(apply(sgs,1,sgavg))
 
-    ## write out phase, pval, and clusters
+    ## write out phase, pval and read-count distributions
     ## convert back to chromosome coordinates
     seg <- index2coor(sgs,chrS)
     file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
@@ -293,6 +296,17 @@ for ( type in sgtypes ) {
     write.table(sgts,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
 
+
+    ## get DFT, use time series processing from segmenTier
+    ## this will be written out; re-calculated after filtering
+    ## below for clustering
+    tset <- processTimeseries(avg,smooth.time=smooth.time, trafo=trafo,
+                              perm=perm,
+                              dft.range=dft.range, dc.trafo=dc.trafo,
+                              use.snr=TRUE,low.thresh=-Inf)
+    ## write out phase, pval and DFT from segment averages
+
+    
     if ( !cluster ) next
 
     if ( verb>0 )
@@ -303,20 +317,17 @@ for ( type in sgtypes ) {
     ## and use these as centers, or cluster these instead?
     ## OR: trust cluster-segment and take only those reads that
     ## were in major clusters
-
-    ## filter for at least one significant pvalue
     dat <- avg 
     unsig <- sgs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
-    lowex <- rds[,"t.0"]>.3    # MINIMAL FRACTION OF READ COUNTS>0
+    lowex <- rds[,"t.0"]>.3        # MINIMAL FRACTION OF READ COUNTS>0
     short <- len < 150             # LONGER THEN 150
     rmvals <- unsig #|short #|     # TODO: does short filter help?
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
-
-    ## get DFT, use time series processing from segmenTier:
     tset <- processTimeseries(dat,smooth.time=smooth.time, trafo=trafo,
+                              perm=0,
                               dft.range=dft.range, dc.trafo=dc.trafo,
-                              use.snr=TRUE,low.thresh=-Inf,
-                              keep.zeros=FALSE)
+                              use.snr=TRUE,low.thresh=-Inf)
+
 
     ## cluster by flowClust
     fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K,
@@ -353,9 +364,9 @@ for ( type in sgtypes ) {
                 sep="\t",col.names=TRUE,row.names=FALSE)
 
     ## save all as RData
-    if ( save ) {
+    if ( save ) 
         save(seg, tset, fcset, file=paste(fname,".RData",sep=""))
-    }
+    
     ## PLOT CLUSTERING
 
     if ( verb>0 )
@@ -364,8 +375,7 @@ for ( type in sgtypes ) {
     ##if ( smooth.time!=smooth.time.plot )
     ##    tset <- processTimeseries(dat,smooth.time=smooth.time.plot, trafo=trafo,
     ##                              dft.range=dft.range, dc.trafo=dc.trafo,
-    ##                              use.snr=TRUE,low.thresh=-Inf,
-    ##                              keep.zeros=FALSE)
+    ##                              use.snr=TRUE,low.thresh=-Inf)
     
     ## plot time-courses
     ## if no smoothing was done, smooth for plots

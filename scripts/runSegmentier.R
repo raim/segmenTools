@@ -66,8 +66,6 @@ option_list <- list(
                 help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
     make_option("--low.thresh", default=-Inf,
                 help="cut-off to set low values to 0 [default %default]"),
-    make_option(c("--keep.zeros"), action="store_true", default=FALSE,
-                help="keep 0 values in clustering [default %default]"),
     ## DISCRETE FOURIER TRANSFORM
     make_option(c("--use.fft"), action="store_false", default=TRUE, 
                 help="do DFT of time-series [default %default]"),
