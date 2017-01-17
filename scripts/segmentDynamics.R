@@ -270,7 +270,7 @@ for ( type in sgtypes ) {
         
         ## write out phase, pval and read-count distributions
         ## convert back to chromosome coordinates
-        sgdst <- data.frame(sgs[,"ID"],rds,phs,pvs)
+        sgdst <- data.frame(ID=sgs[,"ID"],rds,phs,pvs)
         file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
         write.table(sgdst,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
@@ -404,7 +404,7 @@ for ( type in sgtypes ) {
 
     ## and add selected global clustering to segment table
     ## write out clusters
-    sgcls <- data.frame(sgs[,"ID"],sgCL=cls,mCL=mcls)
+    sgcls <- data.frame(ID=sgs[,"ID"],sgCL=cls,mCL=mcls)
     file.name <- file.path(out.path,paste(fname,"_clusters",sep=""))
     write.table(sgcls,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
