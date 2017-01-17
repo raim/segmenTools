@@ -144,8 +144,8 @@ if ( opt$verb>0 )
     cat(paste("SETTINGS:\n"))
 for ( i in 1:length(opt) ) {
     if ( opt$verb>0 )
-        cat(paste("\t",names(opt)[i], ":", #typeof(opt[[i]]),
-                  paste(opt[[i]],collapse=","), "\n"))
+        cat(paste(names(opt)[i], "\t", #typeof(opt[[i]]),
+                  paste(opt[[i]],collapse=","), "\n",sep=""))
     arg <- names(opt)[i]
     assign(arg, opt[[arg]])
 }
@@ -322,11 +322,11 @@ for ( type in sgtypes ) {
     dft <- NULL
     if ( "fourier" %in% jobs ) {
 
-        if ( verb>0 )
-          cat(paste("discrete fourier transform\t", time(), "\n"))
+        if ( perm==0 & verb>0 )
+          cat(paste("discrete fourier transform\t",time(),"\n"),sep="")
         if ( perm>0 & verb>0 )
-          cat(paste("fourier p-values (", perm,
-                    ") permutations\t", time(), "\n"))
+          cat(paste("fourier p-values (",perm,
+                    ") permutations\t", time(),"\n"),sep="")
         tset <- processTimeseries(avg[,read.rng],smooth.time=smooth.time,
                                   trafo=trafo, perm=perm,
                                   dft.range=dft.range, dc.trafo=dc.trafo,
@@ -343,6 +343,10 @@ for ( type in sgtypes ) {
         file.name <- file.path(out.path,paste(fname,"_fourier",sep=""))
         write.table(sgdft,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
+
+        ## our use rain
+        ## TODO: establish exact period from DO, then use rain
+        #res <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
     }
 
     
@@ -359,10 +363,12 @@ for ( type in sgtypes ) {
     ## TODO: use permutation results as filter; optionally load
     ## permutation from previous run!
     dat <- avg 
+    ##nosig <- dft[,"X2_p"] >0.1
+    #nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
     unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
-    lowex <- rds[,"t.0"]>.3        # MINIMAL FRACTION OF READ COUNTS>0
-    len <- sgs[,"end"]-sgs[,"start"]+1    
-    short <- len < 150             # LONGER THEN 150
+    ##lowex <- rds[,"t.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
+    ##len <- sgs[,"end"]-sgs[,"start"]+1    
+    ##short <- len < 150             # LONGER THEN 150
     rmvals <- unsig #|short #|     # TODO: does short filter help?
 
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
