@@ -53,7 +53,7 @@ option_list <- list(
     make_option("--pval.thresh.sig", default=1,
                 help="pvals above will be counted as non-significant [default %default]"),
     make_option("--read.rng", type="character", default="",
-                help="range of time-points for total read-count , comma-separated list of integers"),
+                help="range of time-points for total read-count and Fourier calculations (but not used for clustering!), comma-separated list of integers"),
     ## SEGMENT AVERAGING
     make_option(c("--endcut"), type="integer", default=0, 
                 help="fraction at segment ends that will not be considered for average time series"),
@@ -174,6 +174,11 @@ if ( verb>0 )
     cat(paste("Loading data:",datafile,"\t",time(),"\n"))
 load(datafile)
 
+## set missing read range to all!
+if ( length(read.rng)==0 ) {
+    read.rng <- 1:ncol(ts)
+}
+
 ## oscillation parameters (for first two cycles only)
 phase <- osc[,"phase" ]
 pval <- osc[,"rpval"]
@@ -238,9 +243,9 @@ for ( type in sgtypes ) {
     fname <- gsub(":",".",type) # FOR FILENAMES
     
     sgs <- lst[[type]]
-    len <- sgs[,"end"]-sgs[,"start"]+1    
 
     ## READ-COUNT DISTRIBUTIONS OF SEGMENTS
+    phs <- pvs <- rds <- NULL
     if ( "distribution" %in% jobs ) {
 
         if ( verb>0 )
@@ -264,7 +269,7 @@ for ( type in sgtypes ) {
         ## convert back to chromosome coordinates
         sgdst <- cbind(sgs[,"ID"],rds,phs,pvs)
         file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
-        write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
+        write.table(sgdst,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
     }
     
@@ -310,13 +315,15 @@ for ( type in sgtypes ) {
     ## get DFT, use time series processing from segmenTier
     ## this will be written out; re-calculated after filtering
     ## below for clustering
+    ## NOTE: using read.rng here as well (above for total read count)
+    dft <- NULL
     if ( "fourier" %in% jobs ) {
 
         if ( perm>0 & verb>0 )
           cat(paste("\tcalculating oscillation p-values (", perm,
                     ") permutations\t", time(), "\n"))
-        tset <- processTimeseries(avg,smooth.time=smooth.time, trafo=trafo,
-                                  perm=perm,
+        tset <- processTimeseries(avg[,read.rng],smooth.time=smooth.time,
+                                  trafo=trafo, perm=perm,
                                   dft.range=dft.range, dc.trafo=dc.trafo,
                                   use.snr=TRUE,low.thresh=-Inf, verb=verb)
         
@@ -343,17 +350,19 @@ for ( type in sgtypes ) {
     ## and use these as centers, or cluster these instead?
     ## OR: trust cluster-segment and take only those reads that
     ## were in major clusters
+
     ## TODO: use permutation results as filter; optionally load
     ## permutation from previous run!
     dat <- avg 
-    unsig <- sgs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
+    unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
     lowex <- rds[,"t.0"]>.3        # MINIMAL FRACTION OF READ COUNTS>0
+    len <- sgs[,"end"]-sgs[,"start"]+1    
     short <- len < 150             # LONGER THEN 150
     rmvals <- unsig #|short #|     # TODO: does short filter help?
+
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
     tset <- processTimeseries(dat,smooth.time=smooth.time, trafo=trafo,
-                              perm=0,
-                              dft.range=dft.range, dc.trafo=dc.trafo,
+                              perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
                               use.snr=TRUE,low.thresh=-Inf)
 
 
@@ -385,12 +394,13 @@ for ( type in sgtypes ) {
     
     ## write out clusters
     file.name <- file.path(out.path,paste(fname,"_clusters",sep=""))
-    write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
+    write.table(sgcls,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
 
     ## save all as RData
     if ( save.rdata ) 
-        save(seg, tset, fcset, file=paste(fname,".RData",sep=""))
+      save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls,
+           file=paste(fname,".RData",sep=""))
     
     ## PLOT CLUSTERING
 
