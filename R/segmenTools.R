@@ -775,7 +775,7 @@ readDist <- function(rds) {
            r.var=var(rds,na.rm=TRUE),
            r.min=min(rds,na.rm=TRUE),
            r.max=max(rds,na.rm=TRUE),
-           t.0=sum(rds==0,na.rm=TRUE)/length(rds),
+           r.0=sum(rds==0,na.rm=TRUE)/length(rds),
            r.na=sum(is.na(rds))/length(rds))
   avg
 }
