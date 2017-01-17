@@ -73,12 +73,10 @@ option_list <- list(
     make_option("--smooth.time", type="integer", default=1, # best for clustering was 3
                 help="span of the moving average for smoothing of individual read time-series"),
     ## SEGMENT CLUSTERING
-    make_option(c("--cluster"), action="store_true", default=FALSE,
-                help="use flowClust to cluster time series"),
     make_option(c("--missing"), action="store_true", default=FALSE,
                 help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
     make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
-                help="DFT components to use, comma-separated [default %default]"),
+                help="DFT components to use for clustering, comma-separated [default %default]"),
 ##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
 ##                help="as smooth.time but only for plotting clusters not used of analysis"),
     ## FLOWCLUST PARAMETERS
@@ -102,6 +100,8 @@ option_list <- list(
                 help="A numeric indicating whether the Box-Cox transformation
           parameter is estimated from the data; 0: no, 1: non-specific, 2: cluster-specific estim. of lambda"), ## TODO: try 2
     ## OUTPUT OPTIONS
+    make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,clustering", 
+                help=",-separated list of rseults to save as csv: distributions,timeseries,fourier,clustering; default is to save all, clustering only if specified by separate option --cluster, and fourier results will contain p-values only of --perm was specified and >1"),
     make_option(c("--out.name"), type="character", default=".", 
                 help="file name prefix of summary file"),
     make_option(c("--out.path"), type="character", default=".", 
@@ -110,8 +110,8 @@ option_list <- list(
                 help="0: silent, 1: main messages, 2: warning messages"),
     make_option(c("--fig.type"), type="character", default="png",
                 help="figure type, png or pdf [default %default]"),
-    make_option(c("--save"), action="store_true", default=FALSE,
-                help="save analysis as RData file (big!)"))
+    make_option(c("--save.rdata"), action="store_true", default=FALSE,
+                help="save complete analysis as RData file (big!)"))
 
 ## get command line options
 opt <- parse_args(OptionParser(option_list=option_list))
@@ -120,6 +120,7 @@ opt <- parse_args(OptionParser(option_list=option_list))
 lst.args <- c(dft.range="numeric",
               read.rng="numeric",
               stypes="character",
+              jobs="character",
               K="numeric")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
@@ -223,10 +224,12 @@ segnum <- unlist(lapply(lst,nrow))
 
 ## cluster number of max BIC clustering
 ## will be used in segmentation analysis together with results from
-## segmentLengths and testSegments 
-clnum <- matrix(NA, length(sgtypes),ncol=4) 
-rownames(clnum) <- sgtypes
-colnames(clnum) <- c("K","BIC","NUMCL", "TOT")
+## segmentLengths and testSegments
+if ( "clustering" %in% jobs ) {
+    clnum <- matrix(NA, length(sgtypes),ncol=4) 
+    rownames(clnum) <- sgtypes
+    colnames(clnum) <- c("K","BIC","NUMCL", "TOT")
+}
 
 for ( type in sgtypes ) {
 
@@ -236,44 +239,55 @@ for ( type in sgtypes ) {
     
     sgs <- lst[[type]]
     len <- sgs[,"end"]-sgs[,"start"]+1    
-    ## following code original from tataproject/yeast/scripts/segmentseq.r
-    ## CALCULATE OSCI PARAMETERS FOR SEGMENTS
-    
-    if ( verb>0 )
-        cat(paste("\tcalculating segment read statistics\t",time(),"\n"))
-    
-    ## add phase distribution, weighted by p-values!
-    phs <- t(apply(sgs,1,function(x)
-        phaseDist(phase[x["start"]:x["end"]],w=wght[x["start"]:x["end"]])))
-    
-    sgs <- cbind(sgs,phs)
 
-    ## raw pvalue distribution
-    ## NOTE only p.signif is used, fraction of significantly oscillating reads!
-    pvs<-t(apply(sgs,1,function(x)
-        pvalDist(pval[x["start"]:x["end"]],pval.thresh.sig)))
-    sgs <- cbind(sgs,pvs)
+    ## READ-COUNT DISTRIBUTIONS OF SEGMENTS
+    if ( "distribution" %in% jobs ) {
 
-    ## total range of expression
-    ## NOTE: ONLY TAKING FIRST 20 TIMEPOINTS TO SKIP SHIFT IN THE END?
-    rds <-t(apply(sgs,1,function(x)
-        readDist(c(ts[x["start"]:x["end"],read.rng]))))
-    sgs <- cbind(sgs,rds)
+        if ( verb>0 )
+          cat(paste("\tcalculating segment read statistics\t",time(),"\n"))
+        
+        ## add phase distribution, weighted by p-values!
+        phs <- t(apply(sgs,1,function(x)
+                       phaseDist(phase[x["start"]:x["end"]],
+                                 w=wght[x["start"]:x["end"]])))
+        ## raw pvalue distribution
+        ## NOTE only p.signif is used, fraction of signif. oscill. reads!
+        pvs<-t(apply(sgs,1,function(x)
+                     pvalDist(pval[x["start"]:x["end"]],pval.thresh.sig)))
+
+        ## total range of expression
+        ## NOTE: ONLY TAKING FIRST 20 TIMEPOINTS TO SKIP SHIFT IN THE END?
+        rds <-t(apply(sgs,1,function(x)
+                      readDist(c(ts[x["start"]:x["end"],read.rng]))))
+        
+        ## write out phase, pval and read-count distributions
+        ## convert back to chromosome coordinates
+        sgdst <- cbind(sgs[,"ID"],rds,phs,pvs)
+        file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
+        write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                    sep="\t",col.names=TRUE,row.names=FALSE)
+    }
+    
+    if ( !any(c("timeseries","fourier","clustering") %in% jobs) )
+      next
 
     ## AVERAGE SEGMENT TIME-SERIES
+    ## required for all following options
+    
     ## NOTE: 20161231 - all smoothing attempts failed, and the
     ## simple mean of each nucleotide works best
     ## TODO: rm extrema (take only center 85%)?
     ## runmed (avgk>1) before global mean?
     ## why doesnt median work (clustering fails)?
     ## try to filter for most significant oscillators?
+      
     if ( verb>0 )
-        cat(paste("\tcalculating average segment time series\t",time(),"\n"))
+      cat(paste("\tcalculating average segment time series\t",time(),"\n"))
     sgavg <- function(x) {
         rng <- as.numeric(x["start"]):as.numeric(x["end"])
         rds <- ts[rng,]
         if ( filter.reads )
-            rds <- rds[pval[rng] < pval.thresh.sig]
+          rds <- rds[pval[rng] < pval.thresh.sig]
         ## get average
         avg <- segmentAverage(rds,
                               avg="mean",endcut=endcut,k=avgk,endrule="median",
@@ -282,33 +296,45 @@ for ( type in sgtypes ) {
         avg
     }
     avg <- t(apply(sgs,1,sgavg))
-
-    ## write out phase, pval and read-count distributions
-    ## convert back to chromosome coordinates
-    seg <- index2coor(sgs,chrS)
-    file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
-    write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
-                sep="\t",col.names=TRUE,row.names=FALSE)
-
+    
+    
     ## write out average timeseries
-    sgts <- data.frame(ID=sgs[,"ID"], avg)
-    file.name <- file.path(out.path,paste(fname,"_timeseries",sep=""))
-    write.table(sgts,file=paste(file.name,".csv",sep=""),quote=FALSE,
-                sep="\t",col.names=TRUE,row.names=FALSE)
-
+    if ( "timeseries" %in% jobs ) {
+        sgts <- data.frame(ID=sgs[,"ID"], avg)
+        file.name <- file.path(out.path,paste(fname,"_timeseries",sep=""))
+        write.table(sgts,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                    sep="\t",col.names=TRUE,row.names=FALSE)
+    }
+    
 
     ## get DFT, use time series processing from segmenTier
     ## this will be written out; re-calculated after filtering
     ## below for clustering
-    tset <- processTimeseries(avg,smooth.time=smooth.time, trafo=trafo,
-                              perm=perm,
-                              dft.range=dft.range, dc.trafo=dc.trafo,
-                              use.snr=TRUE,low.thresh=-Inf)
-    ## write out phase, pval and DFT from segment averages
+    if ( "fourier" %in% jobs ) {
+
+        if ( perm>0 & verb>0 )
+          cat(paste("\tcalculating oscillation p-values (", perm,
+                    ") permutations\t", time(), "\n"))
+        tset <- processTimeseries(avg,smooth.time=smooth.time, trafo=trafo,
+                                  perm=perm,
+                                  dft.range=dft.range, dc.trafo=dc.trafo,
+                                  use.snr=TRUE,low.thresh=-Inf, verb=verb)
+        
+        ## write out phase, pval and DFT from segment averages
+        dft <- tset$dft
+        if ( perm>0 ) {
+            pvl <- tset$pvalues
+            colnames(pvl) <- paste(colnames(pvl),"p",sep="_")
+            dft <- data.frame(dft,pvl)
+        }
+        sgdft <- data.frame(ID=sgs[,"ID"], dft)
+        file.name <- file.path(out.path,paste(fname,"_fourier",sep=""))
+        write.table(sgdft,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                    sep="\t",col.names=TRUE,row.names=FALSE)
+    }
 
     
-    if ( !cluster ) next
-
+    if ( !"clustering" %in% jobs ) next
     if ( verb>0 )
         cat(paste("\tclustering average segment time series\t",time(),"\n"))
 
@@ -317,6 +343,8 @@ for ( type in sgtypes ) {
     ## and use these as centers, or cluster these instead?
     ## OR: trust cluster-segment and take only those reads that
     ## were in major clusters
+    ## TODO: use permutation results as filter; optionally load
+    ## permutation from previous run!
     dat <- avg 
     unsig <- sgs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
     lowex <- rds[,"t.0"]>.3        # MINIMAL FRACTION OF READ COUNTS>0
@@ -353,18 +381,15 @@ for ( type in sgtypes ) {
                       NUMCL=sum(!tset$rm.vals), TOT=nrow(avg))
 
     ## and add selected global clustering to segment table
-    sgs <- cbind(sgs,sgCL=cls,mCL=mcls)
+    sgcls <- cbind(sgs[,"ID"],sgCL=cls,mCL=mcls)
     
-    ## convert back to chromosome coordinates
-    seg <- index2coor(sgs,chrS)
-
     ## write out clusters
     file.name <- file.path(out.path,paste(fname,"_clusters",sep=""))
     write.table(seg,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
 
     ## save all as RData
-    if ( save ) 
+    if ( save.rdata ) 
         save(seg, tset, fcset, file=paste(fname,".RData",sep=""))
     
     ## PLOT CLUSTERING
@@ -427,16 +452,16 @@ for ( type in sgtypes ) {
     dev.off()
 }
 
-if ( cluster ) {
+## write out summary for analysis over segmentation types!
+if ( !"clustering" %in% jobs ) {
     if ( verb>0 )
         cat(paste("saving clustering results\t",time(),"\n"))
-    ## write out summary
     clnum <- cbind(ID=rownames(clnum), clnum)
     if ( out.name == "" ) {
         file.name <- "clustering"
     } else {
         file.name <- paste(out.name,"clustering",sep="_")
-}
+    }
     file.name <- file.path(out.path,file.name)
     write.table(clnum,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
