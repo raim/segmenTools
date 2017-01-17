@@ -102,7 +102,7 @@ option_list <- list(
     ## OUTPUT OPTIONS
     make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,clustering", 
                 help=",-separated list of rseults to save as csv: distributions,timeseries,fourier,clustering; default is to save all, clustering only if specified by separate option --cluster, and fourier results will contain p-values only of --perm was specified and >1"),
-    make_option(c("--out.name"), type="character", default=".", 
+    make_option(c("--out.name"), type="character", default="", 
                 help="file name prefix of summary file"),
     make_option(c("--out.path"), type="character", default=".", 
                 help="directory path for output data (figures, csv files)"),
@@ -238,6 +238,9 @@ if ( "clustering" %in% jobs ) {
 
 for ( type in sgtypes ) {
 
+    if ( !exists("type", mode="character") )
+      type <- sgtypes[1] ## NOTE: DEVEL HELPER - NOT REQUIRED
+
     if ( verb>0 )
         cat(paste(type, "\t",time(),"\n"))
     fname <- gsub(":",".",type) # FOR FILENAMES
@@ -249,7 +252,7 @@ for ( type in sgtypes ) {
     if ( "distribution" %in% jobs ) {
 
         if ( verb>0 )
-          cat(paste("\tcalculating segment read statistics\t",time(),"\n"))
+          cat(paste("segment read statistics\t",time(),"\n"))
         
         ## add phase distribution, weighted by p-values!
         phs <- t(apply(sgs,1,function(x)
@@ -287,7 +290,7 @@ for ( type in sgtypes ) {
     ## try to filter for most significant oscillators?
       
     if ( verb>0 )
-      cat(paste("\tcalculating average segment time series\t",time(),"\n"))
+      cat(paste("segment average time series\t",time(),"\n"))
     sgavg <- function(x) {
         rng <- as.numeric(x["start"]):as.numeric(x["end"])
         rds <- ts[rng,]
@@ -319,8 +322,10 @@ for ( type in sgtypes ) {
     dft <- NULL
     if ( "fourier" %in% jobs ) {
 
+        if ( verb>0 )
+          cat(paste("discrete fourier transform\t", time(), "\n"))
         if ( perm>0 & verb>0 )
-          cat(paste("\tcalculating oscillation p-values (", perm,
+          cat(paste("fourier p-values (", perm,
                     ") permutations\t", time(), "\n"))
         tset <- processTimeseries(avg[,read.rng],smooth.time=smooth.time,
                                   trafo=trafo, perm=perm,
@@ -343,7 +348,7 @@ for ( type in sgtypes ) {
     
     if ( !"clustering" %in% jobs ) next
     if ( verb>0 )
-        cat(paste("\tclustering average segment time series\t",time(),"\n"))
+        cat(paste("clustering segments\t",time(),"\n"))
 
     ## CLUSTER DFT OF AVERAGE TIME-SERIES
     ## TODO: instead, collect DFT cluster centers of segments
