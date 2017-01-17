@@ -365,6 +365,7 @@ for ( type in sgtypes ) {
     ## permutation from previous run!
     dat <- avg 
     ##nosig <- dft[,"X2_p"] >0.1
+    ## TODO: use nonsig - no significant pvalue in any fourier component!
     #nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
     unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
     ##lowex <- rds[,"r.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
