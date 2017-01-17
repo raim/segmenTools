@@ -27,7 +27,7 @@ echo ANTISENSE $asprimseg SEGMENT $asid
 if  [ "$plot" = "plot" ]; then
     settings=$GENBRO/data/selections.R
     genome=$GENDAT/yeast
-    selection=gene
+    selection=method
     out=primseg_$primseg
 
     # GREP COORDINATES
