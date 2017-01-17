@@ -33,85 +33,85 @@ suppressPackageStartupMessages(library(optparse))
 
 ### OPTIONS
 option_list <- list(
-    make_option(c("-i", "--infile"), type="character", default="", 
-                help="chromosome coordinates of primary segments as produced by clusterSegments.R but without header ('allsegs.csv')"),    
-    make_option(c("--chrfile"), type="character", default="",
-                help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
-    ##chrfile = $YEASTDAT/chromosomes/sequenceIndex_R64-1-1_20110208.csv
-    make_option(c("--datafile"), type="character", default="",
-                help="full data set, RData that contains the time series in matrix 'ts' and its genomic coordinates in matrix 'coor' [default %default]"),
-    ## SEGMENT SETTINGS
-    make_option(c("--fuse.segs"), action="store_true", default=FALSE,
-                help="use FUSE tag from clusterSegments to fuse adjacent segments"),
-    make_option(c("--stypes"), type="character", default="", 
-                help="sub-set of segments in column 'type'"),
-    ## OSCILLATION SETTINGS
-    make_option("--pval.thresh", default=1,
-                help="phases above this thresh will be set to NA [default %default]"),
-    make_option("--phase.weight", action="store_true", default=FALSE,
-                help="use weight for calculating average phases of segments: 1-p.value [default %default]"),
-    make_option("--pval.thresh.sig", default=1,
-                help="pvals above will be counted as non-significant [default %default]"),
-    make_option("--read.rng", type="character", default="",
-                help="range of time-points for total read-count and Fourier calculations (but not used for clustering!), comma-separated list of integers"),
-    ## SEGMENT AVERAGING
-    make_option(c("--endcut"), type="integer", default=0, 
-                help="fraction at segment ends that will not be considered for average time series"),
-    make_option("--avgk", type="integer", default=0,
-                help="integer width of running median smoothing window, using stats::runmed; must be odd"),
-    make_option(c("--mean.ratio"), action="store_true", default=FALSE,
-                help="take mean ratio of each read time-series before calculating segment average"),
-    make_option(c("--filter.reads"), action="store_true", default=FALSE,
-                help="use only reads with oscillation p.value < pval.thresh.sig for segment average caculation"),
-    ## SEGMENT TIME-SERIES PROCESSING 
+  make_option(c("-i", "--infile"), type="character", default="", 
+              help="chromosome coordinates of primary segments as produced by clusterSegments.R but without header ('allsegs.csv')"),    
+  make_option(c("--chrfile"), type="character", default="",
+              help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
+  ##chrfile = $YEASTDAT/chromosomes/sequenceIndex_R64-1-1_20110208.csv
+  make_option(c("--datafile"), type="character", default="",
+              help="full data set, RData that contains the time series in matrix 'ts' and its genomic coordinates in matrix 'coor' [default %default]"),
+  ## SEGMENT SETTINGS
+  make_option(c("--fuse.segs"), action="store_true", default=FALSE,
+              help="use FUSE tag from clusterSegments to fuse adjacent segments"),
+  make_option(c("--stypes"), type="character", default="", 
+              help="sub-set of segments in column 'type'"),
+  ## OSCILLATION SETTINGS
+  make_option("--pval.thresh", default=1,
+              help="phases above this thresh will be set to NA [default %default]"),
+  make_option("--phase.weight", action="store_true", default=FALSE,
+              help="use weight for calculating average phases of segments: 1-p.value [default %default]"),
+  make_option("--pval.thresh.sig", default=1,
+              help="pvals above will be counted as non-significant [default %default]"),
+  make_option("--read.rng", type="character", default="",
+              help="range of time-points for total read-count and Fourier calculations (but not used for clustering!), comma-separated list of integers"),
+  ## SEGMENT AVERAGING
+  make_option(c("--endcut"), type="integer", default=0, 
+              help="fraction at segment ends that will not be considered for average time series"),
+  make_option("--avgk", type="integer", default=0,
+              help="integer width of running median smoothing window, using stats::runmed; must be odd"),
+  make_option(c("--mean.ratio"), action="store_true", default=FALSE,
+              help="take mean ratio of each read time-series before calculating segment average"),
+  make_option(c("--filter.reads"), action="store_true", default=FALSE,
+              help="use only reads with oscillation p.value < pval.thresh.sig for segment average caculation"),
+  ## SEGMENT TIME-SERIES PROCESSING 
   make_option(c("--trafo"), type="character", default="raw",
-                help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
+              help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
   make_option(c("--dc.trafo"), type="character", default="raw", 
-                help="DC component transformation function, see --trafo [default %default]"),
-    make_option("--perm", type="integer", default=0,
-                help="number of permutations used to calculate p-values for all DFT components"),
-    make_option("--smooth.time", type="integer", default=1, # best for clustering was 3
-                help="span of the moving average for smoothing of individual read time-series"),
-    ## SEGMENT CLUSTERING
-    make_option(c("--missing"), action="store_true", default=FALSE,
-                help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
-    make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
-                help="DFT components to use for clustering, comma-separated [default %default]"),
-##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
-##                help="as smooth.time but only for plotting clusters not used of analysis"),
-    ## FLOWCLUST PARAMETERS
-    make_option("--ncpu", type="integer", default=1, 
-                help="number of available cores for flowClust"),
-#    make_option("--seed", type="integer", default=1, 
-#                help="seed for the random number generator before calling flowclust to get stable clustering results (TODO: set.seed, does it work for flowclust?)"),
-    make_option(c("--K"), type="character", default="12:20", 
-                help="number of clusters to use in flowClust, comma-separated list of integers and colon-separated ranges [default %default]"),
-    make_option("--B", type="integer", default=500, 
-                help="maximal number of EM iterations of flowClust"),
-    make_option("--tol", default=1e-5, 
-                help="tolerance for EM convergence in flowClust"),
+              help="DC component transformation function, see --trafo [default %default]"),
+  make_option("--perm", type="integer", default=0,
+              help="number of permutations used to calculate p-values for all DFT components"),
+  make_option("--smooth.time", type="integer", default=1, # best for clustering was 3
+              help="span of the moving average for smoothing of individual read time-series"),
+  ## SEGMENT CLUSTERING
+  make_option(c("--missing"), action="store_true", default=FALSE,
+              help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
+  make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
+              help="DFT components to use for clustering, comma-separated [default %default]"),
+  ##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
+  ##                help="as smooth.time but only for plotting clusters not used of analysis"),
+  ## FLOWCLUST PARAMETERS
+  make_option("--ncpu", type="integer", default=1, 
+              help="number of available cores for flowClust"),
+  ##    make_option("--seed", type="integer", default=1, 
+  ##                help="seed for the random number generator before calling flowclust to get stable clustering results (TODO: set.seed, does it work for flowclust?)"),
+  make_option(c("--K"), type="character", default="12:20", 
+              help="number of clusters to use in flowClust, comma-separated list of integers and colon-separated ranges [default %default]"),
+  make_option("--B", type="integer", default=500, 
+              help="maximal number of EM iterations of flowClust"),
+  make_option("--tol", default=1e-5, 
+              help="tolerance for EM convergence in flowClust"),
     make_option("--lambda", default=1, 
                 help="intial Box-Cox transformation parameter in flowClust"),
-    make_option("--nu", default=4, 
-                help="degrees of freedom used for the t distribution in flowClust; Inf for pure Gaussian"),
-    make_option("--nu.est", type="integer", default=0, 
-                help="A numeric indicating whether ‘nu’ is to be estimated or not; 0: no, 1: non-specific, 2: cluster-specific estimation of nu"),
-    make_option("--trans", type="integer", default=1, 
-                help="A numeric indicating whether the Box-Cox transformation
+  make_option("--nu", default=4, 
+              help="degrees of freedom used for the t distribution in flowClust; Inf for pure Gaussian"),
+  make_option("--nu.est", type="integer", default=0, 
+              help="A numeric indicating whether ‘nu’ is to be estimated or not; 0: no, 1: non-specific, 2: cluster-specific estimation of nu"),
+  make_option("--trans", type="integer", default=1, 
+              help="A numeric indicating whether the Box-Cox transformation
           parameter is estimated from the data; 0: no, 1: non-specific, 2: cluster-specific estim. of lambda"), ## TODO: try 2
-    ## OUTPUT OPTIONS
-    make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,clustering", 
-                help=",-separated list of rseults to save as csv: distributions,timeseries,fourier,clustering; default is to save all, clustering only if specified by separate option --cluster, and fourier results will contain p-values only of --perm was specified and >1"),
-    make_option(c("--out.name"), type="character", default="", 
-                help="file name prefix of summary file"),
-    make_option(c("--out.path"), type="character", default=".", 
-                help="directory path for output data (figures, csv files)"),
-    make_option(c("-v", "--verb"), type="integer", default=1, 
-                help="0: silent, 1: main messages, 2: warning messages"),
-    make_option(c("--fig.type"), type="character", default="png",
-                help="figure type, png or pdf [default %default]"),
-    make_option(c("--save.rdata"), action="store_true", default=FALSE,
-                help="save complete analysis as RData file (big!)"))
+  ## OUTPUT OPTIONS
+  make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,clustering", 
+              help=",-separated list of rseults to save as csv: distributions,timeseries,fourier,clustering; default is to save all, clustering only if specified by separate option --cluster, and fourier results will contain p-values only of --perm was specified and >1"),
+  make_option(c("--out.name"), type="character", default="", 
+              help="file name prefix of summary file"),
+  make_option(c("--out.path"), type="character", default=".", 
+              help="directory path for output data (figures, csv files)"),
+  make_option(c("-v", "--verb"), type="integer", default=1, 
+              help="0: silent, 1: main messages, 2: warning messages"),
+  make_option(c("--fig.type"), type="character", default="png",
+              help="figure type, png or pdf [default %default]"),
+  make_option(c("--save.rdata"), action="store_true", default=FALSE,
+              help="save complete analysis as RData file (big!)"))
 
 ## get command line options
 opt <- parse_args(OptionParser(option_list=option_list))
@@ -175,9 +175,9 @@ if ( verb>0 )
 load(datafile)
 
 ## set missing read range to all!
-if ( length(read.rng)==0 ) {
-    read.rng <- 1:ncol(ts)
-}
+if ( length(read.rng)==0 ) 
+  read.rng <- 1:ncol(ts)
+
 
 ## oscillation parameters (for first two cycles only)
 phase <- osc[,"phase" ]
@@ -323,10 +323,11 @@ for ( type in sgtypes ) {
     if ( "fourier" %in% jobs ) {
 
         if ( perm==0 & verb>0 )
-          cat(paste("discrete fourier transform\t",time(),"\n"),sep="")
+          cat(paste("discrete fourier transform\t",time(),"\n",sep=""))
         if ( perm>0 & verb>0 )
           cat(paste("fourier p-values (",perm,
-                    ") permutations\t", time(),"\n"),sep="")
+                    ") permutations\t", time(),"\n",sep=""))
+        
         tset <- processTimeseries(avg[,read.rng],smooth.time=smooth.time,
                                   trafo=trafo, perm=perm,
                                   dft.range=dft.range, dc.trafo=dc.trafo,
@@ -474,7 +475,7 @@ for ( type in sgtypes ) {
 }
 
 ## write out summary for analysis over segmentation types!
-if ( !"clustering" %in% jobs ) {
+if ( "clustering" %in% jobs ) {
     if ( verb>0 )
         cat(paste("saving clustering results\t",time(),"\n"))
     clnum <- cbind(ID=rownames(clnum), clnum)
