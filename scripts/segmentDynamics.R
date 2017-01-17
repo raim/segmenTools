@@ -489,6 +489,8 @@ if ( "clustering" %in% jobs ) {
                 sep="\t",col.names=TRUE,row.names=FALSE)
 }
 
+if ( verb>0 )
+  cat(paste("DONE\t",time(),"\n"))
 if ( !interactive() ) quit(save="no")
 
 ## TODO (but elsewhere) :
