@@ -253,6 +253,10 @@ for ( type in sgtypes ) {
 
         if ( verb>0 )
           cat(paste("segment read statistics\t",time(),"\n"))
+        ##file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
+        ##if ( file.exists(file.name) & !redo) {
+        ##    cat(paste("\talready done\n")
+        ##}
         
         ## add phase distribution, weighted by p-values!
         phs <- t(apply(sgs,1,function(x)
@@ -320,7 +324,7 @@ for ( type in sgtypes ) {
     ## below for clustering
     ## NOTE: using read.rng here as well (above for total read count)
     dft <- NULL
-    if ( "fourier" %in% jobs ) {
+    if ( any(c("fourier","clustering") %in% jobs) ) {
 
         if ( perm==0 & verb>0 )
           cat(paste("discrete fourier transform\t",time(),"\n",sep=""))
@@ -366,12 +370,13 @@ for ( type in sgtypes ) {
     dat <- avg 
     ##nosig <- dft[,"X2_p"] >0.1
     ## TODO: use nonsig - no significant pvalue in any fourier component!
-    #nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
-    unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
-    ##lowex <- rds[,"r.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
-    ##len <- sgs[,"end"]-sgs[,"start"]+1    
-    ##short <- len < 150             # LONGER THEN 150
-    rmvals <- unsig #|short #|     # TODO: does short filter help?
+    nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
+    #nonsig[is.na(nonsig)] <- TRUE
+    #unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
+    #lowex <- rds[,"t.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
+    #len <- sgs[,"end"]-sgs[,"start"]+1    
+    #short <- len < 100             # LONGER THEN 150
+    rmvals <- nonsig #|unsig #|short #|     # TODO: does short filter help?
 
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
     tset <- processTimeseries(dat,smooth.time=smooth.time, trafo=trafo,
