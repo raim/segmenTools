@@ -367,7 +367,7 @@ for ( type in sgtypes ) {
     ##nosig <- dft[,"X2_p"] >0.1
     #nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
     unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
-    ##lowex <- rds[,"t.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
+    ##lowex <- rds[,"r.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
     ##len <- sgs[,"end"]-sgs[,"start"]+1    
     ##short <- len < 150             # LONGER THEN 150
     rmvals <- unsig #|short #|     # TODO: does short filter help?
