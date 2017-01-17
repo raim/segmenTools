@@ -367,9 +367,10 @@ for ( type in sgtypes ) {
 
     ## TODO: use permutation results as filter; optionally load
     ## permutation from previous run!
+    ## TODO: move back to unsig! was the most sensible!
     dat <- avg 
     ##nosig <- dft[,"X2_p"] >0.1
-    ## TODO: use nonsig - no significant pvalue in any fourier component!
+    ## nonsig - no significant pvalue in any fourier component!
     nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
     #nonsig[is.na(nonsig)] <- TRUE
     #unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
