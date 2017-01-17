@@ -125,10 +125,10 @@ lst.args <- c(dft.range="numeric",
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
     ## get individual values
-    tmp <- strsplit(opt[[idx]], ",")
+    tmp <- as.list(unlist(strsplit(opt[[idx]], ",")))
     ## expand ranges
     if ( lst.args[i]=="numeric" )
-        for ( j in 1:length(opt[[idx]]) ) { # only for numeric modes
+        for ( j in 1:length(tmp) ) { # only for numeric modes
             tmp2 <- unlist(strsplit(tmp[[j]], ":"))
             if ( length(tmp2)>1 ) {
                 tmp2 <- as.numeric(tmp2)
