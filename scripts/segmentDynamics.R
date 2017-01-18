@@ -171,7 +171,7 @@ chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 
 ## load time-series and oscillation data: coor, ts, osc
 if ( verb>0 )
-    cat(paste("Loading data:",datafile,"\t",time(),"\n"))
+    cat(paste("Loading data\t",time(),"\n"))
 load(datafile)
 
 ## set missing read range to all!
@@ -196,7 +196,7 @@ if ( phase.weight ) wght <-  1-pval
 ## LOAD SEGMENTS
 
 if ( verb>0 )
-    cat(paste("Loading segments:",infile,"\t",time(),"\n"))
+    cat(paste("Loading segments\t",time(),"\n"))
 segs <- read.table(infile,sep="\t",header=TRUE)
 
 ## reduce to requested segment types
@@ -294,7 +294,7 @@ for ( type in sgtypes ) {
     ## try to filter for most significant oscillators?
       
     if ( verb>0 )
-      cat(paste("segment average time series\t",time(),"\n"))
+      cat(paste("segment time series\t",time(),"\n"))
     sgavg <- function(x) {
         rng <- as.numeric(x["start"]):as.numeric(x["end"])
         rds <- ts[rng,]
@@ -326,11 +326,10 @@ for ( type in sgtypes ) {
     dft <- NULL
     if ( any(c("fourier","clustering") %in% jobs) ) {
 
-        if ( perm==0 & verb>0 )
-          cat(paste("discrete fourier transform\t",time(),"\n",sep=""))
+        if ( verb>0 )
+          cat(paste("fourier transform\t",time(),"\n",sep=""))
         if ( perm>0 & verb>0 )
-          cat(paste("fourier p-values (",perm,
-                    ") permutations\t", time(),"\n",sep=""))
+          cat(paste("permutations\t", perm,"\n",sep=""))
         
         tset <- processTimeseries(avg[,read.rng],smooth.time=smooth.time,
                                   trafo=trafo, perm=perm,
@@ -357,7 +356,7 @@ for ( type in sgtypes ) {
     
     if ( !"clustering" %in% jobs ) next
     if ( verb>0 )
-        cat(paste("clustering segments\t",time(),"\n"))
+        cat(paste("segment clustering\t",time(),"\n"))
 
     ## CLUSTER DFT OF AVERAGE TIME-SERIES
     ## TODO: instead, collect DFT cluster centers of segments
@@ -369,15 +368,28 @@ for ( type in sgtypes ) {
     ## permutation from previous run!
     ## TODO: move back to unsig! was the most sensible!
     dat <- avg 
-    ##nosig <- dft[,"X2_p"] >0.1
-    ## nonsig - no significant pvalue in any fourier component!
-    nonsig <- !apply(tset$pvalues,1,function(x) any(x<.05))
-    #nonsig[is.na(nonsig)] <- TRUE
-    #unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT OSCILLATOR
-    #lowex <- rds[,"t.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
-    #len <- sgs[,"end"]-sgs[,"start"]+1    
-    #short <- len < 100             # LONGER THEN 150
-    rmvals <- nonsig #|unsig #|short #|     # TODO: does short filter help?
+
+    ## FILTERS
+    ## NOTE: 20170118
+    ## currently only `unsig' works well in filtering segment mass in
+    ## exponent>1; however, this is based on prior pvalue of read-counts
+    ## while it may be nicer to have a filter based on segment averages
+
+    ##nosig <- dft[,"X2_p"] >= 0.05; nosig[is.na(nosig)] <- TRUE # NO SIG @PERIOD
+    #### nonsig - NO SIGNIFICANT PVALUE IN ANY FOURIER COMPONENT!
+    ##nonsig <- !apply(tset$pvalues,1,function(x) any(x< .05))
+    ##nonsig[is.na(nonsig)] <- TRUE
+    ##lowex <- rds[,"r.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
+    ##len <- sgs[,"end"]-sgs[,"start"]+1
+    ##short <- len < 100             # LONGER THEN 150
+
+    unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT NT. pval.thresh.sig
+    rmvals <- unsig #|nonsig #|short #|     # TODO: does short filter help?
+
+    if ( verb>0 ) {
+        cat(paste("clustered segments\t",sum(!rmvals),"\n"))
+        cat(paste("noise segments\t",sum(rmvals),"\n"))
+    }
 
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
     tset <- processTimeseries(dat,smooth.time=smooth.time, trafo=trafo,
