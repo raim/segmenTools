@@ -248,8 +248,9 @@ for ( type in sgtypes ) {
     sgs <- lst[[type]]
 
     ## READ-COUNT DISTRIBUTIONS OF SEGMENTS
+    ## pvs required for filtering before clustering
     phs <- pvs <- rds <- NULL
-    if ( "distribution" %in% jobs ) {
+    if ( any(c("distribution","clustering") %in% jobs) ) {
 
         if ( verb>0 )
           cat(paste("segment read statistics\t",time(),"\n"))
@@ -324,7 +325,8 @@ for ( type in sgtypes ) {
     ## below for clustering
     ## NOTE: using read.rng here as well (above for total read count)
     dft <- NULL
-    if ( any(c("fourier","clustering") %in% jobs) ) {
+    ##if ( any(c("fourier","clustering") %in% jobs) ) {
+    if ( any(c("fourier") %in% jobs) ) {
 
         if ( verb>0 )
           cat(paste("fourier transform\t",time(),"\n",sep=""))
