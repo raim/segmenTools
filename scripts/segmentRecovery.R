@@ -128,7 +128,7 @@ if ( length(qtypes)==0 ) {
 }
 
 ## split by type
-lst <- split(segs,segs[,qtypcol])
+lst <- split(segs,as.character(segs[,qtypcol]))
 sgtypes <- names(lst)
 
 
