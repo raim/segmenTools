@@ -492,6 +492,15 @@ for ( test.type in test.types ) {
         legend("topleft",paste(test.type,"-",tnum))
         dev.off()
     }
+    file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf",sep=""))
+    plotdev(file.name,width=5,height=5,type=fig.type)
+    par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
+    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
+                col=sgcols, lty=sgltys,
+                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                xlab="cumulative jaccard: intersect/union")
+    legend("topleft",paste(test.type,"-",tnum))
+    dev.off()
     
     ## CDF of relative best hit CDF (rrcdf)
     file.name <- file.path(out.path,testid, paste(test.type,"_ratio",sep=""))
