@@ -301,68 +301,72 @@ for ( test.type in test.types ) {
     tnum <- covlStats$tnum
     nms <- covlStats$nms
 
+    sgnum <- length(sgtypes) ## skip clustering if only one!
+    
     ## TODO: mv this to getOverlapStats
     
     ## MAX vs. MIN CLUSTERING  cluster jaccard vs. numhits vs segment classes
     ## TODO: also include height in clustering?
-    K <- 6
-    dat <- cbind((jaccard-min(jaccard))/(max(jaccard)-min(jaccard)),
-                 (numhit-min(numhit))/(max(numhit)-min(numhit)))
-    pm <- pam(dat, K)
-    cllst <- apply(sgcltab,2,unique)
-    allcl <- unlist(sapply(1:length(cllst),
-                           function(x) paste(names(cllst)[x],
-                                             cllst[[x]],sep=".")))
-    enum <- matrix(NA, nrow=K, ncol=length(allcl))
-    colnames(enum) <- allcl
-    rownames(enum) <- 1:K
-    pval <- enum
-    ## get cumulative hypergeometric distribution of clustering vs. segments
-    for ( i in 1:K ) 
-      for ( j in 1:ncol(sgcltab) ) {
-          clcl <-  clusterCluster(pm$clustering==i,sgcltab[,j],
-                                  plot=FALSE,verbose=FALSE)
-          cln <- colnames(sgcltab)[j]
-          cln <- paste(cln,colnames(clcl$overlap),sep=".")
-          if ( "TRUE" %in% rownames(clcl$overlap) ) {
-              enum[i,cln] <- clcl$overlap["TRUE",]
-              pval[i,cln] <- clcl$p.value["TRUE",]
-          }
-      }
-
-    file.name <- file.path(out.path,testid,
-                           paste(test.type,"_segmentationClusters",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
-    par(mai=c(1,.7,.1,.1),mgp=c(1.75,.5,0))
-    image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                 col=c("#FFFFFF",rev(grey.colors(20))),
-                 axis2.col=1:nrow(pval),
-                 xlab=NA,ylab=NA)
-    axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
-    dev.off()
-   
-    ## TODO: plot by segment classes as length dist
-
-    ## new lower and upper threshold of ratio
-    ## OPT: uppler left, 
-    file.name <- file.path(out.path,testid,
-                           paste(test.type,"_ratioTotal_lh_clustered",sep=""))
-    plotdev(file.name,width=10,height=5,type=fig.type)
-    par(mfcol=c(1,2),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
-    plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
+    pm <- NULL
+    if ( sgnum>5 ) {
+        K <- 6
+        dat <- cbind((jaccard-min(jaccard))/(max(jaccard)-min(jaccard)),
+                     (numhit-min(numhit))/(max(numhit)-min(numhit)))
+        pm <- pam(dat, K)
+        cllst <- apply(sgcltab,2,unique)
+        allcl <- unlist(sapply(1:length(cllst),
+                               function(x) paste(names(cllst)[x],
+                                                 cllst[[x]],sep=".")))
+        enum <- matrix(NA, nrow=K, ncol=length(allcl))
+        colnames(enum) <- allcl
+        rownames(enum) <- 1:K
+        pval <- enum
+        ## get cumulative hypergeometric distribution of clustering vs. segments
+        for ( i in 1:K ) 
+            for ( j in 1:ncol(sgcltab) ) {
+                clcl <-  clusterCluster(pm$clustering==i,sgcltab[,j],
+                                        plot=FALSE,verbose=FALSE)
+                cln <- colnames(sgcltab)[j]
+                cln <- paste(cln,colnames(clcl$overlap),sep=".")
+                if ( "TRUE" %in% rownames(clcl$overlap) ) {
+                    enum[i,cln] <- clcl$overlap["TRUE",]
+                    pval[i,cln] <- clcl$p.value["TRUE",]
+                }
+            }
+        
+        file.name <- file.path(out.path,testid,
+                               paste(test.type,"_segmentationClusters",sep=""))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mai=c(1,.7,.1,.1),mgp=c(1.75,.5,0))
+        image_matrix(-log2(pval) ,text=enum, axis=1:2,
+                     col=c("#FFFFFF",rev(grey.colors(20))),
+                     axis2.col=1:nrow(pval),
+                     xlab=NA,ylab=NA)
+        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
+        dev.off()
+        ## TODO: plot by segment classes as length dist
+        
+        ## new lower and upper threshold of ratio
+        ## OPT: uppler left, 
+        file.name <- file.path(out.path,testid,
+                               paste(test.type,"_ratioTotal_lh_clustered",sep=""))
+        plotdev(file.name,width=10,height=5,type=fig.type)
+        par(mfcol=c(1,2),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
+        plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
          col=NA)
-    legend("topleft","good",bty="n")
-    points(height,col=pm$clustering,pch=sgpchs[nms])
-    abline(v=.2,lty=2)
-    abline(h=.8,lty=2)
-    par(mai=c(1,.7,.1,.1))
-    image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                 col=c("#FFFFFF",rev(grey.colors(20))),
-                 axis2.col=1:nrow(pval),
-                 xlab=NA,ylab=NA)
-    axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
-    dev.off()
-
+        legend("topleft","good",bty="n")
+        points(height,col=pm$clustering,pch=sgpchs[nms])
+        abline(v=.2,lty=2)
+        abline(h=.8,lty=2)
+        par(mai=c(1,.7,.1,.1))
+        image_matrix(-log2(pval) ,text=enum, axis=1:2,
+                     col=c("#FFFFFF",rev(grey.colors(20))),
+                     axis2.col=1:nrow(pval),
+                     xlab=NA,ylab=NA)
+        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
+        dev.off()
+    }
+    
     file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal_lh",sep=""))
     plotdev(file.name,width=10,height=5,type=fig.type)
@@ -389,16 +393,18 @@ for ( test.type in test.types ) {
     dev.off()
 
     ## CDF of absolute best hit CDF (rcdf)  - cluster colors
-    file.name <- file.path(out.path,testid,
-                           paste(test.type,"_ratioTotal_clustered",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
-    par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
-                col=pm$clustering, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                xlab="ratio: query length/target length")
-    legend("topleft",paste(test.type,"-",tnum))
-    dev.off()
+    if ( !is.null(pm) ) {
+        file.name <- file.path(out.path,testid,
+                               paste(test.type,"_ratioTotal_clustered",sep=""))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
+        plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
+                    col=pm$clustering, lty=sgltys,
+                    h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    xlab="ratio: query length/target length")
+        legend("topleft",paste(test.type,"-",tnum))
+        dev.off()
+    }
       
     ## MAX vs. MIN: jaccard of best hits vs. num hits per target 
     file.name <- file.path(out.path,testid,
@@ -416,23 +422,25 @@ for ( test.type in test.types ) {
     dev.off()
 
     ## MAX vs. MIN CLUSTERS - JACCARD
-    file.name <- file.path(out.path,testid,
-                     paste(test.type,"_jaccard_fragmentation_clustered",sep=""))
-    plotdev(file.name,width=10,height=4,type=fig.type)
-    par(mfcol=c(1,2),mai=c(1,1,.1,.1))
-    plot(jaccard,numhit,col=NA,         
-         ylab="average hits per target sequence",
-         xlab="jaccard: intersect/union")#,
-    legend("bottomright","good",bty="n")
-    points(jaccard,numhit,col=pm$clustering,pch=sgpchs[nms])
-    par(mai=c(1,.7,.1,.1))
-    image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                 col=c("#FFFFFF",rev(grey.colors(20))),
-                 axis2.col=1:nrow(pval),
-                 xlab=NA,ylab=NA)
-    axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
-    dev.off()
-
+    if ( !is.null(pm) ) {
+        file.name <- file.path(out.path,testid,
+                               paste(test.type,"_jaccard_fragmentation_clustered",sep=""))
+        plotdev(file.name,width=10,height=4,type=fig.type)
+        par(mfcol=c(1,2),mai=c(1,1,.1,.1))
+        plot(jaccard,numhit,col=NA,         
+             ylab="average hits per target sequence",
+             xlab="jaccard: intersect/union")#,
+        legend("bottomright","good",bty="n")
+        points(jaccard,numhit,col=pm$clustering,pch=sgpchs[nms])
+        par(mai=c(1,.7,.1,.1))
+        image_matrix(-log2(pval) ,text=enum, axis=1:2,
+                     col=c("#FFFFFF",rev(grey.colors(20))),
+                     axis2.col=1:nrow(pval),
+                     xlab=NA,ylab=NA)
+        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
+        dev.off()
+    }
+    
     ## MAX vs. MIN: ratio heights vs. num hits per target
     file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratio_fragmentation",sep=""))
@@ -449,39 +457,43 @@ for ( test.type in test.types ) {
     dev.off()
     
     ## MAX vs. MIN CLUSTERS - good hits per target vs. num hits per target 
-    file.name <-file.path(out.path,testid,
-                          paste(test.type,"_ratio_fragmentation_clustered",
-                                sep=""))
-    plotdev(file.name,width=10,height=4,type=fig.type)
-    par(mfcol=c(1,2),mai=c(1,1,.1,.1))
-    plot(apply(height,1,diff), numhit,
-         col=pm$clustering,pch=sgpchs[nms],
-         ylab="average hits per target sequence",
-         xlab="fraction: 0.8 < ratio < 1.2")#,
-    imgdat <- t(apply(-log2(pval), 2, rev))
-    par(mai=c(1,.7,.1,.1))
-    image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                 col=c("#FFFFFF",rev(grey.colors(20))),
-                 axis2.col=1:nrow(pval),
-                 xlab=NA,ylab=NA)
-    axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
-    dev.off()
-
+    if ( !is.null(pm) ) {
+        file.name <-file.path(out.path,testid,
+                              paste(test.type,"_ratio_fragmentation_clustered",
+                                    sep=""))
+        plotdev(file.name,width=10,height=4,type=fig.type)
+        par(mfcol=c(1,2),mai=c(1,1,.1,.1))
+        plot(apply(height,1,diff), numhit,
+             col=pm$clustering,pch=sgpchs[nms],
+             ylab="average hits per target sequence",
+             xlab="fraction: 0.8 < ratio < 1.2")#,
+        imgdat <- t(apply(-log2(pval), 2, rev))
+        par(mai=c(1,.7,.1,.1))
+        image_matrix(-log2(pval) ,text=enum, axis=1:2,
+                     col=c("#FFFFFF",rev(grey.colors(20))),
+                     axis2.col=1:nrow(pval),
+                     xlab=NA,ylab=NA)
+        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
+        dev.off()
+    }
+    
 ### BELOW PERHAPS NOT REQUIRED
 
     ## CDF PLOTS
 
     ## CDF of jaccard (jcdf)
-    file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf_clustered",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
-    par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
-                col=pm$clustering, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                xlab="cumulative jaccard: intersect/union")
-    legend("topleft",paste(test.type,"-",tnum))
-    dev.off()
-
+    if ( !is.null(pm) ) {
+        file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf_clustered",sep=""))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
+        plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
+                    col=pm$clustering, lty=sgltys,
+                    h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    xlab="cumulative jaccard: intersect/union")
+        legend("topleft",paste(test.type,"-",tnum))
+        dev.off()
+    }
+    
     ## CDF of relative best hit CDF (rrcdf)
     file.name <- file.path(out.path,testid, paste(test.type,"_ratio",sep=""))
     plotdev(file.name,width=5,height=5,type=fig.type)
@@ -505,40 +517,44 @@ for ( test.type in test.types ) {
     dev.off()
    
      ## CDF of best hit target coverage - cluster colors
-    file.name <-file.path(out.path,testid,
-                          paste(test.type,"_totalCoverage_clustered",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
-    par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
-                col=pm$clustering, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                xlab="coverage of test set")
-    legend("topleft",paste(test.type,"-",tnum))
-    dev.off()
+    if ( !is.null(pm) ) {
+        file.name <-file.path(out.path,testid,
+                              paste(test.type,"_totalCoverage_clustered",sep=""))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
+        plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
+                    col=pm$clustering, lty=sgltys,
+                    h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    xlab="coverage of test set")
+        legend("topleft",paste(test.type,"-",tnum))
+        dev.off()
+    }
     
     ## SUMMARY OF CDF of absolute best hit ratio
     ## fraction of mutual coverage between 0.8 and 1.2
-    file.name <- file.path(out.path,testid,
-                           paste(test.type,"_ratioTotal_rng_clustered",sep=""))
-    plotdev(file.name,width=2+.2*length(CDF),height=6,type=fig.type)
-    par(mai=c(3.3,.75,.1,.1))
-    plot(0,col=NA,ylim=c(0,1.2),xlim=c(0,length(CDF)+1),
-         axes=FALSE,xlab=NA,ylab=NA)
-    axis(2)
-    abline(h=c(.2,.8),lty=2)
-    leg <- NULL
-    for ( i in 1:length(CDF) ) {
-        if ( "rcdf" %in% names(CDF[[i]]) ) {
-            nm <- CDF[[i]]$qid
-            if ( diff(height[i,]) > 0 )
-                arrows(x0=i,x1=i,y0=height[i,1],y1=height[i,2],
-                       col=pm$clustering[i],lty=sgltys[nm],
-                       length=0.1, angle=90, code=3)
-            text(i, 1.1, round(diff(height[i,]),3),srt=90)
+    if ( !is.null(pm) ) {
+        file.name <- file.path(out.path,testid,
+                               paste(test.type,"_ratioTotal_rng_clustered",sep=""))
+        plotdev(file.name,width=2+.2*length(CDF),height=6,type=fig.type)
+        par(mai=c(3.3,.75,.1,.1))
+        plot(0,col=NA,ylim=c(0,1.2),xlim=c(0,length(CDF)+1),
+             axes=FALSE,xlab=NA,ylab=NA)
+        axis(2)
+        abline(h=c(.2,.8),lty=2)
+        leg <- NULL
+        for ( i in 1:length(CDF) ) {
+            if ( "rcdf" %in% names(CDF[[i]]) ) {
+                nm <- CDF[[i]]$qid
+                if ( diff(height[i,]) > 0 )
+                    arrows(x0=i,x1=i,y0=height[i,1],y1=height[i,2],
+                           col=pm$clustering[i],lty=sgltys[nm],
+                           length=0.1, angle=90, code=3)
+                text(i, 1.1, round(diff(height[i,]),3),srt=90)
+            }
         }
+        axis(1,at=1:length(CDF),labels=nms,las=2)
+        dev.off()
     }
-    axis(1,at=1:length(CDF),labels=nms,las=2)
-    dev.off()
    
     ## MAX vs. MIN: good hits per target vs. num hits per target
     file.name <- file.path(out.path,testid,
