@@ -116,6 +116,7 @@ segs <- coor2index(segs,chrS)
 
 ## filter types
 qtypes <- qtypes[qtypes!=""]
+cat(paste("HALLO", qtypes, "\n"))
 if ( length(qtypes)==0 ) {
     qtypes <- as.character(segs[,qtypcol])
     qtypes[qtypes==""] <- "na"
