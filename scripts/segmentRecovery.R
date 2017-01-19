@@ -122,8 +122,8 @@ if ( length(qtypes)==0 ) {
     qtypes[is.na(qtypes)] <- "na"
 } else {
     ## filter to types given by cmdline arg qtypes
-    segs <- segs[as.character(segs[,tpcol])%in%qtypes,]
-    qtypes <- as.character(segs[,tpcol]) # get remaining
+    segs <- segs[as.character(segs[,qtypcol])%in%qtypes,]
+    qtypes <- as.character(segs[,qtypcol]) # get remaining
 }
 
 ## split by type
