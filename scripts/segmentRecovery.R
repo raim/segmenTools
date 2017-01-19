@@ -19,6 +19,10 @@ option_list <- list(
                 help="chromosome coordinates of primary segments as produced by clusterSegments.R but without header ('allsegs.csv')"),    
     make_option(c("--chrfile"), type="character", default="",
                 help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
+    make_option(c("--qtypes"), type="character", default="", 
+                help="sub-set testset in column 'type'"),
+    make_option(c("--qtypcol"), type="character", default="type", 
+              help="name of column with sub-set annotation"),
     ##chrfile = $YEASTDAT/chromosomes/sequenceIndex_R64-1-1_20110208.csv
     ## SEGMENT TEST SETTINGS
     make_option(c("--fuse.segs"), action="store_true", default=FALSE,
@@ -49,7 +53,7 @@ option_list <- list(
 opt <- parse_args(OptionParser(option_list=option_list))
 
 ## process comma-separated list arguments
-lst.args <- c(ttypes="character")
+lst.args <- c(ttypes="character",qtypes="character")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
     opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
@@ -110,9 +114,24 @@ if ( fuse.segs ) {
 ## replace genome coordinates by continuous index
 segs <- coor2index(segs,chrS)
 
+## filter types
+qtypes <- qtypes[qtypes!=""]
+if ( length(qtypes)==0 ) {
+    qtypes <- as.character(segs[,qtypcol])
+    qtypes[qtypes==""] <- "na"
+    qtypes[is.na(qtypes)] <- "na"
+} else {
+    ## filter to types given by cmdline arg qtypes
+    segs <- segs[as.character(segs[,tpcol])%in%qtypes,]
+    qtypes <- as.character(segs[,tpcol]) # get remaining
+}
+
 ## split by type
-lst <- split(segs,segs$type)
+lst <- split(segs,segs[,qtypcol])
 sgtypes <- names(lst)
+
+
+
 debug <- FALSE
 if ( debug ) { ## test only large number
     sgnum <- unlist(lapply(lst,nrow))
@@ -236,6 +255,8 @@ if ( save )
 ## export hitnum, jaccard, numhit and ratio thresholds 
 for ( test.type in test.types ) {
 
+    #if ( is.null(ovlstats[[test.type]]) ) next
+    
     covlStats <- collectOvlStats(ovlstats, type=test.type)
 
     ids <- covlStats$nms
