@@ -363,7 +363,7 @@ for ( type in sgtypes ) {
     ## use rain
     ## TODO: establish exact period from DO, then use rain
     ## use only first 20 time-points here as well
-    if ( "rain" %in% jobs ) {
+    if ( any(c("rain") %in% jobs) ) {
         if ( verb>0 )
           cat(paste("rain osci stastistics\t",time(),"\n"))
         rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
@@ -401,7 +401,7 @@ for ( type in sgtypes ) {
     ##lowex <- rds[,"r.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
     ##len <- sgs[,"end"]-sgs[,"start"]+1
     ##short <- len < 100             # LONGER THEN 150
-
+    ## TODO: use RAIN as filter??
     unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT NT. pval.thresh.sig
     rmvals <- unsig #|nonsig #|short #|     # TODO: does short filter help?
 
