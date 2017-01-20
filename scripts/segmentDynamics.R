@@ -26,9 +26,10 @@ library(segmenTools)
 #source(file.path(segtools,"R/coor2index.R")) # coor2index
 
 
-suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
-suppressPackageStartupMessages(library("flowClust"))
-suppressPackageStartupMessages(library("flowMerge"))
+library("rain")
+library("stringr") # for 0-padded filenames
+library("flowClust")
+library("flowMerge")
 suppressPackageStartupMessages(library(optparse))
 
 ### OPTIONS
@@ -53,7 +54,7 @@ option_list <- list(
   make_option("--pval.thresh.sig", default=1,
               help="pvals above will be counted as non-significant [default %default]"),
   make_option("--read.rng", type="character", default="",
-              help="range of time-points for total read-count and Fourier calculations (but not used for clustering!), comma-separated list of integers"),
+              help="range of time-points for total read-count, Fourier and rain calculations (but not used for clustering!), comma-separated list of integers"),
   ## SEGMENT AVERAGING
   make_option(c("--endcut"), type="integer", default=0, 
               help="fraction at segment ends that will not be considered for average time series"),
@@ -100,7 +101,7 @@ option_list <- list(
               help="A numeric indicating whether the Box-Cox transformation
           parameter is estimated from the data; 0: no, 1: non-specific, 2: cluster-specific estim. of lambda"), ## TODO: try 2
   ## OUTPUT OPTIONS
-  make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,clustering", 
+  make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,rain,clustering", 
               help=",-separated list of rseults to save as csv: distributions,timeseries,fourier,clustering; default is to save all, clustering only if specified by separate option --cluster, and fourier results will contain p-values only of --perm was specified and >1"),
   make_option(c("--out.name"), type="character", default="", 
               help="file name prefix of summary file"),
@@ -281,7 +282,7 @@ for ( type in sgtypes ) {
                     sep="\t",col.names=TRUE,row.names=FALSE)
     }
     
-    if ( !any(c("timeseries","fourier","clustering") %in% jobs) )
+    if ( !any(c("rain","timeseries","fourier","clustering") %in% jobs) )
       next
 
     ## AVERAGE SEGMENT TIME-SERIES
@@ -350,11 +351,18 @@ for ( type in sgtypes ) {
         write.table(sgdft,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
 
-        ## our use rain
-        ## TODO: establish exact period from DO, then use rain
-        #res <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
     }
 
+    ## use rain
+    ## TODO: establish exact period from DO, then use rain
+    ## use only first 20 time-points here as well
+    if ( "rain" %in% jobs ) {
+        rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
+        sgrain <- data.frame(ID=sgs[,"ID"], rn)
+        file.name <- file.path(out.path,paste(fname,"_rain",sep=""))
+        write.table(sgrain,file=paste(file.name,".csv",sep=""),quote=FALSE,
+                    sep="\t",col.names=TRUE,row.names=FALSE)
+    }
     
     if ( !"clustering" %in% jobs ) next
     if ( verb>0 )
