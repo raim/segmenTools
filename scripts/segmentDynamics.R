@@ -202,8 +202,10 @@ if ( verb>0 )
 segs <- read.table(infile,sep="\t",header=TRUE)
 
 ## reduce to requested segment types
-if ( stypes[1]!="" ) 
-    segs <- segs[as.character(segs[,"type"])%in%stypes,]
+if ( stypes[1]=="" )  
+    stypes <- sort(unique(as.character(segs[,"type"])))
+segs <- segs[as.character(segs[,"type"])%in%stypes,]
+
 
 
 if ( fuse.segs ) {
