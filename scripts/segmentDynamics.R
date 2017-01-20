@@ -136,7 +136,8 @@ for ( i in 1:length(lst.args) ) {
                 tmp[[j]] <- tmp2[1]:tmp2[2]
             }
         }
-    opt[[idx]] <- unlist(tmp)
+    if ( length(tmp)>0 )
+        opt[[idx]] <- unlist(tmp)
     mode(opt[[idx]]) <- lst.args[i]
 }
 
@@ -201,7 +202,7 @@ if ( verb>0 )
 segs <- read.table(infile,sep="\t",header=TRUE)
 
 ## reduce to requested segment types
-if ( length(stypes)>0 ) 
+if ( stypes[1]!="" ) 
     segs <- segs[as.character(segs[,"type"])%in%stypes,]
 
 

@@ -57,9 +57,9 @@ lst.args <- c(ttypes="character",qtypes="character")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
     opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
-    for ( j in 1:length(opt[[idx]]) ) {
-        tmp <- strsplit(opt[[idx]][j], ":")
-    }
+    ##for ( j in 1:length(opt[[idx]]) ) {
+    ##    tmp <- strsplit(opt[[idx]][j], ":")
+    ##}
     mode(opt[[idx]]) <- lst.args[i]
 }
 
