@@ -26,10 +26,7 @@ library(segmenTools)
 #source(file.path(segtools,"R/coor2index.R")) # coor2index
 
 
-library("rain")
-library("stringr") # for 0-padded filenames
-library("flowClust")
-library("flowMerge")
+suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
 suppressPackageStartupMessages(library(optparse))
 
 ### OPTIONS
@@ -154,6 +151,13 @@ for ( i in 1:length(opt) ) {
 if ( verb>0 )
     cat(paste("\n"))
 
+## LOADING PACKAGES FOR REQUESTED JOBS
+if ( "clustering" %in% jobs ) {
+    suppressPackageStartupMessages(library("flowClust"))
+    suppressPackageStartupMessages(library("flowMerge"))
+}
+if ( "rain" %in% jobs ) 
+    suppressPackageStartupMessages(library("rain"))
 
 
 ### START 
@@ -360,6 +364,8 @@ for ( type in sgtypes ) {
     ## TODO: establish exact period from DO, then use rain
     ## use only first 20 time-points here as well
     if ( "rain" %in% jobs ) {
+        if ( verb>0 )
+          cat(paste("rain osci stastistics\t",time(),"\n"))
         rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
         sgrain <- data.frame(ID=sgs[,"ID"], rn)
         file.name <- file.path(out.path,paste(fname,"_rain",sep=""))
