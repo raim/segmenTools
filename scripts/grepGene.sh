@@ -17,9 +17,12 @@ sid=`grep $id $seg | cut -f 1|sed 's/.*\://'`
 primseg=`echo $sid|sed s/_.*//`
 asid=`grep -P "^$sid\t" $sas| cut -f 2`
 asprimseg=`echo $asid|sed s/_.*//`
+# GREP COORDINATES
+primsg=`echo $primseg | sed 's/^0*//g'`
+coor=`grep -P "^$primsg\t" $primsegs | cut -f 2,3,4 | sed 's/\s/,/;s/\s/:/'`
+ 
 
-
-echo GENE $gene 
+echo GENE $gene $coor
 echo PRIMSEG $primseg SEGMENT $sid 
 echo ANTISENSE $asprimseg SEGMENT $asid 
 
@@ -29,10 +32,6 @@ if  [ "$plot" = "plot" ]; then
     genome=$GENDAT/yeast
     selection=method
     out=primseg_$primseg
-
-    # GREP COORDINATES
-    primsg=`echo $primseg | sed 's/^0*//g'`
-    coor=`grep -P "^$primsg\t" $primsegs | cut -f 2,3,4 | sed 's/\s/,/;s/\s/:/'`
     cmd="$GENBRO/src/plotFeature.R -i $genome --coor $coor -r $range  -s $selection -S $settings  -f png -v -o $gene --height 4 --width 6"
     echo $cmd
     $cmd 
