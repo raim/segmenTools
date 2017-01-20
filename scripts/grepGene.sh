@@ -25,7 +25,7 @@ coor=`grep -P "^$primsg\t" $primsegs | cut -f 2,3,4 | sed 's/\s/,/;s/\s/:/'`
 echo GENE $gene 
 echo PRIMSEG $primseg SEGMENT $sid 
 echo ANTISENSE $asprimseg SEGMENT $asid 
-echo $coor
+echo COOR $coor
 
 ## use genomeBrowser to plot the primary segment
 if  [ "$plot" = "plot" ]; then
