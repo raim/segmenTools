@@ -22,9 +22,10 @@ primsg=`echo $primseg | sed 's/^0*//g'`
 coor=`grep -P "^$primsg\t" $primsegs | cut -f 2,3,4 | sed 's/\s/,/;s/\s/:/'`
  
 
-echo GENE $gene $coor
+echo GENE $gene 
 echo PRIMSEG $primseg SEGMENT $sid 
 echo ANTISENSE $asprimseg SEGMENT $asid 
+echo $coor
 
 ## use genomeBrowser to plot the primary segment
 if  [ "$plot" = "plot" ]; then
