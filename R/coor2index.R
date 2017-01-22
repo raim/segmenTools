@@ -83,9 +83,9 @@ idx2coor <- function(pos, chrS, strands=c(1,-1)) {
 #' @return returns the chromosome number
 #' @export
 idx2chr <- function(idx,chrS) {
-    chr <- sapply(idx,function(x) which(chrS>x)[1]-1)
+    chr <- sapply(idx,function(x) which(chrS>=x)[1]-1)
     chr[is.na(chr)] <- sapply(idx[is.na(chr)],function(x) # reverse strand
-        which((chrS+max(chrS))>x)[1]-1)
+        which((chrS+max(chrS))>=x)[1]-1)
     chr
 }
 #' get the strand from continuous index
