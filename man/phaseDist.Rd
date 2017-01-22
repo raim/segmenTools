@@ -4,7 +4,7 @@
 \alias{phaseDist}
 \title{Calculates phase distributions in segments, i.e., the circular mean and
 standard deviation and the R statistics, copied from from package
-\code{circstats} and after
+\code{CircStats} and after
 http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
 https://en.wikipedia.org/wiki/Mean_of_circular_quantities
 TODO: recognize bimodal?}
@@ -19,7 +19,7 @@ phaseDist(phs, w)
 \description{
 Calculates phase distributions in segments, i.e., the circular mean and
 standard deviation and the R statistics, copied from from package
-\code{circstats} and after
+\code{CircStats} and after
 http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
 https://en.wikipedia.org/wiki/Mean_of_circular_quantities
 TODO: recognize bimodal?

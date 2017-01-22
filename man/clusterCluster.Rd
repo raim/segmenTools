@@ -9,8 +9,9 @@ enriched or deprived mutual overlaps}
 clusterCluster(cl1, cl2, bonferroni = FALSE, store.data = FALSE,
   req.vals = c("greater"), na.rm = FALSE, verbose = TRUE, pval = 0.01,
   plot = FALSE, xlab = "cluster 1", ylab = "cluster 2",
-  plot.type = "spine", plot.ppoor = FALSE, plot.prich = TRUE, name1,
-  name2, cl1.max = 100, cl2.max = 100, cl1.sorting, cl2.sorting)
+  na.string = "na", plot.type = "spine", plot.ppoor = FALSE,
+  plot.prich = TRUE, name1, name2, cl1.max = 100, cl2.max = 100,
+  cl1.sorting, cl2.sorting)
 }
 \arguments{
 \item{cl1}{clustering 1}

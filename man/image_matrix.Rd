@@ -7,7 +7,7 @@ it is displayed in R console, i.e. the field \code{dat[1,1]}
 is at the top left corner. It further allows to plot text
 into individual fields and have colored axis tick labels.}
 \usage{
-image_matrix(dat, text, axis, axis1.col, axis2.col, ...)
+image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col, ...)
 }
 \arguments{
 \item{dat}{the numeric data matrix to be plotted}
