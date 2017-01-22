@@ -80,6 +80,8 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::postscript(file.name, width=width, height=height,paper="special")
   if ( type == "pdf" )
     grDevices::pdf(file.name, width=width, height=height)
+  if ( type == "tiff" )
+    grDevices::tiff(file.name, width=width, height=height, units="in")
   if ( type == "svg" )
     grDevices::svg(file.name, width=width, height=height)
 }
