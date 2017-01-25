@@ -20,6 +20,8 @@ option_list <- list(
                 help="minimal count of reads in main prim.seg. cutoff [default %default]"),
     make_option(c("--minds"), type="integer", default=250,  
                 help="minimal distance to be treated as separate segments [default: %default]"),
+    make_option(c("--minsg"), type="integer", default=250,  
+                help="minimal segment length [default: %default]"),
     ## OUTPUT OPTIONS
     make_option(c("-o", "--outdir"), type="character", default=".", 
                 help="directory path for output data (figures, csv files"),
@@ -78,16 +80,17 @@ if ( verb>0 )
 if ( plot.borders ) {
     if ( verb>0 ) cat(paste(" and plotting border scans.\n"))
     primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
-                          avg=avg, favg=favg, minrd=minrd, minds=minds,
+                          avg=avg, favg=favg,
+                          minrd=minrd, minds=minds, minsg=minsg,
                           fig.path=outdir, verb=verb)
 } else {
     if ( verb>0 ) cat(paste(".\n"))
     primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
-                          avg=avg, favg=favg, minrd=minrd, minds=minds,
+                          avg=avg, favg=favg,
+                          minrd=minrd, minds=minds, minsg=minsg,
                           verb=verb)
 }
 
-## todo: add primseg IDs explicitly
 ## column chr will be filled by index2coor
 primseg <- cbind(ID=1:nrow(primseg),chr=rep(NA,nrow(primseg)),primseg)
 
@@ -151,8 +154,8 @@ hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="# of time points",
 hist(sgexpr,breaks=seq(0,24,.5),add=TRUE)
 legend("right",legend=c("primary segments","inter-segment"),col=1:2,
        pch=15)
-hist(emdf,breaks=seq(0,89e3,500),border=2,xlim=c(0,25e3),
+hist(emdf,breaks=seq(0,2e5,500),border=2,xlim=c(0,25e3),
      main="segment length distribution",xlab="length, bp")
-hist(sgdf,breaks=seq(0,89e3,500),add=TRUE)
+hist(sgdf,breaks=seq(0,2e5,500),add=TRUE)
 dev.off()
 
