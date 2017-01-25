@@ -6,7 +6,8 @@
 be handle by segmenTier.}
 \usage{
 presegment(ts, chrS, avg = 1000, favg = 100, minrd = 8, minds = 250,
-  map2chrom = FALSE, seg.path, fig.path, fig.type = "png", verb = 1)
+  minsg = 250, map2chrom = FALSE, seg.path, fig.path, fig.type = "png",
+  verb = 1)
 }
 \arguments{
 \item{ts}{the time-series of readcounts for the complete chromosome,
@@ -29,6 +30,8 @@ end scanning that can result in fusing back segments w/o good separation}
 moving average used as cutoff between segments}
 
 \item{minds}{minimum distance between two segments (will be fused otherwise)}
+
+\item{minsg}{minimum segment length (smaller will be removed!)}
 
 \item{map2chrom}{if true, argument \code{chrS} is required to map
 the segment coordinates to chromosomal coordinates}
