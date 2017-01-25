@@ -1169,6 +1169,7 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' @param favg as \code{avg}, but a narrower moving average used in
 #' end scanning that can result in fusing back segments w/o good separation
 #' @param minds minimum distance between two segments (will be fused otherwise)
+#' @param minsg minimum segment length (smaller will be removed!)
 #' @param map2chrom if true, argument \code{chrS} is required to map
 #' the segment coordinates to chromosomal coordinates
 #' @param fig.path a directory path for plots of the segment end scanning;
@@ -1179,9 +1180,10 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' \code{seg.path} is not provided.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-presegment <- function(ts, chrS, avg=1000, favg=100, minrd=8, minds=250,
-                       map2chrom=FALSE,
-                       seg.path, fig.path, fig.type="png", verb=1) {
+presegment <- function(ts, chrS, avg=1000, favg=100,
+                       minrd=8, minds=250, minsg=250,
+                       map2chrom=FALSE, seg.path, fig.path, fig.type="png",
+                       verb=1) {
 
     if ( verb> 0 )
         cat(paste("Calculating total read-counts and moving averages.\n"))
@@ -1222,7 +1224,9 @@ presegment <- function(ts, chrS, avg=1000, favg=100, minrd=8, minds=250,
     start <- start[c(TRUE,!close)]
     end <- end[c(!close,TRUE)]
     ## remove too small segments
-    small <- end-start < minds
+    small <- end-start < minsg
+    if ( verb>0 )
+        cat(paste("Removing", sum(small), "small segments <",minsg,"bp\n"))
     start <- start[!small]
     end <- end[!small]
     primseg <- cbind(start,end)
@@ -1325,7 +1329,7 @@ presegment <- function(ts, chrS, avg=1000, favg=100, minrd=8, minds=250,
         start <- sort(start)
 
         ## remove too small segments again
-        small <- end-start < minds
+        small <- end-start < minsg
         start <- start[!small]
         end <- end[!small]
     }
