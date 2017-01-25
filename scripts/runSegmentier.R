@@ -432,6 +432,7 @@ for ( i in sets ) {
 ##
 ##consegs <- consegs[consegs[,"end"]-consegs[,"start"] > 1,]
 
+    ## TODO: adapt with to segment length!
     plotdev(out,width=8,height=3.5,type=fig.type)
 
     par(mfcol=c(5,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
