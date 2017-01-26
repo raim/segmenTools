@@ -5,6 +5,9 @@
 
 library("segmenTools") ## coor2index and presegment function
 
+## nicer timestamp
+time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
+
 ### OPTIONS
 suppressPackageStartupMessages(library(optparse))
 option_list <- list(
@@ -76,15 +79,14 @@ for ( i in 2:length(chrS) ) {
 ## pass fig.path to induce border plotting (in dir fig.path)
 ## and seg.path to write files with data for all segments
 if ( verb>0 )
-    cat(paste("Calculating pre-segmentation"))
+    cat(paste("Calculating pre-segmentation\t",time(),"\n",sep=""))
 if ( plot.borders ) {
-    if ( verb>0 ) cat(paste(" and plotting border scans.\n"))
+    if ( verb>0 ) cat(paste("... and plotting border scans.\n"))
     primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
                           avg=avg, favg=favg,
                           minrd=minrd, minds=minds, minsg=minsg,
                           fig.path=outdir, verb=verb)
 } else {
-    if ( verb>0 ) cat(paste(".\n"))
     primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
                           avg=avg, favg=favg,
                           minrd=minrd, minds=minds, minsg=minsg,
@@ -97,7 +99,7 @@ primseg <- cbind(ID=1:nrow(primseg),chr=rep(NA,nrow(primseg)),primseg)
 ## write out segments!
 if ( write.segments ) {
     if ( verb>0 )
-        cat(paste("Writing data files for each segment!\n"))
+        cat(paste("Writing segment data files\t",time(),"\n",sep=""))
     writeSegments(data=ts, segments=primseg, name="primseg", path=outdir)
 }
 
@@ -108,7 +110,7 @@ emptyseg <- cbind(start=c(1,primseg[1:nrow(primseg),"end"]+1),
 ## (5): map back to chromosome coordinates
 ## and write to file
 if ( verb>0 )
-    cat(paste("Writing segments and intersegments to files.\n"))
+    cat(paste("Writing segments and intersegments\t",time(),"\n",sep=""))
 sgcoors <- index2coor(primseg,chrS)
 
 file.name <- file.path(outdir,"primseg.csv")
@@ -125,7 +127,7 @@ write.table(emcoors,file.name,row.names=FALSE,sep="\t",quote=FALSE)
 if ( !plot.summary )
     quit(save="no")
 if ( verb>0 )
-    cat(paste("Constructing summary plot.\n"))
+    cat(paste("Summary plot\t",time(),"\n",sep=""))
 
 ## calculate numts as in function presegment
 numts <- rowSums(ts > 0) ## timepoints with reads
