@@ -5,9 +5,9 @@
 \title{pre-segmentation of whole-genome data into chunks that can
 be handle by segmenTier.}
 \usage{
-presegment(ts, chrS, avg = 1000, favg = 100, minrd = 8, minds = 250,
-  minsg = 250, map2chrom = FALSE, seg.path, fig.path, fig.type = "png",
-  verb = 1)
+presegment(ts, numts, chrS, avg = 1000, favg = 100, minrd = 8,
+  minds = 250, rmlen = 250, minsg = 5000, map2chrom = FALSE, seg.path,
+  fig.path, fig.type = "png", verb = 1)
 }
 \arguments{
 \item{ts}{the time-series of readcounts for the complete chromosome,
@@ -31,7 +31,10 @@ moving average used as cutoff between segments}
 
 \item{minds}{minimum distance between two segments (will be fused otherwise)}
 
-\item{minsg}{minimum segment length (smaller will be removed!)}
+\item{rmlen}{minimum segment length for removal (shorter segments
+will be dropped)}
+
+\item{minsg}{minimum segment length for fusion with (shorter) neighbor}
 
 \item{map2chrom}{if true, argument \code{chrS} is required to map
 the segment coordinates to chromosomal coordinates}
