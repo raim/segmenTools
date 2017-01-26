@@ -21,10 +21,12 @@ option_list <- list(
                 help="window length for primary segment extension [default: %default]"),
     make_option(c("--minrd"), default=8,
                 help="minimal count of reads in main prim.seg. cutoff [default %default]"),
-    make_option(c("--minds"), type="integer", default=250,  
+    make_option(c("--minds"), type="integer", default=5000,  
                 help="minimal distance to be treated as separate segments [default: %default]"),
-    make_option(c("--minsg"), type="integer", default=250,  
-                help="minimal segment length [default: %default]"),
+    make_option(c("--minsg"), type="integer", default=5000,  
+                help="minimal segment length for fusion [default: %default]"),
+    make_option(c("--rmlen"), type="integer", default=1,  
+                help="minimal segment length for removal [default: %default]"),
     ## OUTPUT OPTIONS
     make_option(c("-o", "--outdir"), type="character", default=".", 
                 help="directory path for output data (figures, csv files"),
@@ -84,12 +86,12 @@ if ( plot.borders ) {
     if ( verb>0 ) cat(paste("... and plotting border scans.\n"))
     primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
                           avg=avg, favg=favg,
-                          minrd=minrd, minds=minds, minsg=minsg,
+                          minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
                           fig.path=outdir, verb=verb)
 } else {
     primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
                           avg=avg, favg=favg,
-                          minrd=minrd, minds=minds, minsg=minsg,
+                          minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
                           verb=verb)
 }
 
@@ -106,6 +108,8 @@ if ( write.segments ) {
 ## inter-segments
 emptyseg <- cbind(start=c(1,primseg[1:nrow(primseg),"end"]+1),
                   end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
+emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
+emptyseg <- emptyseg[emlen>0,]
 
 ## (5): map back to chromosome coordinates
 ## and write to file
@@ -135,8 +139,8 @@ numts <- rowSums(ts > 0) ## timepoints with reads
 
 ## (5) analyze segment length and read-count presence distributions
 ## primary segment lengths
-sgdf <- primseg[,"end"] - primseg[,"start"] +1
-emdf <- emptyseg[,"end"] - emptyseg[,"start"] +1 
+sglen <- primseg[,"end"] - primseg[,"start"] +1
+emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
 
 
 ## average number of expressed time-points in emptyseg
@@ -145,6 +149,8 @@ emexpr <- apply(emptyseg,1,function(x)
 sgexpr <- apply(primseg,1,function(x)
     sum(numts[x["start"]:x["end"]])/length(x["start"]:x["end"]))
 
+mx <- max(c(sglen,emlen))*1.01
+xl<- 2*mean(sglen)
 
 ## plot segments and inter-segments
 ## average time-point presence and segment lengths
@@ -156,8 +162,8 @@ hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="# of time points",
 hist(sgexpr,breaks=seq(0,24,.5),add=TRUE)
 legend("right",legend=c("primary segments","inter-segment"),col=1:2,
        pch=15)
-hist(emdf,breaks=seq(0,2e5,500),border=2,xlim=c(0,25e3),
+hist(emlen,breaks=seq(0,mx,1000),border=2,xlim=c(0,xl),
      main="segment length distribution",xlab="length, bp")
-hist(sgdf,breaks=seq(0,2e5,500),add=TRUE)
+hist(sglen,breaks=seq(0,mx,1000),add=TRUE)
 dev.off()
 
