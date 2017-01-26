@@ -1169,7 +1169,9 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' @param favg as \code{avg}, but a narrower moving average used in
 #' end scanning that can result in fusing back segments w/o good separation
 #' @param minds minimum distance between two segments (will be fused otherwise)
-#' @param minsg minimum segment length (smaller will be removed!)
+#' @param minsg minimum segment length for fusion with (shorter) neighbor
+#' @param rmlen minimum segment length for removal (shorter segments
+#' will be dropped)
 #' @param map2chrom if true, argument \code{chrS} is required to map
 #' the segment coordinates to chromosomal coordinates
 #' @param fig.path a directory path for plots of the segment end scanning;
@@ -1180,16 +1182,17 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' \code{seg.path} is not provided.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-presegment <- function(ts, chrS, avg=1000, favg=100,
-                       minrd=8, minds=250, minsg=250,
+presegment <- function(ts, numts, chrS, avg=1000, favg=100,
+                       minrd=8, minds=250, rmlen=250, minsg=5e3,
                        map2chrom=FALSE, seg.path, fig.path, fig.type="png",
                        verb=1) {
 
     if ( verb> 0 )
-        cat(paste("Calculating total read-counts and moving averages.\n"))
+        cat(paste("Calculating total read-counts and moving averages...\n"))
     
     ## total time series
-    numts <- rowSums(ts > 0) ## timepoints with reads
+    if ( missing(numts) )
+      numts <- rowSums(ts > 0) ## timepoints with reads
     
     ## moving averages of read-count presence 
     avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg
@@ -1219,14 +1222,16 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
     close <- start[2:length(end)] - end[2:length(end)-1] < minds
 
     if ( verb>0 )
-        cat(paste("Fusing", sum(close), "segments with distance <",minds,"\n"))
+      cat(paste("Fusing close segments, distance <",minds,
+                "bp\t", sum(close), "\n",sep=""))
 
     start <- start[c(TRUE,!close)]
     end <- end[c(!close,TRUE)]
     ## remove too small segments
-    small <- end-start < minsg
+    small <- end-start < rmlen
     if ( verb>0 )
-        cat(paste("Removing", sum(small), "small segments <",minsg,"bp\n"))
+      cat(paste("Removing small segments, <",rmlen,
+                "bp\t",sum(small),"\n",sep=""))
     start <- start[!small]
     end <- end[!small]
     primseg <- cbind(start,end)
@@ -1235,7 +1240,7 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
     ## (2) expand ends in both directions until mov.avg. (n=10) of signal is 0
     ## TODO: analyze gradients and minima, and add to appropriate segments
     if ( verb>0 )
-        cat(paste("Scanning borders.\n"))
+        cat(paste("Scanning borders ...\n"))
     fused <- 0
     for ( sg in 2:nrow(primseg) ) {
         rng <- primseg[sg-1,2]:primseg[sg,1]
@@ -1295,7 +1300,7 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
     close <- start[2:length(end)] - end[2:length(end)-1] < 2
 
     if ( verb>0 )
-        cat(paste("Fusing", sum(close), "more segments\n"))
+        cat(paste("Fusing close segments\t", sum(close), "\n",sep=""))
     
     start <- start[c(TRUE,!close)]
     end <- end[c(!close,TRUE)]
@@ -1306,13 +1311,13 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
     ## get chromosomes of starts and ends via chrS
     if ( !missing(chrS) ) {
         
-        if ( verb>0 )
-            cat(paste("Splitting segments that still span chromosome ends.\n"))
-
         schr <- idx2chr(start,chrS) # forward strand
         echr <- idx2chr(end,chrS) # reverse strand
         splt <- which(echr!=schr) # which are spanning chromosome ends?
-    
+        
+        if ( verb>0 )
+          cat(paste("Splitting chromosome ends",length(splt),"\n"))
+        
         ## split chromosome-spanning segments, and fuse with rest
         old <- cbind(start[-splt], end[-splt])
         
@@ -1329,24 +1334,51 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
         start <- sort(start)
 
         ## remove too small segments again
-        small <- end-start < minsg
+        small <- end-start < rmlen
+        if ( verb>0 )
+          cat(paste("Removing small segments, <",rmlen,
+                    "bp\t", sum(small), "\n",sep=""))
         start <- start[!small]
         end <- end[!small]
     }
+
     
     primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENTS v3 DEFINED!
 
+    ## primseg v4
+    ## recursively fuse short (<minsg) to adjacent neighbor (shorter of both)
+    if ( verb>0 )
+      cat(paste("Fusing small segments, <",minsg,
+                "bp\t", sum(end - start +1 < minsg), "\n",sep=""))
+    
+    while( sum(end - start +1 < minsg) ) {
+        sglen <- end - start +1
+        idx <- which.min(sglen)
+        prev <- FALSE
+        if (idx==length(start) )
+          prev <- TRUE
+        if ( !idx%in% c(1,length(start)) ) 
+          prev <- sglen[idx-1]<sglen[idx+1]
+        if ( prev ) {
+            start <- start[-idx]
+            end <- end[-(idx-1)]
+        } else {
+            start <- start[-(idx+1)]
+            end <- end[-idx]
+        }
+    }
+    primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENTS v3 DEFINED!
+
+    ## map back to original chromosome coordinates
+    if ( !missing(chrS) & map2chrom ) {
+        #primseg <-cbind(start=primseg[,1], end=primseg[,2])
+        primseg <- index2coor(primseg,chrS)
+    }
     ## write out data for each segment, if requested
     if ( !missing(seg.path) ) {
         if ( verb>0 )
             cat(paste("Writing segment data to single files.\n"))
         writeSegments(data=ts, segments=primseg, name="primseg", path=seg.path)
-    }
-    
-    ## map back to original chromosome coordinates
-    if ( !missing(chrS) & map2chrom ) {
-        #primseg <-cbind(start=primseg[,1], end=primseg[,2])
-        primseg <- index2coor(primseg,chrS)
     }
     primseg
 }
