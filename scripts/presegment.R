@@ -111,6 +111,14 @@ emptyseg <- cbind(start=c(1,primseg[1:nrow(primseg),"end"]+1),
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
 emptyseg <- emptyseg[emlen>0,]
 
+## write out segments!
+if ( write.segments ) {
+    if ( verb>0 )
+        cat(paste("Writing inter-segment data files\t",time(),"\n",sep=""))
+    writeSegments(data=ts, segments=emptyseg, name="interseg", path=outdir)
+}
+
+
 ## (5): map back to chromosome coordinates
 ## and write to file
 if ( verb>0 )
