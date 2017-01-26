@@ -168,8 +168,7 @@ par(mfcol=c(2,1),mai=c(.5,.75,.15,.1),mgp=c(1.5,.5,0))
 hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="# of time points",
      main="mean number of present time points")
 hist(sgexpr,breaks=seq(0,24,.5),add=TRUE)
-legend("right",legend=c("primary segments","inter-segment"),col=1:2,
-       pch=15)
+legend("right",legend=c("primary segments","inter-segment"),col=1:2, pch=15)
 hist(emlen,breaks=seq(0,mx,1000),border=2,xlim=c(0,xl),
      main="segment length distribution",xlab="length, bp")
 hist(sglen,breaks=seq(0,mx,1000),add=TRUE)
