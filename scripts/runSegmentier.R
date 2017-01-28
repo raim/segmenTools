@@ -115,7 +115,8 @@ lst.args <- c(segs="integer",
               K="integer",
               scores="character",
               scales="numeric",
-              M="integer")
+              M="integer",
+              nui.cr="integer")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
     opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
