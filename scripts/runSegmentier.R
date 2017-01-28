@@ -274,11 +274,15 @@ for ( i in sets ) {
     allsegs <- NULL
     if ( !is.null(cset) ) {
 
-        allsegs <- segmentCluster.batch(cset, csim.scale=scales,
-                                        score=scores,
-                                        M=M, Mn=Mn, a=2, nui=nui.cr,
-                                        nextmax=nextmax,
-                                        multi=multi,multib=multib, 
+        ## collect varysettings
+        vary <- list(## scoring function
+            E=scales, S=scores,
+            ## scoring params
+            M=M, Mn=Mn, a=2, nui=nui.cr,
+            ## backtrace params
+            nextmax=nextmax, multi=multi,multib=multib)
+        
+        allsegs <- segmentCluster.batch(cset, varySettings=vary, 
                                         ncpu=1, verb=1,
                                         id=segid, short.name=short.name,
                                         save.matrix=save.matrix)
