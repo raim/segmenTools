@@ -85,7 +85,7 @@ option_list <- list(
     make_option("--nui.thresh", default=0.6,
                 help="cluster correlation threshold to re-assign points to nuissance [default %default]"),
     ## SEGMENTATION PARAMETERS
-    make_option("--nui.cr", default=2,
+    make_option("--nui.cr", type="character", default="2",
                 help="correlation of nuissance cluster with others (-) and itself (+), comma-separated characters [default %default]"),
     make_option(c("--scores"), type="character", default="ccor,icor", 
                 help="scoring functions to use, comma-separated characters [default %default]"),
