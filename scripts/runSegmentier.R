@@ -298,10 +298,16 @@ for ( i in do.sets ) {
                                         id=segid, short.name=short.name,
                                         save.matrix=save.matrix)
         ## TODO: save matrices to files?
+        ## TODO: plot matrices?
         SK <- NULL
         if ( save.matrix ) {
-            allsegs <- allsegs$allsegs
             SK <- allsegs$SK
+            allsegs <- allsegs$allsegs
+            #S <- allsegs$SK[[1]]$S
+            #matplot(apply(S,2,diff),type="l")
+            #matplot((S+100)/apply(S+100,1,mean),type="l",ylim=c(.5,1.5))
+            ##matplot(allsegs$SK[[1]]$S,type="l")
+            ##matplot(allsegs$SK[[1]]$K,type="l")
         }
         if ( is.null(allsegs) )
           cat(paste("no segments\n"))
