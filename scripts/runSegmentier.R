@@ -115,7 +115,7 @@ lst.args <- c(segs="integer",
               K="integer",
               scores="character",
               scales="numeric",
-              M="integer", nui.cr="integer",
+              M="integer", Mn="integer", nui.cr="integer",
               nextmax="logical",
               multi="character",multib="character")
 for ( i in 1:length(lst.args) ) {
