@@ -402,7 +402,7 @@ for ( i in sets ) {
     file.name <- file.path(paste(outname,"_",segid,sep=""))
  
     ## already plotted?
-    if ( file.exists(paste(file.name,fig.type,sep=".") & !redo ) {
+    if ( file.exists(paste(file.name,fig.type,sep=".")) & !redo ) {
         cat(paste("\talready plotted\n"))
         next
     }
