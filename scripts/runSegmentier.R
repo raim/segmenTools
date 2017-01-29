@@ -472,6 +472,8 @@ for ( i in sets ) {
     if ( !is.null(allsegs) ) {
         
         segcols <- columns; segcols["color"] <- "CL"
+        ## tmp to check nuissance!!
+        allsegs [,"CL"] <- allsegs [,"CL"] +1
         typs <- sort(unique(allsegs[,"type"]))
         sgtypes <- typs
         tpy <- segment.plotFeatures(allsegs, coors=coors,
