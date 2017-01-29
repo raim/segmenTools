@@ -294,8 +294,15 @@ for ( i in do.sets ) {
         
         allsegs <- segmentCluster.batch(cset, varySettings=vary, 
                                         ncpu=1, verb=1,
+                                        fuse.threshold=fuse.threshold,
                                         id=segid, short.name=short.name,
                                         save.matrix=save.matrix)
+        ## TODO: save matrices to files?
+        SK <- NULL
+        if ( save.matrix ) {
+            allsegs <- allsegs$allsegs
+            SK <- allsegs$SK
+        }
         if ( is.null(allsegs) )
           cat(paste("no segments\n"))
         else {
@@ -332,7 +339,7 @@ for ( i in do.sets ) {
                         file=paste(file.name,"_segments.csv",sep=""),quote=FALSE,
                         row.names=FALSE,col.names=TRUE)
             ## as RData, mainly for plots below
-            save(segid, tset, cset, allsegs,
+            save(opt, segid, tset, cset, allsegs, SK,
                  file=paste(file.name,"_segments.RData",sep=""))
             #write.table(clusters,sep="\t",
             #            file=paste(file.name,"_clusters.csv",sep=""),quote=FALSE,
@@ -349,6 +356,9 @@ for ( i in do.sets ) {
 if ( !plot ) next
 
 cat(paste("PLOTTING\t",time(),"\n",sep=""))
+
+## TODO: load plotting specific parameters
+##       and align with opt from saved RData file
 
 ## LOAD GENOME BROWSER
 
@@ -414,6 +424,21 @@ for ( i in sets ) {
         next
     }
     load(dfile)
+
+    ## record settings of plotted data
+    ## TODO: write setting file  before segmentation run and
+    ## use to load into analysis scripts?
+    sink(paste(file.name,"_settings.dat",sep=""))
+    if ( opt$verb>0 )
+        cat(paste("LOADED SETTINGS:\n"))
+    for ( i in 1:length(opt) ) {
+        if ( opt$verb>0 )
+            cat(paste(names(opt)[i], "\t", #typeof(opt[[i]]),
+                      paste(opt[[i]],collapse=", "), "\n",sep=""))
+        ##arg <- names(opt)[i]
+        ##assign(arg, opt[[arg]])
+    }
+    sink()
 
     ## plot
     coors <- index2coor(t(c(chr=1,unlist(primseg[i,c("start","end")]))),chrS)
