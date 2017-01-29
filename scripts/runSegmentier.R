@@ -294,7 +294,7 @@ for ( i in do.sets ) {
         
         allsegs <- segmentCluster.batch(cset, varySettings=vary, 
                                         ncpu=1, verb=1,
-                                        fuse.threshold=fuse.threshold,
+                                        fuse.threshold=fuse.thresh,
                                         id=segid, short.name=short.name,
                                         save.matrix=save.matrix)
         ## TODO: save matrices to files?
