@@ -59,7 +59,7 @@ option_list <- list(
                 help="cluster inter-segment regions instead"),
     make_option(c("--min.sz"), type="integer", default=2,  
                 help="minimal size of segments (non cluster-0 values) [default: %default]"),
-    make_option(c("--max.sz"), type="integer", default=37e4,  
+    make_option(c("--max.sz"), type="integer", default=3e6,  
                 help="maximal size of segments (non cluster-0 values) [default: %default]"),
     ## TIMESERIES PROCESSING
     make_option(c("--trafo"), type="character", default="raw",
@@ -93,13 +93,13 @@ option_list <- list(
                 help="scale exponent for similarity matrices, comma-separated doubles [default %default]"),
     make_option(c("--M"), type="character", default="175", 
                 help="minimal length penalty, comma-separated integers [default %default]"),
-    make_option(c("--Mn"), type="integer", default=15, 
+    make_option(c("--Mn"), type="character", default="15", 
                 help="minimal length penalty [default %default]"),
     make_option(c("--multi"), type="character", default="max", 
                 help="handling of multiple max. score k in scoring, min or max [default %default]"),
     make_option(c("--multib"), type="character", default="max", 
                 help="handling of multiple max. score k in back-tracing, min or max [default %default]"),
-    make_option(c("--nextmax"), action="store_false", default=TRUE, 
+    make_option(c("--nextmax"), type="character", default="T", 
                 help="in back-tracing, search for the next non-decreasing S(i,c) before initializing a new segment [default %default]"),
     ## POST-PROCESSING
     make_option("--fuse.thresh", default=0.2,
@@ -115,8 +115,9 @@ lst.args <- c(segs="integer",
               K="integer",
               scores="character",
               scales="numeric",
-              M="integer",
-              nui.cr="integer")
+              M="integer", nui.cr="integer",
+              nextmax="logical",
+              multi="character",multib="character")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
     opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
