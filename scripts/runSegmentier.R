@@ -40,6 +40,8 @@ option_list <- list(
                 help="figure type, png or pdf [default %default]"),
     make_option(c("--do.test"), action="store_true", default=FALSE,
                 help="only do testsets"),
+    make_option(c("--only.plot"), action="store_true", default=FALSE,
+                help="only plot existing segmentations; useful to check ongoing results during longer runs"),
     make_option(c("--redo"), action="store_true", default=FALSE,
                 help="overwrite existing segmentations; leave FALSE if you merely want to plot existing segmentations"),
     make_option(c("--save.matrix"), action="store_true", default=FALSE,
@@ -208,7 +210,12 @@ cat(paste("CALCULATING SEGMENTATIONS\t", time(), "\n",sep=""))
 cat(paste("TESTSETS\t", length(sets), "\n",sep=""))
 
 ### RUN SEGMENTATION
-for ( i in sets ) { 
+do.sets <- sets
+if ( only.plot ) { # skip segmentation; continue at plots
+    do.sets <- c()
+    plot <- TRUE
+}
+for ( i in do.sets ) { 
 
     ## generate segment id
     segdat <- i
@@ -270,7 +277,8 @@ for ( i in sets ) {
                               use.fft=use.fft, dft.range=dft.range,
                               use.snr=use.snr, low.thresh=low.thresh)
     ## cluster time series
-    cset <- clusterTimeseries(tset,K=K, iter.max=iter.max, nstart=nstart, nui.thresh=nui.thresh, verb=1)
+    cset <- clusterTimeseries(tset,K=K, iter.max=iter.max, nstart=nstart,
+                              nui.thresh=nui.thresh, verb=1)
     
     ## segment all clusterings for different scoring functions
     allsegs <- NULL
@@ -392,11 +400,11 @@ for ( i in sets ) {
               length(sets),"\n",sep=""))
 
     out <- file.path(paste(outname,"_",segid,sep=""))
-
+ 
     ## load data
     dfile <- paste(out,"_segments.RData",sep="")
     if ( !file.exists(dfile) ) {
-        warning(dfile, "NOT FOUND\n")
+        warning(dfile, " NOT FOUND\n")
         next
     }
     load(dfile)
