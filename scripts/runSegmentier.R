@@ -403,14 +403,14 @@ for ( i in sets ) {
  
     ## already plotted?
     if ( file.exists(paste(file.name,fig.type,sep=".")) & !redo ) {
-        cat(paste("\talready plotted\n"))
+        cat(paste("\talready plotted.\n"))
         next
     }
 
     ## load data
     dfile <- paste(file.name,"_segments.RData",sep="")
     if ( !file.exists(dfile) ) {
-        cat(paste(dfile, "NOT FOUND\n"))
+        cat(paste("\tnot yet calculated.\n"))
         next
     }
     load(dfile)
@@ -456,7 +456,8 @@ for ( i in sets ) {
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
 
     plotdev(file.name,width=width,height=3.5,type=fig.type)
-
+    ## TODO: replace mfcol by layout and adjust height
+    ## with segment number
     par(mfcol=c(5,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
     plot(1:N,tot,log="",type="l",lwd=2,axes=FALSE,ylab=NA)
     polygon(x=c(1,1,N,N),
