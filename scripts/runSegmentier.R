@@ -410,7 +410,7 @@ for ( i in sets ) {
     ## load data
     dfile <- paste(file.name,"_segments.RData",sep="")
     if ( !file.exists(dfile) ) {
-        warning(dfile, " NOT FOUND\n")
+        cat(paste(dfile, "NOT FOUND\n"))
         next
     }
     load(dfile)
