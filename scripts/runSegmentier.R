@@ -245,8 +245,8 @@ for ( i in do.sets ) {
         next
     }
     ## already done?
-    out <- file.path(paste(outname,"_",segid,"_clusters.csv",sep=""))
-    if ( file.exists(out) & !redo ) {
+    file.name <- file.path(paste(outname,"_",segid,"_clusters.csv",sep=""))
+    if ( file.exists(file.name) & !redo ) {
         cat(paste("\talready done\n"))
         next
     }
@@ -325,21 +325,21 @@ for ( i in do.sets ) {
                 clusters <- clusters[nrow(clusters):1,]
             
             ## save data!
-            out <- file.path(paste(outname,"_",segid,sep=""))
+            file.name <- file.path(paste(outname,"_",segid,sep=""))
 
             ## as table
             write.table(allsegs,sep="\t",
-                        file=paste(out,"_segments.csv",sep=""),quote=FALSE,
+                        file=paste(file.name,"_segments.csv",sep=""),quote=FALSE,
                         row.names=FALSE,col.names=TRUE)
             ## as RData, mainly for plots below
             save(segid, tset, cset, allsegs,
-                 file=paste(out,"_segments.RData",sep=""))
+                 file=paste(file.name,"_segments.RData",sep=""))
             #write.table(clusters,sep="\t",
-            #            file=paste(out,"_clusters.csv",sep=""),quote=FALSE,
+            #            file=paste(file.name,"_clusters.csv",sep=""),quote=FALSE,
             #            row.names=FALSE,col.names=TRUE)
             #tmp <- lapply(names(centers),function(x)
             #              write.table(centers[[x]],
-            #                          file= paste(out,"_",str_pad(x,2,pad="0"),
+            #                          file= paste(file.name,"_",str_pad(x,2,pad="0"),
             #                            "_centers.csv",sep=""),
             #                          sep="\t",row.names=TRUE,col.names=FALSE))
         }
@@ -399,10 +399,16 @@ for ( i in sets ) {
     cat(paste("Primary segment\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
 
-    out <- file.path(paste(outname,"_",segid,sep=""))
+    file.name <- file.path(paste(outname,"_",segid,sep=""))
  
+    ## already plotted?
+    if ( file.exists(paste(file.name,fig.type,sep=".") & !redo ) {
+        cat(paste("\talready plotted\n"))
+        next
+    }
+
     ## load data
-    dfile <- paste(out,"_segments.RData",sep="")
+    dfile <- paste(file.name,"_segments.RData",sep="")
     if ( !file.exists(dfile) ) {
         warning(dfile, " NOT FOUND\n")
         next
@@ -449,7 +455,7 @@ for ( i in sets ) {
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
 
-    plotdev(out,width=width,height=3.5,type=fig.type)
+    plotdev(file.name,width=width,height=3.5,type=fig.type)
 
     par(mfcol=c(5,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
     plot(1:N,tot,log="",type="l",lwd=2,axes=FALSE,ylab=NA)
