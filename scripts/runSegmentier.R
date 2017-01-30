@@ -206,7 +206,8 @@ if ( length(segs)==0 ) {
     sets <- segs
 } 
 
-cat(paste("CALCULATING SEGMENTATIONS\t", time(), "\n",sep=""))
+if ( !only.plot )
+  cat(paste("CALCULATING SEGMENTATIONS\t", time(), "\n",sep=""))
 cat(paste("TESTSETS\t", length(sets), "\n",sep=""))
 
 ### RUN SEGMENTATION
@@ -303,11 +304,6 @@ for ( i in do.sets ) {
         if ( save.matrix ) {
             SK <- allsegs$SK
             allsegs <- allsegs$allsegs
-            #S <- allsegs$SK[[1]]$S
-            #matplot(apply(S,2,diff),type="l")
-            #matplot((S+100)/apply(S+100,1,mean),type="l",ylim=c(.5,1.5))
-            ##matplot(allsegs$SK[[1]]$S,type="l")
-            ##matplot(allsegs$SK[[1]]$K,type="l")
         }
         if ( is.null(allsegs) )
           cat(paste("no segments\n"))
@@ -379,7 +375,7 @@ data.path <- file.path(data.path,"yeast")
 ## TODO: load data from files to make independent of genomeBrowser/genomeData
 ## PLOT SETTINGS FOR TESTSETS
 columns <- c(name="name", chr="chr", strand="strand",
-             start="start", end="end", type="type", color="CL")
+             start="start", end="end", type="type", color="color")
 fcolumns <- columns
 fcolumns["color"] <- "CL_rdx_col"
 ftypes <- c( "gene_cassette"       , "gene",           
@@ -399,9 +395,19 @@ dataSets <- loadData(testIDs, data.path=data.path)
 
 dataSets[["annotation"]]$settings$names <- FALSE
 
-## for data heatmaps
+## colors for data heatmaps
 colors0 <- matlab.like(100)  ## read count 
 colors0[1] <- "#FFFFFF" ## replace minimal by white
+
+## segment colors (cluster labels)
+#library(ggplot2) # for colors;  scale_colour_hue
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+sgcolors <- c("#000000",           # nuissance
+              gg_color_hue(max(K))) # maximal cluster number
 
 ### PLOTTING
 
@@ -437,10 +443,10 @@ for ( i in sets ) {
     sink(paste(file.name,"_settings.dat",sep=""))
     if ( opt$verb>0 )
         cat(paste("LOADED SETTINGS:\n"))
-    for ( i in 1:length(opt) ) {
+    for ( j in 1:length(opt) ) {
         if ( opt$verb>0 )
-            cat(paste(names(opt)[i], "\t", #typeof(opt[[i]]),
-                      paste(opt[[i]],collapse=", "), "\n",sep=""))
+            cat(paste(names(opt)[j], "\t", #typeof(opt[[i]]),
+                      paste(opt[[j]],collapse=", "), "\n",sep=""))
         ##arg <- names(opt)[i]
         ##assign(arg, opt[[arg]])
     }
@@ -502,12 +508,13 @@ for ( i in sets ) {
                      colnorm=TRUE)
     if ( !is.null(allsegs) ) {
         
-        segcols <- columns; segcols["color"] <- "CL"
+        ##segcols <- columns; #segcols["color"] <- "CL"
+        als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
         typs <- sort(unique(allsegs[,"type"]))
         sgtypes <- typs
-        tpy <- segment.plotFeatures(allsegs, coors=coors,
+        tpy <- segment.plotFeatures(als, coors=coors,
                                     types=sgtypes,typord=TRUE,cuttypes=TRUE,
-                                    ylab="", names=FALSE,columns=segcols,tcx=.5)
+                                    ylab="", names=FALSE,columns=columns,tcx=.5)
         fuse <- allsegs[allsegs[,"fuse"],]
         points(fuse[,"start"],tpy[fuse[,"type"]],col="black",pch=1,lwd=2,cex=2)
     } else {
@@ -525,6 +532,47 @@ for ( i in sets ) {
     
     dev.off()
 
+    ## PLOT SCORING MATRICES
+    x <- coors[,"start"]:coors[,"end"]
+    if ( save.matrix & exists("SK", mode="list") ) {
+        file.name <- paste(file.name,"_scoring",sep="")
+        plotdev(file.name,width=width,height=5,type=fig.type)
+        par(mfcol=c(length(SK)+1,1),
+            mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+        if ( !is.null(allsegs) ) {
+            
+            ##segcols <- columns; #segcols["color"] <- "CL"
+            als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
+            typs <- sort(unique(allsegs[,"type"]))
+            sgtypes <- typs
+            tpy <- segment.plotFeatures(als, coors=coors,
+                                        types=sgtypes,typord=TRUE,cuttypes=TRUE,
+                                        ylab="", names=FALSE,columns=columns,tcx=.5)
+                fuse <- allsegs[allsegs[,"fuse"],]
+            points(fuse[,"start"],tpy[fuse[,"type"]],col="black",pch=1,lwd=2,cex=2)
+        } else {
+            plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
+            text(1,1,"no segments",cex=2)
+        }
+        for ( j in 1:length(SK) ) {
+            ## get ylim by removing outliers
+            S <- SK[[j]]$S
+            dS <- apply(S,2,function(x) c(0,diff(x)))
+            matplot(x,ash(dS),ylim=quantile(dS,c(.1,.9)),
+                    type="l", ylab="asinh(S(i,C)",lty=1, lwd=1.5,
+                    col=paste(sgcolors[1:ncol(S)],"77",sep=""))
+            mtext(names(SK)[j], side=2 , line=4, las=2)
+        }
+        dev.off()
+        #par(mfcol=c(length(SK),1),
+        #    mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+        #for ( j in 1:length(SK) ) {
+        #    matplot(x,SK[[j]]$K,type="l",
+        #            ylab="back-tracing",col=sgcolors[1:ncol(S)])
+        #    mtext(names(SK)[j], side=2 , line=4, las=2)
+        #}
+    }
+ 
 }
 
 cat(paste("DONE AT  \t",time(),"\n",sep=""))
