@@ -576,9 +576,8 @@ for ( i in sets ) {
             S <- SK[[j]]$S
             dS <- apply(S,2,function(x) c(0,diff(x)))
             xlim <- range(x) ## END EFFECTS AT E>1: ylim for interior segments
-            len <- diff(xlim)
-            xrng <- xrng <- quantile(x,c(.05,.95))
-            xidx <- x%in%xrng[1]:xrng[2]
+            xrng <- quantile(x,c(.05,.95))
+            xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
             ylim <- quantile(dS[xidx,],c(.1,.9))
             matplot(x,ash(dS),ylim=ylim,xlim=xlim,
                     type="l", ylab="asinh(S(i,C)",lty=1, lwd=1,
