@@ -551,7 +551,7 @@ for ( i in sets ) {
         nrows <- length(SK)+1
         height <- 0.7*nrows
         
-        plotdev(file.name,width=width,height=height,type=fig.type)
+        plotdev(file.name,width=width,height=height,type=fig.type,res=300)
         par(mfcol=c(nrows,1),
             mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
         if ( !is.null(allsegs) ) {
@@ -581,6 +581,7 @@ for ( i in sets ) {
             matplot(x,ash(dS),ylim=ylim,xlim=xlim,
                     type="l", ylab="asinh(S(i,C)",lty=1, lwd=1,
                     col=paste(sgcolors[1:ncol(S)],"44",sep=""))
+            lines(x,ash(dS[,1]),lwd=2)
             mtext(names(SK)[j], side=2 , line=4, las=2)
         }
         dev.off()
