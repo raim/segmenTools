@@ -362,38 +362,46 @@ cat(paste("PLOTTING\t",time(),"\n",sep=""))
 ## TODO: load plotting specific parameters
 ##       and align with opt from saved RData file
 
-## LOAD GENOME BROWSER
-
-## for genome data and plots - todo - skip this!
-browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
-source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
-data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
-data.path <- file.path(data.path,"yeast")
-
-### LOCAL PATHS
-
-## TODO: load data from files to make independent of genomeBrowser/genomeData
-## PLOT SETTINGS FOR TESTSETS
 columns <- c(name="name", chr="chr", strand="strand",
              start="start", end="end", type="type", color="color")
-fcolumns <- columns
-fcolumns["color"] <- "CL_rdx_col"
-ftypes <- c( "gene_cassette"       , "gene",           
-            "five_prime_UTR_intron", "intron",                   
-            "dubious"              , "pseudogene",               
-            "rRNA"                 , "tRNA",              
-            "tRNA.intron"          , "ncRNA",                    
-            "snRNA"                , "snoRNA",                   
-            "telomere"             , "centromere",               
-            "ARS"                  , "transposable_element_gene",
-            "LTR_retrotransposon"  , "repeat_region")
 
-## LOAD DATA SETS
-cat(paste("Loading annotation data\n"))
-testIDs <- c("transcripts","annotation")
-dataSets <- loadData(testIDs, data.path=data.path)
+## LOAD YEAST GENOME BROWSER
+genome <- "yeast_R64-1-1"
+if ( genome=="yeast_R64-1-1" ) {
 
-dataSets[["annotation"]]$settings$names <- FALSE
+### REQUIRES ENVIRONMENT VARIABLES SET TO YEAST GENOME & DATA!
+### see https://gitlab.com/raim/genomeBrowser and raim@tbi.univie.ac.at
+### for the required data files
+    
+    ## for genome data and plots - todo - skip this!
+    browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
+    source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
+    data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
+    data.path <- file.path(data.path,"yeast")
+
+    
+    ## TODO: load data from files to make independent of
+    ## genomeBrowser/genomeData
+    ## PLOT SETTINGS FOR TESTSETS
+    fcolumns <- columns
+    fcolumns["color"] <- "CL_rdx_col"
+    ftypes <- c( "gene_cassette"       , "gene",           
+                "five_prime_UTR_intron", "intron",                   
+                "dubious"              , "pseudogene",               
+                "rRNA"                 , "tRNA",              
+                "tRNA.intron"          , "ncRNA",                    
+                "snRNA"                , "snoRNA",                   
+                "telomere"             , "centromere",               
+                "ARS"                  , "transposable_element_gene",
+                "LTR_retrotransposon"  , "repeat_region")
+    
+    ## LOAD DATA SETS
+    cat(paste("Loading annotation data\n"))
+    testIDs <- c("transcripts","annotation")
+    dataSets <- loadData(testIDs, data.path=data.path)
+    
+    dataSets[["annotation"]]$settings$names <- FALSE
+}
 
 ## colors for data heatmaps
 colors0 <- matlab.like(100)  ## read count 
@@ -406,7 +414,7 @@ gg_color_hue <- function(n) {
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
 
-sgcolors <- c("#000000",           # nuissance
+sgcolors <- c("#000000",            # nuissance
               gg_color_hue(max(K))) # maximal cluster number
 
 ### PLOTTING
@@ -491,11 +499,13 @@ for ( i in sets ) {
 
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
+    height <- 1.5 + ifelse(genome=="yeast_R61-1-1",2,0)
+    nrow <- 3 + ifelse(genome=="yeast_R61-1-1",2,0)
 
-    plotdev(file.name,width=width,height=3.5,type=fig.type)
+    plotdev(file.name,width=width,height=height,type=fig.type)
     ## TODO: replace mfcol by layout and adjust height
     ## with segment number
-    par(mfcol=c(5,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+    par(mfcol=c(nrow,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
     plot(1:N,tot,log="",type="l",lwd=2,axes=FALSE,ylab=NA)
     polygon(x=c(1,1,N,N),
             y=c(min(tot,na.rm=TRUE),rep(low.thresh,2),min(tot,na.rm=TRUE)),
@@ -521,14 +531,17 @@ for ( i in sets ) {
         plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
         text(1,1,"no segments",cex=2)
     }
-    tmp <- segment.plotFeatures(dataSets[["annotation"]]$data, coors=coors,
-                                strand=strand, axis1=TRUE,
-                                typord=TRUE, cuttypes=TRUE, ylab=NA,names=TRUE,
-                                columns=fcolumns, types=ftypes)
-    #axis(1)
-    tpy <- segment.plotFeatures(dataSets[["transcripts"]]$data, coors=coors,
-                                typord=TRUE, cuttypes=TRUE, ylab=NA,
-                                strand=strand)
+    if ( genome=="yeast_R61-1-1" ) {
+        tmp <- segment.plotFeatures(dataSets[["annotation"]]$data,
+                                    coors=coors, strand=strand,
+                                    typord=TRUE, cuttypes=TRUE,
+                                    axis1=TRUE, ylab=NA, names=TRUE,
+                                    columns=fcolumns, types=ftypes)
+                                        #axis(1)
+        tpy <- segment.plotFeatures(dataSets[["transcripts"]]$data,
+                                    coors=coors, strand=strand,
+                                    typord=TRUE, cuttypes=TRUE, ylab=NA)
+    }
     
     dev.off()
 
@@ -545,11 +558,12 @@ for ( i in sets ) {
             als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
             typs <- sort(unique(allsegs[,"type"]))
             sgtypes <- typs
-            tpy <- segment.plotFeatures(als, coors=coors,
-                                        types=sgtypes,typord=TRUE,cuttypes=TRUE,
-                                        ylab="", names=FALSE,columns=columns,tcx=.5)
-                fuse <- allsegs[allsegs[,"fuse"],]
-            points(fuse[,"start"],tpy[fuse[,"type"]],col="black",pch=1,lwd=2,cex=2)
+            tpy <- segment.plotFeatures(als, coors=coors, types=sgtypes,
+                                        typord=TRUE,cuttypes=TRUE, names=FALSE, 
+                                        ylab="", columns=columns, tcx=.5)
+            fuse <- allsegs[allsegs[,"fuse"],]
+            points(fuse[,"start"],tpy[fuse[,"type"]],
+                   col="black",pch=1,lwd=2,cex=2)
         } else {
             plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
             text(1,1,"no segments",cex=2)
@@ -559,8 +573,8 @@ for ( i in sets ) {
             S <- SK[[j]]$S
             dS <- apply(S,2,function(x) c(0,diff(x)))
             matplot(x,ash(dS),ylim=quantile(dS,c(.1,.9)),
-                    type="l", ylab="asinh(S(i,C)",lty=1, lwd=1.5,
-                    col=paste(sgcolors[1:ncol(S)],"77",sep=""))
+                    type="l", ylab="asinh(S(i,C)",lty=1, lwd=1,
+                    col=paste(sgcolors[1:ncol(S)],"44",sep=""))
             mtext(names(SK)[j], side=2 , line=4, las=2)
         }
         dev.off()
