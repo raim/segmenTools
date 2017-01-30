@@ -572,6 +572,7 @@ for ( i in sets ) {
         }
         for ( j in 1:length(SK) ) {
             ## get ylim by removing outliers
+            ## TODO: plot by segment; highlight winning segment!!
             S <- SK[[j]]$S
             dS <- apply(S,2,function(x) c(0,diff(x)))
             xlim <- range(x) ## END EFFECTS AT E>1: ylim for interior segments
