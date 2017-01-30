@@ -496,10 +496,9 @@ for ( i in sets ) {
 ##
 ##
 ##consegs <- consegs[consegs[,"end"]-consegs[,"start"] > 1,]
-
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
-    nrows <- 3 + ifelse(genome=="yeast_R61-1-1",2,0)
+    nrows <- 3 + ifelse(genome=="yeast_R64-1-1",2,0)
     height <- 0.7*nrows
 
     plotdev(file.name,width=width,height=height,type=fig.type)
@@ -531,7 +530,7 @@ for ( i in sets ) {
         plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
         text(1,1,"no segments",cex=2)
     }
-    if ( genome=="yeast_R61-1-1" ) {
+    if ( genome=="yeast_R64-1-1" ) {
         tmp <- segment.plotFeatures(dataSets[["annotation"]]$data,
                                     coors=coors, strand=strand,
                                     typord=TRUE, cuttypes=TRUE,
