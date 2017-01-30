@@ -499,13 +499,13 @@ for ( i in sets ) {
 
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
-    height <- 1.5 + ifelse(genome=="yeast_R61-1-1",2,0)
-    nrow <- 3 + ifelse(genome=="yeast_R61-1-1",2,0)
+    nrows <- 3 + ifelse(genome=="yeast_R61-1-1",2,0)
+    height <- 0.7*nrows
 
     plotdev(file.name,width=width,height=height,type=fig.type)
     ## TODO: replace mfcol by layout and adjust height
     ## with segment number
-    par(mfcol=c(nrow,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+    par(mfcol=c(nrows,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
     plot(1:N,tot,log="",type="l",lwd=2,axes=FALSE,ylab=NA)
     polygon(x=c(1,1,N,N),
             y=c(min(tot,na.rm=TRUE),rep(low.thresh,2),min(tot,na.rm=TRUE)),
@@ -549,8 +549,11 @@ for ( i in sets ) {
     x <- coors[,"start"]:coors[,"end"]
     if ( save.matrix & exists("SK", mode="list") ) {
         file.name <- paste(file.name,"_scoring",sep="")
-        plotdev(file.name,width=width,height=5,type=fig.type)
-        par(mfcol=c(length(SK)+1,1),
+        nrows <- length(SK)+1
+        height <- 0.7*nrows
+        
+        plotdev(file.name,width=width,height=height,type=fig.type)
+        par(mfcol=c(nrows,1),
             mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
         if ( !is.null(allsegs) ) {
             
