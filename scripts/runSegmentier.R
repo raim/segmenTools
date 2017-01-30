@@ -575,7 +575,12 @@ for ( i in sets ) {
             ## get ylim by removing outliers
             S <- SK[[j]]$S
             dS <- apply(S,2,function(x) c(0,diff(x)))
-            matplot(x,ash(dS),ylim=quantile(dS,c(.1,.9)),
+            xlim <- range(x) ## END EFFECTS AT E>1: ylim for interior segments
+            len <- diff(xlim)
+            xrng <- xrng <- quantile(x,c(.05,.95))
+            xidx <- x%in%xrng[1]:xrng[2]
+            ylim <- quantile(dS[xidx,],c(.1,.9))
+            matplot(x,ash(dS),ylim=ylim,xlim=xlim,
                     type="l", ylab="asinh(S(i,C)",lty=1, lwd=1,
                     col=paste(sgcolors[1:ncol(S)],"44",sep=""))
             mtext(names(SK)[j], side=2 , line=4, las=2)
