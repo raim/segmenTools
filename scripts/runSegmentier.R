@@ -549,7 +549,7 @@ for ( i in sets ) {
     if ( save.matrix & exists("SK", mode="list") ) {
         file.name <- paste(file.name,"_scoring",sep="")
         nrows <- length(SK)+1
-        height <- 0.7*nrows
+        height <- 0.75*nrows
         
         plotdev(file.name,width=width,height=height,type=fig.type,res=300)
         par(mfcol=c(nrows,1),
@@ -578,7 +578,7 @@ for ( i in sets ) {
             xrng <- quantile(x,c(.05,.95))
             xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
             ylim <- quantile(dS[xidx,],c(.1,.9))
-            plot(1,ylim=ylim,xlim=xlim,ylab="asinh(S(i,C)",
+            plot(1,ylim=ylim,xlim=xlim,ylab="asinh(S(i,C)")
             lines(x,ash(dS[,1]),lwd=2.5,col="#00000077")
             matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
                     col=paste(sgcolors[1:ncol(S)],"EE",sep=""))
