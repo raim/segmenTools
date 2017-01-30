@@ -579,7 +579,7 @@ for ( i in sets ) {
             xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
             ylim <- quantile(dS[xidx,],c(.1,.9))
             plot(1,ylim=ylim,xlim=xlim,ylab="asinh(S(i,C)")
-            lines(x,ash(dS[,1]),lwd=2.5,col="#00000077")
+            lines(x,ash(dS[,1]),lwd=4,col="#00000077") # NUI: BACKGROUND GRAY
             matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
                     col=paste(sgcolors[1:ncol(S)],"EE",sep=""))
             mtext(names(SK)[j], side=2 , line=4, las=2)
