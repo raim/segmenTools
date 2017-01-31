@@ -550,11 +550,6 @@ for ( i in sets ) {
         file.name <- paste(file.name,"_scoring",sep="")
         nrows <- length(SK)+1
         height <- 0.75*nrows
-
-        ## only show clusters that actually produced a segment
-        sgcols <- sgcolors
-        sgcols <- paste(sgcols,"EE",sep="")
-        sgcols[! (2:length(sgcols)%in%allsegs[,"CL"])] <- NA
         
         plotdev(file.name,width=width,height=height,type=fig.type,res=300)
         par(mfcol=c(nrows,1),
@@ -581,7 +576,14 @@ for ( i in sets ) {
             S <- SK[[j]]$S
             dS <- apply(S,2,function(x) c(0,diff(x)))
             xlim <- range(x) ## END EFFECTS AT E>1: ylim for interior segments
-            #cat(paste(paste(range(ash(dS)),collapse="-"),"\n"))
+
+            ## only show clusters that actually produced a segment
+            sgcols <- sgcolors
+            sgcols <- paste(sgcols,"EE",sep="") ## scale down
+            tp <- allsegs[,"type"]%in%names(SK)[j]
+            sgcols[! (2:length(sgcols)%in%allsegs[tp,"CL"])] <- NA
+
+            ##cat(paste(paste(range(ash(dS)),collapse="-"),"\n"))
             xrng <- quantile(x,c(.05,.95))
             xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
             ylim <- quantile(ash(dS[xidx,]),c(0,1))
