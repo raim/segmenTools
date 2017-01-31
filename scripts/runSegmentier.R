@@ -210,12 +210,13 @@ if ( !only.plot )
   cat(paste("CALCULATING SEGMENTATIONS\t", time(), "\n",sep=""))
 cat(paste("TESTSETS\t", length(sets), "\n",sep=""))
 
-### RUN SEGMENTATION
 do.sets <- sets
 if ( only.plot ) { # skip segmentation; continue at plots
     do.sets <- c()
     plot <- TRUE
 }
+
+### RUN SEGMENTATION
 for ( i in do.sets ) { 
 
     ## generate segment id
@@ -545,11 +546,12 @@ for ( i in sets ) {
     dev.off()
 
     ## PLOT SCORING MATRICES
-    x <- coors[,"start"]:coors[,"end"]
     if ( save.matrix & exists("SK", mode="list") ) {
+
         file.name <- paste(file.name,"_scoring",sep="")
         nrows <- length(SK)+1
         height <- 0.75*nrows
+        x <- coors[,"start"]:coors[,"end"]
         
         plotdev(file.name,width=width,height=height,type=fig.type,res=300)
         par(mfcol=c(nrows,1),
@@ -581,7 +583,7 @@ for ( i in sets ) {
             sgcols <- sgcolors
             sgcols <- paste(sgcols,"EE",sep="") ## scale down
             tp <- allsegs[,"type"]%in%names(SK)[j]
-            sgcols[! (2:length(sgcols)%in%allsegs[tp,"CL"])] <- NA
+            sgcols[! (1:length(sgcols)%in%(allsegs[tp,"CL"]+1))] <- NA
 
             ##cat(paste(paste(range(ash(dS)),collapse="-"),"\n"))
             xrng <- quantile(x,c(.05,.95))
