@@ -376,7 +376,7 @@ if ( genome=="yeast_R64-1-1" ) {
 ### see https://gitlab.com/raim/genomeBrowser and raim@tbi.univie.ac.at
 ### for the required data files
 
-    cat(paste("including data from genome\t", genome, "\n",sep=""))
+    cat(paste("genome data\t", genome, "\n",sep=""))
 
     ## for genome data and plots - todo - skip this!
     browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
