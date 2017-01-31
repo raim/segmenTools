@@ -550,6 +550,10 @@ for ( i in sets ) {
         file.name <- paste(file.name,"_scoring",sep="")
         nrows <- length(SK)+1
         height <- 0.75*nrows
+
+        ## only show clusters that actually produced a segment
+        sgcols <- sgcolors
+        sgcols[! (2:length(sgcols)%in%allsegs[,"CL"])] <- NA
         
         plotdev(file.name,width=width,height=height,type=fig.type,res=300)
         par(mfcol=c(nrows,1),
@@ -582,7 +586,7 @@ for ( i in sets ) {
             plot(1,ylim=ylim,xlim=xlim,ylab=expression(ash(Delta~S(i,C))))
             lines(x,ash(dS[,1]),lwd=7,col="#00000015") # NUI: BACKGROUND GRAY
             matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
-                    col=paste(sgcolors[1:ncol(S)],"EE",sep=""))
+                    col=paste(sgcols[1:ncol(S)],"EE",sep=""))
             mtext(names(SK)[j], side=2 , line=4, las=2)
         }
         dev.off()
