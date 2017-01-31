@@ -52,6 +52,8 @@ option_list <- list(
                 help="suffix for segment IDs [default %default]"),
     make_option(c("--short.name"),  action="store_true", default=FALSE,
                 help="strip down segment types to varied values [default %default]"),
+    make_option(c("--genome"), type="character", default="yeast_R64-1-1",
+                help="in plots, additionally show annoted features and reported transcripts; this requires installation of the `R Genome Browser' and data sets and is currently only available for `yeast_R64-1-1"),
     make_option(c("-o", "--outdir"), type="character", default=".", 
                 help="path to output directory"),    
     ## PRIMARY SEGMENT SELECTION
@@ -367,7 +369,7 @@ columns <- c(name="name", chr="chr", strand="strand",
              start="start", end="end", type="type", color="color")
 
 ## LOAD YEAST GENOME BROWSER
-genome <- "yeast_R64-1-1"
+##genome <- "yeast_R64-1-1"
 if ( genome=="yeast_R64-1-1" ) {
 
 ### REQUIRES ENVIRONMENT VARIABLES SET TO YEAST GENOME & DATA!
@@ -592,7 +594,7 @@ for ( i in sets ) {
             xrng <- quantile(x,c(.05,.95))
             xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
             ylim <- quantile(ash(dS[xidx,]),c(0,1))
-            plot(1,ylim=ylim,xlim=xlim,ylab=expression(ash(Delta S["i,C"])))
+            plot(1,ylim=ylim,xlim=xlim,ylab=expression(ash(Delta~S["i,C"])))
             lines(x,ash(dS[,1]),lwd=7,col="#00000015") # NUI: BACKGROUND GRAY
             lines(x,ash(dS[,1]),lwd=1,lty=3,col="#00000099") # NUI: BACKGROUND GRAY
             matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
