@@ -500,6 +500,8 @@ for ( i in sets ) {
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
     nrows <- 3 + ifelse(genome=="yeast_R64-1-1",2,0)
+    if ( save.matrix & exists("SK", mode="list") )
+        nrows <- nrows + length(SK)
     height <- 0.7*nrows
 
     plotdev(file.name,width=width,height=height,type=fig.type)
@@ -543,35 +545,35 @@ for ( i in sets ) {
                                     typord=TRUE, cuttypes=TRUE, ylab=NA)
     }
     
-    dev.off()
+    #dev.off()
 
     ## PLOT SCORING MATRICES
     if ( save.matrix & exists("SK", mode="list") ) {
 
-        file.name <- paste(file.name,"_scoring",sep="")
-        nrows <- length(SK)+1
-        height <- 0.75*nrows
+        #file.name <- paste(file.name,"_scoring",sep="")
+        #nrows <- length(SK)+1
+        #height <- 0.75*nrows
         x <- coors[,"start"]:coors[,"end"]
         
-        plotdev(file.name,width=width,height=height,type=fig.type,res=300)
-        par(mfcol=c(nrows,1),
-            mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
-        if ( !is.null(allsegs) ) {
-            
-            ##segcols <- columns; #segcols["color"] <- "CL"
-            als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
-            typs <- sort(unique(allsegs[,"type"]))
-            sgtypes <- typs
-            tpy <- segment.plotFeatures(als, coors=coors, types=sgtypes,
-                                        typord=TRUE,cuttypes=TRUE, names=FALSE, 
-                                        ylab="", columns=columns, tcx=.5)
-            fuse <- allsegs[allsegs[,"fuse"],]
-            points(fuse[,"start"],tpy[fuse[,"type"]],
-                   col="black",pch=1,lwd=2,cex=2)
-        } else {
-            plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
-            text(1,1,"no segments",cex=2)
-        }
+        #plotdev(file.name,width=width,height=height,type=fig.type,res=300)
+        #par(mfcol=c(nrows,1),
+        #    mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+        ##if ( !is.null(allsegs) ) {
+        ##    
+        ##    ##segcols <- columns; #segcols["color"] <- "CL"
+        ##    als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
+        ##    typs <- sort(unique(allsegs[,"type"]))
+        ##    sgtypes <- typs
+        ##    tpy <- segment.plotFeatures(als, coors=coors, types=sgtypes,
+        ##                                typord=TRUE,cuttypes=TRUE, names=FALSE, 
+        ##                                ylab="", columns=columns, tcx=.5)
+        ##    fuse <- allsegs[allsegs[,"fuse"],]
+        ##    points(fuse[,"start"],tpy[fuse[,"type"]],
+        ##           col="black",pch=1,lwd=2,cex=2)
+        ##} else {
+        ##    plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
+        ##    text(1,1,"no segments",cex=2)
+        ##}
         for ( j in 1:length(SK) ) {
             ## get ylim by removing outliers
             ## TODO: plot by segment; highlight winning segment!!
