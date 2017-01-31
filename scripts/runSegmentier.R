@@ -553,6 +553,7 @@ for ( i in sets ) {
 
         ## only show clusters that actually produced a segment
         sgcols <- sgcolors
+        sgcols <- paste(sgcols,"EE",sep="")
         sgcols[! (2:length(sgcols)%in%allsegs[,"CL"])] <- NA
         
         plotdev(file.name,width=width,height=height,type=fig.type,res=300)
@@ -586,7 +587,7 @@ for ( i in sets ) {
             plot(1,ylim=ylim,xlim=xlim,ylab=expression(ash(Delta~S(i,C))))
             lines(x,ash(dS[,1]),lwd=7,col="#00000015") # NUI: BACKGROUND GRAY
             matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
-                    col=paste(sgcols[1:ncol(S)],"EE",sep=""))
+                    col=sgcols)
             mtext(names(SK)[j], side=2 , line=4, las=2)
         }
         dev.off()
