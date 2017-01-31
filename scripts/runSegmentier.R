@@ -584,7 +584,7 @@ for ( i in sets ) {
             #cat(paste(paste(range(ash(dS)),collapse="-"),"\n"))
             xrng <- quantile(x,c(.05,.95))
             xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
-            ylim <- quantile(ash(dS[xidx,]),c(.05,.95))
+            ylim <- quantile(ash(dS[xidx,]),c(0.01,.99))
             plot(1,ylim=ylim,xlim=xlim,ylab=expression(ash(Delta~S(i,C))))
             lines(x,ash(dS[,1]),lwd=7,col="#00000015") # NUI: BACKGROUND GRAY
             matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
