@@ -503,11 +503,12 @@ for ( i in sets ) {
     if ( save.matrix & exists("SK", mode="list") )
         nrows <- nrows + length(SK)
     height <- 0.7*nrows
+    ## TODO: adapt left mai according to longest type name!
 
     plotdev(file.name,width=width,height=height,type=fig.type)
     ## TODO: replace mfcol by layout and adjust height
     ## with segment number
-    par(mfcol=c(nrows,1),mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+    par(mfcol=c(nrows,1),mai=c(.01,1.25,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
     plot(1:N,tot,log="",type="l",lwd=2,axes=FALSE,ylab=NA)
     polygon(x=c(1,1,N,N),
             y=c(min(tot,na.rm=TRUE),rep(low.thresh,2),min(tot,na.rm=TRUE)),
