@@ -270,8 +270,7 @@ for ( i in do.sets ) {
     if ( strand==-1 )
         tsd <- tsd[nrow(tsd):1,]
 
-    if ( verb>0 )
-        cat(paste("CLUSTERING\t",time(),"\n",sep=""))
+    cat(paste("CLUSTERING\t",time(),"\n",sep=""))
 
     ## process time series, get DFT etc.
     ## TODO: add processing info to tset
@@ -372,10 +371,13 @@ columns <- c(name="name", chr="chr", strand="strand",
 ##genome <- "yeast_R64-1-1"
 if ( genome=="yeast_R64-1-1" ) {
 
-### REQUIRES ENVIRONMENT VARIABLES SET TO YEAST GENOME & DATA!
+### REQUIRES ENVIRONMENT VARIABLES SET TO YEAST GENOME BROWSER & DATA!
+### TODO: make genomeBrowser a package; introduce official IDs for genomes
 ### see https://gitlab.com/raim/genomeBrowser and raim@tbi.univie.ac.at
 ### for the required data files
-    
+
+    cat(paste("including data from genome\t", genome, "\n",sep="")=)
+
     ## for genome data and plots - todo - skip this!
     browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
     source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
