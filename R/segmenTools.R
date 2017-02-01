@@ -1342,11 +1342,11 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
         end <- end[!small]
     }
 
-    
     primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENTS v3 DEFINED!
 
-    ## primseg v4
-    ## recursively fuse short (<minsg) to adjacent neighbor (shorter of both)
+    ## NOTE: primseg v4 - primseg v3 can be reproduced with minsg==1
+    ## TODO: account for chromosome ends!
+    ## (5) recursively fuse short (<minsg) to shorter neighbor
     if ( verb>0 )
       cat(paste("Fusing small segments, <",minsg,
                 "bp\t", sum(end - start +1 < minsg), "\n",sep=""))
@@ -1367,7 +1367,9 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
             end <- end[-idx]
         }
     }
-    primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENTS v3 DEFINED!
+    
+    ## TODO (6) split too long segments!
+    primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENT v4
 
     ## map back to original chromosome coordinates
     if ( !missing(chrS) & map2chrom ) {
