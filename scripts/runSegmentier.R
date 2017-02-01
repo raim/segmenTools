@@ -503,6 +503,8 @@ for ( i in sets ) {
 ##consegs <- consegs[consegs[,"end"]-consegs[,"start"] > 1,]
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
+    if ( fig.type=="png" )
+        width <- min(c(width, 326)) # APPARENTLY THE MAX. WIDTH ALLOWED
     nrows <- 3 + ifelse(genome=="yeast_R64-1-1",2,0)
     if ( save.matrix & exists("SK", mode="list") )
         nrows <- nrows + length(SK)
@@ -603,7 +605,6 @@ for ( i in sets ) {
                     col=sgcols)
             mtext(names(SK)[j], side=2 , line=4, las=2)
         }
-        dev.off()
         #par(mfcol=c(length(SK),1),
         #    mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
         #for ( j in 1:length(SK) ) {
@@ -612,6 +613,7 @@ for ( i in sets ) {
         #    mtext(names(SK)[j], side=2 , line=4, las=2)
         #}
     }
+    dev.off()
  
 }
 
