@@ -1200,7 +1200,6 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
 
     ## main primary segment definition! 
     segs <- avgts > minrd # smoothed total read number is larger then threshold
-    
     ## set chromosome ends to FALSE as well
     if ( !missing(chrS) )
         segs[c(chrS[2:length(chrS)],chrS+1)] <- FALSE
@@ -1305,9 +1304,39 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
     start <- start[c(TRUE,!close)]
     end <- end[c(!close,TRUE)]
     
-    ## (4) split chromosome ends!
+
+    ## NOTE: primseg v4 - primseg v3 can be reproduced with minsg==1
+    ## TODO: account for chromosome ends!
+    ## (4) recursively fuse short (<minsg) to shorter neighbor
+    if ( verb>0 )
+      cat(paste("Fusing small segments, <",minsg,
+                "bp\t", sum(end - start +1 < minsg), "\n",sep=""))
+    
+    while( sum(end - start +1 < minsg) ) {
+        sglen <- end - start +1
+        idx <- which.min(sglen)
+        if ( idx==1 ) # first: fise with next
+            prev <- FALSE 
+        else if ( idx==length(start) ) # last: only previous possible
+            prev <- TRUE
+        else # take shorter neighbor
+            prev <- sglen[idx-1]<sglen[idx+1]
+        ## fuse
+        if ( prev ) {
+            start <- start[-idx]
+            end <- end[-(idx-1)]
+        } else {
+            start <- start[-(idx+1)]
+            end <- end[-idx]
+        }
+    }
+
+    ## TODO: split too long segments
+    ## while ( sglen>maxsg ) {}
+
+    ## (5) split chromosome ends!
     ## TODO: why is multiple chromosome end handling required?
-    ## 
+    ## TODO: attach small telomeric segments to next?
     ## get chromosomes of starts and ends via chrS
     if ( !missing(chrS) ) {
         
@@ -1341,34 +1370,10 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
         start <- start[!small]
         end <- end[!small]
     }
-
-    primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENTS v3 DEFINED!
-
-    ## NOTE: primseg v4 - primseg v3 can be reproduced with minsg==1
-    ## TODO: account for chromosome ends!
-    ## (5) recursively fuse short (<minsg) to shorter neighbor
-    if ( verb>0 )
-      cat(paste("Fusing small segments, <",minsg,
-                "bp\t", sum(end - start +1 < minsg), "\n",sep=""))
-    
-    while( sum(end - start +1 < minsg) ) {
-        sglen <- end - start +1
-        idx <- which.min(sglen)
-        prev <- FALSE
-        if (idx==length(start) )
-          prev <- TRUE
-        if ( !idx%in% c(1,length(start)) ) 
-          prev <- sglen[idx-1]<sglen[idx+1]
-        if ( prev ) {
-            start <- start[-idx]
-            end <- end[-(idx-1)]
-        } else {
-            start <- start[-(idx+1)]
-            end <- end[-idx]
-        }
-    }
-    
+   
     ## TODO (6) split too long segments!
+
+    
     primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENT v4
 
     ## map back to original chromosome coordinates
