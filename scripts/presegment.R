@@ -94,6 +94,7 @@ if ( plot.borders ) {
                           minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
                           verb=verb)
 }
+# sglen <- primseg[,"end"] - primseg[,"start"] +1
 
 ## column chr will be filled by index2coor
 primseg <- cbind(ID=1:nrow(primseg),chr=rep(NA,nrow(primseg)),primseg)
