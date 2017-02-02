@@ -295,18 +295,14 @@ for ( i in do.sets ) {
             ## backtrace params
             nextmax=nextmax, multi=multi,multib=multib)
         
-        allsegs <- segmentCluster.batch(cset, varySettings=vary, 
-                                        ncpu=1, verb=1,
-                                        fuse.threshold=fuse.thresh,
-                                        id=segid, short.name=short.name,
-                                        save.matrix=save.matrix)
-        ## TODO: save matrices to files?
-        ## TODO: plot matrices?
-        SK <- NULL
-        if ( save.matrix ) {
-            SK <- allsegs$SK
-            allsegs <- allsegs$allsegs
-        }
+        sset <- segmentCluster.batch(cset, varySettings=vary, 
+                                     ncpu=1, verb=1,
+                                     fuse.threshold=fuse.thresh,
+                                     id=segid, short.name=short.name,
+                                     save.matrix=save.matrix)
+        SK <- sset$SK # NULL if !save.matrix
+        allsegs <- sset$segments # SEGMENTS!
+
         if ( is.null(allsegs) )
           cat(paste("no segments\n"))
         else {
@@ -466,6 +462,12 @@ for ( i in sets ) {
     sink()
 
     ## plot
+    ## TODO:
+    ## consolidate to plot functions, aligned with segment_data.R
+    ## plot.tset(tset)
+    ## plot.cset(cset, k)
+    ## plot.sset(sset, k)
+    ## plotAll(tset,cset,sset) # plot by k in fitting order
     coors <- index2coor(t(c(chr=1,unlist(primseg[i,c("start","end")]))),chrS)
     strand <- ifelse(coors[,"strand"]==-1, "-", "+")
     
@@ -479,28 +481,6 @@ for ( i in sets ) {
         tsd <- tsd[nrow(tsd):1,]
     }
     
-    ## BREAK COUNT
-    ##starts <- ends <- rep(0,N)
-    ##tab <- table(allsegs[,"start"]-coors[,"start"])
-    ##starts[as.numeric(names(tab))] <- tab
-    ##tab <- table(allsegs[,"end"]-coors[,"start"])
-    ##ends[as.numeric(names(tab))] <- tab
-##ntype <- length(unique(allsegs[,"type"]))
-## consensus segments: in more then half of types
-##n.thresh <- ntype/3
-##constarts <- which(starts>=n.thresh)
-##conends <- which(ends>=n.thresh)
-##
-##consegs <- data.frame(matrix(NA,ncol=ncol(allsegs),nrow=length(constarts)))
-##colnames(consegs) <- colnames(allsegs)
-##
-##consegs[,"start"] <- constarts
-##consegs[,"end"] <- conends
-##consegs[,"fuse"] <- FALSE
-##consegs[,"type"] <- "consensus"
-##
-##
-##consegs <- consegs[consegs[,"end"]-consegs[,"start"] > 1,]
     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
     if ( fig.type=="png" )
@@ -560,7 +540,6 @@ for ( i in sets ) {
         #file.name <- paste(file.name,"_scoring",sep="")
         #nrows <- length(SK)+1
         #height <- 0.75*nrows
-        x <- coors[,"start"]:coors[,"end"]
         
         #plotdev(file.name,width=width,height=height,type=fig.type,res=300)
         #par(mfcol=c(nrows,1),
@@ -581,6 +560,7 @@ for ( i in sets ) {
         ##    plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
         ##    text(1,1,"no segments",cex=2)
         ##}
+        x <- coors[,"start"]:coors[,"end"]
         for ( j in 1:length(SK) ) {
             ## get ylim by removing outliers
             ## TODO: plot by segment; highlight winning segment!!
