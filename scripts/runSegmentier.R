@@ -296,11 +296,10 @@ for ( i in do.sets ) {
             nextmax=nextmax, multi=multi,multib=multib)
         
         sset <- segmentCluster.batch(cset, varySettings=vary, 
-                                     ncpu=1, verb=1,
+                                     verb=1,
                                      fuse.threshold=fuse.thresh,
                                      id=segid, short.name=short.name,
                                      save.matrix=save.matrix)
-        SK <- sset$SK # NULL if !save.matrix
         allsegs <- sset$segments # SEGMENTS!
 
         if ( is.null(allsegs) )
@@ -321,9 +320,9 @@ for ( i in do.sets ) {
             }
             ## 2) map back to chromosomes
             segcoors <- index2coor(segcoors,chrS)
-            allsegs <- cbind(allsegs[,c("ID","type","CL")],
+            allsegs <- cbind(allsegs[,c("ID","type")],
                              segcoors,
-                             allsegs[,"fuse",drop=FALSE])
+                             allsegs[,c("CL","color","fuse"),drop=FALSE])
             
             
             centers <- cset$centers
@@ -336,13 +335,14 @@ for ( i in do.sets ) {
 
             ## as table
             write.table(allsegs,sep="\t",
-                        file=paste(file.name,"_segments.csv",sep=""),quote=FALSE,
-                        row.names=FALSE,col.names=TRUE)
+                        file=paste(file.name,"_segments.csv",sep=""),
+                        quote=FALSE,row.names=FALSE,col.names=TRUE)
             ## as RData, mainly for plots below
-            save(opt, segid, tset, cset, allsegs, SK,
+            sset$segments <- allsegs
+            save(opt, segid, tset, cset, sset, 
                  file=paste(file.name,"_segments.RData",sep=""))
             #write.table(clusters,sep="\t",
-            #            file=paste(file.name,"_clusters.csv",sep=""),quote=FALSE,
+            #          file=paste(file.name,"_clusters.csv",sep=""),quote=FALSE,
             #            row.names=FALSE,col.names=TRUE)
             #tmp <- lapply(names(centers),function(x)
             #              write.table(centers[[x]],
@@ -377,6 +377,7 @@ if ( genome=="yeast_R64-1-1" ) {
     ## for genome data and plots - todo - skip this!
     browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
     source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
+    source(file.path(browser.path,"src/genomeBrowser_utils.R")) ## plotFeature
     data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
     data.path <- file.path(data.path,"yeast")
 
@@ -470,24 +471,16 @@ for ( i in sets ) {
     ## plotAll(tset,cset,sset) # plot by k in fitting order
     coors <- index2coor(t(c(chr=1,unlist(primseg[i,c("start","end")]))),chrS)
     strand <- ifelse(coors[,"strand"]==-1, "-", "+")
-    
-    tot <- tset$tot
-    tsd <- tset$ts
-    tsd[tset$zero.vals,] <- NA
-    N <- nrow(tsd)
+    xaxis <- coors[,"start"]:coors[,"end"]
+    N <- nrow(tset$ts)
 
-    if ( coors[,"strand"]==-1 ) {
-        tot <- rev(tot)
-        tsd <- tsd[nrow(tsd):1,]
-    }
-    
-    ## TODO: adapt with to segment length!
+     ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
     if ( fig.type=="png" )
         width <- min(c(width, 326)) # APPARENTLY THE MAX. WIDTH ALLOWED
     nrows <- 3 + ifelse(genome=="yeast_R64-1-1",2,0)
-    if ( save.matrix & exists("SK", mode="list") )
-        nrows <- nrows + length(SK)
+    if ( save.matrix )
+        nrows <- nrows + length(sset$SK)
     height <- 0.7*nrows
     ## TODO: adapt left mai according to longest type name!
 
@@ -495,104 +488,23 @@ for ( i in sets ) {
     ## TODO: replace mfcol by layout and adjust height
     ## with segment number
     par(mfcol=c(nrows,1),mai=c(.01,1.25,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
-    plot(1:N,tot,log="",type="l",lwd=2,axes=FALSE,ylab=NA)
-    polygon(x=c(1,1,N,N),
-            y=c(min(tot,na.rm=TRUE),rep(low.thresh,2),min(tot,na.rm=TRUE)),
-            col="#00000055",border=NA)
-    abline(h=low.thresh,col="#000000BB")
-    lines(1:N,tot)
-    axis(2); axis(1)
-    mtext("total signal", 2, 2)
-    segment.plotHeat(tsd,coors=c(chr=1,start=1,end=N),chrS=0,colors=colors0,
-                     colnorm=TRUE)
-    if ( !is.null(allsegs) ) {
-        
-        ##segcols <- columns; #segcols["color"] <- "CL"
-        als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
-        typs <- sort(unique(allsegs[,"type"]))
-        sgtypes <- typs
-        tpy <- segment.plotFeatures(als, coors=coors,
-                                    types=sgtypes,typord=TRUE,cuttypes=TRUE,
-                                    ylab="", names=FALSE,columns=columns,tcx=.5)
-        fuse <- allsegs[allsegs[,"fuse"],]
-        points(fuse[,"start"],tpy[fuse[,"type"]],col="black",pch=1,lwd=2,cex=2)
-    } else {
-        plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
-        text(1,1,"no segments",cex=2)
-    }
+    plot(tset,plot=c("total","timeseries"),xaxis=xaxis)
+    plot(sset,plot="segments",xaxis=xaxis, lwd=2)
+    axis(1)
     if ( genome=="yeast_R64-1-1" ) {
-        tmp <- segment.plotFeatures(dataSets[["annotation"]]$data,
-                                    coors=coors, strand=strand,
-                                    typord=TRUE, cuttypes=TRUE,
-                                    axis1=TRUE, ylab=NA, names=TRUE,
-                                    columns=fcolumns, types=ftypes)
+        tmp <- plotFeatures(dataSets[["annotation"]]$data,
+                            coors=coors, strand=strand,
+                            typord=TRUE, cuttypes=TRUE,
+                            axis1=TRUE, ylab=NA, names=TRUE,
+                            columns=fcolumns, types=ftypes)
                                         #axis(1)
-        tpy <- segment.plotFeatures(dataSets[["transcripts"]]$data,
-                                    coors=coors, strand=strand,
-                                    typord=TRUE, cuttypes=TRUE, ylab=NA)
+        tpy <- plotFeatures(dataSets[["transcripts"]]$data,
+                            coors=coors, strand=strand,
+                            typord=TRUE, cuttypes=TRUE, ylab=NA)
     }
-    
-    #dev.off()
-
     ## PLOT SCORING MATRICES
-    if ( save.matrix & exists("SK", mode="list") ) {
-
-        #file.name <- paste(file.name,"_scoring",sep="")
-        #nrows <- length(SK)+1
-        #height <- 0.75*nrows
-        
-        #plotdev(file.name,width=width,height=height,type=fig.type,res=300)
-        #par(mfcol=c(nrows,1),
-        #    mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
-        ##if ( !is.null(allsegs) ) {
-        ##    
-        ##    ##segcols <- columns; #segcols["color"] <- "CL"
-        ##    als <- cbind(allsegs,color=sgcolors[allsegs[,"CL"]+1])
-        ##    typs <- sort(unique(allsegs[,"type"]))
-        ##    sgtypes <- typs
-        ##    tpy <- segment.plotFeatures(als, coors=coors, types=sgtypes,
-        ##                                typord=TRUE,cuttypes=TRUE, names=FALSE, 
-        ##                                ylab="", columns=columns, tcx=.5)
-        ##    fuse <- allsegs[allsegs[,"fuse"],]
-        ##    points(fuse[,"start"],tpy[fuse[,"type"]],
-        ##           col="black",pch=1,lwd=2,cex=2)
-        ##} else {
-        ##    plot(1,1,col=NA,axes=FALSE,ylab=NA,xlab=NA)
-        ##    text(1,1,"no segments",cex=2)
-        ##}
-        x <- coors[,"start"]:coors[,"end"]
-        for ( j in 1:length(SK) ) {
-            ## get ylim by removing outliers
-            ## TODO: plot by segment; highlight winning segment!!
-            S <- SK[[j]]$S
-            dS <- apply(S,2,function(x) c(0,diff(x)))
-            xlim <- range(x) ## END EFFECTS AT E>1: ylim for interior segments
-
-            ## only show clusters that actually produced a segment
-            sgcols <- sgcolors
-            sgcols <- paste(sgcols,"EE",sep="") ## scale down
-            tp <- allsegs[,"type"]%in%names(SK)[j]
-            sgcols[! (1:length(sgcols)%in%(allsegs[tp,"CL"]+1))] <- NA
-
-            ##cat(paste(paste(range(ash(dS)),collapse="-"),"\n"))
-            xrng <- quantile(x,c(.05,.95))
-            xidx <- which(x>xrng[1]&x<xrng[2]) #x%in%xrng[1]:xrng[2]
-            ylim <- quantile(ash(dS[xidx,]),c(0,1))
-            plot(1,ylim=ylim,xlim=xlim,ylab=expression(ash(Delta~S["i,C"])))
-            lines(x,ash(dS[,1]),lwd=7,col="#00000015") # NUI: BACKGROUND GRAY
-            lines(x,ash(dS[,1]),lwd=1,lty=3,col="#00000099") # NUI: BACKGROUND GRAY
-            matplot(x,ash(dS), type="l", lty=1, lwd=1, add=TRUE,
-                    col=sgcols)
-            mtext(names(SK)[j], side=2 , line=4, las=2)
-        }
-        #par(mfcol=c(length(SK),1),
-        #    mai=c(.01,2.5,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
-        #for ( j in 1:length(SK) ) {
-        #    matplot(x,SK[[j]]$K,type="l",
-        #            ylab="back-tracing",col=sgcolors[1:ncol(S)])
-        #    mtext(names(SK)[j], side=2 , line=4, las=2)
-        #}
-    }
+    if ( save.matrix ) 
+      plot(sset,plot="S",xaxis=xaxis)
     dev.off()
  
 }
