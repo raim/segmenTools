@@ -324,10 +324,10 @@ for ( i in do.sets ) {
                              segcoors,
                              allsegs[,c("CL","color","fuse"),drop=FALSE])
             
-            
+            ## store clustering data
             centers <- cset$centers
             clusters <- cset$clusters
-            if ( strand == -1 )
+            if ( strand == -1 ) 
                 clusters <- clusters[nrow(clusters):1,]
             
             ## save data!
@@ -341,14 +341,6 @@ for ( i in do.sets ) {
             sset$segments <- allsegs
             save(opt, segid, tset, cset, sset, 
                  file=paste(file.name,"_segments.RData",sep=""))
-            #write.table(clusters,sep="\t",
-            #          file=paste(file.name,"_clusters.csv",sep=""),quote=FALSE,
-            #            row.names=FALSE,col.names=TRUE)
-            #tmp <- lapply(names(centers),function(x)
-            #              write.table(centers[[x]],
-            #                          file= paste(file.name,"_",str_pad(x,2,pad="0"),
-            #                            "_centers.csv",sep=""),
-            #                          sep="\t",row.names=TRUE,col.names=FALSE))
         }
     }
 }
@@ -474,6 +466,12 @@ for ( i in sets ) {
     xaxis <- coors[,"start"]:coors[,"end"]
     N <- nrow(tset$ts)
 
+    ## revert back timeseries!
+    if ( strand=="-" ) {
+        tset$tot <- rev(tset$tot)
+        tset$ts <- tset$ts[nrow(tset$ts):1,]
+    }
+    
      ## TODO: adapt with to segment length!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
     if ( fig.type=="png" )
