@@ -1151,9 +1151,10 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
     all[order(all[,"target"]),]
 }
 
-
-#' pre-segmentation of whole-genome data into chunks that can
-#' be handle by segmenTier.
+#' Pre-segmentation of the time-series
+#' 
+#' pre-segmentation of the time-series into chunks that can
+#' be handled by segmenTier.
 #' @param ts the time-series of readcounts for the complete chromosome,
 #' rows are chromosomal positions and columns are time-points; reverse
 #' strand rows at the bottom of the matrix. Option \code{chrS} can be
