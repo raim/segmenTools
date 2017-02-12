@@ -94,7 +94,6 @@ if ( plot.borders ) {
                           minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
                           verb=verb)
 }
-# sglen <- primseg[,"end"] - primseg[,"start"] +1
 
 ## column chr will be filled by index2coor
 primseg <- cbind(ID=1:nrow(primseg),chr=rep(NA,nrow(primseg)),primseg)
@@ -112,13 +111,15 @@ emptyseg <- cbind(start=c(1,primseg[1:nrow(primseg),"end"]+1),
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
 emptyseg <- emptyseg[emlen>0,]
 
-## write out segments!
+## write out inter-segments!
 if ( write.segments ) {
     if ( verb>0 )
         cat(paste("Writing inter-segment data files\t",time(),"\n",sep=""))
     writeSegments(data=ts, segments=emptyseg, name="interseg", path=outdir)
 }
 
+## TODO: write out presegmentation stats
+## total coverage?
 
 ## (5): map back to chromosome coordinates
 ## and write to file
@@ -151,6 +152,12 @@ numts <- rowSums(ts > 0) ## timepoints with reads
 sglen <- primseg[,"end"] - primseg[,"start"] +1
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
 
+## genome coverage
+total <- max(chrS)*2
+sgcvg <- sum(sglen)/total
+emcvg <- sum(emlen)/total
+
+
 
 ## average number of expressed time-points in emptyseg
 emexpr <- apply(emptyseg,1,function(x)
@@ -166,12 +173,16 @@ xl<- 2*mean(sglen)
 file.name <- file.path(outdir,"primseg_lengths")
 plotdev(file.name,width=5,height=4,type=fig.type)
 par(mfcol=c(2,1),mai=c(.5,.75,.15,.1),mgp=c(1.5,.5,0))
-hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="# of time points",
-     main="mean number of present time points")
+hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="mean number of expressed time points",
+     main=NA)#"mean number of expressed time points")
 hist(sgexpr,breaks=seq(0,24,.5),add=TRUE)
-legend("right",legend=c("primary segments","inter-segment"),col=1:2, pch=15)
-hist(emlen,breaks=seq(0,mx,1000),border=2,xlim=c(0,xl),
-     main="segment length distribution",xlab="length, bp")
+legend("right",legend=c("pre-segments","inter-segments"),
+       col=1:2, pch=15,bty="n")
+hist(emlen,breaks=seq(0,mx,1000),border=2,xlim=c(0,xl),xlab="length, bp",
+     main=NA)#"segment length distribution")
 hist(sglen,breaks=seq(0,mx,1000),add=TRUE)
+legend("right",legend=c("coverage:",
+                        paste(100*c(round(sgcvg,2), round(emcvg,2)),"%")),
+       col=c(NA,1:2), pch=15,bty="n")       
 dev.off()
 
