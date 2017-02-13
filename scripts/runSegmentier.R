@@ -294,11 +294,16 @@ for ( i in do.sets ) {
             M=M, Mn=Mn, a=2, nui=nui.cr,
             ## backtrace params
             nextmax=nextmax, multi=multi,multib=multib)
-        
+
+        ## note: we add time-series processing to the segment
+        ## type names, allowing to externally vary (multiple
+        ## distinct calls to this script) and later co-analyse
+        ## them.
         sset <- segmentCluster.batch(cset, varySettings=vary, 
                                      verb=1,
                                      fuse.threshold=fuse.thresh,
-                                     id=segid, short.name=short.name,
+                                     id=segid, type.name=c("T","D"),
+                                        #short.name=short.name,
                                      save.matrix=save.matrix)
         allsegs <- sset$segments # SEGMENTS!
 
