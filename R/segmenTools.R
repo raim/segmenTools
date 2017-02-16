@@ -1407,8 +1407,8 @@ writeSegments <- function(data, segments, name="segment", path) {
 
     for ( i in 1:nrow(segments) ) {
         rng <- segments[i,"start"]:segments[i,"end"]
-        if ( length(rng) < 100 )
-            cat(paste("short segment",i, ":", length(rng),"\n"))
+        ##if ( length(rng) < 100 )
+        ##    cat(paste("short segment",i, ":", length(rng),"\n"))
         dat <- data[rng,]
         id <- ifelse("ID"%in%colnames(segments), segments[i,"ID"], i)
         file.name <- paste(name, "_",id,".csv",sep="")
