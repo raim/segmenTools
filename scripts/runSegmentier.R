@@ -402,19 +402,6 @@ if ( genome=="yeast_R64-1-1" ) {
     dataSets[["annotation"]]$settings$names <- FALSE
 }
 
-## colors for data heatmaps
-colors0 <- matlab.like(100)  ## read count 
-colors0[1] <- "#FFFFFF" ## replace minimal by white
-
-## segment colors (cluster labels)
-#library(ggplot2) # for colors;  scale_colour_hue
-gg_color_hue <- function(n) {
-  hues = seq(15, 375, length = n + 1)
-  hcl(h = hues, l = 65, c = 100)[1:n]
-}
-
-sgcolors <- c("#000000",            # nuissance
-              gg_color_hue(max(K))) # maximal cluster number
 
 ### PLOTTING
 
@@ -472,8 +459,10 @@ for ( i in sets ) {
     N <- nrow(tset$ts)
 
     ## revert back timeseries!
+    ## TODO: use function or move to plot
     if ( strand=="-" ) {
         tset$tot <- rev(tset$tot)
+        tset$zero.vals <- rev(tset$zero.vals)
         tset$ts <- tset$ts[nrow(tset$ts):1,]
     }
     
