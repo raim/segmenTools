@@ -50,7 +50,7 @@ option_list <- list(
                 help="plot segment figures"),
     make_option(c("--idsuffix"), type="character", default="",
                 help="suffix for segment IDs [default %default]"),
-    make_option(c("--type.name"),  action="store_true", default=c("T,D"),
+    make_option(c("--type.name"),  type="character", default=c("T,D"),
                 help="parameters to use for IDs [default %default]"),
     make_option(c("--short.name"),  action="store_true", default=FALSE,
                 help="strip down segment types to varied values [default %default]"),
