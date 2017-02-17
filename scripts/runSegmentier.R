@@ -50,6 +50,8 @@ option_list <- list(
                 help="plot segment figures"),
     make_option(c("--idsuffix"), type="character", default="",
                 help="suffix for segment IDs [default %default]"),
+    make_option(c("--type.name"),  action="store_true", default=c("T,D"),
+                help="parameters to use for IDs [default %default]"),
     make_option(c("--short.name"),  action="store_true", default=FALSE,
                 help="strip down segment types to varied values [default %default]"),
     make_option(c("--genome"), type="character", default="yeast_R64-1-1",
@@ -115,6 +117,7 @@ opt <- parse_args(OptionParser(option_list=option_list))
 
 ## process comma-separated list arguments
 lst.args <- c(segs="integer",
+              type.name="character",
               dft.range="integer",
               K="integer",
               scores="character",
@@ -302,7 +305,7 @@ for ( i in do.sets ) {
         sset <- segmentCluster.batch(cset, varySettings=vary, 
                                      verb=1,
                                      fuse.threshold=fuse.thresh,
-                                     id=segid, type.name=c("T","D"),
+                                     id=segid, type.name=type.name,
                                         #short.name=short.name,
                                      save.matrix=save.matrix)
         allsegs <- sset$segments # SEGMENTS!
