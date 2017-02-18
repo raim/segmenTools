@@ -187,6 +187,7 @@ hist(sglen,breaks=seq(0,mx,500),add=TRUE)
 legend("right",legend=c("coverage:",
                         paste(100*c(round(sgcvg,2), round(emcvg,2)),"%"),
                         #"max:",
+                        paste(length(sglen), "segments"),
                         paste("max:", round(c(max.sg)/1e3), "kb"),
                         paste("tail: ", sum(sglen>xl),sep="")),
        col=c(NA,1:2,NA,NA), pch=15,bty="n")       
