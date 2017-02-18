@@ -166,7 +166,7 @@ sgexpr <- apply(primseg,1,function(x)
     sum(numts[x["start"]:x["end"]])/length(x["start"]:x["end"]))
 
 mx <- max(c(sglen,emlen))*1.01
-xl<- 2*mean(sglen)
+xl<- 2.5*mean(sglen)
 
 ## plot segments and inter-segments
 ## average time-point presence and segment lengths
@@ -178,9 +178,9 @@ hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="mean number of expressed time poi
 hist(sgexpr,breaks=seq(0,24,.5),add=TRUE)
 legend("right",legend=c("pre-segments","inter-segments"),
        col=1:2, pch=15,bty="n")
-hist(emlen,breaks=seq(0,mx,1000),border=2,xlim=c(0,xl),xlab="length, bp",
+hist(emlen,breaks=seq(0,mx,500),border=2,xlim=c(0,xl),xlab="length, bp",
      main=NA)#"segment length distribution")
-hist(sglen,breaks=seq(0,mx,1000),add=TRUE)
+hist(sglen,breaks=seq(0,mx,500),add=TRUE)
 legend("right",legend=c("coverage:",
                         paste(100*c(round(sgcvg,2), round(emcvg,2)),"%")),
        col=c(NA,1:2), pch=15,bty="n")       
