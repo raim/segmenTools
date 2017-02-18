@@ -190,7 +190,7 @@ legend("right",legend=c("coverage:",
                         paste(length(sglen), "segments"),
                         paste("max:", round(c(max.sg)/1e3), "kb"),
                         paste("tail: ", sum(sglen>xl),sep="")),
-       col=c(NA,1:2,NA,NA), pch=15,bty="n")       
+       col=c(NA,1:2,NA,NA,NA), pch=15,bty="n")       
 dev.off()
 cat(paste("maximum segment, bp\t", max.sg, "\n"))
 cat(paste("maximum inter-segment, bp\t", max.em, "\n"))
