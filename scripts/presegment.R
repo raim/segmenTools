@@ -184,12 +184,11 @@ legend("right",legend=c("pre-segments","inter-segments"),
 hist(emlen,breaks=seq(0,mx,500),border=2,xlim=c(0,xl),xlab="length, bp",
      main=NA)#"segment length distribution")
 hist(sglen,breaks=seq(0,mx,500),add=TRUE)
-legend("right",legend=c(paste(100*c(round(sgcvg,2)),"% coverage",sep=""),
-                        #"max:",
-                        paste(length(sglen), "segments"),
+legend("right",legend=c(paste(length(sglen), "segments"),
+                        paste(100*c(round(sgcvg,2)),"% coverage",sep=""),
                         paste("max:", round(c(max.sg)/1e3), "kb"),
                         paste("tail: ", sum(sglen>xl),sep="")),
-       col=c(NA,1,NA,NA,NA), pch=15,bty="n")       
+       col=c(1,NA,NA,NA), pch=15,bty="n")       
 dev.off()
 cat(paste("maximum segment, bp\t", max.sg, "\n"))
 cat(paste("maximum inter-segment, bp\t", max.em, "\n"))
