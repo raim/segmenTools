@@ -165,7 +165,10 @@ emexpr <- apply(emptyseg,1,function(x)
 sgexpr <- apply(primseg,1,function(x)
     sum(numts[x["start"]:x["end"]])/length(x["start"]:x["end"]))
 
-mx <- max(c(sglen,emlen))*1.01
+
+max.sg <- max(c(sglen))
+max.em <- max(c(emlen))
+mx <- max(c(max.sg,max.em)) *1.01
 xl<- 2.5*mean(sglen)
 
 ## plot segments and inter-segments
@@ -182,7 +185,11 @@ hist(emlen,breaks=seq(0,mx,500),border=2,xlim=c(0,xl),xlab="length, bp",
      main=NA)#"segment length distribution")
 hist(sglen,breaks=seq(0,mx,500),add=TRUE)
 legend("right",legend=c("coverage:",
-                        paste(100*c(round(sgcvg,2), round(emcvg,2)),"%")),
-       col=c(NA,1:2), pch=15,bty="n")       
+                        paste(100*c(round(sgcvg,2), round(emcvg,2)),"%"),
+                        #"max:",
+                        paste("max:", round(c(max.sg)/1e3), "kb"),
+                        paste("tail: ", sum(sglen>xl),sep="")),
+       col=c(NA,1:2,NA,NA), pch=15,bty="n")       
 dev.off()
-
+cat(paste("maximum segment, bp\t", max.sg, "\n"))
+cat(paste("maximum inter-segment, bp\t", max.em, "\n"))
