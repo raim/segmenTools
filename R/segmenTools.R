@@ -1335,6 +1335,8 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
     ## TODO: split too long segments
     ## while ( sglen>maxsg ) {}
 
+    ## TODO: assign small intersegment to smaller adjacent segments
+
     ## (5) split chromosome ends!
     ## TODO: why is multiple chromosome end handling required?
     ## TODO: attach small telomeric segments to next?
