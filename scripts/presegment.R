@@ -3,8 +3,8 @@
 ## cut time-series into primary segments based on level
 ## of expression
 
-library("segmenTools") ## coor2index and presegment function
-suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
+library("segmenTools") # coor2index and presegment function
+library("stringr") # for 0-padded filenames
 
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
@@ -97,7 +97,7 @@ if ( plot.borders ) {
 }
 
 ## column chr will be filled by index2coor
-primseg <- data.frame(ID=paste("sg_",str_pad(1:nrow(primseg),4,pad="0"),sep=""),
+primseg <- data.frame(ID=paste("sg",str_pad(1:nrow(primseg),4,pad="0"),sep=""),
                       chr=rep(NA,nrow(primseg)),primseg)
 
 ## write out segments!
@@ -108,8 +108,8 @@ if ( write.segments ) {
 }
 
 ## inter-segments
-emptyseg <- data.frame(ID=paste("is_",str_pad(1:(nrow(primseg)+1),4,pad="0"),
-                                sep=""),
+emptyseg <- data.frame(ID=paste("is",str_pad(1:(nrow(primseg)+1),4,pad="0"),
+                         sep=""),
                        chr=rep(NA,nrow(primseg)+1),
                        start=c(1,primseg[1:nrow(primseg),"end"]+1),
                        end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
@@ -196,3 +196,19 @@ legend("right",legend=c(paste(length(sglen), "segments"),
 dev.off()
 cat(paste("maximum segment, bp\t", max.sg, "\n"))
 cat(paste("maximum inter-segment, bp\t", max.em, "\n"))
+
+## time is N^2
+sg.eta <- ecdf(sglen^2)
+em.eta <- ecdf(emlen^2)
+x <- seq(0,sum(sglen^2),1e4)
+mxx <- x[which(sg.eta(x)==1)][1]
+x <- seq(0,mxx,mxx/1000) 
+file.name <- file.path(outdir,"primseg_times")
+plotdev(file.name,width=5,height=2.5,type=fig.type)
+par(mfcol=c(1,1),mai=c(.5,.75,.05,.05),mgp=c(1.5,.5,0))
+plot(x, sg.eta(x),type="l",log="x",
+     xlab="time ~ N^2, bp^2", ylab="E.C.D.F.", ylim=c(0,1))
+lines(x, em.eta(x), col=2)
+abline(v=mxx)
+legend("right",paste("max", signif(mxx,3)))
+dev.off()
