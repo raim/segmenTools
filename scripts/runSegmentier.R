@@ -126,10 +126,19 @@ lst.args <- c(segs="integer",
               multi="character",multib="character")
 for ( i in 1:length(lst.args) ) {
     idx <- which(names(opt)==names(lst.args)[i])
-    opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
-    for ( j in 1:length(opt[[idx]]) ) {
-        tmp <- strsplit(opt[[idx]][j], ":")
-    }
+    ## get individual values
+    tmp <- as.list(unlist(strsplit(opt[[idx]], ",")))
+    ## expand ranges
+    if ( lst.args[i]=="numeric" )
+        for ( j in 1:length(tmp) ) { # only for numeric modes
+            tmp2 <- unlist(strsplit(tmp[[j]], ":"))
+            if ( length(tmp2)>1 ) {
+                tmp2 <- as.numeric(tmp2)
+                tmp[[j]] <- tmp2[1]:tmp2[2]
+            }
+        }
+    if ( length(tmp)>0 )
+        opt[[idx]] <- unlist(tmp)
     mode(opt[[idx]]) <- lst.args[i]
 }
 
@@ -182,7 +191,7 @@ if ( chrfile != "" ) {
 cat(paste("Loading primary segments:",infile,"\n"))
 
 primseg <- read.table(infile, sep="\t",header=TRUE)
-primseg <- coor2index(primseg, chrS)[,c("start","end")]
+primseg <- coor2index(primseg, chrS)[,c("ID","start","end")]
 prdf <- primseg[,"end"] - primseg[,"start"] + 1
 ## set segment name (used in segment IDs and file names)
 outname <- file.path(outdir,"primseg")
@@ -225,7 +234,7 @@ for ( i in do.sets ) {
 
     ## generate segment id
     segdat <- i
-    segid <- primseg[i,"ID"]
+    segid <- as.character(primseg[i,"ID"])
     ##segid <- str_pad(i,5,pad="0")
     ##if ( idsuffix!="" )
     ##    segid <- paste(segid, idsuffix, sep="_")
@@ -470,20 +479,24 @@ for ( i in sets ) {
         tset$ts <- tset$ts[nrow(tset$ts):1,]
     }
     
-     ## TODO: adapt with to segment length!
+    ## adapt width to segment length!
+    ## TODO: adapt left mai according to longest type name!
     width <- 2.5 + N/1e3 # 1 kb per inch; plut left margin
     if ( fig.type=="png" )
-        width <- min(c(width, 326)) # APPARENTLY THE MAX. WIDTH ALLOWED
+      width <- min(c(width, 326)) # APPARENTLY THE MAX. WIDTH ALLOWED
+    nsg <- length(sset$ids)
     nrows <- 3 + ifelse(genome=="yeast_R64-1-1",2,0)
     if ( save.matrix )
         nrows <- nrows + length(sset$SK)
-    height <- 0.7*nrows
-    ## TODO: adapt left mai according to longest type name!
+    heights <- rep(0.7,nrows)
+    heights[3] <- max(c(0.7, nsg * 0.7/10))
+    height <- sum(heights)
 
     plotdev(file.name,width=width,height=height,type=fig.type)
     ## TODO: replace mfcol by layout and adjust height
     ## with segment number
-    par(mfcol=c(nrows,1),mai=c(.01,1.25,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+    par(mai=c(.01,1.25,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
+    layout(matrix(1:nrows),widths=1,heights=heights)
     plot(tset,plot=c("total","timeseries"),xaxis=xaxis)
     plot(sset,plot="segments",xaxis=xaxis, lwd=2)
     axis(1)
