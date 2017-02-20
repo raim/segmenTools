@@ -110,6 +110,7 @@ if ( write.segments ) {
 ## inter-segments
 emptyseg <- data.frame(ID=paste("is_",str_pad(1:(nrow(primseg)+1),4,pad="0"),
                                 sep=""),
+                       chr=rep(NA,nrow(primseg)+1),
                        start=c(1,primseg[1:nrow(primseg),"end"]+1),
                        end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
@@ -130,14 +131,12 @@ if ( write.segments ) {
 ## and write to file
 if ( verb>0 )
     cat(paste("Writing segments and intersegments\t",time(),"\n",sep=""))
-sgcoors <- index2coor(primseg,chrS)
 
+sgcoors <- index2coor(primseg,chrS)
 file.name <- file.path(outdir,"primseg.csv")
 write.table(sgcoors,file.name,row.names=FALSE,sep="\t",quote=FALSE)
 
-emcoors <-cbind(start=emptyseg[,1],
-                end=emptyseg[,2]) 
-emcoors <- index2coor(emcoors,chrS)
+emcoors <- index2coor(emptyseg,chrS)
 file.name <- file.path(outdir,"primseg_interseg.csv")
 write.table(emcoors,file.name,row.names=FALSE,sep="\t",quote=FALSE)
 
