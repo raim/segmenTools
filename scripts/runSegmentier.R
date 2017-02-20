@@ -264,7 +264,7 @@ for ( i in do.sets ) {
     #                 skip=primseg[i,"start"],
     #                 nrows=primseg[i,"end"]-primseg[i,"start"]+1)
     if ( !use.data ) {
-        segdata <- file.path(primdir, paste(primfiles,i,".csv",sep=""))
+        segdata <- file.path(primdir, paste(primfiles,segid,".csv",sep=""))
         tsd <- read.table(segdata, sep="\t", header=TRUE)
     } else 
         tsd <- ts[rng,]

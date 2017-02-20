@@ -121,7 +121,7 @@ emptyseg <- emptyseg[emlen>0,] # rm 0-length
 if ( write.segments ) {
     if ( verb>0 )
         cat(paste("Writing inter-segment data files\t",time(),"\n",sep=""))
-    writeSegments(data=ts, segments=emptyseg, name="interseg", path=outdir)
+    writeSegments(data=ts, segments=emptyseg, name="primseg", path=outdir)
 }
 
 ## TODO: write out presegmentation stats
