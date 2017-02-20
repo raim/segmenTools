@@ -97,8 +97,8 @@ if ( plot.borders ) {
 }
 
 ## column chr will be filled by index2coor
-primseg <- cbind(ID=paste("sg_",str_pad(1:nrow(primseg),4,pad="0"),sep=""),
-                chr=rep(NA,nrow(primseg)),primseg)
+primseg <- data.frame(ID=paste("sg_",str_pad(1:nrow(primseg),4,pad="0"),sep=""),
+                      chr=rep(NA,nrow(primseg)),primseg)
 
 ## write out segments!
 if ( write.segments ) {
@@ -108,11 +108,13 @@ if ( write.segments ) {
 }
 
 ## inter-segments
-emptyseg <- cbind(ID=paste("is",str_pad(1:nrow(emptyseg),pad="0"),sep=""),
-                  start=c(1,primseg[1:nrow(primseg),"end"]+1),
-                  end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
+emptyseg <- data.frame(ID=paste("is_",str_pad(1:(nrow(primseg)+1),4,pad="0"),
+                                sep=""),
+                       start=c(1,primseg[1:nrow(primseg),"end"]+1),
+                       end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
-emptyseg <- emptyseg[emlen>0,]
+emptyseg <- emptyseg[emlen>0,] # rm 0-length
+## TODO: remove >max(chrS)
 
 ## write out inter-segments!
 if ( write.segments ) {
