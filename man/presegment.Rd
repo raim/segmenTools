@@ -2,8 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{presegment}
 \alias{presegment}
-\title{pre-segmentation of whole-genome data into chunks that can
-be handle by segmenTier.}
+\title{Pre-segmentation of the time-series}
 \usage{
 presegment(ts, numts, chrS, avg = 1000, favg = 100, minrd = 8,
   minds = 250, rmlen = 250, minsg = 5000, map2chrom = FALSE, seg.path,
@@ -51,7 +50,7 @@ no figures will be plotted if \code{fig.path} is not provided.}
 \item{verb}{integer level of verbosity, 0: no messages, 1: show messages}
 }
 \description{
-pre-segmentation of whole-genome data into chunks that can
-be handle by segmenTier.
+pre-segmentation of the time-series into chunks that can
+be handled by segmenTier.
 }
 
