@@ -106,7 +106,8 @@ if ( write.segments ) {
 }
 
 ## inter-segments
-emptyseg <- cbind(start=c(1,primseg[1:nrow(primseg),"end"]+1),
+emptyseg <- cbind(ID=paste("is",1:nrow(emptyseg),sep=""),
+                  start=c(1,primseg[1:nrow(primseg),"end"]+1),
                   end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
 emptyseg <- emptyseg[emlen>0,]
