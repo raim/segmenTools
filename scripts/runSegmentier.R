@@ -226,9 +226,10 @@ for ( i in do.sets ) {
 
     ## generate segment id
     segdat <- i
-    segid <- str_pad(i,5,pad="0")
-    if ( idsuffix!="" )
-        segid <- paste(segid, idsuffix, sep="_")
+    segid <- primseg[i,"ID"]
+    ##segid <- str_pad(i,5,pad="0")
+    ##if ( idsuffix!="" )
+    ##    segid <- paste(segid, idsuffix, sep="_")
     
     cat(paste("PRIMARY SEGMENT\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
@@ -411,9 +412,10 @@ if ( genome=="yeast_R64-1-1" ) {
 for ( i in sets ) { 
 
     ## generate segment id
-    segid <- str_pad(i,5,pad="0")
-    if ( idsuffix!="" )
-        segid <- paste(segid, idsuffix, sep="_")
+    segid <- primseg[i,"ID"]
+    ##segid <- str_pad(i,5,pad="0")
+    ##if ( idsuffix!="" )
+    ##    segid <- paste(segid, idsuffix, sep="_")
     
     cat(paste("Primary segment\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
