@@ -129,7 +129,7 @@ for ( i in 1:length(lst.args) ) {
     ## get individual values
     tmp <- as.list(unlist(strsplit(opt[[idx]], ",")))
     ## expand ranges
-    if ( lst.args[i]=="numeric" )
+    if ( lst.args[i]=="numeric" |  lst.args[i]=="integer" )
         for ( j in 1:length(tmp) ) { # only for numeric modes
             tmp2 <- unlist(strsplit(tmp[[j]], ":"))
             if ( length(tmp2)>1 ) {
