@@ -4,6 +4,7 @@
 ## of expression
 
 library("segmenTools") ## coor2index and presegment function
+suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
 
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
@@ -96,7 +97,8 @@ if ( plot.borders ) {
 }
 
 ## column chr will be filled by index2coor
-primseg <- cbind(ID=1:nrow(primseg),chr=rep(NA,nrow(primseg)),primseg)
+primseg <- cbind(ID=paste("sg_",str_pad(1:nrow(primseg),4,pad="0"),sep=""),
+                chr=rep(NA,nrow(primseg)),primseg)
 
 ## write out segments!
 if ( write.segments ) {
@@ -106,7 +108,7 @@ if ( write.segments ) {
 }
 
 ## inter-segments
-emptyseg <- cbind(ID=paste("is",1:nrow(emptyseg),sep=""),
+emptyseg <- cbind(ID=paste("is",str_pad(1:nrow(emptyseg),pad="0"),sep=""),
                   start=c(1,primseg[1:nrow(primseg),"end"]+1),
                   end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
