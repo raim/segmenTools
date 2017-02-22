@@ -76,7 +76,7 @@ chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 )
     cat(paste("LOADING SEGMENTS:", infile, "\n"))
-segs <- read.table(infile,sep="\t",header=TRUE)
+segs <- read.table(infile,sep="\t",header=TRUE, comment.char="")
 
 #' uses a logical column to fuse adjacent segments, i.e. the
 #' lower segment i with segment i-1, where segments

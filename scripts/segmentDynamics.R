@@ -203,7 +203,7 @@ if ( phase.weight ) wght <-  1-pval
 
 if ( verb>0 )
     cat(paste("Loading segments\t",time(),"\n"))
-segs <- read.table(infile,sep="\t",header=TRUE)
+segs <- read.table(infile,sep="\t",header=TRUE, comment.char="")
 
 ## reduce to requested segment types
 if ( stypes[1]=="" )  
