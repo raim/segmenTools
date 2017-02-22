@@ -170,7 +170,7 @@ if ( chrfile != "" ) {
     cf <- read.table(chrfile, sep="\t",header=FALSE)
     chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 } else {
-    ##file.path(data.path,"genomeData/Sacchromyces.cerevisiae.clean.S288C_oscillation.RData")
+    ##datafile <- file.path("/data/yeast/RNAseq/results/genomeData/Sacchromyces.cerevisiae.clean.S288C_oscillation.RData")
     cat(paste("Using full data file:", datafile, "\n"))
     load(datafile) 
     
@@ -293,7 +293,7 @@ for ( i in do.sets ) {
                               use.snr=use.snr, low.thresh=low.thresh)
     ## cluster time series
     cset <- clusterTimeseries(tset,K=K, iter.max=iter.max, nstart=nstart,
-                              nui.thresh=nui.thresh, verb=1)
+                              nui.thresh=nui.thresh, verb=verb)
     
     ## segment all clusterings for different scoring functions
     allsegs <- NULL
@@ -312,12 +312,13 @@ for ( i in do.sets ) {
         ## distinct calls to this script) and later co-analyse
         ## them.
         sset <- segmentCluster.batch(cset, varySettings=vary, 
-                                     verb=1,
+                                     verb=verb,
                                      fuse.threshold=fuse.thresh,
                                      id=segid, type.name=type.name,
                                         #short.name=short.name,
                                      save.matrix=save.matrix)
         allsegs <- sset$segments # SEGMENTS!
+        ## plotSegmentation(tset,cset,sset)
 
         if ( is.null(allsegs) )
           cat(paste("no segments\n"))
@@ -485,7 +486,7 @@ for ( i in sets ) {
     if ( fig.type=="png" )
       width <- min(c(width, 326)) # APPARENTLY THE MAX. WIDTH ALLOWED
     nsg <- length(sset$ids)
-    nrows <- 3 + ifelse(genome=="yeast_R64-1-1",2,0)
+    nrows <- 3 + ncol(cset$clusters) + ifelse(genome=="yeast_R64-1-1",2,0)
     if ( save.matrix )
         nrows <- nrows + length(sset$SK)
     heights <- rep(0.7,nrows)
@@ -498,6 +499,8 @@ for ( i in sets ) {
     par(mai=c(.01,1.25,.01,.01),mgp=c(1.7,.5,0),xaxs="i")
     layout(matrix(1:nrows),widths=1,heights=heights)
     plot(tset,plot=c("total","timeseries"),xaxis=xaxis)
+    for ( k in 1:ncol(cset$clusters) )
+      plot(cset, k=k)
     plot(sset,plot="segments",xaxis=xaxis, lwd=2)
     axis(1)
     if ( genome=="yeast_R64-1-1" ) {
