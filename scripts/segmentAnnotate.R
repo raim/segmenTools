@@ -130,7 +130,7 @@ chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 ) msg(paste("Loading query:", query, "\t\n"))
-query <- read.table(query,sep="\t",header=TRUE, stringsAsFactors=FALSE)
+query <- read.table(query,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char="")
 
 if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 
@@ -138,7 +138,7 @@ if ( target=="" ) {
     target <- file("stdin")
 }
 
-target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE)
+target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char="")
 
 ## filter by type
 if ( length(qtypes)>0 )
