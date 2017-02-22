@@ -170,11 +170,6 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ..
 whichSegment <- function(pos, seg) 
     which(seg[,"start"]<= pos & seg[,"end"]>=pos)
 
-## calculate overlap between two sets of genome segments, e.g.
-## test a segmentation of RNA-seq data vs. known features or transcripts
-## NOTE: all chromosome coordinates must be mapped to a continuous index
-## via coor2index
-## NOTE: mod from $TATADIR/yeast/scripts/analyzeSeq2013_utils.R
 
 #' specifically tailored to segment strings in segmenTier;
 #' splits a list of strings by a separator and constructs
@@ -213,6 +208,9 @@ getSegmentClassTable <- function(sgtypes, sep="_", gsep=":") {
             cltab[,i] <- as.factor(col)
         }
     }
+    ## rm non-varied
+    rmc <- apply(cltab, 2, function(x) length(unique(x))==1)
+    cltab <- cltab[,!rmc,drop=FALSE]
     
     cltab
 }
@@ -238,6 +236,11 @@ getSegmentClasses <- function(sgtypes, sep="_", gsep=":") {
 }
 
 ### WRAPPERS of segmentOverlap for specific purposes
+## calculate overlap between two sets of genome segments, e.g.
+## test a segmentation of RNA-seq data vs. known features or transcripts
+## NOTE: all chromosome coordinates must be mapped to a continuous index
+## via coor2index
+## NOTE: mod from $TATADIR/yeast/scripts/analyzeSeq2013_utils.R
 
 ## wrapper around \code{\link{segmentOverlap}}, used to 
 ## annotate the query set by a column in the target set
