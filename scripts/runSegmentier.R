@@ -46,6 +46,10 @@ option_list <- list(
                 help="NOT IMPLEMENTED: store the total score matrix S(i,c) and the backtracing matrix K(i,c) in the RData file"),
     make_option(c("--plot"), action="store_true", default=FALSE,
                 help="plot segment figures"),
+    make_option(c("--genbro"), type="character", default="",
+                help="path for the R genome browser sources"),
+    make_option(c("--gendat"), type="character", default="",
+                help="path for the R genome data sources"),
     make_option(c("--idsuffix"), type="character", default="",
                 help="suffix for segment IDs [default %default]"),
     make_option(c("--type.name"),  type="character", default=c("T,D"),
@@ -384,11 +388,13 @@ if ( genome=="yeast_R64-1-1" ) {
     cat(paste("genome data\t", genome, "\n",sep=""))
 
     ## for genome data and plots - todo - skip this!
-    browser.path <- Sys.getenv("GENBRO")
-    source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
-    source(file.path(browser.path,"src/genomeBrowser_utils.R")) ## plotFeature
-    data.path <- Sys.getenv("GENDAT")
-    data.path <- file.path(data.path,"yeast")
+    if ( missing(genbro) )
+      genbro <- Sys.getenv("GENBRO")
+    source(file.path(genbro,"src/genomeBrowser.R")) ## for loadData
+    source(file.path(genbro,"src/genomeBrowser_utils.R")) ## plotFeature
+    if ( missing(gendat) )
+      gendat <- Sys.getenv("GENDAT")
+    gendat <- file.path(gendat,"yeast")
 
     
     ## TODO: load data from files to make independent of
@@ -409,7 +415,7 @@ if ( genome=="yeast_R64-1-1" ) {
     ## LOAD DATA SETS
     cat(paste("Loading annotation data\n"))
     testIDs <- c("transcripts","annotation")
-    dataSets <- loadData(testIDs, data.path=data.path)
+    dataSets <- loadData(testIDs, data.path=gendat)
     
     dataSets[["annotation"]]$settings$names <- FALSE
 }
