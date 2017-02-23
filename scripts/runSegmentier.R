@@ -58,6 +58,8 @@ option_list <- list(
                 help="strip down segment types to varied values [default %default]"),
     make_option(c("--genome"), type="character", default="yeast_R64-1-1",
                 help="in plots, additionally show annoted features and reported transcripts; this requires installation of the `R Genome Browser' and data sets and is currently only available for `yeast_R64-1-1"),
+    make_option(c("-n", "--outname"), type="character", default="primseg", 
+                help="output filename prefix"),    
     make_option(c("-o", "--outdir"), type="character", default=".", 
                 help="path to output directory"),    
     ## PRIMARY SEGMENT SELECTION
@@ -157,6 +159,9 @@ for ( i in 1:length(opt) ) {
     assign(arg, opt[[arg]])
 }
 
+### OUTPUT FILENAME PREFIX
+outname <- file.path(outdir,"primseg")
+
 
 ### START
 cat(paste("LOADING SEQUENCING DATA\t", time(), "\n",sep=""))
@@ -197,7 +202,6 @@ primseg <- read.table(infile, sep="\t",header=TRUE)
 primseg <- coor2index(primseg, chrS)[,c("ID","start","end")]
 prdf <- primseg[,"end"] - primseg[,"start"] + 1
 ## set segment name (used in segment IDs and file names)
-outname <- file.path(outdir,"primseg")
 
 
 ## TESTSETS
@@ -239,8 +243,8 @@ for ( i in do.sets ) {
     segdat <- i
     segid <- as.character(primseg[i,"ID"])
     ##segid <- str_pad(i,5,pad="0")
-    ##if ( idsuffix!="" )
-    ##    segid <- paste(segid, idsuffix, sep="_")
+    if ( idsuffix!="" )
+        segid <- paste(segid, idsuffix, sep="_")
     
     cat(paste("PRIMARY SEGMENT\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
@@ -428,8 +432,8 @@ for ( i in sets ) {
     ## generate segment id
     segid <- primseg[i,"ID"]
     ##segid <- str_pad(i,5,pad="0")
-    ##if ( idsuffix!="" )
-    ##    segid <- paste(segid, idsuffix, sep="_")
+    if ( idsuffix!="" )
+        segid <- paste(segid, idsuffix, sep="_")
     
     cat(paste("Primary segment\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
