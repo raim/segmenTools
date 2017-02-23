@@ -7,7 +7,7 @@ set -e
 
 module load R
 
-R_LIBS=/home/machne/raim
+R_LIBS=/home/machne/raim/R
 chrfile=$YEASTDAT/chromosomes/sequenceIndex_R64-1-1_20110208.csv
 OUTSEQ=$YEASTSEQ
 rundate=20170223 # primseg v5 - calculated with j<=i 
