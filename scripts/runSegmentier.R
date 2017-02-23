@@ -385,10 +385,10 @@ if ( genome=="yeast_R64-1-1" ) {
     cat(paste("genome data\t", genome, "\n",sep=""))
 
     ## for genome data and plots - todo - skip this!
-    browser.path <- sub("GENBRO=","",system("env|grep GENBRO",intern=TRUE))
+    browser.path <- Sys.getenv("GENBRO")
     source(file.path(browser.path,"src/genomeBrowser.R")) ## for loadData
     source(file.path(browser.path,"src/genomeBrowser_utils.R")) ## plotFeature
-    data.path <- sub("GENDAT=","",system("env|grep GENDAT",intern=TRUE))
+    data.path <- Sys.getenv("GENDAT")
     data.path <- file.path(data.path,"yeast")
 
     
