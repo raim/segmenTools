@@ -369,8 +369,10 @@ for ( i in do.sets ) {
     }
 }
 
-if ( !plot ) next
-
+if ( !plot ) {
+    cat(paste("DONE SEGMENTATION AT\t",time(),"\n",sep=""))
+    quit(save="no")
+}
 cat(paste("PLOTTING\t",time(),"\n",sep=""))
 
 ## TODO: load plotting specific parameters
@@ -529,7 +531,7 @@ for ( i in sets ) {
  
 }
 
-cat(paste("DONE AT  \t",time(),"\n",sep=""))
+cat(paste("DONE PLOTS AT\t",time(),"\n",sep=""))
 quit(save="no")
 
 ## OLD TODO - keep until checked
