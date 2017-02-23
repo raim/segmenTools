@@ -3,6 +3,7 @@
 
 library("segmenTools") # coor2index
 library("segmenTier")  # main segmentation algorithm
+suppressPackageStartupMessages(library(optparse))
 #library("Rcpp")
 #source("~/programs/segmenTier/R/cluster.R")
 #source("~/programs/segmenTier/R/segment.R")
@@ -15,7 +16,6 @@ time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
 msg <- function(x) cat(x, file=stdout()) # until piping is implemented
 
 ### PARSE OPTIONS
-suppressPackageStartupMessages(library(optparse))
 
 option_list <- list(
     ## INPUT OPTIONS
