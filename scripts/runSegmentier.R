@@ -3,7 +3,6 @@
 
 library("segmenTools") # coor2index
 library("segmenTier")  # main segmentation algorithm
-suppressPackageStartupMessages(library("colorRamps")) # matlab-like colors
 #library("Rcpp")
 #source("~/programs/segmenTier/R/cluster.R")
 #source("~/programs/segmenTier/R/segment.R")

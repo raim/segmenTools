@@ -3,7 +3,7 @@
 #PBS -l walltime=01:59:00
 #PBS -A "Coilseq"
  
-set -e
+set -e # exit immediately upon error
 
 module load R
 
