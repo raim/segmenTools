@@ -23,6 +23,6 @@ logdir=$rundir/log
 mkdir -p $logdir
 
 
-segs=4441
+segs=3000
 
 ~/programs/segmenTools/scripts/runSegmentier.R  --segs $segs -i $OUTSEQ/segmentation/primarysegments_v5/allprimseg.csv --primdir $OUTSEQ/segmentation/primarysegments_v5 --primfiles primseg_  --chrfile $chrfile --trafo ash --dc.trafo ash --dft.range 1,2,3,4,5,6,7 --K 16 --nui.thresh 0.6 --nui.cr 1:5 --scores icor --scales 1:5 --M 100 --Mn 100 --fuse.thresh 0.2 --short.name --idsuffix test --plot --fig.type pdf -o $rundir --genbro $GENBRO --gendat $GENDAT > $logdir/$PBS_JOBID".out" &> $logdir/$PBS_JOBID".log"
