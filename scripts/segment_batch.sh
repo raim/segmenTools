@@ -2,8 +2,6 @@
 #PBS -l select=1:ncpus=1:mem=1gb
 #PBS -l walltime=01:59:00
 #PBS -A "Coilseq"
-#PBS -e /mypath/error.txt
-#PBS -o /mypath/output.txt
 
 set -e # exit immediately upon error
 
