@@ -240,11 +240,10 @@ if ( only.plot ) { # skip segmentation; continue at plots
 for ( i in do.sets ) { 
 
     ## generate segment id
-    segdat <- i
-    segid <- as.character(primseg[i,"ID"])
+    segf <- as.character(primseg[i,"ID"])
     ##segid <- str_pad(i,5,pad="0")
     if ( idsuffix!="" )
-        segid <- paste(segid, idsuffix, sep="_")
+        segid <- paste(segf, idsuffix, sep="_")
     
     cat(paste("PRIMARY SEGMENT\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
@@ -279,7 +278,7 @@ for ( i in do.sets ) {
     #                 skip=primseg[i,"start"],
     #                 nrows=primseg[i,"end"]-primseg[i,"start"]+1)
     if ( !use.data ) {
-        segdata <- file.path(primdir, paste(primfiles,segid,".csv",sep=""))
+        segdata <- file.path(primdir, paste(primfiles,segf,".csv",sep=""))
         tsd <- read.table(segdata, sep="\t", header=TRUE)
     } else 
         tsd <- ts[rng,]
@@ -430,10 +429,10 @@ if ( genome=="yeast_R64-1-1" ) {
 for ( i in sets ) { 
 
     ## generate segment id
-    segid <- primseg[i,"ID"]
+    segf <- primseg[i,"ID"]
     ##segid <- str_pad(i,5,pad="0")
     if ( idsuffix!="" )
-        segid <- paste(segid, idsuffix, sep="_")
+        segid <- paste(segf, idsuffix, sep="_")
     
     cat(paste("Primary segment\t", segid, "\t", which(sets==i), "of",
               length(sets),"\n",sep=""))
