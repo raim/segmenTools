@@ -495,7 +495,7 @@ for ( i in sets ) {
     if ( save.matrix )
         nrows <- nrows + length(sset$SK)
     heights <- rep(0.7,nrows)
-    heights[3] <- max(c(0.7, nsg * 0.7/10))
+    heights[4] <- max(c(0.7, nsg * 0.7/10))
     height <- sum(heights)
 
     plotdev(file.name,width=width,height=height,type=fig.type)
