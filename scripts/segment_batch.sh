@@ -8,6 +8,8 @@ set -e # exit immediately upon error
 module load R
 
 R_LIBS=/home/machne/R
+YEASTSEQ=/home/machne/data/yeast/RNAseq/results
+YEASTDAT=/home/machne/data/yeast
 chrfile=$YEASTDAT/chromosomes/sequenceIndex_R64-1-1_20110208.csv
 OUTSEQ=$YEASTSEQ
 rundate=20170223 # primseg v5 - calculated with j<=i 
