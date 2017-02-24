@@ -23,6 +23,10 @@ lst <- lapply(1:nn, function(x) {
 
 times <- lapply(lst, function(x) times[x])
 mn.times <- unlist(lapply(times, mean))
+
+png("calculation_timing.png",res=200,width=5,height=3,units="in")
+par(mai=c(.75,.75,.1,.1),mgp=1.2,.5,0))
 plot(sglen,mn.times/60,xlab="segment length, bp",ylab="calculation time, min")
+dev.off()
 
 ## TODO: by class!
