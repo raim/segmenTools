@@ -267,7 +267,7 @@ for ( i in do.sets ) {
         next
     }
     ## already done?
-    file.name <- file.path(paste(outname,"_",segid,"_clusters.csv",sep=""))
+    file.name <- file.path(paste(outname,"_",segid,"_segments.csv",sep=""))
     if ( file.exists(file.name) & !redo ) {
         cat(paste("\talready done\n"))
         next
