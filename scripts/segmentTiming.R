@@ -1,6 +1,9 @@
 
 library(segmenTools) # for segment classes
 
+## computation timing file was constructed by grepping entries in the
+## runSegmentier <log files>, as recorded by stdout redirection:
+## grep "SEGMENT TYPE\|elapsed\|Timeseries" <logfiles> | sed 's/.*SEGM/SEGM/g;s/.*elapsed/elapsed/g;s/.*Timeseries/Timeseries/' > timing.csv
 timing.file <- "timing.csv"
 data <- read.table(timing.file, sep="\t", header=FALSE,fill=TRUE)
 
@@ -9,7 +12,10 @@ tsidx <- which(dat[,1]=="Timeseries N")
 
 nn <- length(tsidx)
 tsidx <- c(tsidx,nrow(dat)+1)
-## TODO: whats the error, why is "try" required?
+
+## get only values where the range between two Timeseries entries
+## indicates proper run: each "Timeseries" must be followed by
+## pairs of "SEGMENT TYPE" and "elapsed, sec" entries
 lst <- lapply(1:nn, function(x) {
     from <- tsidx[x]+1
     to <- tsidx[x+1]-1
@@ -17,18 +23,22 @@ lst <- lapply(1:nn, function(x) {
     if ( from<=to & (to-from+1)%%2==0)
         sq <- seq(from,to,by=1)
     sq})
-wrong <- which(unlist(lapply(lst, is.null)))
 
-tsidx <- tsidx[-wrong]
+wrong <- which(unlist(lapply(lst, is.null)))
 lst <- lst[-wrong]
 
-chck <- lapply(lst, function(x) {
-    data.frame(length=rep(dat[x[1]-1,1],length(x)/2),
-               type=dat[x[seq(1,length(x)-1,2)],1],
-               time=dat[x[seq(2,length(x),2)],1])
-})
-chck <- do.call(rbind, chck)
-apply(chck,2,unique)
+## check if the entries in column 1 are as expected
+## takes LONG
+check <- FALSE
+if ( check ) {
+    chck <- lapply(lst, function(x) {
+        data.frame(length=rep(dat[x[1]-1,1],length(x)/2),
+                   type=dat[x[seq(1,length(x)-1,2)],1],
+                   time=dat[x[seq(2,length(x),2)],1])
+    })
+    chck <- do.call(rbind, chck)
+    apply(chck,2,unique)
+}
 
 sglens <- lapply(lst, function(x) {
     data.frame(length=rep(as.numeric(as.character(dat[x[1]-1,2])),length(x)/2),
