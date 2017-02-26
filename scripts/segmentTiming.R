@@ -64,9 +64,9 @@ typ.col <- color_hue(length(types))
 names(typ.col) <- types
 
 
-xlim <- c(700,max(sglens[,1]))
+xlim <- c(900,max(sglens[,1]))
 ylim <- c(min(sglens[sglens[,3]>0,3]),max(sglens[,3]))
-
+ylim <- c(1/60,2e2)
 
 ## segmentation classes
 cltab <- getSegmentClassTable(types)
@@ -79,7 +79,7 @@ for ( cl in colnames(cltab) ) {
     png(paste("calculation_timing_by",cl,".png",sep=""),
         res=200,width=5,height=3,units="in")
     par(mai=c(.6,.6,.1,.1),mgp=c(1.5,.5,0))
-    plot(mn.len,mn.time,col=NA,xlab="segment length, bp",ylab="calculation time, min",log="xy",xlim=xlim)
+    plot(mn.len,mn.time,col=NA,xlab="segment length, bp",ylab="calculation time, min",log="xy",xlim=xlim,ylim=ylim)
     for ( k in clk ) {
         t <- rownames(cltab)[cltab[,cl]==k]
         ft <- sglens[,2]%in%t
@@ -92,9 +92,9 @@ for ( cl in colnames(cltab) ) {
 ## segment classes
 png("calculation_timing.png",res=200,width=5,height=3,units="in")
 par(mai=c(.6,.6,.1,.1),mgp=c(1.5,.5,0))
-plot(mn.len,mn.time,col=NA,xlab="segment length, bp",ylab="calculation time, min",log="xy",xlim=xlim)
+plot(mn.len,mn.time,col=NA,xlab="segment length, bp",ylab="calculation time, min",log="xy",xlim=xlim,ylim=ylim)
 for ( t in types ) {
     ft <- sglens[,2]==t
-    points(sglens[ft,1],sglens[ft,3]/60,col=paste(typ.col[t],"AA",sep=""),pch=4,cex=.5)
+    points(sglens[ft,1],sglens[ft,3]/60,col=paste(typ.col[t],"11",sep=""),pch=4,cex=.3)
 }
 dev.off()
