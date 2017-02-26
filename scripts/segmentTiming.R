@@ -31,12 +31,19 @@ chck <- do.call(rbind, chck)
 apply(chck,2,unique)
 
 sglens <- lapply(lst, function(x) {
-    data.frame(length=rep(as.numeric(dat[x[1]-1,2]),length(x)/2),
-               type=dat[x[seq(1,length(x)-1,2)],2],
-               time=as.numeric(dat[x[seq(2,length(x),2)],2]))
+    data.frame(length=rep(as.numeric(as.character(dat[x[1]-1,2])),length(x)/2),
+               type=           dat[x[seq(1,length(x)-1,2)],2],
+               time=as.numeric(as.character(dat[x[seq(2,length(x),2)],2])))
 })
+
+## mean time per segment length
+mn.time <- unlist(lapply(sglens, function(x) mean(x[,3])))
+mn.len <- unlist(lapply(sglens, function(x) mean(x[,1])))
+## all segments table!
 sglens <- do.call(rbind, sglens)
 
+## TODO: generate class table and analyze by class
+## or just split manually into K classes?
 types <- as.character(unique(sglens[,2]))
 color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
@@ -46,11 +53,33 @@ color_hue <- function(n) {
 typ.col <- color_hue(length(types))
 names(typ.col) <- types
 
+cltab <- getSegmentClassTable(types)
+
+xlim <- c(min(sglens[,1]),max(sglens[,1]))
+ylim <- c(min(sglens[sglens[,3]>0,3]),max(sglens[,3]))
+
 png("calculation_timing.png",res=200,width=5,height=3,units="in")
 par(mai=c(.6,.6,.1,.1),mgp=c(1.5,.5,0))
-plot(1,xlab="segment length, bp",ylab="calculation time, min",log="",col=sglens[,2],xlim=range(sglens[,1]),ylim=range(sglens[,3]/60))
+plot(mn.len,mn.time,col=NA,xlab="segment length, bp",ylab="calculation time, min",log="xy")
 for ( t in types ) {
     ft <- sglens[,2]==t
-    points(sglens[ft,1],sglens[ft,3]/60,col=typ.col[t])
+    points(sglens[ft,1],sglens[ft,3]/60,col=paste(typ.col[t],"AA",sep=""),pch=19,cex=.5)
 }
 dev.off()
+
+for ( cl in colnames(cltab) ) {
+    cat(paste("plotting by", cl, "\n"))
+    clk <- unique(cltab[,cl])
+    clk.cols <- color_hue(length(clk))
+    names(clk.cols) <- clk
+    png(paste("calculation_timing_by",cl,".png",sep=""),
+        res=200,width=5,height=3,units="in")
+    par(mai=c(.6,.6,.1,.1),mgp=c(1.5,.5,0))
+    plot(mn.len,mn.time,col=NA,xlab="segment length, bp",ylab="calculation time, min",log="xy")
+    for ( k in clk ) {
+        t <- rownames(cltab)[cltab[,cl]==k]
+        ft <- sglens[,2]%in%t
+        points(sglens[ft,1],sglens[ft,3]/60,col=clk.cols[as.character(k)],pch=19,cex=.5)
+    }
+    dev.off()
+}
