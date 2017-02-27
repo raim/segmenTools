@@ -316,6 +316,7 @@ for ( test.type in test.types ) {
         ## strange bug: 75 in list of 75,100,150 gets a leading space
         ## trim all:
         cllst <- lapply(cllst,trimws)
+        ## TODO: sort if numeric! K, S, E, M, nui
         allcl <- unlist(sapply(1:length(cllst),
                                function(x) paste(names(cllst)[x],
                                                  cllst[[x]],sep=".")))
