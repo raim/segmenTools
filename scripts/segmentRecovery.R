@@ -312,7 +312,11 @@ for ( test.type in test.types ) {
         dat <- cbind((jaccard-min(jaccard))/(max(jaccard)-min(jaccard)),
                      (numhit-min(numhit))/(max(numhit)-min(numhit)))
         pm <- pam(dat, K)
-        cllst <- apply(sgcltab,2,unique)
+        cllst <- apply(sgcltab,2, unique)
+        ## strange bug: 75 in list of 75,100,150 gets a leading space
+        ## trim all:
+        cllst <- lapply(cllst,trimws)
+        ## TODO: sort if numeric! K, S, E, M, nui
         allcl <- unlist(sapply(1:length(cllst),
                                function(x) paste(names(cllst)[x],
                                                  cllst[[x]],sep=".")))
