@@ -19,6 +19,7 @@ R_LIBS=/home/machne/R
 
 jobList="job.conf"
 job=$( head -n $PBS_ARRAYID $jobList | tail -n 1 )
+echo $job
 $job > $logdir/${PBS_JOBID}_${PBS_ARRAYID}.dat 2> $logdir/${PBS_JOBID}_${PBS_ARRAYID}.log
 
 
