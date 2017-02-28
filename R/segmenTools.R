@@ -270,7 +270,7 @@ annotateQuery <- function(query, target, col) {
 #' @export
 annotateTarget <- function(query, target, qcol=colnames(query), tcol,
                            prefix, details=FALSE, only.best=TRUE,
-                           collapse=TRUE, msgfile=file("stdout")) {
+                           collapse=TRUE, msgfile=stdout()) {
 
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
@@ -424,7 +424,7 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' @param msgfile file pointer for progress messages and warnings, defaults to
 #' stdout, useful when using in context of command line pipes
 #' @export
-segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FALSE, collapse=FALSE, sort=FALSE, msgfile=file("stdout")) {
+segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FALSE, collapse=FALSE, sort=FALSE, msgfile=stdout) {
 
     ## get target and query ID - only required for messages
     if ( "ID" %in% colnames(target) ) {

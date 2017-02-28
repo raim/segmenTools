@@ -236,7 +236,7 @@ for ( test.type in test.types ) {
         ovl <- segmentOverlap(query=sgs, target=target,
                               add.na=TRUE, details=TRUE,
                               untie=FALSE, collapse=FALSE, sort=FALSE,
-                              msgfile=file("stdout"))
+                              msgfile=stdout())
         if ( !any(!is.na(ovl[,"query"])) ) next
         sts <- getOverlapStats(ovl,ovlth=ovlth, hrng=c(.8,1.2),
                                tnum=nrow(target),qnum=nrow(sgs),
