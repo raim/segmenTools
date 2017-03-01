@@ -98,3 +98,12 @@ for ( t in types ) {
     points(sglens[ft,1],sglens[ft,3]/60,col=paste(typ.col[t],"11",sep=""),pch=4,cex=.3)
 }
 dev.off()
+
+
+## cumulative timing
+cumtime <- cumsum(sort(sglens[,3]))
+png("calculation_timing_cumulative.png",res=200,width=5,height=2.5,units="in")
+par(mai=c(.6,.6,.1,.1),mgp=c(1.5,.5,0))
+plot(cumtime/60/60,type="l",ylab="cumul. calc. time, hours",xlab="sorted jobs",log="y")
+legend("right", paste("total:",round(max(cumtime)/60/60/24), "days"))
+dev.off()
