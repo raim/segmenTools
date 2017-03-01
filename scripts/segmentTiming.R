@@ -102,7 +102,7 @@ dev.off()
 
 ## cumulative timing
 cumtime <- cumsum(sort(sglens[,3]))
-png("calculation_timing_cumulative.png",res=200,width=5,height=2.5,units="in")
+png("calculation_timing_cumulative.png",res=200,width=5,height=3,units="in")
 par(mai=c(.6,.6,.1,.1),mgp=c(1.5,.5,0))
 plot(cumtime/60/60,type="l",ylab="cumul. calc. time, hours",xlab="sorted jobs",log="y")
 legend("right", paste("total:",round(max(cumtime)/60/60/24), "days"))
