@@ -236,6 +236,13 @@ if ( only.plot ) { # skip segmentation; continue at plots
     plot <- TRUE
 }
 
+writeEmpty <- function(outname, segid, opt, segid, tset, cset, sset) {
+    ## TODO: write empty files!
+    ## segments.csv: just the header
+    ## segments.RData: all available objects
+}
+
+
 ### RUN SEGMENTATION
 for ( i in do.sets ) { 
 
@@ -254,16 +261,19 @@ for ( i in do.sets ) {
     ## minimial size of segment in terms of expressed points!
     if ( length(rng) < 2 ) {
         cat(paste("\tinvalid primary segment\n"))
+        writeEmpty(outname, segid, opt, segid, NULL, NULL, NULL)
         next
     }
     ## minimial size of segment in terms of expressed points!
     if ( length(rng) < min.sz ) {
         cat(paste("\ttoo short:",length(rng),"\n"))
+        writeEmpty(outname, segid, opt, segid, NULL, NULL, NULL)
         next
     }
     ## maximal size of segment in terms of expressed points!
     if ( length(rng) > max.sz ) {
         cat(paste("\ttoo long:",length(rng),"\n"))
+        writeEmpty(outname, segid, opt, segid, NULL, NULL, NULL)
         next
     }
     ## already done?
@@ -303,7 +313,10 @@ for ( i in do.sets ) {
     
     ## segment all clusterings for different scoring functions
     allsegs <- NULL
-    if ( !is.null(cset) ) {
+    if ( is.null(cset) ) {
+        cat(paste("WARNING", i, segid, "no clustering\n")
+        writeEmpty(outname, segid, opt, segid, tset, cset, NULL)
+    } else {
 
         ## collect varysettings
         vary <- list(## scoring function
@@ -326,9 +339,10 @@ for ( i in do.sets ) {
         allsegs <- sset$segments # SEGMENTS!
         ## plotSegmentation(tset,cset,sset)
 
-        if ( is.null(allsegs) )
+        if ( is.null(allsegs) ) {
           cat(paste("no segments\n"))
-        else {
+          writeEmpty(outname, segid, opt, segid, tset, cset, sset)
+        } else {
             ## CHROMOSOMAL COORDINATES
             ## 1) add/subtract to primseg indexed coordinates
             if ( strand==-1 ) {
