@@ -423,11 +423,11 @@ if ( genome=="yeast_R64-1-1" ) {
     cat(paste("genome data\t", genome, "\n",sep=""))
 
     ## for genome data and plots - todo - skip this!
-    if ( missing(genbro) )
+    if ( genbro=="" )
       genbro <- Sys.getenv("GENBRO")
     source(file.path(genbro,"src/genomeBrowser.R")) ## for loadData
     source(file.path(genbro,"src/genomeBrowser_utils.R")) ## plotFeature
-    if ( missing(gendat) )
+    if ( gendat=="" )
       gendat <- Sys.getenv("GENDAT")
     gendat <- file.path(gendat,"yeast")
 
