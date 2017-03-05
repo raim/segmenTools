@@ -328,7 +328,7 @@ for ( i in do.sets ) {
     ## segment all clusterings for different scoring functions
     allsegs <- NULL
     if ( is.null(cset) ) {
-        cat(paste("WARNING", i, segid, "no clustering\n")
+        cat(paste("WARNING", i, segid, "no clustering\n"))
         if ( write.empty )
             writeEmpty(outname, segid, opt, tset, NULL, NULL)
     } else {
