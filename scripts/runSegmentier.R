@@ -42,6 +42,8 @@ option_list <- list(
                 help="only plot existing segmentations; useful to check ongoing results during longer runs"),
     make_option(c("--redo"), action="store_true", default=FALSE,
                 help="overwrite existing segmentations; leave FALSE if you merely want to plot existing segmentations"),
+    make_option(c("--write.empty"), action"store_true", default=FALSE,
+                help="write result files for also for pre-segments that were skipped (length<min.size, length>max.size), didnt comprise enough data for clustering ('not enough data', 'not enough data diversity'), or no segments where found ('no segments'); the csv file of segments will be empty), the RData file will contain the call arguments (list 'opt') and all objects created before abortion or NULL ('tset', 'cset', 'sset')"),
     make_option(c("--save.matrix"), action="store_true", default=FALSE,
                 help="NOT IMPLEMENTED: store the total score matrix S(i,c) and the backtracing matrix K(i,c) in the RData file"),
     make_option(c("--plot"), action="store_true", default=FALSE,
@@ -236,10 +238,19 @@ if ( only.plot ) { # skip segmentation; continue at plots
     plot <- TRUE
 }
 
-writeEmpty <- function(outname, segid, opt, segid, tset, cset, sset) {
-    ## TODO: write empty files!
-    ## segments.csv: just the header
+## write empty result files
+## handy for checking completeness of results when stdout/stderr
+## are redirected on clusters and may be lost (e.g. on PBS without
+## option -k oe)
+writeEmpty <- function(outname, segid, opt, tset, cset, sset) {
+
+    file.name <- file.path(paste(outname,"_",segid,sep=""))
+    
+    ## segments.csv: empty file
+    file.create(paste(file.name,"_segments.csv",sep=""))
     ## segments.RData: all available objects
+    save(opt, segid, tset, cset, sset, 
+         file=paste(file.name,"_segments.RData",sep=""))
 }
 
 
@@ -261,19 +272,22 @@ for ( i in do.sets ) {
     ## minimial size of segment in terms of expressed points!
     if ( length(rng) < 2 ) {
         cat(paste("\tinvalid primary segment\n"))
-        writeEmpty(outname, segid, opt, segid, NULL, NULL, NULL)
+        if ( write.empty )
+            writeEmpty(outname, segid, opt, NULL, NULL, NULL)
         next
     }
     ## minimial size of segment in terms of expressed points!
     if ( length(rng) < min.sz ) {
         cat(paste("\ttoo short:",length(rng),"\n"))
-        writeEmpty(outname, segid, opt, segid, NULL, NULL, NULL)
+        if ( write.empty )
+            writeEmpty(outname, segid, opt, NULL, NULL, NULL)
         next
     }
     ## maximal size of segment in terms of expressed points!
     if ( length(rng) > max.sz ) {
         cat(paste("\ttoo long:",length(rng),"\n"))
-        writeEmpty(outname, segid, opt, segid, NULL, NULL, NULL)
+        if ( write.empty )
+            writeEmpty(outname, segid, opt, NULL, NULL, NULL)
         next
     }
     ## already done?
@@ -315,7 +329,8 @@ for ( i in do.sets ) {
     allsegs <- NULL
     if ( is.null(cset) ) {
         cat(paste("WARNING", i, segid, "no clustering\n")
-        writeEmpty(outname, segid, opt, segid, tset, cset, NULL)
+        if ( write.empty )
+            writeEmpty(outname, segid, opt, tset, NULL, NULL)
     } else {
 
         ## collect varysettings
@@ -341,7 +356,8 @@ for ( i in do.sets ) {
 
         if ( is.null(allsegs) ) {
           cat(paste("no segments\n"))
-          writeEmpty(outname, segid, opt, segid, tset, cset, sset)
+          if ( write.empty )
+              writeEmpty(outname, segid, opt, tset, cset, sset)
         } else {
             ## CHROMOSOMAL COORDINATES
             ## 1) add/subtract to primseg indexed coordinates
