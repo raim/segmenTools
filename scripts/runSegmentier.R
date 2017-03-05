@@ -42,7 +42,7 @@ option_list <- list(
                 help="only plot existing segmentations; useful to check ongoing results during longer runs"),
     make_option(c("--redo"), action="store_true", default=FALSE,
                 help="overwrite existing segmentations; leave FALSE if you merely want to plot existing segmentations"),
-    make_option(c("--write.empty"), action"store_true", default=FALSE,
+    make_option(c("--write.empty"), action="store_true", default=FALSE,
                 help="write result files for also for pre-segments that were skipped (length<min.size, length>max.size), didnt comprise enough data for clustering ('not enough data', 'not enough data diversity'), or no segments where found ('no segments'); the csv file of segments will be empty), the RData file will contain the call arguments (list 'opt') and all objects created before abortion or NULL ('tset', 'cset', 'sset')"),
     make_option(c("--save.matrix"), action="store_true", default=FALSE,
                 help="NOT IMPLEMENTED: store the total score matrix S(i,c) and the backtracing matrix K(i,c) in the RData file"),
