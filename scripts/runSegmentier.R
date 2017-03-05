@@ -271,7 +271,7 @@ for ( i in do.sets ) {
     
     ## minimial size of segment in terms of expressed points!
     if ( length(rng) < 2 ) {
-        cat(paste("\tinvalid primary segment\n"))
+        cat(paste("\tinvalid primary segment of length <2\n"))
         if ( write.empty )
             writeEmpty(outname, segid, opt, NULL, NULL, NULL)
         next
