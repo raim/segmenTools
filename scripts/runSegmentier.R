@@ -260,6 +260,8 @@ for ( i in do.sets ) {
     ## generate segment id
     segf <- as.character(primseg[i,"ID"])
     ##segid <- str_pad(i,5,pad="0")
+    ## TODO: add back number to segid/file.name
+    ## for easer maintenance of parameter scan results
     if ( idsuffix!="" )
         segid <- paste(segf, idsuffix, sep="_")
     
@@ -269,6 +271,13 @@ for ( i in do.sets ) {
     rng <- primseg[i,"start"]:primseg[i,"end"]
     strand <- idx2str(primseg[i,"start"],chrS)
     
+    ## already done?
+    file.name <- file.path(paste(outname,"_",segid,"_segments.csv",sep=""))
+    if ( file.exists(file.name) & !redo ) {
+        cat(paste("\talready done\n"))
+        next
+    }
+
     ## minimial size of segment in terms of expressed points!
     if ( length(rng) < 2 ) {
         cat(paste("\tinvalid primary segment of length <2\n"))
@@ -288,12 +297,6 @@ for ( i in do.sets ) {
         cat(paste("\ttoo long:",length(rng),"\n"))
         if ( write.empty )
             writeEmpty(outname, segid, opt, NULL, NULL, NULL)
-        next
-    }
-    ## already done?
-    file.name <- file.path(paste(outname,"_",segid,"_segments.csv",sep=""))
-    if ( file.exists(file.name) & !redo ) {
-        cat(paste("\talready done\n"))
         next
     }
     
