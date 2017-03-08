@@ -308,11 +308,20 @@ for ( test.type in test.types ) {
     ## TODO: also include height in clustering?
     pm <- NULL
     if ( sgnum>5 ) {
-        K <- 6
+        K <- 7
         dat <- cbind((jaccard-min(jaccard))/(max(jaccard)-min(jaccard)),
-                     (numhit-min(numhit))/(max(numhit)-min(numhit)))
+                     (numhit-min(numhit))/(max(numhit)-min(numhit)),
+                     height)
         pm <- pam(dat, K)
         cllst <- apply(sgcltab,2, unique)
+
+        ## TODO: sort clustering by increasing height!
+        pmsrt <- split(dat[,3],pm$clustering)
+        pmmn <- unlist(lapply(pmsrt, mean))
+        pmsrt <- as.numeric(names(pmmn)[order(pmmn)])
+        ## sorted clustering
+        pmcls <- pmsrt[pm$clustering]
+        
         ## strange bug: 75 in list of 75,100,150 gets a leading space
         ## trim all:
         cllst <- lapply(cllst,trimws)
@@ -332,7 +341,7 @@ for ( test.type in test.types ) {
         ## get cumulative hypergeometric distribution of clustering vs. segments
         for ( i in 1:K ) 
             for ( j in 1:ncol(sgcltab) ) {
-                clcl <-  clusterCluster(pm$clustering==i,sgcltab[,j],
+                clcl <-  clusterCluster(pmcls==i,sgcltab[,j],
                                         plot=FALSE,verbose=FALSE)
                 cln <- colnames(sgcltab)[j]
                 cln <- paste(cln,colnames(clcl$overlap),sep=".")
@@ -363,7 +372,7 @@ for ( test.type in test.types ) {
         plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
          col=NA)
         legend("topleft","good",bty="n")
-        points(height,col=pm$clustering,pch=sgpchs[nms])
+        points(height,col=pmcls,pch=sgpchs[nms])
         abline(v=.2,lty=2)
         abline(h=.8,lty=2)
         par(mai=c(1,.7,.1,.1))
@@ -407,7 +416,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=5,height=5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
-                    col=pm$clustering, lty=sgltys,
+                    col=pmcls, lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="ratio: query length/target length")
         legend("topleft",paste(test.type,"-",tnum))
@@ -439,7 +448,7 @@ for ( test.type in test.types ) {
              ylab="average hits per target sequence",
              xlab="jaccard: intersect/union")#,
         legend("bottomright","good",bty="n")
-        points(jaccard,numhit,col=pm$clustering,pch=sgpchs[nms])
+        points(jaccard,numhit,col=pmcls,pch=sgpchs[nms])
         par(mai=c(1,.7,.1,.1))
         image_matrix(-log2(pval) ,text=enum, axis=1:2,
                      col=c("#FFFFFF",rev(grey.colors(20))),
@@ -472,7 +481,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=10,height=4,type=fig.type)
         par(mfcol=c(1,2),mai=c(1,1,.1,.1))
         plot(apply(height,1,diff), numhit,
-             col=pm$clustering,pch=sgpchs[nms],
+             col=pmcls,pch=sgpchs[nms],
              ylab="average hits per target sequence",
              xlab="fraction: 0.8 < ratio < 1.2")#,
         imgdat <- t(apply(-log2(pval), 2, rev))
@@ -495,7 +504,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=5,height=5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
-                    col=pm$clustering, lty=sgltys,
+                    col=pmcls, lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="cumulative jaccard: intersect/union")
         legend("topleft",paste(test.type,"-",tnum))
@@ -540,7 +549,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=5,height=5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
-                    col=pm$clustering, lty=sgltys,
+                    col=pmcls, lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="coverage of test set")
         legend("topleft",paste(test.type,"-",tnum))
@@ -564,7 +573,7 @@ for ( test.type in test.types ) {
                 nm <- CDF[[i]]$qid
                 if ( diff(height[i,]) > 0 )
                     arrows(x0=i,x1=i,y0=height[i,1],y1=height[i,2],
-                           col=pm$clustering[i],lty=sgltys[nm],
+                           col=pmcls[i],lty=sgltys[nm],
                            length=0.1, angle=90, code=3)
                 text(i, 1.1, round(diff(height[i,]),3),srt=90)
             }
