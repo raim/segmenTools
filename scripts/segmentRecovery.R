@@ -318,7 +318,8 @@ for ( test.type in test.types ) {
         ## TODO: sort clustering by increasing height!
         pmsrt <- split(dat[,3],pm$clustering)
         pmmn <- unlist(lapply(pmsrt, mean))
-        pmsrt <- as.numeric(names(pmmn)[order(pmmn)])
+        
+        pmsrt <- order(as.numeric(names(pmmn)[order(pmmn)]))
         ## sorted clustering
         pmcls <- pmsrt[pm$clustering]
         
