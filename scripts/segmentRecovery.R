@@ -360,6 +360,7 @@ for ( test.type in test.types ) {
                      col=c("#FFFFFF",rev(grey.colors(20))),
                      axis2.col=1:nrow(pval),
                      xlab=NA,ylab=NA)
+        abline(v=cumsum(unlist(lapply(cllst, length)))+.5)
         axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
         dev.off()
         ## TODO: plot by segment classes as length dist
