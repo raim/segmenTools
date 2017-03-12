@@ -104,6 +104,8 @@ segs <- coor2index(segs,chrS)
 lst <- split(segs,segs$type)
 sgtypes <- names(lst)
 
+ 
+
 ## define colors and pch for segment types
 sgcols <- rainbow(length(sgtypes))
 sgpchs <- rep(1:17, len=length(sgtypes)) #only 17 of 18 to avoid multiple of lty
@@ -113,6 +115,15 @@ names(sgcols) <- names(sgpchs) <- names(sgltys) <- sgtypes
 ## define segment classes by their type
 sgcltab <- getSegmentClassTable(sgtypes,sep="_") ## TODO: use
 sgclasses <- getSegmentClasses(sgtypes,sep="_")
+
+## short names
+short.name <- colnames(sgcltab)
+paste(short.name[1], sgcltab[,short.name[1]],sep=":")
+tmp <- lapply(1:ncol(sgcltab),
+              function(x) paste(short.name[x],sgcltab[,short.name[x]],sep=":"))
+mat <- matrix(unlist(tmp), ncol = length(tmp), byrow = FALSE)
+sgnames <- apply(mat, 1, paste, collapse="_")
+names(sgnames) <- sgtypes
 
 ## col, pch and lty for classes
 sgclcols <- rainbow(length(sgclasses))
@@ -149,6 +160,7 @@ ymax <- 6e3
 brks <- seq(0,35e4,100)
 for ( type in sgtypes ) {
 
+    ## figure file.name fit for latex
     typef <- gsub(":","_",gsub("\\.","_",type))
     
     if ( verb>0 )
@@ -178,11 +190,11 @@ for ( type in sgtypes ) {
     sglen[[type]]  <- tmp
 
     ## plot length distribution and gamma dist, and length cumulative dist.
-    file.name <- file.path(out.path,paste("length_segment_",type,sep=""))
+    file.name <- file.path(out.path,paste("length_segment_",typef,sep=""))
     plotdev(file.name,width=4.5,height=4.5, type=fig.type)
     par(mfcol=c(1,1), mai=c(.75,.75,.75,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(tmp,border=sgcols[type],freq=FALSE,#ylim=c(0,ymax),
-         xlim=c(0,xmax*1.05), xlab="length, bp",main=type)
+         xlim=c(0,xmax*1.05), xlab="length, bp",main=sgnames[type])
     legend("topright",legend=c(nrow(sgs),paste("fuse",sum(sgs[,"fuse"]))),
            col=c(sgcols[type],NA),pch=c(sgpchs[type],NA),lty=c(sgpchs[type],NA))
     #legend("topright",legend=type)
@@ -192,10 +204,10 @@ for ( type in sgtypes ) {
     dev.off()
     #high <- which(tmp$counts>ymax)
     #axis(3, at= tmp$mids[high], label=tmp$counts[high],las=2, cex.axis=.7)
-    file.name <- file.path(out.path,paste("length_segment_",type,"_cum",sep=""))
+    file.name <- file.path(out.path,paste("length_segment_",typef,"_cum",sep=""))
     plotdev(file.name,width=4.5,height=4.5, type=fig.type)
     par(mfcol=c(1,1), mai=c(.75,.75,.75,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot(sgcdf[[type]],xlim=c(0,xmax),col=sgcols[type],main=NA,
+    plot(sgcdf[[type]],xlim=c(0,xmax),col=sgcols[type],main=sgnames[type],
          xlab="length, bp",ylab="cum.dist.fun.")
     dev.off()
 }
@@ -262,7 +274,7 @@ for ( i in 1:ncol(sgcltab) ) {
     plotdev(file.name,width=9,height=4.5,type=fig.type)
     par(mfcol=c(1,1),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(0,col=NA, xlim=c(0,xmax), ylim=c(0,1),
-         xlab="length, bp",ylab="cum. dist. fun.",main=NA)
+         xlab="length, bp",ylab="cum. dist. fun.",main=paste("class:", scl))
     abline(h=0:1,lty=2,col="gray")
     for ( class in classes ) {
         sgtype <- paste(scl,":",class,sep="")
