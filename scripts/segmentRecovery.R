@@ -461,6 +461,7 @@ for ( test.type in test.types ) {
     }
     
     ## MAX vs. MIN: ratio heights vs. num hits per target
+    ## TODO: plot name legend separately and adaptive!
     file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratio_fragmentation",sep=""))
     plotdev(file.name,width=10,height=4,type=fig.type)

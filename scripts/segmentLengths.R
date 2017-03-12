@@ -175,8 +175,8 @@ for ( type in sgtypes ) {
 
     ## plot length distribution and gamma dist, and length cumulative dist.
     file.name <- file.path(out.path,paste("length_segment_",type,sep=""))
-    plotdev(file.name,width=9,height=4.5, type=fig.type)
-    par(mfcol=c(1,2), mai=c(.75,.75,.75,.1),mgp=c(1.75,.5,0),xaxs="i")
+    plotdev(file.name,width=4.5,height=4.5, type=fig.type)
+    par(mfcol=c(1,1), mai=c(.75,.75,.75,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(tmp,border=sgcols[type],freq=FALSE,#ylim=c(0,ymax),
          xlim=c(0,xmax*1.05), xlab="length, bp",main=type)
     legend("topright",legend=c(nrow(sgs),paste("fuse",sum(sgs[,"fuse"]))),
@@ -185,8 +185,12 @@ for ( type in sgtypes ) {
     lines(xy$x, get_gamma(xy$x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
     legend("right", paste(c("a","mu"),":", signif(sggam[type,],3)),
            lty=c(1,NA),col=4)
+    dev.off()
     #high <- which(tmp$counts>ymax)
     #axis(3, at= tmp$mids[high], label=tmp$counts[high],las=2, cex.axis=.7)
+    file.name <- file.path(out.path,paste("length_segment_",type,"_cum",sep=""))
+    plotdev(file.name,width=4.5,height=4.5, type=fig.type)
+    par(mfcol=c(1,1), mai=c(.75,.75,.75,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(sgcdf[[type]],xlim=c(0,xmax),col=sgcols[type],main=NA,
          xlab="length, bp",ylab="cum.dist.fun.")
     dev.off()
@@ -232,7 +236,7 @@ for ( i in 1:ncol(sgcltab) ) {
     ## plot mean/sd of histograms and of CDF
     file.name <- file.path(out.path,paste("length_class_",scl,sep=""))
     plotdev(file.name,width=9,height=4.5,type=fig.type)
-    par(mfcol=c(1,2),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
+    par(mfcol=c(1,1),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(0,col=NA, xlim=c(0,xmax), ylim=c(0,ymax),
          xlab="length, bp",ylab="count",main=paste("class:", scl))
     for ( class in classes ) {
@@ -248,6 +252,11 @@ for ( i in 1:ncol(sgcltab) ) {
                  round(tot/1000,1), "+/-",
                  round(totsd/1000,1), " k", sep="")
     legend("topright",legend=leg, col=sgclcols[tmp],lty=sgclltys[tmp])
+    dev.off()
+    
+    file.name <- file.path(out.path,paste("length_class_",scl,"_CDF",sep=""))
+    plotdev(file.name,width=9,height=4.5,type=fig.type)
+    par(mfcol=c(1,1),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(0,col=NA, xlim=c(0,xmax), ylim=c(0,1),
          xlab="length, bp",ylab="cum. dist. fun.",main=NA)
     abline(h=0:1,lty=2,col="gray")
