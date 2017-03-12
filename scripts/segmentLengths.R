@@ -251,7 +251,7 @@ for ( i in 1:ncol(sgcltab) ) {
 
     ## plot mean/sd of histograms and of CDF
     file.name <- file.path(out.path,paste("length_class_",scl,sep=""))
-    plotdev(file.name,width=9,height=4.5,type=fig.type)
+    plotdev(file.name,width=4.5,height=4.5,type=fig.type)
     par(mfcol=c(1,1),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(0,col=NA, xlim=c(0,xmax), ylim=c(0,ymax),
          xlab="length, bp",ylab="count",main=paste("class:", scl))
@@ -271,7 +271,7 @@ for ( i in 1:ncol(sgcltab) ) {
     dev.off()
     
     file.name <- file.path(out.path,paste("length_class_",scl,"_CDF",sep=""))
-    plotdev(file.name,width=9,height=4.5,type=fig.type)
+    plotdev(file.name,width=4.5,height=4.5,type=fig.type)
     par(mfcol=c(1,1),mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(0,col=NA, xlim=c(0,xmax), ylim=c(0,1),
          xlab="length, bp",ylab="cum. dist. fun.",main=paste("class:", scl))
