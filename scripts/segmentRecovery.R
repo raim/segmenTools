@@ -369,20 +369,20 @@ for ( test.type in test.types ) {
         ## OPT: uppler left, 
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_ratioTotal_lh_clustered",sep=""))
-        plotdev(file.name,width=10,height=5,type=fig.type)
-        par(mfcol=c(1,2),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
         plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
          col=NA)
         legend("topleft","good",bty="n")
         points(height,col=pmcls,pch=sgpchs[nms])
         abline(v=.2,lty=2)
         abline(h=.8,lty=2)
-        par(mai=c(1,.7,.1,.1))
-        image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                     col=c("#FFFFFF",rev(grey.colors(20))),
-                     axis2.col=1:nrow(pval),
-                     xlab=NA,ylab=NA)
-        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
+        ##par(mai=c(1,.7,.1,.1))
+        ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
+        ##             col=c("#FFFFFF",rev(grey.colors(20))),
+        ##             axis2.col=1:nrow(pval),
+        ##             xlab=NA,ylab=NA)
+        ##axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
         dev.off()
     }
     
@@ -444,19 +444,19 @@ for ( test.type in test.types ) {
     if ( !is.null(pm) ) {
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_jaccard_fragmentation_clustered",sep=""))
-        plotdev(file.name,width=10,height=4,type=fig.type)
-        par(mfcol=c(1,2),mai=c(1,1,.1,.1))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mfcol=c(1,1),mai=c(1,1,.1,.1))
         plot(jaccard,numhit,col=NA,         
              ylab="average hits per target sequence",
              xlab="jaccard: intersect/union")#,
         legend("bottomright","good",bty="n")
         points(jaccard,numhit,col=pmcls,pch=sgpchs[nms])
-        par(mai=c(1,.7,.1,.1))
-        image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                     col=c("#FFFFFF",rev(grey.colors(20))),
-                     axis2.col=1:nrow(pval),
-                     xlab=NA,ylab=NA)
-        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
+        ##par(mai=c(1,.7,.1,.1))
+        ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
+        ##             col=c("#FFFFFF",rev(grey.colors(20))),
+        ##             axis2.col=1:nrow(pval),
+        ##             xlab=NA,ylab=NA)
+        ##axis(1, at=cumsum(unlist(lapply(cllst,length)))+.5, tck=-1,labels=NA) 
         dev.off()
     }
     
@@ -480,19 +480,19 @@ for ( test.type in test.types ) {
         file.name <-file.path(out.path,testid,
                               paste(test.type,"_ratio_fragmentation_clustered",
                                     sep=""))
-        plotdev(file.name,width=10,height=4,type=fig.type)
-        par(mfcol=c(1,2),mai=c(1,1,.1,.1))
+        plotdev(file.name,width=5,height=5,type=fig.type)
+        par(mfcol=c(1,1),mai=c(1,1,.1,.1))
         plot(apply(height,1,diff), numhit,
              col=pmcls,pch=sgpchs[nms],
              ylab="average hits per target sequence",
              xlab="fraction: 0.8 < ratio < 1.2")#,
         imgdat <- t(apply(-log2(pval), 2, rev))
-        par(mai=c(1,.7,.1,.1))
-        image_matrix(-log2(pval) ,text=enum, axis=1:2,
-                     col=c("#FFFFFF",rev(grey.colors(20))),
-                     axis2.col=1:nrow(pval),
-                     xlab=NA,ylab=NA)
-        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
+        ##par(mai=c(1,.7,.1,.1))
+        ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
+        ##             col=c("#FFFFFF",rev(grey.colors(20))),
+        ##             axis2.col=1:nrow(pval),
+        ##             xlab=NA,ylab=NA)
+        ##axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
         dev.off()
     }
     
