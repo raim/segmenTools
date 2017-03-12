@@ -445,7 +445,8 @@ for ( test.type in test.types ) {
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_jaccard_fragmentation_clustered",sep=""))
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
-        par(mfcol=c(1,1),mai=c(1,1,.1,.1))
+        par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
+        #par(mfcol=c(1,1),mai=c(1,1,.1,.1))
         plot(jaccard,numhit,col=NA,         
              ylab="average hits per target sequence",
              xlab="jaccard: intersect/union")#,
@@ -482,7 +483,7 @@ for ( test.type in test.types ) {
                               paste(test.type,"_ratio_fragmentation_clustered",
                                     sep=""))
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
-        par(mfcol=c(1,1),mai=c(1,1,.1,.1))
+        par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
         plot(apply(height,1,diff), numhit,
              col=pmcls,pch=sgpchs[nms],
              ylab="average hits per target sequence",
