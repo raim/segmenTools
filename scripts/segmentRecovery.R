@@ -354,7 +354,7 @@ for ( test.type in test.types ) {
         
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_segmentationClusters",sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(1,.7,.1,.1),mgp=c(1.75,.5,0))
         image_matrix(-log2(pval) ,text=enum, axis=1:2,
                      col=c("#FFFFFF",rev(grey.colors(20))),
@@ -369,7 +369,7 @@ for ( test.type in test.types ) {
         ## OPT: uppler left, 
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_ratioTotal_lh_clustered",sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
         plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
          col=NA)
@@ -403,7 +403,7 @@ for ( test.type in test.types ) {
     ## CDF of absolute best hit CDF (rcdf)
     file.name <- file.path(out.path,testid,
                            paste(test.type,"_ratioTotal",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
+    plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf", col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
@@ -415,7 +415,7 @@ for ( test.type in test.types ) {
     if ( !is.null(pm) ) {
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_ratioTotal_clustered",sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
                     col=pmcls, lty=sgltys,
@@ -444,7 +444,7 @@ for ( test.type in test.types ) {
     if ( !is.null(pm) ) {
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_jaccard_fragmentation_clustered",sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mfcol=c(1,1),mai=c(1,1,.1,.1))
         plot(jaccard,numhit,col=NA,         
              ylab="average hits per target sequence",
@@ -481,7 +481,7 @@ for ( test.type in test.types ) {
         file.name <-file.path(out.path,testid,
                               paste(test.type,"_ratio_fragmentation_clustered",
                                     sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mfcol=c(1,1),mai=c(1,1,.1,.1))
         plot(apply(height,1,diff), numhit,
              col=pmcls,pch=sgpchs[nms],
@@ -504,7 +504,7 @@ for ( test.type in test.types ) {
     ## CDF of jaccard (jcdf)
     if ( !is.null(pm) ) {
         file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf_clustered",sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
                     col=pmcls, lty=sgltys,
@@ -514,7 +514,7 @@ for ( test.type in test.types ) {
         dev.off()
     }
     file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
+    plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
                 col=sgcols, lty=sgltys,
@@ -525,7 +525,7 @@ for ( test.type in test.types ) {
     
     ## CDF of relative best hit CDF (rrcdf)
     file.name <- file.path(out.path,testid, paste(test.type,"_ratio",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
+    plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rrcdf", col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
@@ -537,7 +537,7 @@ for ( test.type in test.types ) {
     ## CDF of best hit target coverage
     file.name <-file.path(out.path,testid,
                           paste(test.type,"_totalCoverage",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
+    plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf", col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
@@ -549,7 +549,7 @@ for ( test.type in test.types ) {
     if ( !is.null(pm) ) {
         file.name <-file.path(out.path,testid,
                               paste(test.type,"_totalCoverage_clustered",sep=""))
-        plotdev(file.name,width=5,height=5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
                     col=pmcls, lty=sgltys,
@@ -659,7 +659,7 @@ for ( type in sgtypes ) {
     ## plot
     file.name <- file.path(out.path,testid,"segtypes",
                            paste(type,"_ratioTotal",sep=""))
-    plotdev(file.name,width=5,height=5,type=fig.type)
+    plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
     leg <- NULL
     xmax <- 3
@@ -717,7 +717,7 @@ trcl <- segmentOverlap(query=clorf,target=genes,
 trst <- getOverlapStats(trcl,tnum=nrow(genes),
                         qnum=nrow(clorf),qid="clorf", ovlth=ovlth)
 file.name <- file.path(paste("orfXtranscripts_ratioTotal",sep=""))
-plotdev(file.name,width=5,height=5,type=fig.type)
+plotdev(file.name,width=3.5,height=3.5,type=fig.type)
 par(mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
 xmax <- 2
 x <- seq(0,xmax,.05)
@@ -786,7 +786,7 @@ for ( test.type in test.types ) {
  
 ## plot
 file.name <- file.path(paste("clusterXtranscripts_ratioTotal",sep=""))
-plotdev(file.name,width=5,height=5,type=fig.type)
+plotdev(file.name,width=3.5,height=3.5,type=fig.type)
 par(mai=c(.75,.75,.5,.1),mgp=c(1.75,.5,0),xaxs="i")
 leg <- NULL
 xmax <- 3
