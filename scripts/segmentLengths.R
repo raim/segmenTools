@@ -148,8 +148,12 @@ xmax <- 4.5e3
 ymax <- 6e3
 brks <- seq(0,35e4,100)
 for ( type in sgtypes ) {
+
+    typef <- gsub(":","_",gsub("\\.","_",type))
+    
     if ( verb>0 )
         cat(paste("segment", type, "distribution\t",time(),"\n"))
+    
     sgs <- lst[[type]]
     len <- sgs[,"end"] - sgs[,"start"] +1
     ## cumulative dist. function
