@@ -303,6 +303,8 @@ result <- data.frame(ID=names(segnum),segnum,sggam)
 file.name <- file.path(out.path,paste("segmentLengths.csv",sep=""))
 write.table(result,file=file.name, sep="\t",col.names=TRUE,row.names=FALSE,quote=FALSE)
 
+## TODO: cluster & plot a vs. mu of all segmentations
+
 ## TODO: more analyses of segment number vs. classes
 ## TODO: segment length vs. dynamics - load result
 ## from analyzeSegments.R
