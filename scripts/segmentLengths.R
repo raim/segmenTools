@@ -155,7 +155,7 @@ sggam <- matrix(NA, ncol=2, nrow=length(sgtypes)) # gamma distribution
 rownames(sggam) <- sgtypes
 colnames(sggam) <- c("a","mu") ## gamma distribution parameters
 
-xmax <- 4.5e3
+xmax <- 2.5e3
 ymax <- 6e3
 brks <- seq(0,35e4,100)
 for ( type in sgtypes ) {
