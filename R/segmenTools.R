@@ -1343,6 +1343,7 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
     ## (5) split chromosome ends!
     ## TODO: why is multiple chromosome end handling required?
     ## TODO: attach small telomeric segments to next?
+    ## TODO: doesnt work at chrXVI
     ## get chromosomes of starts and ends via chrS
     if ( !missing(chrS) ) {
         
