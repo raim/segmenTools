@@ -306,6 +306,8 @@ file.name <- file.path(out.path,paste("segmentLengths.csv",sep=""))
 write.table(result,file=file.name, sep="\t",col.names=TRUE,row.names=FALSE,quote=FALSE)
 
 ## TODO: cluster & plot a vs. mu of all segmentations
+## TODO: two heatmaps with parameters E vs. nui as axes
+## and segment number and gamma-mu as color
 
 ## TODO: more analyses of segment number vs. classes
 ## TODO: segment length vs. dynamics - load result
