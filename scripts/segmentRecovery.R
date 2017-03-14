@@ -12,6 +12,11 @@ library(optparse) # command-line options
 
 ## nicer timestamp
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
+## cluster/segment colors; function derived from scale_colour_hue in ggplot2
+color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+}
 
 ### OPTIONS
 option_list <- list(
@@ -322,6 +327,18 @@ for ( test.type in test.types ) {
         pmsrt <- order(as.numeric(names(pmmn)[order(pmmn)]))
         ## sorted clustering
         pmcls <- pmsrt[pm$clustering]
+
+        pmcol <- color_hue(length(pmsrt))
+        names(pmcol) <- 1:length(pmsrt)
+
+        ## write out table of segmentation characteristics
+        result <- data.frame(ID=nms, CL=pmcls)
+        file.name <- file.path(out.path,testid,
+                               paste("segmentRecovery_",test.type,
+                                     "_clusters.csv",sep=""))
+        write.table(result,file=file.name, sep="\t",
+                    col.names=TRUE,row.names=FALSE,quote=FALSE)
+        
         
         ## strange bug: 75 in list of 75,100,150 gets a leading space
         ## trim all:
@@ -354,11 +371,11 @@ for ( test.type in test.types ) {
         
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_segmentationClusters",sep=""))
-        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
-        par(mai=c(1,.7,.1,.1),mgp=c(1.75,.5,0))
+        plotdev(file.name,width=4.5,height=4.5,type=fig.type)
+        par(mai=c(.7,.5,.1,.1),mgp=c(1.75,.5,0))
         image_matrix(-log2(pval) ,text=enum, axis=1:2,
                      col=c("#FFFFFF",rev(grey.colors(20))),
-                     axis2.col=1:nrow(pval),
+                     axis2.col=pmcol[1:nrow(pval)],
                      xlab=NA,ylab=NA)
         abline(v=cumsum(unlist(lapply(cllst, length)))+.5)
         axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
@@ -374,15 +391,9 @@ for ( test.type in test.types ) {
         plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
          col=NA)
         legend("topleft","good",bty="n")
-        points(height,col=pmcls,pch=sgpchs[nms])
+        points(height,col=pmcol[pmcls],pch=sgpchs[nms])
         abline(v=.2,lty=2)
         abline(h=.8,lty=2)
-        ##par(mai=c(1,.7,.1,.1))
-        ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
-        ##             col=c("#FFFFFF",rev(grey.colors(20))),
-        ##             axis2.col=1:nrow(pval),
-        ##             xlab=NA,ylab=NA)
-        ##axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
         dev.off()
     }
     
@@ -418,7 +429,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
-                    col=pmcls, lty=sgltys,
+                    col=pmcol[pmcls], lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="ratio: query length/target length")
         legend("topleft",paste(test.type,"-",tnum))
@@ -451,7 +462,7 @@ for ( test.type in test.types ) {
              ylab="average hits per target sequence",
              xlab="jaccard: intersect/union")#,
         legend("bottomright","good",bty="n")
-        points(jaccard,numhit,col=pmcls,pch=sgpchs[nms])
+        points(jaccard,numhit,col=pmcol[pmcls],pch=sgpchs[nms])
         ##par(mai=c(1,.7,.1,.1))
         ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
         ##             col=c("#FFFFFF",rev(grey.colors(20))),
@@ -485,16 +496,10 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
         plot(apply(height,1,diff), numhit,
-             col=pmcls,pch=sgpchs[nms],
+             col=pmcol[pmcls],pch=sgpchs[nms],
              ylab="average hits per target sequence",
              xlab="fraction: 0.8 < ratio < 1.2")#,
         imgdat <- t(apply(-log2(pval), 2, rev))
-        ##par(mai=c(1,.7,.1,.1))
-        ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
-        ##             col=c("#FFFFFF",rev(grey.colors(20))),
-        ##             axis2.col=1:nrow(pval),
-        ##             xlab=NA,ylab=NA)
-        ##axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA)
         dev.off()
     }
     
@@ -508,7 +513,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
-                    col=pmcls, lty=sgltys,
+                    col=pmcol[pmcls], lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="cumulative jaccard: intersect/union")
         legend("topleft",paste(test.type,"-",tnum))
@@ -553,7 +558,7 @@ for ( test.type in test.types ) {
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
-                    col=pmcls, lty=sgltys,
+                    col=pmcol[pmcls], lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="coverage of test set")
         legend("topleft",paste(test.type,"-",tnum))
@@ -577,7 +582,7 @@ for ( test.type in test.types ) {
                 nm <- CDF[[i]]$qid
                 if ( diff(height[i,]) > 0 )
                     arrows(x0=i,x1=i,y0=height[i,1],y1=height[i,2],
-                           col=pmcls[i],lty=sgltys[nm],
+                           col=pmcol[pmcls[i]],lty=sgltys[nm],
                            length=0.1, angle=90, code=3)
                 text(i, 1.1, round(diff(height[i,]),3),srt=90)
             }
