@@ -372,13 +372,13 @@ for ( test.type in test.types ) {
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_segmentationClusters",sep=""))
         plotdev(file.name,width=4.5,height=4.5,type=fig.type)
-        par(mai=c(.7,.5,.1,.1),mgp=c(1.75,.5,0))
+        par(mai=c(.7,.5,.1,.1),mgp=c(1.7,.5,0))
         image_matrix(-log2(pval) ,text=enum, axis=1:2,
                      col=c("#FFFFFF",rev(grey.colors(20))),
                      axis2.col=pmcol[1:nrow(pval)],
                      xlab=NA,ylab=NA)
         abline(v=cumsum(unlist(lapply(cllst, length)))+.5)
-        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
+        axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-.1,labels=NA) 
         dev.off()
         ## TODO: plot by segment classes as length dist
         
