@@ -328,7 +328,7 @@ for ( test.type in test.types ) {
         ## sorted clustering
         pmcls <- pmsrt[pm$clustering]
 
-        pmcol <- color_hue(length(pmsrt))
+        pmcol <- rainbow(length(pmsrt))
         names(pmcol) <- 1:length(pmsrt)
 
         ## write out table of segmentation characteristics
