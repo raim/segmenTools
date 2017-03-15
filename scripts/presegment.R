@@ -178,7 +178,7 @@ xl<- 2.5*mean(sglen)
 ## plot segments and inter-segments
 ## average time-point presence and segment lengths
 file.name <- file.path(outdir,"primseg_lengths")
-plotdev(file.name,width=5,height=4,type=fig.type)
+plotdev(file.name,width=3.5,height=4,type=fig.type)
 par(mfcol=c(2,1),mai=c(.5,.75,.15,.1),mgp=c(1.5,.5,0))
 hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="mean number of expressed time points",
      main=NA)#"mean number of expressed time points")
