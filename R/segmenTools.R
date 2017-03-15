@@ -114,7 +114,7 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
             cdfhi[,cl] <- apply(cdfmat[,col==cl],1,max)
         }
         plot(x,rep(1,length(x)),col=NA,xlim=range(x),ylim=c(0,1),
-             ylab=ylab) #,...)
+             ylab=ylab,...)
         abline(v=v,lty=2)
         abline(h=h,lty=2)
         abline(h=0:1, lty=2, col="gray",lwd=.75)
