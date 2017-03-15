@@ -312,7 +312,7 @@ for ( test.type in test.types ) {
     ## MAX vs. MIN CLUSTERING  cluster jaccard vs. numhits vs segment classes
     ## TODO: also include height in clustering?
     pm <- NULL
-    if ( sgnum>5 ) {
+    if ( sgnum>5 ) { # TODO: pmcol used below skip if 
         K <- 7
         dat <- cbind((jaccard-min(jaccard))/(max(jaccard)-min(jaccard)),
                      (numhit-min(numhit))/(max(numhit)-min(numhit)),
