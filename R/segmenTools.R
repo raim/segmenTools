@@ -123,13 +123,13 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
             lines(x,cdfmn[,cl], col=cl,lwd=3, lty=1)
         }
     } else {    
-        plot(x, CDF[[1]]$[[type]](x),type="l",
+        plot(x, CDF[[1]][[type]](x),type="l",
              col=NA,main=NA, ylim=c(0,1), ylab=ylab, ...)
         abline(v=v,lty=2)
         abline(h=h,lty=2)
         abline(h=0:1, lty=2, col="gray",lwd=.75)
         for ( i in 1:length(CDF) ) 
-            lines(x,CDF[[i]][[type]](x),col=col[i],lty=lty[i])
+          lines(x,CDF[[i]][[type]](x),col=col[i],lty=lty[i])
     }
 }
 
