@@ -12,8 +12,7 @@ It loops over targets and collects all queries that match;
 optionally adds NA lines for non-matched targets}
 \usage{
 segmentOverlap(query, target, details = FALSE, add.na = FALSE,
-  untie = FALSE, collapse = FALSE, sort = FALSE,
-  msgfile = file("stdout"))
+  untie = FALSE, collapse = FALSE, sort = FALSE, msgfile = stdout)
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}

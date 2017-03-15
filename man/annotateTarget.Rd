@@ -7,7 +7,7 @@ annotate the target set by a column in the query set}
 \usage{
 annotateTarget(query, target, qcol = colnames(query), tcol, prefix,
   details = FALSE, only.best = TRUE, collapse = TRUE,
-  msgfile = file("stdout"))
+  msgfile = stdout())
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}
