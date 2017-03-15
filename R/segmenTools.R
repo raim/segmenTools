@@ -93,15 +93,44 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
 #' @param type character indicating the type of the overlap CDF
 #' @export
 plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ...) {
-    
-    plot(x, CDF[[1]]$rcdf(x),type="l",col=NA,main=NA, ylim=c(0,1), ylab=ylab,
-         ...)
-    abline(v=v,lty=2)
-    abline(h=h,lty=2)
-    abline(h=0:1, lty=2, col="gray",lwd=.75)
-    for ( i in 1:length(CDF) ) 
-        if ( type %in% names(CDF[[i]]) ) 
-            lines(x,CDF[[i]][[type]](x),col=col[i],lty=lty[i]) 
+
+
+    ## TODO: group by colors and plot mean
+    ## and ci95 as polygon!
+    cls <- sort(unique(col))
+    if ( length(cls)<length(col) ) {
+        #plot_cdfGroups(x, )
+        cdfmat <- matrix(NA, nrow=length(x), ncol=length(CDF))
+        for ( i in 1:length(CDF) )
+            cdfmat[,i] <- CDF[[i]][[type]](x)
+        ## calculate meana and ci95
+        cdfmn <- matrix(NA,nrow=length(x), ncol=length(cls))
+        colnames(cdfmn) <- cls
+        cdfci <- cdflo <- cdfhi <- cdfmn
+        for ( cl in as.character(cls) ) {
+            cdfmn[,cl] <- apply(cdfmat[,col==cl],1,mean)
+            cdfci[,cl] <- apply(cdfmat[,col==cl],1,ci95)
+            cdflo[,cl] <- apply(cdfmat[,col==cl],1,min)
+            cdfhi[,cl] <- apply(cdfmat[,col==cl],1,max)
+        }
+        plot(x,rep(1,length(x)),col=NA,xlim=range(x),ylim=c(0,1),
+             ylab=ylab) #,...)
+        for ( cl in as.character(cls) ) {
+            px <-c(x,rev(x))
+            #py <- c(cdfmn[,cl]+cdfci[,cl],rev(cdfmn[,cl]-cdfci[,cl]))
+            py <- c(cdfhi[,cl],rev(cdflo[,cl]))
+            polygon(px, py, col=sub("FF$","77",cl),border=NA)
+            lines(x,cdfmn[,cl], col=cl,lwd=3, lty=1)
+        }
+    } else {    
+        plot(x, CDF[[1]]$[[type]](x),type="l",
+             col=NA,main=NA, ylim=c(0,1), ylab=ylab, ...)
+        abline(v=v,lty=2)
+        abline(h=h,lty=2)
+        abline(h=0:1, lty=2, col="gray",lwd=.75)
+        for ( i in 1:length(CDF) ) 
+            lines(x,CDF[[i]][[type]](x),col=col[i],lty=lty[i])
+    }
 }
 
 #' Wrapper around \code{\link[graphics]{image}} to plot a matrix as
