@@ -195,13 +195,27 @@ for ( type in sgtypes ) {
     par(mfcol=c(1,1), mai=c(.65,.65,.65,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(tmp,border=sgcols[type],freq=FALSE,#ylim=c(0,ymax),
          xlim=c(0,xmax*1.05), xlab="length, bp",main=sgnames[type],cex.main=.9)
+    lines(xy$x, get_gamma(xy$x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
     legend("topright",legend=c(nrow(sgs),paste("fuse",sum(sgs[,"fuse"]))),
            col=c(sgcols[type],NA),pch=c(sgpchs[type],NA),lty=c(sgpchs[type],NA))
     #legend("topright",legend=type)
-    lines(xy$x, get_gamma(xy$x, as.list(coefficients(fit))),type="l",col=4)# GAMMA
     legend("right", paste(c("a","mu"),":", signif(sggam[type,],3)),
            lty=c(1,NA),col=4)
     dev.off()
+
+    ## same as above but compact 
+    file.name <- file.path(out.path,paste("length_segment_",typef,"_compact",sep=""))
+    plotdev(file.name,width=3.5,height=2, type=fig.type)
+    par(mfcol=c(1,1), mai=c(.65,.65,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
+    plot(tmp,col=sub("FF$","88",sgcols[type]),border=sgcols[type],freq=FALSE,#ylim=c(0,ymax),
+         xlim=c(0,xmax*1.05), xlab="length, bp",main=NA,cex.main=.9)
+    lines(xy$x, get_gamma(xy$x, as.list(coefficients(fit))),type="l",col=4,lwd=2)# GAMMA
+    legend("topright",legend=c(nrow(sgs),
+                        paste("a:",signif(sggam[type,"a"],3)),
+                        paste("mu:",signif(sggam[type,"mu"],3))),
+           col=c(sgcols[type],4,NA),pch=NA,lty=1,bty="n")
+    dev.off()
+    
     #high <- which(tmp$counts>ymax)
     #axis(3, at= tmp$mids[high], label=tmp$counts[high],las=2, cex.axis=.7)
     file.name <- file.path(out.path,paste("length_segment_",typef,"_cum",sep=""))
