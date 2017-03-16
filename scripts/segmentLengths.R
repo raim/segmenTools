@@ -210,9 +210,10 @@ for ( type in sgtypes ) {
     plot(tmp,col=sub("FF$","88",sgcols[type]),border=sgcols[type],freq=FALSE,#ylim=c(0,ymax),
          xlim=c(0,xmax*1.05), xlab="length, bp",main=NA,cex.main=.9)
     lines(xy$x, get_gamma(xy$x, as.list(coefficients(fit))),type="l",col=4,lwd=2)# GAMMA
-    legend("topright",legend=c(nrow(sgs),
-                        paste("a:",signif(sggam[type,"a"],3)),
-                        paste("mu:",signif(sggam[type,"mu"],3))),
+    legend("topright",legend=c(
+                          paste("n:", nrow(sgs)),
+                          paste("a:",signif(sggam[type,"a"],3)),
+                          paste("mu:",signif(sggam[type,"mu"],3))),
            col=c(sgcols[type],4,NA),pch=NA,lty=1,bty="n")
     dev.off()
     
