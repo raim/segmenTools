@@ -203,17 +203,19 @@ for ( type in sgtypes ) {
            lty=c(1,NA),col=4)
     dev.off()
 
-    ## same as above but compact 
+    ## same as above but compact
+    gline <- get_gamma(xy$x, as.list(coefficients(fit)))
     file.name <- file.path(out.path,paste("length_segment_",typef,"_compact",sep=""))
-    plotdev(file.name,width=3.5,height=2, type=fig.type)
-    par(mfcol=c(1,1), mai=c(.65,.65,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
+    plotdev(file.name,width=3,height=2.5, type=fig.type)
+    par(mfcol=c(1,1), mai=c(.65,.65,.15,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot(tmp,col=sub("FF$","88",sgcols[type]),border=sgcols[type],freq=FALSE,#ylim=c(0,ymax),
-         xlim=c(0,xmax*1.05), xlab="length, bp",main=NA,cex.main=.9)
-    lines(xy$x, get_gamma(xy$x, as.list(coefficients(fit))),type="l",col=4,lwd=2)# GAMMA
+         xlim=c(0,xmax*1.05), ylim=range(gline),
+         xlab="length, bp",main=NA,cex.main=.9)
+    lines(xy$x, gline,type="l",col=4,lwd=2)# GAMMA
     legend("topright",legend=c(
-                          paste("n:", nrow(sgs)),
-                          paste("a:",signif(sggam[type,"a"],3)),
-                          paste("mu:",signif(sggam[type,"mu"],3))),
+                        paste("n:", nrow(sgs)),
+                        paste("a:",signif(sggam[type,"a"],3)),
+                        paste("mu:",signif(sggam[type,"mu"],3))),
            col=c(sgcols[type],4,NA),pch=NA,lty=1,bty="n")
     dev.off()
     
