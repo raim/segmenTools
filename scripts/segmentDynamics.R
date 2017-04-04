@@ -26,7 +26,7 @@ library(segmenTools)
 #source(file.path(segtools,"R/coor2index.R")) # coor2index
 
 
-suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
+#suppressPackageStartupMessages(library("stringr")) # for 0-padded filenames
 suppressPackageStartupMessages(library(optparse))
 
 ### OPTIONS
