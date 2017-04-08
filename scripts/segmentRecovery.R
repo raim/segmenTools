@@ -433,10 +433,10 @@ for ( test.type in test.types ) {
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="ratio: query length/target length")
         legend("topleft",paste(test.type,"-",tnum))
-        rect(1.4,.86,1.9,.94,col="#FFFFFFBB",border=NA)
-        text(1.65,.9,"too long",font=2)
-        rect(.1,.01,0.6,.09,col="#FFFFFFBB",border=NA)
-        text(.35,.05,"too short",font=2)
+        rect(1.4,.26,1.9,.34,col="#FFFFFFBB",border=NA)
+        text(1.65,.3,"too long",font=2, col=pmcol[1])
+        rect(.1,.56,0.6,.64,col="#FFFFFFBB",border=NA)
+        text(.35,.6,"too short",font=2, col=pmcol[length(pmcol)])
         dev.off()
     }
       
