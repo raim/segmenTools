@@ -465,8 +465,12 @@ for ( test.type in test.types ) {
         plot(jaccard,numhit,col=NA,         
              ylab="average hits per target sequence",
              xlab="jaccard: intersect/union")#,
-        legend("bottomright","good",bty="n")
-        points(jaccard,numhit,col=pmcol[pmcls],pch=sgpchs[nms])
+        mxx <- max(jaccard)
+        mny <- min(numhit)
+        points(jaccard,numhit,col=pmcol[pmcls],pch=20) #sgpchs[nms])
+        #rect(.1,.01,0.6,.09,col="#FFFFFFBB",border=NA)
+        #text(.35,.05,"good",font=2)
+        legend("bottomright","good",bty="n") #bg="#FFFFFFBB",box.col=NA, text.font=2) 
         ##par(mai=c(1,.7,.1,.1))
         ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
         ##             col=c("#FFFFFF",rev(grey.colors(20))),
