@@ -390,7 +390,7 @@ for ( test.type in test.types ) {
         par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
         plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
          col=NA)
-        legend("topleft","good",bty="n")
+        legend("topleft","good",bty="n",text.font=2)
         points(height,col=pmcol[pmcls],pch=sgpchs[nms])
         abline(v=.2,lty=2)
         abline(h=.8,lty=2)
@@ -470,7 +470,7 @@ for ( test.type in test.types ) {
         points(jaccard,numhit,col=pmcol[pmcls],pch=20) #sgpchs[nms])
         #rect(.1,.01,0.6,.09,col="#FFFFFFBB",border=NA)
         #text(.35,.05,"good",font=2)
-        legend("bottomright","good",bty="n") #bg="#FFFFFFBB",box.col=NA, text.font=2) 
+        legend("bottomright","good",bty="n", text.font=2) #bg="#FFFFFFBB",box.col=NA, text.font=2) 
         ##par(mai=c(1,.7,.1,.1))
         ##image_matrix(-log2(pval) ,text=enum, axis=1:2,
         ##             col=c("#FFFFFF",rev(grey.colors(20))),
