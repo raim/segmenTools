@@ -388,10 +388,10 @@ for ( test.type in test.types ) {
                                paste(test.type,"_ratioTotal_lh_clustered",sep=""))
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mfcol=c(1,1),mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0))
-        plot(height,xlab="fraction: ratio < 0.8",ylab="fraction: ratio < 1.2",
+        plot(height,xlab=expression(R["short"]),ylab=expression(R["long"]),
          col=NA)
         legend("topleft","good",bty="n",text.font=2)
-        points(height,col=pmcol[pmcls],pch=sgpchs[nms])
+        points(height,col=pmcol[pmcls],pch=20) #sgpchs[nms])
         abline(v=.2,lty=2)
         abline(h=.8,lty=2)
         dev.off()
@@ -437,6 +437,10 @@ for ( test.type in test.types ) {
         text(1.65,.3,"too long",font=2, col=pmcol[1])
         rect(.1,.56,0.6,.64,col="#FFFFFFBB",border=NA)
         text(.35,.6,"too short",font=2, col=pmcol[length(pmcol)])
+        points(1.2,.1,pch=4)
+        text(1.2,.1,expression(R["long"]),pos=4,font=2)
+        points(.8,.7,pch=4)
+        text(.8,.7,expression(R["short"]),pos=2,font=2)
         dev.off()
     }
       
