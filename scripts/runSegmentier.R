@@ -149,7 +149,8 @@ for ( i in 1:length(lst.args) ) {
         opt[[idx]] <- unlist(tmp)
     mode(opt[[idx]]) <- lst.args[i]
 }
-
+## clear NAs
+segs <- segs[!is.na(segs)]
 
 ## promote options to main environment and print all arguments
 if ( opt$verb>0 )
