@@ -136,14 +136,15 @@ for ( i in 1:length(lst.args) ) {
     ## get individual values
     tmp <- as.list(unlist(strsplit(opt[[idx]], ",")))
     ## expand ranges
-    if ( lst.args[i]=="numeric" |  lst.args[i]=="integer" )
-        for ( j in 1:length(tmp) ) { # only for numeric modes
-            tmp2 <- unlist(strsplit(tmp[[j]], ":"))
-            if ( length(tmp2)>1 ) {
-                tmp2 <- as.numeric(tmp2)
-                tmp[[j]] <- tmp2[1]:tmp2[2]
+    if ( length(tmp)>0 ) 
+        if ( lst.args[i]=="numeric" |  lst.args[i]=="integer" )
+            for ( j in 1:length(tmp) ) { # only for numeric modes
+                tmp2 <- unlist(strsplit(tmp[[j]], ":"))
+                if ( length(tmp2)>1 ) {
+                    tmp2 <- as.numeric(tmp2)
+                    tmp[[j]] <- tmp2[1]:tmp2[2]
+                }
             }
-        }
     if ( length(tmp)>0 )
         opt[[idx]] <- unlist(tmp)
     mode(opt[[idx]]) <- lst.args[i]
