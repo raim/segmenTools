@@ -149,8 +149,6 @@ for ( i in 1:length(lst.args) ) {
         opt[[idx]] <- unlist(tmp)
     mode(opt[[idx]]) <- lst.args[i]
 }
-## clear NAs
-segs <- segs[!is.na(segs)]
 
 ## promote options to main environment and print all arguments
 if ( opt$verb>0 )
@@ -162,6 +160,8 @@ for ( i in 1:length(opt) ) {
     arg <- names(opt)[i]
     assign(arg, opt[[arg]])
 }
+## clear NAs - this happens for missing segment arg (due to char-int mapping)
+segs <- segs[!is.na(segs)]
 
 ### OUTPUT FILENAME PREFIX
 outname <- file.path(outdir,"primseg")
