@@ -294,6 +294,7 @@ annotateQuery <- function(query, target, col) {
 #' @param details set to \code{TRUE} to add details of the used
 #' match, i.e., union and intersect, and relative position of the query
 #' to the matching targets
+#' @param only.best only consider the top-ranking query hit
 #' @param collapse  if \code{TRUE} multiple query hits are collapsed
 #' into a single row, with ;-separated strings in the respective fields.
 #' @param msgfile file pointer for progress messages and warnings, defaults to

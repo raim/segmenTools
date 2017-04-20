@@ -26,6 +26,8 @@ defaults to none}
 match, i.e., union and intersect, and relative position of the query
 to the matching targets}
 
+\item{only.best}{only consider the top-ranking query hit}
+
 \item{collapse}{if \code{TRUE} multiple query hits are collapsed
 into a single row, with ;-separated strings in the respective fields.}
 
