@@ -6,7 +6,7 @@
 provided by function \code{\link{getOverlapStats}}}
 \usage{
 plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", col, lty, h = c(0.2,
-  0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.", ...)
+  0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.", ylim = c(0, 1), ...)
 }
 \arguments{
 \item{x}{x-values for which cumulative distribution functions of overlap characteristics are plotted}

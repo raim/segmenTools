@@ -5,7 +5,7 @@
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot
-#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
+#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb polygon
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap
 NULL # this just ends the global package documentation
 
