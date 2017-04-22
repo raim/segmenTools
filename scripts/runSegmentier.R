@@ -221,7 +221,8 @@ alltests <- unique(unlist(tests)) # new primseg3 20161115
 
 ### SELECT SEGMENTS
 if ( length(segs)==0 ) {
-    sets <- order(prdf) # rev(order(prdf)) ) #
+    ## smallest segments first
+    sets <- order(prdf) # rev(order(prdf)) ) 
     if ( do.test ) {
         cat(paste("DEVEL OPTION: CALCULATING TESTSETS\n"))
         sets <- alltests
@@ -387,7 +388,7 @@ for ( i in do.sets ) {
             centers <- cset$centers
             clusters <- cset$clusters
             if ( strand == -1 ) 
-                clusters <- clusters[nrow(clusters):1,]
+              clusters <- clusters[nrow(clusters):1,]
             
             ## save data!
             file.name <- file.path(paste(outname,"_",segid,sep=""))
