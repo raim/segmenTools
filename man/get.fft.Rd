@@ -2,10 +2,10 @@
 % Please edit documentation in R/segmenTools.R
 \name{get.fft}
 \alias{get.fft}
-\title{perform Discrete Fourier Transformation using \code{\link[stats]{mvfft}},
-and returning the non-redundant (for real numbers) first half of
-the transform, i.e., from the DC (direct current) component to the
-Nyquist frequency}
+\title{perform Discrete Fourier Transformation using \code{mvfft} from
+the \code{stats} package, and returning the non-redundant (for
+real numbers) first half of the transform, i.e., from the DC
+(direct current) component to the Nyquist frequency}
 \usage{
 get.fft(x)
 }
@@ -13,9 +13,9 @@ get.fft(x)
 \item{x}{data to be transformed}
 }
 \description{
-perform Discrete Fourier Transformation using \code{\link[stats]{mvfft}},
-and returning the non-redundant (for real numbers) first half of
-the transform, i.e., from the DC (direct current) component to the
-Nyquist frequency
+perform Discrete Fourier Transformation using \code{mvfft} from
+the \code{stats} package, and returning the non-redundant (for
+real numbers) first half of the transform, i.e., from the DC
+(direct current) component to the Nyquist frequency
 }
 

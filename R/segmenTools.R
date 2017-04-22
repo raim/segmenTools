@@ -4,8 +4,8 @@
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table
-#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot
-#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb polygon
+#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon
+#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap
 NULL # this just ends the global package documentation
 
@@ -14,10 +14,10 @@ NULL # this just ends the global package documentation
 
 ### DATA STAT & TRANSFORMATION UTILS
 
-#' perform Discrete Fourier Transformation using \code{\link[stats]{mvfft}},
-#' and returning the non-redundant (for real numbers) first half of
-#' the transform, i.e., from the DC (direct current) component to the
-#' Nyquist frequency
+#' perform Discrete Fourier Transformation using \code{mvfft} from
+#' the \code{stats} package, and returning the non-redundant (for
+#' real numbers) first half of the transform, i.e., from the DC
+#' (direct current) component to the Nyquist frequency
 #' @param x data to be transformed
 #' @export
 get.fft <- function(x) {
@@ -140,8 +140,9 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 #' is at the top left corner. It further allows to plot text
 #' into individual fields and have colored axis tick labels.
 #' @param dat the numeric data matrix to be plotted
-#' @param text a matrix of characteres corresponding to \code{dat}
+#' @param text a matrix of characters corresponding to \code{dat}
 #' which will be plotted on the image
+#' @param text.col individual colors for text fields
 #' @param axis integer vector, sets whether bottom (1) and/or left
 #' (2) axis are draw; the column and row names of \code{dat} will
 #' be used as tick labels
@@ -1218,7 +1219,7 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' \code{seg.path} is not provided.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-presegment <- function(ts, numts, chrS, avg=1000, favg=100,
+presegment <- function(ts, chrS, avg=1000, favg=100,
                        minrd=8, minds=250, rmlen=250, minsg=5e3,
                        map2chrom=FALSE, seg.path, fig.path, fig.type="png",
                        verb=1) {
@@ -1227,8 +1228,7 @@ presegment <- function(ts, numts, chrS, avg=1000, favg=100,
         cat(paste("Calculating total read-counts and moving averages...\n"))
     
     ## total time series
-    if ( missing(numts) )
-      numts <- rowSums(ts > 0) ## timepoints with reads
+    numts <- rowSums(ts > 0) ## number timepoints with reads
     
     ## moving averages of read-count presence 
     avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg

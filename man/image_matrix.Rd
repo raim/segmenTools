@@ -12,8 +12,10 @@ image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col, ...)
 \arguments{
 \item{dat}{the numeric data matrix to be plotted}
 
-\item{text}{a matrix of characteres corresponding to \code{dat}
+\item{text}{a matrix of characters corresponding to \code{dat}
 which will be plotted on the image}
+
+\item{text.col}{individual colors for text fields}
 
 \item{axis}{integer vector, sets whether bottom (1) and/or left
 (2) axis are draw; the column and row names of \code{dat} will
