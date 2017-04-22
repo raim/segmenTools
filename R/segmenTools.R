@@ -67,10 +67,10 @@ ci95 <- function(x,na.rm=FALSE) {
 ### PLOT UTILS
 #' Switch between plot devices
 #' @param file.name file name without suffix (.png, etc)
-#' @param type plot type: pdf, png or eps
+#' @param type plot type: png, eps, pdf, tiff or svg
 #' @param width figure width in inches
 #' @param height figure height in inches
-#' @param res resolution in ppi (pixels per inch), only for 'png'
+#' @param res resolution in ppi (pixels per inch), only for 'png' and 'tiff'
 #' @export
 plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
   file.name <- paste(file.name, type, sep=".")
@@ -81,7 +81,7 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
   if ( type == "pdf" )
     grDevices::pdf(file.name, width=width, height=height)
   if ( type == "tiff" )
-    grDevices::tiff(file.name, width=width, height=height, units="in")
+    grDevices::tiff(file.name, width=width, height=height, units="in", res=res)
   if ( type == "svg" )
     grDevices::svg(file.name, width=width, height=height)
 }
