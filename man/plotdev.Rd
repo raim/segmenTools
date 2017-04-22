@@ -10,13 +10,13 @@ plotdev(file.name = "test", type = "png", width = 5, height = 5,
 \arguments{
 \item{file.name}{file name without suffix (.png, etc)}
 
-\item{type}{plot type: pdf, png or eps}
+\item{type}{plot type: png, eps, pdf, tiff or svg}
 
 \item{width}{figure width in inches}
 
 \item{height}{figure height in inches}
 
-\item{res}{resolution in ppi (pixels per inch), only for 'png'}
+\item{res}{resolution in ppi (pixels per inch), only for 'png' and 'tiff'}
 }
 \description{
 Switch between plot devices
