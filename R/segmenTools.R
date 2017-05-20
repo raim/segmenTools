@@ -399,6 +399,9 @@ collectOvlStats <- function(ovlStatLst, type) {
                                    function(x) x$height)),ncol=2,byrow=TRUE)
     jaccard <- unlist(lapply(ovlStatLst[[type]],
                              function(x) x$jaccard))
+    jpercent <- unlist(lapply(ovlStatLst[[type]],
+                             function(x) x$jpercent))
+    #jpercent<- covlStats$jpercent# percent of targets covered with J>threshold
     hitnum <- unlist(lapply(ovlStatLst[[type]],
                                 function(x) x$hitnum))
     numhit <- unlist(lapply(ovlStatLst[[type]],
@@ -413,7 +416,8 @@ collectOvlStats <- function(ovlStatLst, type) {
     if ( length(tnum)>1 ) # temporary until sure that it works
         stop("ERROR,",type,"tnum should be unique for types")
     res <- list(CDF=CDF, DIST=DIST,
-                jaccard=jaccard, height=height, hitnum=hitnum, numhit=numhit,
+                jaccard=jaccard, jpercent=jpercent,
+                height=height, hitnum=hitnum, numhit=numhit,
                 qnum=qnum, tnum=tnum, nms=nms)
     class(res) <- "overlapStatLst"
     res
