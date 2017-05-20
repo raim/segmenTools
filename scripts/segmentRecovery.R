@@ -526,20 +526,20 @@ for ( test.type in test.types ) {
         file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf_clustered",sep=""))
         plotdev(file.name,width=3.5,height=3.5,type=fig.type)
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-        plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
+        plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="jcdf",
                     col=pmcol[pmcls], lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                    xlab="cumulative jaccard: intersect/union")
+                    xlab="jaccard: intersect/union")
         legend("topleft",paste(test.type,"-",tnum))
         dev.off()
     }
-    file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_cdf",sep=""))
+    file.name <- file.path(out.path,testid,paste(test.type,"_jaccard_rcdf",sep=""))
     plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
-    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="rjcdf",
+    plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="jcdf",
                 col=sgcols, lty=sgltys,
                 h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                xlab="cumulative jaccard: intersect/union")
+                xlab="jaccard: intersect/union")
     legend("topleft",paste(test.type,"-",tnum))
     dev.off()
     
