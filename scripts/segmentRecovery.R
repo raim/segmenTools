@@ -266,6 +266,7 @@ for ( test.type in test.types ) {
 
     ids <- covlStats$nms
     jaccard <- covlStats$jaccard # jaccard of best hits
+    jpercent<- covlStats$jpercent# percent of targets covered with J>threshold
     height <- covlStats$height # target recovery fraction within threshold
     hitnum <- covlStats$hitnum # total number of 'good' hits 
     numhit <- covlStats$numhit # average number of hits per target
@@ -273,6 +274,7 @@ for ( test.type in test.types ) {
     tnum <- covlStats$tnum # number of tested targets
 
     result <- data.frame(ID=ids, tnum=tnum, hits=hitnum, Jaccard=jaccard,
+                         JaccPrcnt=jpercent,
                          hits.per.target=numhit,
                          ratio.low=height[,1], ratio.high=height[,2])
     
