@@ -745,7 +745,7 @@ getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid
                 DIST=DIST, # list of distributions
                 height=height, # fraction of best hit ratios within hrng
                 jaccard=J,     # MAX: jaccard measure of best hits
-                jpercent=jaccpercent # % of best hits with J > threshold
+                jpercent=jaccpercent, # % of best hits with J > threshold
                 hitnum=hitnum, # MAX: num. of hits with minimal mutual coverage
                 numhit=numhit, # MIN: avg. num. of hits per target
                 qnum=qnum, tnum=tnum,# number of queries/targets 
