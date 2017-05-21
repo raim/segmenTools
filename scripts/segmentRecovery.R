@@ -541,7 +541,7 @@ for ( test.type in test.types ) {
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="jcdf",
                     col=pmcol[pmcls], lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                    xlab="jaccard: intersect/union")
+                    xlab="jaccard: intersect/union",range="lines")
         legend("topleft",paste(test.type,"-",tnum))
         dev.off()
     }
