@@ -92,7 +92,7 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
 #' @param CDF named list of cumulative distribution functions
 #' @param type character indicating the type of the overlap CDF
 #' @export
-plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ylim=c(0,1), ...) {
+plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ylim=c(0,1), range="polygon", ...) {
 
 
     ## group by colors and plot mean and ci95 as polygon!
@@ -118,10 +118,15 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
         abline(h=h,lty=2)
         abline(h=0:1, lty=2, col="gray",lwd=.75)
         for ( cl in as.character(cls) ) {
-            px <-c(x,rev(x))
-            #py <- c(cdfmn[,cl]+cdfci[,cl],rev(cdfmn[,cl]-cdfci[,cl]))
-            py <- c(cdfhi[,cl],rev(cdflo[,cl]))
-            polygon(px, py, col=sub("FF$","77",cl),border=NA)
+            if ( range=="polygon" ) {
+                px <-c(x,rev(x))
+                ##py <- c(cdfmn[,cl]+cdfci[,cl],rev(cdfmn[,cl]-cdfci[,cl]))
+                py <- c(cdfhi[,cl],rev(cdflo[,cl]))
+                polygon(px, py, col=sub("FF$","77",cl),border=NA)
+            } else if ( range=="lines" ) {
+                lines(x,cdfhi[,cl], col=cl,lwd=1, lty=2)
+                lines(x,cdflo[,cl], col=cl,lwd=1, lty=2)
+            }
             lines(x,cdfmn[,cl], col=cl,lwd=3, lty=1)
         }
     } else {    
