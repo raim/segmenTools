@@ -21,4 +21,3 @@ information}
 switches the strand information (reverse<->forward) of genomic
 features with continuously indexed chromosome coordinates
 }
-

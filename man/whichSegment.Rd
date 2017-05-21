@@ -14,4 +14,3 @@ whichSegment(pos, seg)
 \description{
 which segment covers a position
 }
-

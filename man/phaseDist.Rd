@@ -24,4 +24,3 @@ http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spr
 https://en.wikipedia.org/wiki/Mean_of_circular_quantities
 TODO: recognize bimodal?
 }
-

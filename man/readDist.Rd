@@ -14,4 +14,3 @@ readDist(rds)
 distribution of read-counts, i.e., the mean, var, min&max and the number
 of NA values
 }
-

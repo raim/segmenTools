@@ -6,7 +6,8 @@
 provided by function \code{\link{getOverlapStats}}}
 \usage{
 plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", col, lty, h = c(0.2,
-  0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.", ylim = c(0, 1), ...)
+  0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.", ylim = c(0, 1),
+  range = "polygon", ...)
 }
 \arguments{
 \item{x}{x-values for which cumulative distribution functions of overlap characteristics are plotted}
@@ -14,9 +15,10 @@ plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", col, lty, h = c(0.2,
 \item{CDF}{named list of cumulative distribution functions}
 
 \item{type}{character indicating the type of the overlap CDF}
+
+\item{range}{draw the range of values either as "polygon" or "lines"}
 }
 \description{
 plot multiple cumulative distribution functions of overlap statistics, as
 provided by function \code{\link{getOverlapStats}}
 }
-

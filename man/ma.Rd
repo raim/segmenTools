@@ -16,4 +16,3 @@ ma(x, n = 5, circular = FALSE)
 \description{
 moving average using \code{\link[stats]{filter}}
 }
-

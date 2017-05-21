@@ -17,4 +17,3 @@ entries come from \code{\link{segmentOverlap}}}
 Collect stats from a nested list of overlap statistics in lists
 and vectors for a given segment \code{type}
 }
-

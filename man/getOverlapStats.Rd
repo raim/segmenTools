@@ -4,14 +4,20 @@
 \alias{getOverlapStats}
 \title{Statistics of overlaps between two segment sets.}
 \usage{
-getOverlapStats(ovl, ovlth = 0.8, hrng = c(0.8, 1.2), tnum = NA,
-  qnum = NA, qid = NA, tid = NA)
+getOverlapStats(ovl, ovlth = 0.8, minj = 0.8, minf = 0.2, hrng = c(0.8,
+  1.2), tnum = NA, qnum = NA, qid = NA, tid = NA)
 }
 \arguments{
 \item{ovl}{overlap table from \code{\link{segmentOverlap}}}
 
-\item{ovlth}{threshold fraction of overlap of target and query to be
-counted as 'good' hit}
+\item{ovlth}{threshold fraction of overlap of
+target and query to be counted as 'good' hit}
+
+\item{minj}{the minimal Jaccard index above which the fraction
+is reported as \code{JaccPrcnt}}
+
+\item{minf}{fraction cutoff, the Jaccard index reported for this
+fraction of test sets is reported as \code{JaccCutoff}}
 
 \item{hrng}{lower and upper thresholds of the ratio CDF (query length/target
 length); the fraction of 'best' hits within this range will be reported
@@ -29,4 +35,3 @@ as 'height'}
 \description{
 Statistics of overlaps between two segment sets.
 }
-

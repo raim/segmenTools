@@ -19,4 +19,3 @@ information}
 \description{
 Simple version of \code{\link{index2coor}} for single values
 }
-

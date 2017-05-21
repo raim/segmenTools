@@ -21,4 +21,3 @@ plotdev(file.name = "test", type = "png", width = 5, height = 5,
 \description{
 Switch between plot devices
 }
-

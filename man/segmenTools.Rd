@@ -11,7 +11,7 @@ segmenTools : analysis of genome segmentations by segmenTier
 \section{Dependencies}{
  basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 }
+
 \author{
 Rainer Machne \email{raim@tbi.univie.ac.at}
 }
-

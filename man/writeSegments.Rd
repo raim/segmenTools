@@ -26,4 +26,3 @@ writing out data for segments to files, used for writing the primary
 segments by \code{\link{presegment}} to single files that are
 then further processed by segmenTier.
 }
-

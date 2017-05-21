@@ -19,4 +19,3 @@ returns the strand
 \description{
 get the strand from continuous index
 }
-

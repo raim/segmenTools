@@ -19,4 +19,3 @@ returns the chromosome number
 \description{
 get the chromosome from continuous index
 }
-

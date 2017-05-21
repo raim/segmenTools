@@ -32,4 +32,3 @@ information}
 \description{
 convert chromosome coordinates to continuous index
 }
-

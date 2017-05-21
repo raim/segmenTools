@@ -17,4 +17,3 @@ will be calculated}
 calculate 95% confidence intervals for the given
 data vector using a t-distribution
 }
-

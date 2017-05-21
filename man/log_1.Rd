@@ -15,4 +15,3 @@ log(x+1)
 \description{
 log trafo handling zeros by adding 1
 }
-

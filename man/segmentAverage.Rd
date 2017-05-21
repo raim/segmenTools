@@ -38,4 +38,3 @@ that the diverse attempts to smooth or filter read-counts before
 taking the averages did not give good results, and we remained using
 avg="mean" and no other transformations.
 }
-

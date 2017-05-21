@@ -23,4 +23,3 @@ specifically tailored to segment strings in segmenTier;
 splits a list of strings by a separator and constructs
 a table from the entries.
 }
-

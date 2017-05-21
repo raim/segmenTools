@@ -38,4 +38,3 @@ stdout, useful when using in context of command line pipes}
 wrapper around \code{\link{segmentOverlap}}, used to 
 annotate the target set by a column in the query set
 }
-

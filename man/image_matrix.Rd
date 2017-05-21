@@ -36,4 +36,3 @@ it is displayed in R console, i.e. the field \code{dat[1,1]}
 is at the top left corner. It further allows to plot text
 into individual fields and have colored axis tick labels.
 }
-

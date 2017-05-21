@@ -16,4 +16,3 @@ pvalDist(pvs, threshold = 0.01)
 calculates the mean of p-values and number of significant
 p-values (<\code{threshold}) and number of NA values
 }
-

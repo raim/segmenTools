@@ -18,4 +18,3 @@ the \code{stats} package, and returning the non-redundant (for
 real numbers) first half of the transform, i.e., from the DC
 (direct current) component to the Nyquist frequency
 }
-

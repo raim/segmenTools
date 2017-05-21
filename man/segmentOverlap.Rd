@@ -51,4 +51,3 @@ in packages IRanges and GenomicRanges) for similar tools.
 It loops over targets and collects all queries that match;
 optionally adds NA lines for non-matched targets
 }
-

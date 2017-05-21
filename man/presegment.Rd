@@ -53,4 +53,3 @@ no figures will be plotted if \code{fig.path} is not provided.}
 pre-segmentation of the time-series into chunks that can
 be handled by segmenTier.
 }
-

@@ -19,4 +19,3 @@ class table)}
 \description{
 specifically tailored to segment strings in segmenTier
 }
-

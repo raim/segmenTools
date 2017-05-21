@@ -35,4 +35,3 @@ depending on strand}
 convert continuous index to chromosome coordinates (reverse of
 \code{\link{coor2index}})
 }
-
