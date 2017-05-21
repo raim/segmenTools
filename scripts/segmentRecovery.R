@@ -445,7 +445,7 @@ for ( test.type in test.types ) {
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
                     col=pmcol[pmcls], lty=sgltys,
                     h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                    xlab="ratio: query length/target length")
+                    xlab="ratio: query length/target length",range="lines")
         legend("topleft",paste(test.type,"-",tnum))
         rect(1.4,.26,1.9,.34,col="#FFFFFFBB",border=NA)
         text(1.65,.3,"too long",font=2, col=pmcol[1])
