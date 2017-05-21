@@ -645,7 +645,7 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
 #' @param tid ID for the target set, just passed on to results and used in plot
 #' @param qid ID for the query set, just passed on to results and used in plot
 #' @export
-getOverlapStats <- function(ovl, ovlth=.8, minf=0.2, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid=NA, tid=NA) {
+getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid=NA, tid=NA) {
 
     ## returning NULL if no query had been found
     if ( !any(!is.na(ovl[,"query"])) )
