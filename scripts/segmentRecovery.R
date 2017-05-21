@@ -42,6 +42,10 @@ option_list <- list(
               help="name of column with sub-set colors for plots"),
     make_option("--ovlth", default=0.8,
                 help="overlap threshold (mutual coverage) to be counted as a direct hit; at least ovlth*length must be reached for both query (segments) and targets (test set) [default %default]"),
+    make_option("--minj", default=0.8,
+                help="minimal jaccard index, the fraction of tests above this threshold are reported and the cutoff line plotted [default %default]"),
+    make_option("--minf", default=0.2,
+                help="minimal fraction of testsets; the jaccard index at this threshold is reported and the cutoff line plotted [default %default]"),
     ## OUTPUT OPTIONS
     make_option(c("--out.path"), type="character", default=".", 
                 help="directory path for output data (figures, csv files)"),
@@ -255,7 +259,8 @@ for ( test.type in test.types ) {
                               untie=FALSE, collapse=FALSE, sort=FALSE,
                               msgfile=stdout())
         if ( !any(!is.na(ovl[,"query"])) ) next
-        sts <- getOverlapStats(ovl,ovlth=ovlth, hrng=c(.8,1.2),
+        sts <- getOverlapStats(ovl, ovlth=ovlth, minj=minj, minj=minf,
+                               hrng=c(.8,1.2),
                                tnum=nrow(target),qnum=nrow(sgs),
                                qid=type, tid=test.type)
 
@@ -278,7 +283,8 @@ for ( test.type in test.types ) {
 
     ids <- covlStats$nms
     jaccard <- covlStats$jaccard # jaccard of best hits
-    jpercent<- covlStats$jpercent# percent of targets covered with J>threshold
+    j.prcnt<- covlStats$j.prcnt# percent of targets covered with J>threshold
+    j.cutoff<- covlStats$j.cutoff# jaccard index at CDF(threshold)
     height <- covlStats$height # target recovery fraction within threshold
     hitnum <- covlStats$hitnum # total number of 'good' hits 
     numhit <- covlStats$numhit # average number of hits per target
@@ -286,7 +292,7 @@ for ( test.type in test.types ) {
     tnum <- covlStats$tnum # number of tested targets
 
     result <- data.frame(ID=ids, tnum=tnum, hits=hitnum, Jaccard=jaccard,
-                         JaccPrcnt=jpercent,
+                         JaccPrcnt=j.prcnt, JaccCutoff=j.cutoff
                          hits.per.target=numhit,
                          ratio.low=height[,1], ratio.high=height[,2])
     
@@ -431,7 +437,7 @@ for ( test.type in test.types ) {
     plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf", col=sgcols, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="ratio: query length/target length")
     legend("topleft",paste(test.type,"-",tnum))
     dev.off()
@@ -444,7 +450,7 @@ for ( test.type in test.types ) {
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
                     col=pmcol[pmcls], lty=sgltys,
-                    h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="ratio: query length/target length",range="lines")
         legend("topleft",paste(test.type,"-",tnum))
         rect(1.4,.26,1.9,.34,col="#FFFFFFBB",border=NA)
@@ -540,7 +546,7 @@ for ( test.type in test.types ) {
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="jcdf",
                     col=pmcol[pmcls], lty=sgltys,
-                    h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="jaccard: intersect/union",range="lines")
         legend("topleft",paste(test.type,"-",tnum))
         dev.off()
@@ -550,7 +556,7 @@ for ( test.type in test.types ) {
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="jcdf",
                 col=sgcols, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="jaccard: intersect/union")
     legend("topleft",paste(test.type,"-",tnum))
     dev.off()
@@ -560,7 +566,7 @@ for ( test.type in test.types ) {
     plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rrcdf", col=sgcols, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="relative ratio: query length/target length")
     legend("topleft",paste(test.type,"-",tnum))
     dev.off()
@@ -572,7 +578,7 @@ for ( test.type in test.types ) {
     plotdev(file.name,width=3.5,height=3.5,type=fig.type)
     par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
     plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf", col=sgcols, lty=sgltys,
-                h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                 xlab="coverage of test set")
     legend("topleft",paste(test.type,"-",tnum))
     dev.off()
@@ -585,7 +591,7 @@ for ( test.type in test.types ) {
         par(mai=c(.75,.75,.1,.1),mgp=c(1.75,.5,0),xaxs="i")
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="tcdf",
                     col=pmcol[pmcls], lty=sgltys,
-                    h=c(.2,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    h=c(minj,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
                     xlab="coverage of test set")
         legend("topleft",paste(test.type,"-",tnum))
         dev.off()
@@ -601,7 +607,7 @@ for ( test.type in test.types ) {
         plot(0,col=NA,ylim=c(0,1.2),xlim=c(0,length(CDF)+1),
              axes=FALSE,xlab=NA,ylab=NA)
         axis(2)
-        abline(h=c(.2,.8),lty=2)
+        abline(h=c(minj,.8),lty=2)
         leg <- NULL
         for ( i in 1:length(CDF) ) {
             if ( "rcdf" %in% names(CDF[[i]]) ) {
@@ -700,7 +706,7 @@ for ( type in sgtypes ) {
          xlab="ratio: query length/target length",xlim=c(0,xmax),
          ylab="cum.dist.func.",ylim=c(0,1.1))
     abline(v=c(ovlth,2-ovlth),lty=2)
-    abline(h=c(.2,.8),lty=2)
+    abline(h=c(minj,.8),lty=2)
     abline(h=0:1, lty=2, col="gray",lwd=.75)
     for ( i in 1:length(CDF) ) {
       col <- tcols[CDF[[i]]$name] # todo: tid
@@ -721,7 +727,7 @@ for ( type in sgtypes ) {
     plot(0,col=NA,ylim=c(0,1.2),xlim=c(0,length(CDF)+1),
          axes=FALSE,xlab=NA,ylab=NA)
     axis(2)
-    abline(h=c(.2,.8),lty=2)
+    abline(h=c(minj,.8),lty=2)
     leg <- NULL
     for ( i in 1:length(CDF) ) {
         if ( "rcdf" %in% names(CDF[[i]]) ) {
@@ -755,7 +761,7 @@ xmax <- 2
 x <- seq(0,xmax,.05)
 plot(x, trst$CDF$rcdf(x),type="l",col=1,lty=1,xlim=c(0,xmax),xlab="transcript length/ORF length",ylab="cum.dist.func.",main=NA,ylim=c(0,1))
 abline(v=c(ovlth,2-ovlth),lty=2)
-abline(h=c(.2,.8),lty=2)
+abline(h=c(minj,.8),lty=2)
 abline(h=0:1, lty=2, col="gray",lwd=.75)
 mtext(paste("ORF recovery by ORF transcripts"),3,0,cex=1.5)
 legend("bottomright","ORF recovery by ORF transcripts",bty="n")
@@ -825,7 +831,7 @@ xmax <- 3
 x <- seq(0,xmax,.05)
 plot(x, CDF[[1]]$rcdf(x),type="l",col=NA,lty=1,xlim=c(0,xmax),xlab="ratio: query length/target length",ylab="cum.dist.func.",main=NA,ylim=c(0,1))
 abline(v=c(ovlth,2-ovlth),lty=2)
-abline(h=c(.2,.8),lty=2)
+abline(h=c(minj,.8),lty=2)
 abline(h=0:1, lty=2, col="gray",lwd=.75)
 for ( i in 1:length(CDF) ) {
     col <- tcols[CDF[[i]]$name]

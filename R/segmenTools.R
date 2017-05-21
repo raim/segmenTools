@@ -405,9 +405,11 @@ collectOvlStats <- function(ovlStatLst, type) {
                                    function(x) x$height)),ncol=2,byrow=TRUE)
     jaccard <- unlist(lapply(ovlStatLst[[type]],
                              function(x) x$jaccard))
-    jpercent <- unlist(lapply(ovlStatLst[[type]],
-                             function(x) x$jpercent))
-    #jpercent<- covlStats$jpercent# percent of targets covered with J>threshold
+    j.prcnt <- unlist(lapply(ovlStatLst[[type]],
+                             function(x) x$j.prcnt))
+    j.cutoff <- unlist(lapply(ovlStatLst[[type]],
+                             function(x) x$j.cutoff))
+    #j.prcnt<- covlStats$j.prcnt# percent of targets covered with J>threshold
     hitnum <- unlist(lapply(ovlStatLst[[type]],
                                 function(x) x$hitnum))
     numhit <- unlist(lapply(ovlStatLst[[type]],
@@ -422,7 +424,7 @@ collectOvlStats <- function(ovlStatLst, type) {
     if ( length(tnum)>1 ) # temporary until sure that it works
         stop("ERROR,",type,"tnum should be unique for types")
     res <- list(CDF=CDF, DIST=DIST,
-                jaccard=jaccard, jpercent=jpercent,
+                jaccard=jaccard, j.prcnt=j.prcnt, j.cutoff=j.cutoff,
                 height=height, hitnum=hitnum, numhit=numhit,
                 qnum=qnum, tnum=tnum, nms=nms)
     class(res) <- "overlapStatLst"
@@ -628,8 +630,12 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
 
 #' Statistics of overlaps between two segment sets. 
 #' @param ovl overlap table from \code{\link{segmentOverlap}}
-#' @param ovlth threshold fraction of overlap of target and query to be
-#' counted as 'good' hit
+#' @param ovlth threshold fraction of overlap of
+#' target and query to be counted as 'good' hit
+#' @param minj the minimal Jaccard index above which the fraction
+#' is reported as \code{JaccPrcnt}
+#' @param minf fraction cutoff, the Jaccard index reported for this
+#' fraction of test sets is reported as \code{JaccCutoff}
 #' @param hrng lower and upper thresholds of the ratio CDF (query length/target
 #' length); the fraction of 'best' hits within this range will be reported
 #' as 'height'
@@ -639,7 +645,7 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
 #' @param tid ID for the target set, just passed on to results and used in plot
 #' @param qid ID for the query set, just passed on to results and used in plot
 #' @export
-getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid=NA, tid=NA) {
+getOverlapStats <- function(ovl, ovlth=.8, minf=0.2, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid=NA, tid=NA) {
 
     ## returning NULL if no query had been found
     if ( !any(!is.na(ovl[,"query"])) )
@@ -729,7 +735,8 @@ getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid
         if ( length(jac)<tnum ) # todo: why?
             jac <- c(jac,rep(0,tnum-length(jac) ))
         jcdf <- ecdf(jac)
-        jaccpercent <- sum(jac>ovlth)/length(jac)
+        j.prcnt <- sum(jac>minj)/length(jac) # fraction above jaccard cutoff
+        j.cutoff <- jcdf(minf) # jaccard index at CDF cutoff
     }
    
     ## SINGLE OPTIMIZATION MEASURES
@@ -755,7 +762,8 @@ getOverlapStats <- function(ovl, ovlth=.8, hrng=c(.8,1.2), tnum=NA, qnum=NA, qid
                 DIST=DIST, # list of distributions
                 height=height, # fraction of best hit ratios within hrng
                 jaccard=J,     # MAX: jaccard measure of best hits
-                jpercent=jaccpercent, # % of best hits with J > threshold
+                j.prcnt=j.prcnt, # % of best hits with j > minj
+                j.cutoff=j.cutoff, # jaccard index at CDF(minf) 
                 hitnum=hitnum, # MAX: num. of hits with minimal mutual coverage
                 numhit=numhit, # MIN: avg. num. of hits per target
                 qnum=qnum, tnum=tnum,# number of queries/targets 
