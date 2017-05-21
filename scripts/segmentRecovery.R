@@ -141,6 +141,18 @@ debug <- FALSE
 if ( debug ) { ## test only large number
     sgnum <- unlist(lapply(lst,nrow))
     sgtypes <- sgtypes[sgnum>1000] ### TODO: remove this and fuse types
+
+    ## only selected!
+    best.selected <- c("D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:1_M:75_nui:1",
+                       ##"D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:2_M:150_nui:2",
+                       "D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:2_M:150_nui:3",
+                       "D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:3_M:200_nui:3")
+    worst.selected <- c("D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:1_M:200_nui:1",
+                        "D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:3_M:75_nui:3")
+    ## concatenate: numbered 1--5:
+    selected <- c(worst.selected[1],best.selected,worst.selected[2])
+    sgtypes <- selected
+
 }
 
 ## define colors and pch for segment types
