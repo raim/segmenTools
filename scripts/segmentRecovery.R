@@ -338,7 +338,7 @@ for ( test.type in test.types ) {
                      (numhit-min(numhit))/(max(numhit)-min(numhit)),
                      height)
         pm <- pam(dat, K)
-        cllst <- apply(sgcltab,2, unique)
+        cllst <- apply(sgcltab,2, unique) 
 
         ## TODO: sort clustering by increasing height!
         pmsrt <- split(dat[,3],pm$clustering)
@@ -361,6 +361,7 @@ for ( test.type in test.types ) {
         
         
         ## strange bug: 75 in list of 75,100,150 gets a leading space
+        ## TODO: names lost for $rundir/test.csv !? 
         ## trim all:
         cllst <- lapply(cllst,trimws)
         
