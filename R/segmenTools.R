@@ -735,8 +735,8 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
         if ( length(jac)<tnum ) # todo: why?
             jac <- c(jac,rep(0,tnum-length(jac) ))
         jcdf <- ecdf(jac)
-        j.prcnt <- sum(jac>minj)/length(jac) # fraction above jaccard cutoff
-        j.cutoff <- jcdf(minf) # jaccard index at CDF cutoff
+        j.prcnt <- 1-jcdf(minj) # fraction above jaccard cutoff
+        j.cutoff <- quantile(jac,minf) # jaccard index at CDF cutoff
     }
    
     ## SINGLE OPTIMIZATION MEASURES
