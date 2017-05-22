@@ -292,7 +292,7 @@ for ( test.type in test.types ) {
     tnum <- covlStats$tnum # number of tested targets
 
     result <- data.frame(ID=ids, tnum=tnum, hits=hitnum, Jaccard=jaccard,
-                         JaccPrcnt=j.prcnt, JaccCutoff=j.cutoff
+                         JaccPrcnt=j.prcnt, JaccCutoff=j.cutoff,
                          hits.per.target=numhit,
                          ratio.low=height[,1], ratio.high=height[,2])
     
