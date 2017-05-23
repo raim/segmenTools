@@ -452,7 +452,7 @@ for ( test.type in test.types ) {
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
                     col=pmcol[pmcls], lty=sgltys,
                     h=c(minf,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                    xlab="ratio R: query length/target length",range="lines")
+                    xlab="R: query length/target length",range="lines")
         legend("topleft",paste(test.type,"-",tnum))
         rect(1.4,.26,1.9,.34,col="#FFFFFFBB",border=NA)
         text(1.65,.3,"too long",font=2, col=pmcol[1])
@@ -548,7 +548,7 @@ for ( test.type in test.types ) {
         plot_cdfLst(x=seq(0,1.1,.05), CDF=CDF, type="jcdf",
                     col=pmcol[pmcls], lty=sgltys,
                     h=c(minf,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
-                    xlab="jaccard J: intersect/union",range="lines")
+                    xlab="J: intersect/union",range="lines")
         legend("topleft",paste(test.type,"-",tnum))
         dev.off()
     }
