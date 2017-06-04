@@ -67,7 +67,7 @@ ci95 <- function(x,na.rm=FALSE) {
 ### PLOT UTILS
 #' Switch between plot devices
 #' @param file.name file name without suffix (.png, etc)
-#' @param type plot type: png, eps, pdf, tiff or svg
+#' @param type plot type: png, jpeg, eps, pdf, tiff or svg
 #' @param width figure width in inches
 #' @param height figure height in inches
 #' @param res resolution in ppi (pixels per inch), only for 'png' and 'tiff'
