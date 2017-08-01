@@ -7,8 +7,10 @@ gene=$1
 plot=$2
 range=$3
 primsegs=$YEASTSEQ/segmentation/primarysegments/primseg.csv
+primsegs=~/work/yeastSeq2016/data/segmentation/primarysegments_v5/primseg.csv
 features=/data/yeast/feature_R64-1-1_20110208_withclusters.csv
 sgtype=$YEASTSEQ/segmentation/segmentTest/20161228/annotation/T.ash_D.dcash_K.16_S.icor_E.3_M.175_
+sgtype=~/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/annotation/D.dft1-7.dcash.snr_T.ash_K.16_S.icor_E.3_M.150_nui.2_
 
 seg=${sgtype}genes.csv
 sas=${sgtype}antisense.csv
@@ -31,7 +33,7 @@ echo COOR $coor
 if  [ "$plot" = "plot" ]; then
     settings=$GENBRO/data/selections.R
     genome=$GENDAT/yeast
-    selection=method
+    selection=gene 
     out=primseg_$primseg
     cmd="$GENBRO/src/plotFeature.R -i $genome --coor $coor -r $range  -s $selection -S $settings  -f png -v -o $gene --height 4 --width 6"
     echo $cmd
