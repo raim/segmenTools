@@ -159,10 +159,11 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 #' equal the number of columns of \code{dat}
 #' @param axis2.col invididual colors for y-axis tick labels, length must
 #' equal the number of rows of \code{dat}
+#' @param axis.cex if axis[1|2].col is provided, this sets the tick label size
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ...) {
+image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, axis.cex=1.5, ...) {
 
     ## reverse columns and transpose
     if ( nrow(dat)>1 )
@@ -187,7 +188,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ..
                 for ( i in 1:ncol(dat) )
                     axis(1, at=i,colnames(dat)[i],
                          col.axis=axis1.col[i], col=axis1.col[i],
-                         las=2, cex.axis=1.5, lwd=2)
+                         las=2, cex.axis=axis.cex, lwd=2)
             else
                 axis(1, at=1:ncol(dat), labels=colnames(dat), las=2)
         if ( 2 %in% axis )
@@ -195,7 +196,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ..
                 for ( i in 1:nrow(dat) )
                         axis(2, at=nrow(dat)-i+1, rownames(dat)[i],
                              col.axis=axis2.col[i], col=axis2.col[i],
-                             las=2, cex.axis=1.5, lwd=2)
+                             las=2, cex.axis=axis.cex, lwd=2)
             else
                 axis(2, at=nrow(dat):1, rownames(dat),las=2)        
     }
