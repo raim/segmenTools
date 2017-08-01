@@ -7,7 +7,8 @@ it is displayed in R console, i.e. the field \code{dat[1,1]}
 is at the top left corner. It further allows to plot text
 into individual fields and have colored axis tick labels.}
 \usage{
-image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col, ...)
+image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col,
+  axis.cex = 1.5, ...)
 }
 \arguments{
 \item{dat}{the numeric data matrix to be plotted}
@@ -26,6 +27,8 @@ equal the number of columns of \code{dat}}
 
 \item{axis2.col}{invididual colors for y-axis tick labels, length must
 equal the number of rows of \code{dat}}
+
+\item{axis.cex}{if axis[1|2].col is provided, this sets the tick label size}
 
 \item{...}{further arguments to \code{\link[graphics]{image}}, e.g., col
 to select colors}
