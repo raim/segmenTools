@@ -178,8 +178,8 @@ xl<- 2.5*mean(sglen)
 ## plot segments and inter-segments
 ## average time-point presence and segment lengths
 file.name <- file.path(outdir,"primseg_expression")
-plotdev(file.name,width=3.5,height=4,type=fig.type)
-par(mfcol=c(1,1),mai=c(.5,.75,.15,.1),mgp=c(1.5,.5,0))
+plotdev(file.name,width=4,height=2.5,type=fig.type)
+par(mfcol=c(1,1),mai=c(.5,.5,.15,.1),mgp=c(1.5,.5,0))
 hist(emexpr,breaks=seq(0,24,.5),border=2,xlab="expressed time points",
      main=NA)#"mean number of expressed time points")
 hist(sgexpr,breaks=seq(0,24,.5),add=TRUE)
@@ -187,8 +187,8 @@ legend("right",legend=c("pre-segments","inter-segments"),
        col=1:2, pch=15,bty="n")
 dev.off()
 file.name <- file.path(outdir,"primseg_length")
-plotdev(file.name,width=3.5,height=4,type=fig.type)
-par(mfcol=c(1,1),mai=c(.5,.75,.15,.1),mgp=c(1.5,.5,0))
+plotdev(file.name,width=4,height=2.5,type=fig.type)
+par(mfcol=c(1,1),mai=c(.5,.5,.15,.1),mgp=c(1.5,.5,0))
 hist(emlen,breaks=seq(0,mx,500),border=2,xlim=c(0,xl),xlab="length, bp",
      main=NA)#"segment length distribution")
 hist(sglen,breaks=seq(0,mx,500),add=TRUE)
