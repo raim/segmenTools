@@ -195,8 +195,9 @@ hist(sglen,breaks=seq(0,mx,500),add=TRUE)
 legend("right",legend=c(paste(length(sglen), "segments"),
                         paste(100*c(round(sgcvg,2)),"% coverage",sep=""),
                         paste("max:", round(c(max.sg)/1e3), "kb"),
+                                        #paste("tail: ", sum(sglen>xl),sep="")),
                         paste(length(emlen), "inter-segm."),
-                        paste("max:", round(c(max.sg)/1e3), "kb")),                        #paste("tail: ", sum(sglen>xl),sep="")),
+                        paste("max:", round(c(max.em)/1e3), "kb")),
        col=c(1,NA,NA,2,NA), pch=15,bty="n")       
 dev.off()
 cat(paste("maximum segment, bp\t", max.sg, "\n"))
