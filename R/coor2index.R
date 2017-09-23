@@ -19,7 +19,7 @@ insertRow <- function(existingDF, newrow, r) {
 #' Util to insert multiple rows at specified positions
 #' in a \code{data.frame}, expanding single-row code by user
 #' Ari B. Friedman at
-#' \link{https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appendedlooping through new rows}
+#' \url{https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appendedlooping through new rows}
 #' @param existingDF existing \code{data.frame}
 #' @param newrows rows to add to \code{existingDF}
 #' @param r positions at which rows are to be inserted, \code{length(r)}
