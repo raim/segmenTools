@@ -7,6 +7,7 @@
 #' used the row number in chrIdx as its chromosome identifier
 #' @param lcol numeric or character indicating the  number
 #' or name of the column with chromosome lengths
+#' @export
 getChrS <- function(chrIdx, lcol="length")
     c(0,cumsum(chrIdx[,lcol]))
 
