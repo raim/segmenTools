@@ -2,20 +2,15 @@
 % Please edit documentation in R/coor2index.R
 \name{getChrS}
 \alias{getChrS}
-\title{generate chromosome index \code{chrS} from and ordered (!)
-chromosome length table}
+\title{Generate chromosome index \code{chrS} from lengths}
 \usage{
-getChrS(chrIdx, lcol = "length")
+getChrS(chrL)
 }
 \arguments{
-\item{chrIdx}{an ordered chromosome length table; feature
-files for these chromosomes must have a column "chr" which
-used the row number in chrIdx as its chromosome identifier}
-
-\item{lcol}{numeric or character indicating the  number
-or name of the column with chromosome lengths}
+\item{chrL}{an ordered vector of chromosome lengths; where the
+order must correspond to chromosome numbering in feature tables
+for which chrS is used}
 }
 \description{
-generate chromosome index \code{chrS} from and ordered (!)
-chromosome length table
+Generate chromosome index \code{chrS} from lengths
 }
