@@ -1,20 +1,113 @@
 ## GENOME UTILS
 
-#' generate chromosome index \code{chrS} from and ordered (!)
-#' chromosome length table
-#' @param chrIdx an ordered chromosome length table; feature
-#' files for these chromosomes must have a column "chr" which
-#' used the row number in chrIdx as its chromosome identifier
-#' @param lcol numeric or character indicating the  number
-#' or name of the column with chromosome lengths
+#' Generate chromosome index \code{chrS} from lengths
+#' @param chrL an ordered vector of chromosome lengths; where the
+#' order must correspond to chromosome numbering in feature tables
+#' for which chrS is used
 #' @export
-getChrS <- function(chrIdx, lcol="length")
-    c(0,cumsum(chrIdx[,lcol]))
+getChrS <- function(chrL) c(0,cumsum(chrL))
 
-## TODO: for overlap analysis and browser, detect
-## overlaps in circular chromosomes; generate two genes for each
-## end, re-tag original as gene_parent_circular
-expandCircularFeatures <- function(features, chrS, chrC) {
+## util to insert rows, by user Ari B. Friedman at
+## https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appended
+insertRow <- function(existingDF, newrow, r) {
+    existingDF <- as.data.frame(existingDF)
+    existingDF[seq(r+1,nrow(existingDF)+1),] <-
+        existingDF[seq(r,nrow(existingDF)),]
+    existingDF[r,] <- newrow
+    existingDF
+}
+#' Util to insert multiple rows at specified positions
+#' in a \code{data.frame}, expanding single-row code by user
+#' Ari B. Friedman at
+#' \link{https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appendedlooping through new rows}
+#' @param existingDF existing \code{data.frame}
+#' @param newrows rows to add to \code{existingDF}
+#' @param r positions at which rows are to be inserted, \code{length(r)}
+#' must equal \code{nrow(newrows)}, and \code{r<=nrow(existingDF)}
+#' @export
+insertRows <- function(existingDF, newrows, r ) {
+    new <- existingDF
+    for ( i in 1:nrow(newrows) )
+        new <- insertRow(new, newrows[i,], r[i]+i-1)
+    new
+}
+
+#' Splits genome features crossing ends of circular chromosomes.
+#' Splits genome features that cover start/end coordinates of circular
+#' chromosomes, and adds the downstream half with optional modification
+#' of ID, and type values. Note that only the upstream half retains
+#' all column information, the downstream half will only carry
+#' information on coordinates, and optionally updated feature type and ID.
+#' The update will only happen if the passed table contains type and ID
+#' information (see argument \code{idCools}
+#' @param features a list of genomic features with coordinates
+#' @param chrL obligatory list of chromosome lengths, in order used
+#' in chromosome column in \code{features} (see argument \code{coorCols}
+#' @param coorCols ordered string vector providing the column names
+#' of coordinate columns to be used; must be of length 4 and provide in
+#' order: chromosome number (refering to argument \code{chrL}), start, end,
+#' and strand (see argument \code{reverse})
+#' @param reverse allowed indicators of reverse strand features
+#' in strand column (see argument \code{coorCols})
+#' @param idTag tag to add to downstream ID and type
+#' @param idCols named vector of alternative column names for feature ID, type,
+#' and feature parent; note that a "parent" column will be added if not present
+#' to refer the downstream half to its upstream feature, which retains
+#' all other information
+expandCircularFeatures <- function(features, chrL, 
+                                   coorCols=c("chr","start","end","strand"),
+                                   reverse=c("-",-1),
+                                   idTag="-circ2", idCols=c(ID="ID",type="type",
+                                          parent="parent")) {
+
+    ## chromosome index - revert from chrL
+    
+    ## add parent column if not present
+    if ( idCols["ID"]%in%colnames(features) &
+         !idCols["parent"] %in% colnames(features) )
+        features <- cbind(features,parent=rep(NA,nrow(features)))
+
+    ## get all coordinates
+    start <- features[,coorCols[2]] # "start"
+    end <- features[,coorCols[3]] # "end"
+    strand <- features[,coorCols[4]] # "strand"
+    rev <- strand%in%reverse
+    
+    ## get circular
+    circ <- start>end # ASSUMES ORDERED START/END
+    cidx <- which(circ) # index in original
+    
+    ## copy and rename (ID_circ#, type: type_circular, parent: ID)
+    cfeat <- as.data.frame(matrix(NA,ncol=ncol(features),nrow=length(cidx)))
+    colnames(cfeat) <- colnames(features)
+    ## set up type
+    if ( idCols["ID"]%in%colnames(features) ) {
+        cfeat[,idCols["parent"]] <- features[cidx,idCols["ID"]]
+        cfeat[,idCols["ID"]] <- paste(features[cidx,idCols["ID"]],idTag,sep="")
+    }
+    if ( idCols["type"]%in%colnames(features) )
+        cfeat[,idCols["type"]] <- paste(features[cidx,idCols["type"]],
+                                        idTag,sep="")
+    crev <- rev[cidx]
+
+    ## set up coordinates
+    ## c("chr","start","end","strand")
+    cfeat[,coorCols] <- features[cidx,coorCols]
+
+    ## reverse coordinates
+    ## copy: end becomes chromosome length
+    cfeat[crev,coorCols[3]] <- chrL[cfeat[crev,coorCols[1]]]
+    ## original: start becomes 1
+    features[circ&rev,coorCols[2]] <- 1
+
+    ## forward coordinates
+    ## copy: start becomes 1
+    cfeat[!crev,coorCols[2]] <- 1
+    ## original: end becomes chromosome length
+    features[circ&!rev,coorCols[3]] <- chrL[features[circ&!rev,coorCols[1]]]
+
+    ## insert below original & return
+    insertRows(features,cfeat,cidx+1)
 }
 
 #' convert chromosome coordinates to continuous index
