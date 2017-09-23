@@ -1,5 +1,21 @@
 ## GENOME UTILS
 
+#' generate chromosome index \code{chrS} from and ordered (!)
+#' chromosome length table
+#' @param chrIdx an ordered chromosome length table; feature
+#' files for these chromosomes must have a column "chr" which
+#' used the row number in chrIdx as its chromosome identifier
+#' @param lcol numeric or character indicating the  number
+#' or name of the column with chromosome lengths
+getChrS <- function(chrIdx, lcol="length")
+    c(0,cumsum(chrIdx[,lcol]))
+
+## TODO: for overlap analysis and browser, detect
+## overlaps in circular chromosomes; generate two genes for each
+## end, re-tag original as gene_parent_circular
+expandCircularFeatures <- function(features, chrS, chrC) {
+}
+
 #' convert chromosome coordinates to continuous index
 #' @param features a table of chromosome features that must contain
 #' the chromosome number (option \code{chrCol}), one or more chromosome
@@ -7,7 +23,7 @@
 #'  \code{strandCol}).
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length
-#' information
+#' information, see function \code{\link{getChrS}}
 #' @param cols name of the columns giving coordinates that will be mapped
 #' to continuous index
 #' @param chrCol name of the column that gives the chromosome number
