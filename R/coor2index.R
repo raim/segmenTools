@@ -54,6 +54,7 @@ insertRows <- function(existingDF, newrows, r ) {
 #' and feature parent; note that a "parent" column will be added if not present
 #' to refer the downstream half to its upstream feature, which retains
 #' all other information
+#' @export
 expandCircularFeatures <- function(features, chrL, 
                                    coorCols=c("chr","start","end","strand"),
                                    reverse=c("-",-1),
