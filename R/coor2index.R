@@ -39,7 +39,8 @@ insertRows <- function(existingDF, newrows, r ) {
 #' all column information, the downstream half will only carry
 #' information on coordinates, and optionally updated feature type and ID.
 #' The update will only happen if the passed table contains type and ID
-#' information (see argument \code{idCools}
+#' information (see argument \code{idCools}. The split can be reversed
+#' by function \code{removeCircularFeatures}.
 #' @param features a list of genomic features with coordinates
 #' @param chrL obligatory list of chromosome lengths, in order used
 #' in chromosome column in \code{features} (see argument \code{coorCols}
@@ -50,10 +51,11 @@ insertRows <- function(existingDF, newrows, r ) {
 #' @param reverse allowed indicators of reverse strand features
 #' in strand column (see argument \code{coorCols})
 #' @param idTag tag to add to downstream ID and type
-#' @param idCols named vector of alternative column names for feature ID, type,
+#' @param idCols named vector of column names for feature ID, type,
 #' and feature parent; note that a "parent" column will be added if not present
 #' to refer the downstream half to its upstream feature, which retains
 #' all other information
+#' @seealso \code{removeCircularFeatures}
 #' @export
 expandCircularFeatures <- function(features, chrL, 
                                    coorCols=c("chr","start","end","strand"),
@@ -109,6 +111,21 @@ expandCircularFeatures <- function(features, chrL,
 
     ## insert below original & return
     insertRows(features,cfeat,cidx+1)
+}
+
+#' NOT WORKING - Undo \code{expandCircularFeatures}
+#' searches for circular features by the \code{idTag} added
+#' to ID and type columns in \code{expandCircularFeatures},
+#' and maps downstream coordinates back to original features.
+#' @param features  list of genomic features with coordinates
+#' @param idTag tag used for tagging downstream halves
+#' @param idCols named vector of column names for feature ID, type,
+#' and feature parent; note that a "parent" column will be removed if
+#' it is (a) empty and (b) argument \code{rmParent==TRUE}
+#' @param rmParent the column parent
+#' @seealso \code{expandCircularFeatures}
+#' @export
+removeCircularFeatures <- function(features, idTag="-circ2", idCols=c(ID="ID",type="type",parent="parent"), rmParent=TRUE) {
 }
 
 #' convert chromosome coordinates to continuous index
