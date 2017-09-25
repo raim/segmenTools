@@ -6,15 +6,16 @@
 Splits genome features that cover start/end coordinates of circular
 chromosomes, and adds the downstream half with optional modification
 of ID, and type values. Note that only the upstream half retains
-all column information, the downstream half will only carry
-information on coordinates, and optionally updated feature type and ID.
+all column information (exceptions: see argument \code{copyCols}),
+the downstream half will only carry information on coordinates, and
+optionally updated feature type and ID.
 The update will only happen if the passed table contains type and ID
 information (see argument \code{idCools}. The split can be reversed
 by function \code{removeCircularFeatures}.}
 \usage{
 expandCircularFeatures(features, chrL, coorCols = c("chr", "start", "end",
   "strand"), reverse = c("-", -1), idTag = "-circ2", idCols = c(ID = "ID",
-  type = "type", parent = "parent"))
+  type = "type", parent = "parent"), copyCols = FALSE)
 }
 \arguments{
 \item{features}{a list of genomic features with coordinates}
@@ -36,14 +37,18 @@ in strand column (see argument \code{coorCols})}
 and feature parent; note that a "parent" column will be added if not present
 to refer the downstream half to its upstream feature, which retains
 all other information}
+
+\item{copyCols}{copy values to circular feature copy; either logical
+\code{TRUE} to copy all columns, or a vector of column indices or names}
 }
 \description{
 Splits genome features crossing ends of circular chromosomes.
 Splits genome features that cover start/end coordinates of circular
 chromosomes, and adds the downstream half with optional modification
 of ID, and type values. Note that only the upstream half retains
-all column information, the downstream half will only carry
-information on coordinates, and optionally updated feature type and ID.
+all column information (exceptions: see argument \code{copyCols}),
+the downstream half will only carry information on coordinates, and
+optionally updated feature type and ID.
 The update will only happen if the passed table contains type and ID
 information (see argument \code{idCools}. The split can be reversed
 by function \code{removeCircularFeatures}.
