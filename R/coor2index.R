@@ -10,7 +10,7 @@ getChrS <- function(chrL) c(0,cumsum(chrL))
 ## util to insert rows, by user Ari B. Friedman at
 ## https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appended
 insertRow <- function(existingDF, newrow, r) {
-    existingDF <- as.data.frame(existingDF)
+    existingDF <- as.data.frame(existingDF,stringsAsFactors=FALSE)
     existingDF[seq(r+1,nrow(existingDF)+1),] <-
         existingDF[seq(r,nrow(existingDF)),]
     existingDF[r,] <- newrow
@@ -67,9 +67,9 @@ expandCircularFeatures <- function(features, chrL,
     
     ## add parent column if not present
     if ( idCols["ID"]%in%colnames(features) &
-         !idCols["parent"] %in% colnames(features) )
+        !idCols["parent"] %in% colnames(features) ) {
         features <- cbind(features,parent=rep(NA,nrow(features)))
-
+    }
     ## get all coordinates
     start <- features[,coorCols[2]] # "start"
     end <- features[,coorCols[3]] # "end"
@@ -89,8 +89,8 @@ expandCircularFeatures <- function(features, chrL,
         cfeat[,idCols["ID"]] <- paste(features[cidx,idCols["ID"]],idTag,sep="")
     }
     if ( idCols["type"]%in%colnames(features) )
-        cfeat[,idCols["type"]] <- paste(features[cidx,idCols["type"]],
-                                        idTag,sep="")
+      cfeat[,idCols["type"]] <- paste(features[cidx,idCols["type"]],
+                                      idTag,sep="")
     crev <- rev[cidx]
 
     ## set up coordinates
