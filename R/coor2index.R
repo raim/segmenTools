@@ -36,8 +36,9 @@ insertRows <- function(existingDF, newrows, r ) {
 #' Splits genome features that cover start/end coordinates of circular
 #' chromosomes, and adds the downstream half with optional modification
 #' of ID, and type values. Note that only the upstream half retains
-#' all column information, the downstream half will only carry
-#' information on coordinates, and optionally updated feature type and ID.
+#' all column information (exceptions: see argument \code{copyCols}),
+#' the downstream half will only carry information on coordinates, and
+#' optionally updated feature type and ID.
 #' The update will only happen if the passed table contains type and ID
 #' information (see argument \code{idCools}. The split can be reversed
 #' by function \code{removeCircularFeatures}.
@@ -55,13 +56,15 @@ insertRows <- function(existingDF, newrows, r ) {
 #' and feature parent; note that a "parent" column will be added if not present
 #' to refer the downstream half to its upstream feature, which retains
 #' all other information
+#' @param copyCols copy values to circular feature copy; either logical
+#' \code{TRUE} to copy all columns, or a vector of column indices or names
 #' @seealso \code{removeCircularFeatures}
 #' @export
 expandCircularFeatures <- function(features, chrL, 
                                    coorCols=c("chr","start","end","strand"),
                                    reverse=c("-",-1),
                                    idTag="-circ2", idCols=c(ID="ID",type="type",
-                                          parent="parent")) {
+                                          parent="parent"),copyCols=FALSE) {
 
     ## chromosome index - revert from chrL
     
@@ -70,6 +73,14 @@ expandCircularFeatures <- function(features, chrL,
         !idCols["parent"] %in% colnames(features) ) {
         features <- cbind(features,parent=rep(NA,nrow(features)))
     }
+
+    ## filter
+    if ( typeof(copyCols)=="logical" ) {
+        if ( copyCols )
+          copyCols <- colnames(features)
+    } else if ( typeof(copyCols)=="integer" )
+      copyCols <- colnames(features)[copyCols]
+    
     ## get all coordinates
     start <- features[,coorCols[2]] # "start"
     end <- features[,coorCols[3]] # "end"
@@ -79,6 +90,9 @@ expandCircularFeatures <- function(features, chrL,
     ## get circular
     circ <- start>end # ASSUMES ORDERED START/END
     cidx <- which(circ) # index in original
+
+    if ( sum(circ)==0 )
+      return(features)
     
     ## copy and rename (ID_circ#, type: type_circular, parent: ID)
     cfeat <- as.data.frame(matrix(NA,ncol=ncol(features),nrow=length(cidx)))
@@ -91,6 +105,10 @@ expandCircularFeatures <- function(features, chrL,
     if ( idCols["type"]%in%colnames(features) )
       cfeat[,idCols["type"]] <- paste(features[cidx,idCols["type"]],
                                       idTag,sep="")
+    ## copy requested columns
+    cfeat[,copyCols] <- features[cidx,copyCols]
+    
+      
     crev <- rev[cidx]
 
     ## set up coordinates
