@@ -1,5 +1,19 @@
 ## GENOME UTILS
 
+#' Tag duplicate names by increasing numbers.
+#' @param names a vector of characters
+#' @export
+tagDuplicates <- function(names) {
+    sel <- paste(names,".1",sep="")
+    cnt <- 2
+    while( sum(duplicated(sel)) ) {
+        sel[duplicated(sel)] <- sub("\\..*",paste(".",cnt,sep=""),
+                                    sel[duplicated(sel)])
+        cnt <- cnt+1
+    }
+    sub("\\.1$","",sel)
+}
+
 #' Generate chromosome index \code{chrS} from lengths
 #' @param chrL an ordered vector of chromosome lengths; where the
 #' order must correspond to chromosome numbering in feature tables
