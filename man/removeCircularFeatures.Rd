@@ -7,8 +7,9 @@ searches for circular features by the \code{idTag} added
 to ID and type columns in \code{expandCircularFeatures},
 and maps downstream coordinates back to original features.}
 \usage{
-removeCircularFeatures(features, idTag = "-circ2", idCols = c(ID = "ID",
-  type = "type", parent = "parent"), rmParent = TRUE)
+removeCircularFeatures(features, coorCols = c("chr", "start", "end",
+  "strand"), idTag = "-circ2", idCols = c(ID = "ID", type = "type", parent =
+  "parent"), rmParent = TRUE)
 }
 \arguments{
 \item{features}{list of genomic features with coordinates}
