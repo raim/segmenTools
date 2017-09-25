@@ -6,7 +6,7 @@
 annotate the target set by a column in the query set}
 \usage{
 annotateTarget(query, target, qcol = colnames(query), tcol, prefix,
-  details = FALSE, only.best = TRUE, collapse = TRUE,
+  details = FALSE, only.best = TRUE, minJaccard, collapse = TRUE,
   msgfile = stdout())
 }
 \arguments{
@@ -27,6 +27,10 @@ match, i.e., union and intersect, and relative position of the query
 to the matching targets}
 
 \item{only.best}{only consider the top-ranking query hit}
+
+\item{minJaccard}{minimal Jaccard index (intersect/union) threshold;
+overlaps below this value will NOT be reported; NOTE that this will
+set argument \code{details} to \code{TRUE}}
 
 \item{collapse}{if \code{TRUE} multiple query hits are collapsed
 into a single row, with ;-separated strings in the respective fields.}

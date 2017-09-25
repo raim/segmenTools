@@ -306,15 +306,22 @@ annotateQuery <- function(query, target, col) {
 #' match, i.e., union and intersect, and relative position of the query
 #' to the matching targets
 #' @param only.best only consider the top-ranking query hit
+#' @param minJaccard minimal Jaccard index (intersect/union) threshold;
+#' overlaps below this value will NOT be reported; NOTE that this will
+#' set argument \code{details} to \code{TRUE}
 #' @param collapse  if \code{TRUE} multiple query hits are collapsed
 #' into a single row, with ;-separated strings in the respective fields.
 #' @param msgfile file pointer for progress messages and warnings, defaults to
 #' stdout, useful when using in context of command line pipes
 #' @export
 annotateTarget <- function(query, target, qcol=colnames(query), tcol,
-                           prefix, details=FALSE, only.best=TRUE,
+                           prefix, details=FALSE, only.best=TRUE, minJaccard,
                            collapse=TRUE, msgfile=stdout()) {
 
+    ## activate "details" for jaccard filter
+    if ( !missing(minJaccard) )
+        details <- TRUE
+    
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
     cltr <- segmentOverlap(query=query, target=target,
@@ -328,7 +335,12 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ## REDUCE TO TOP-RANKING QUERY HIT
     best <- cltr
     if ( only.best )
-        best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
+      best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
+    ## apply threshold
+    if ( !missing(minJaccard) ) {
+        rmJ <- which(best[,"intersect"]/best[,"union"] < minJaccard)
+        best[rmJ,2:ncol(best)] <- NA
+    }
     
     ## collapse or remove duplicated with qrank==1
     ## TODO: is this necessary, or can we just use collapse=TRUE
