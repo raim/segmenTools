@@ -125,7 +125,16 @@ expandCircularFeatures <- function(features, chrL,
 #' @param rmParent the column parent
 #' @seealso \code{expandCircularFeatures}
 #' @export
-removeCircularFeatures <- function(features, idTag="-circ2", idCols=c(ID="ID",type="type",parent="parent"), rmParent=TRUE) {
+removeCircularFeatures <- function(features,
+                                   coorCols=c("chr","start","end","strand"),
+                                   idTag="-circ2",
+                                   idCols=c(ID="ID",type="type",
+                                            parent="parent"), rmParent=TRUE) {
+    idCols <- idCols[idCols%in%colnames(features)]
+    if ( length(idCols)==0 )
+        stop("no columns present to scan for idTag, use argument idCols")
+    cidx <- grep(idTag, features[,idCols[1]])
+    
 }
 
 #' convert chromosome coordinates to continuous index
