@@ -111,6 +111,8 @@ expandCircularFeatures <- function(features, chrL,
     ## copy and rename (ID_circ#, type: type_circular, parent: ID)
     cfeat <- as.data.frame(matrix(NA,ncol=ncol(features),nrow=length(cidx)))
     colnames(cfeat) <- colnames(features)
+    ## copy requested columns
+    cfeat[,copyCols] <- features[cidx,copyCols]
     ## set up type
     if ( idCols["ID"]%in%colnames(features) ) {
         cfeat[,idCols["parent"]] <- features[cidx,idCols["ID"]]
@@ -119,8 +121,6 @@ expandCircularFeatures <- function(features, chrL,
     if ( idCols["type"]%in%colnames(features) )
       cfeat[,idCols["type"]] <- paste(features[cidx,idCols["type"]],
                                       idTag,sep="")
-    ## copy requested columns
-    cfeat[,copyCols] <- features[cidx,copyCols]
     
       
     crev <- rev[cidx]
