@@ -19,7 +19,7 @@ tagDuplicates <- function(names) {
 #' order must correspond to chromosome numbering in feature tables
 #' for which chrS is used
 #' @export
-getChrS <- function(chrL) c(0,cumsum(chrL))
+getChrSum <- function(chrL) c(0,cumsum(chrL))
 
 ## util to insert rows, by user Ari B. Friedman at
 ## https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appended
