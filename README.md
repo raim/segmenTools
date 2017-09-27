@@ -13,7 +13,7 @@ The repository currently also holds the command-line scripts
 from [Karl, the segmenTier](https://github.com/raim/segmenTier), a
 (genomic) segmentation algorithm working with abstract similarities,
 e.g., derived from RNA-seq time series
-([Machne, Murray & Stadler 2017](https://www.nature.com/articless41598-017-12401-8)).
+([Machne, Murray & Stadler 2017](http://www.nature.com/articless41598-017-12401-8)).
 
 
 ## Quick Guide
