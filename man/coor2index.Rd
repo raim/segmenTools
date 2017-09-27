@@ -15,7 +15,7 @@ positions (option \code{cols}) and strand information (column
 
 \item{chrS}{the chromosome index, indicating the start position
 of each chromosome in the continuous index, derived from chromosome length
-information, see function \code{\link{getChrS}}}
+information, see function \code{\link{getChrSum}}}
 
 \item{cols}{name of the columns giving coordinates that will be mapped
 to continuous index}
