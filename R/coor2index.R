@@ -176,7 +176,7 @@ removeCircularFeatures <- function(features,
 #'  \code{strandCol}).
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length
-#' information, see function \code{\link{getChrS}}
+#' information, see function \code{\link{getChrSum}}
 #' @param cols name of the columns giving coordinates that will be mapped
 #' to continuous index
 #' @param chrCol name of the column that gives the chromosome number
