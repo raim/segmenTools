@@ -9,12 +9,13 @@
 # seq - DNAString input sequence
 # patterns - list of characters describing the hit patterns
 make.hit.seq <- function(seq, patterns) {
-	genome.dn.pos <- lapply(patterns, function(x) matchPattern(x, seq, fixed=FALSE))
+	genome.dn.pos <- lapply(patterns, function(x)
+            Biostrings::matchPattern(x, seq, fixed=FALSE))
 	names(genome.dn.pos) <- patterns
 	#add hits for patterns in sequence
 	pat.pos <- rep(0,length(seq))
 	for(p in patterns) 
-          pat.pos[ unlist( start(genome.dn.pos[[p]]) ) ] <- 1
+          pat.pos[ unlist( BiocGenerics::start(genome.dn.pos[[p]]) ) ] <- 1
 	pat.pos
 } 
 #######################################
@@ -104,7 +105,7 @@ power.spect.k <- function(signal, Periods, norm.spect=FALSE) {
 #######################################
 #smooth vector function
 moving.avg <- function(x,n=5, na.rm=TRUE){
-	res = filter(x,rep(1/n,n), sides=2)
+	res = stats::filter(x,rep(1/n,n), sides=2)
 	if(na.rm)
 			res[-which(is.na(res))]
 	else
