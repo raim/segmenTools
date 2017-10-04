@@ -14,13 +14,18 @@ removeCircularFeatures(features, coorCols = c("chr", "start", "end",
 \arguments{
 \item{features}{list of genomic features with coordinates}
 
+\item{coorCols}{ordered string vector providing the column names
+of coordinate columns to be used; must be of length 4 and provide in
+order: chromosome number (refering to argument \code{chrL}), start, end,
+and strand}
+
 \item{idTag}{tag used for tagging downstream halves}
 
 \item{idCols}{named vector of column names for feature ID, type,
 and feature parent; note that a "parent" column will be removed if
 it is (a) empty and (b) argument \code{rmParent==TRUE}}
 
-\item{rmParent}{the column parent}
+\item{rmParent}{rm the parent column}
 }
 \description{
 NOT WORKING - Undo \code{expandCircularFeatures}

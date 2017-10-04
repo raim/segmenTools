@@ -11,7 +11,7 @@ index2coor(features, chrS, cols = c("start", "end", "coor"), chrCol = "chr",
 \arguments{
 \item{features}{a table of chromosome features that must contain
 the chromosome number (option \code{chrCol}), one or more chromosome
-positions (option \code{coorCols}) and strand information (column
+positions (option \code{cols}) and strand information (column
  \code{strandCol}).}
 
 \item{chrS}{the chromosome index, indicating the start position

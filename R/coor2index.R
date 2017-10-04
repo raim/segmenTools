@@ -150,11 +150,15 @@ expandCircularFeatures <- function(features, chrL,
 #' to ID and type columns in \code{expandCircularFeatures},
 #' and maps downstream coordinates back to original features.
 #' @param features  list of genomic features with coordinates
+#' @param coorCols ordered string vector providing the column names
+#' of coordinate columns to be used; must be of length 4 and provide in
+#' order: chromosome number (refering to argument \code{chrL}), start, end,
+#' and strand 
 #' @param idTag tag used for tagging downstream halves
 #' @param idCols named vector of column names for feature ID, type,
 #' and feature parent; note that a "parent" column will be removed if
 #' it is (a) empty and (b) argument \code{rmParent==TRUE}
-#' @param rmParent the column parent
+#' @param rmParent rm the parent column
 #' @seealso \code{expandCircularFeatures}
 #' @export
 removeCircularFeatures <- function(features,
@@ -273,7 +277,7 @@ idx2str <- function(idx,chrS)
 #' \code{\link{coor2index}})
 #' @param features a table of chromosome features that must contain
 #' the chromosome number (option \code{chrCol}), one or more chromosome
-#' positions (option \code{coorCols}) and strand information (column
+#' positions (option \code{cols}) and strand information (column
 #'  \code{strandCol}).
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length

@@ -380,8 +380,7 @@ for ( test.type in test.types ) {
         ## get cumulative hypergeometric distribution of clustering vs. segments
         for ( i in 1:K ) 
             for ( j in 1:ncol(sgcltab) ) {
-                clcl <-  clusterCluster(pmcls==i,sgcltab[,j],
-                                        plot=FALSE,verbose=FALSE)
+                clcl <-  clusterCluster(pmcls==i,sgcltab[,j])
                 cln <- colnames(sgcltab)[j]
                 cln <- paste(cln,colnames(clcl$overlap),sep=".")
                 if ( "TRUE" %in% rownames(clcl$overlap) ) {

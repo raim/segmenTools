@@ -4,7 +4,7 @@
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table
-#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon
+#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap
 NULL # this just ends the global package documentation
@@ -144,63 +144,6 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
     }
 }
 
-#' Wrapper around \code{\link[graphics]{image}} to plot a matrix as
-#' it is displayed in R console, i.e. the field \code{dat[1,1]}
-#' is at the top left corner. It further allows to plot text
-#' into individual fields and have colored axis tick labels.
-#' @param dat the numeric data matrix to be plotted
-#' @param text a matrix of characters corresponding to \code{dat}
-#' which will be plotted on the image
-#' @param text.col individual colors for text fields
-#' @param axis integer vector, sets whether bottom (1) and/or left
-#' (2) axis are draw; the column and row names of \code{dat} will
-#' be used as tick labels
-#' @param axis1.col invididual colors for x-axis tick labels, length must
-#' equal the number of columns of \code{dat}
-#' @param axis2.col invididual colors for y-axis tick labels, length must
-#' equal the number of rows of \code{dat}
-#' @param axis.cex if axis[1|2].col is provided, this sets the tick label size
-#' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
-#' to select colors
-#' @export
-image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, axis.cex=1.5, ...) {
-
-    ## reverse columns and transpose
-    if ( nrow(dat)>1 )
-        imgdat <- t(apply(dat, 2, rev))
-    else
-        imgdat <- t(dat)
-    image(x=1:ncol(dat), y=1:nrow(dat), z=imgdat, axes=FALSE, ...)
-
-    ## add text
-    if ( !missing(text) ) {
-        if ( missing(text.col) )
-            text.col <- rep(1, length(c(text)))
-        text(x=rep(1:ncol(dat),nrow(dat)), y=rep(nrow(dat):1,each=ncol(dat)),
-             paste(t(text)),col=t(text.col))
-    }
-    
-    ## add axes
-    ## TODO : handle axes=FALSE
-    if ( !missing(axis) ) {
-        if ( 1 %in% axis ) 
-            if ( !missing(axis1.col) ) # colored ticks
-                for ( i in 1:ncol(dat) )
-                    axis(1, at=i,colnames(dat)[i],
-                         col.axis=axis1.col[i], col=axis1.col[i],
-                         las=2, cex.axis=axis.cex, lwd=2)
-            else
-                axis(1, at=1:ncol(dat), labels=colnames(dat), las=2)
-        if ( 2 %in% axis )
-            if ( !missing(axis2.col) ) # colored ticks
-                for ( i in 1:nrow(dat) )
-                        axis(2, at=nrow(dat)-i+1, rownames(dat)[i],
-                             col.axis=axis2.col[i], col=axis2.col[i],
-                             las=2, cex.axis=axis.cex, lwd=2)
-            else
-                axis(2, at=nrow(dat):1, rownames(dat),las=2)        
-    }
-} 
 
 
 ### SEGMENT UTILS
@@ -792,8 +735,8 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 
 ### SEGMENT READ STATISTICS
 
-#' Calculates phase distributions in segments, i.e., the circular mean and
-#' standard deviation and the R statistics, copied from from package
+#' Calculates phase distributions
+#' calculates the circular mean and R statistics, copied from from package
 #' \code{CircStats} and after
 #' http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
 #' https://en.wikipedia.org/wiki/Mean_of_circular_quantities
@@ -965,199 +908,7 @@ my.colorpanel <- function (n, low, mid, high)
     }
     rgb(red, blue, green)
 }
-#' mututal overlaps between two clusterings of the same data set;
-#' calculates hypergeometric distribution statistics for significantly
-#' enriched or deprived mutual overlaps
-#' @param cl1 clustering 1
-#' @param cl2 clustering 2
-#' @param plot.type default is a spineplot, matrices from the returned results
-#' can be plotted as heat maps , e.g. by plot.type=="p.value" or
-#' plot.type=="percent"
-#' @param bonferroni bonferroni correction is merely for signficant messages when option 'verbose' is TRUE
-#'@export
-clusterCluster <- function(cl1, cl2, bonferroni=FALSE, store.data=FALSE,
-                           req.vals=c("greater"), na.rm=FALSE,
-                           verbose=TRUE, pval=0.01, plot=FALSE,
-                           xlab="cluster 1", ylab="cluster 2",na.string="na",
-                           plot.type="spine", plot.ppoor=FALSE, plot.prich=TRUE,
-                           name1, name2, cl1.max=100, cl2.max=100,
-                           cl1.sorting, cl2.sorting) {
-  ## check cluster length
-  if ( length(cl1) != length(cl2) ) {
-    print(paste("ERROR cluster vectors of different size:",
-                length(cl1),length(cl2)))
-    return(NULL)
-  }
 
-  ## DANGEROUS - MAYBE REMOVE THIS OPTION or replace total size incl NA
-  if ( na.rm ) {# remove NA clusters
-    remove <- is.na(cl1) | is.na (cl2)
-    cl1 <- cl1[!remove]
-    cl2 <- cl2[!remove]
-  } else { # add NA cluster
-    if ( sum(is.na(cl1)) )
-      cl1[is.na(cl1)] <- na.string
-    if ( sum(is.na(cl2)) )
-      cl2[is.na(cl2)] <- na.string
-    ## also rename empty strings!
-    if ( sum(cl1=="") )
-      cl1[cl1==""] <- na.string
-    if ( sum(cl2=="") )
-      cl2[cl2==""] <- na.string
-  }
-
-    
-  ## rename clustering
-  if ( !missing(name1) ) cl1 <- paste(name1,cl1,sep=".")
-  if ( !missing(name2) ) cl2 <- paste(name2,cl2,sep=".")
-  
-  
-  ## get requested values
-  ## TODO : name p.value result matrices if both are requested!
-  do.prich <- sum(req.vals=="greater")>0
-  do.ppoor <- sum(req.vals=="less")>0
-    if ( sum(req.vals=="two.sided")>0 )
-        do.ppoor <- do.prich <- TRUE
-  
-  ## get clusters
-  f1 = levels(as.factor(cl1));
-  f2 = levels(as.factor(cl2));
-  if ( !missing(cl1.sorting) ) f1 <-  cl1.sorting
-  if ( !missing(cl2.sorting) ) f2 <-  cl2.sorting
-
-  ## TODO : remove this? why?
-  if ( length(f1) > cl1.max | length(f2) > cl2.max ) {
-    print("ERROR: too many clusters")
-    return(1)
-  }
-  ##print(paste("TESTING ", length(f1), "vs", length(f2), "CLUSTERS"));
-  ## Bonferroni correction
-  bonf = 1;
-  if ( bonferroni )
-    bonf = length(f1) * length(f2);
-      
-
-  ## result matrices
-  overlap <- matrix(NA, nrow=length(f1), ncol=length(f2))
-  rownames(overlap) <- f1
-  colnames(overlap) <- f2
-  percent <- overlap
-  if ( do.prich | plot.prich ) prich <- overlap
-  if ( do.ppoor | plot.ppoor ) ppoor <- overlap
-  
-  
-  for (i in 1:length(f1) ) { # white and black balls
-      
-    m=sum(cl1==f1[i]); # number of white balls
-    n=sum(cl1!=f1[i]); # number of black balls
-    
-    if (verbose) cat(paste("Cluster 1:", f1[i], "m:",m,"n:",n,"\n"))
-    
-    for ( j in 1:length(f2) ) { # balls drawn
-
-      q<-sum(cl1==f1[i] & cl2==f2[j]); # white balls drawn
-      k<-sum(cl2==f2[j]); # number of balls drawn
-      
-      if (verbose) cat(paste("Cluster 2: ", f2[j], "q:",q,"k:",k,"\n"))
-      
-      overlap[i,j] <- q
-      percent[i,j] <- round(100*q/k, digits = 2)
-            
-      ## Calculate cumulative HYPERGEOMETRIC distributions 
-          
-      ## enrichment:  p-value of finding q or more white balls,
-      ## P[X >= x]
-      if ( do.prich | plot.prich ) {
-        prich[i,j] <- phyper(q=q-1, m=m, n=n, k=k, lower.tail=F)
-        if ( is.na(prich[i,j]) ) 
-          prich[i,j]=1
-        if ( prich[i,j] < pval/bonf & verbose )
-          print(paste(f1[i], "ENRICHED IN", f2[j],
-                      ": ", round((100*q/k)/(100*m/(m+n)), digits = 2),
-                      "=",  round(100*q/k, digits = 2),
-                      "vs", round(100*m/(m+n), digits = 2),
-                      "%, p=", signif(prich[i,j])))
-      }
-
-          
-      ## deprivation: p-value for finding q or less white balls,
-      ## P[X <= x]
-      if ( do.ppoor | plot.ppoor ) {
-        ppoor[i,j] <- phyper(q=q, m=m, n=n, k=k, lower.tail=T);
-        if ( is.na(ppoor[i,j]) )
-          ppoor[i,j]=1;
-        if ( ppoor[i,j] < pval/bonf  & verbose )
-          print(paste(f1[i], "DEPRIVED IN", f2[j], 
-                      ": ", round((100*q/k)/(100*m/(m+n)), digits = 2),
-                      "=",  round(100*q/k, digits = 2),
-                      "vs", round(100*m/(m+n), digits = 2),
-                      "%, p=", signif(ppoor[i,j])))
-      }
-    }
-  }
-  
-    
-  
-  result <- list(overlap=overlap,percent=percent)
-  
-  p.value <- prich
-  if ( do.prich & !do.ppoor ) p.value <- prich
-  if ( do.ppoor & !do.prich ) p.value <- ppoor
-  ## take smaller p-value
-  if ( do.ppoor &  do.prich )
-    for ( prow in 1:nrow(prich) )
-      for ( pcol in 1:ncol(prich) )
-        p.value[prow,pcol] <- min(prich[prow,pcol],ppoor[prow,pcol])
-
-  result <- append(result, list(p.value=p.value))
-    
-  if ( do.prich|do.ppoor ) result<-append(result, list(bonferroni=bonferroni))
-  if ( store.data )
-    result <- append(list(cluster1=cl1, cluster2=cl2), result)
-    
-  ## TODO : plot as spinogram or else
-  ## MAYBE: draw Venn diagrams for strongest overlapping duplets and triplets!
-
-  if ( plot ) {
-    if ( plot.type!="spine" ) {
-      heat.data <- percent # default - percent of columns, cluster 2
-      if ( plot.type %in% names(result) )
-        if ( is.matrix(result[[plot.type]]) )
-          heat.data <- result[[plot.type]] 
-
-            ## add total numbers and p-values as text to the plot
-            # TODO : why doesn't this work? it works outside function, but here
-            # error: "object plot.text not found" even though plot.text is there
-            #cluster.text <- paste(overlap)
-            #if ( plot.ppoor )
-            #  cluster.text <- paste(cluster.text, signif(ppoor), sep="\n")
-            #if ( plot.prich )
-            #  cluster.text <- paste(cluster.text, signif(prich), sep="\n")
-             
-            #coords<- cbind(rep(1:nrow(heat.data),each=ncol(heat.data)),
-            #               rep(1:ncol(heat.data),nrow(heat.data)))
-            #cat(paste(coords, cluster.text, collapse=","))
-            #cat(paste(coords, collapse=","))
-
-        colramp <- my.colorpanel(length(heat.data), "black","yellow")
-                                        # revert for pvalue!
-      if ( plot.type=="p.value" ) colramp <- rev(colramp)
-      
-      if ( dim(heat.data)[1]>1 & dim(heat.data)[2]>1 )
-        heatmap(heat.data, Rowv=NA,Colv=NA,scale="none",col=colramp,
-                main=plot.type)#,
-      ##add.expr=text(coords,labels=cluster.text,col="red",cex=1.5))
-      else # fall back on spineplot for two small cluster number
-        plot.type <- "spine"
-    }
-    if ( plot.type=="spine" )
-      spineplot(as.factor(cl1),as.factor(cl2), xlab=xlab, ylab=ylab)
-    
-  }
-  
-  class(result) <- "hypergeoTables"
-  return(result)
-}
 
 
 ### TODO - NOT WORKING CODE
