@@ -1,19 +1,23 @@
 # Genomic Feature & Coordinate Utilities 
 
-This R library includes various utilities to handle genomic feature
-coordinates, analyze overlaps between genomic segments, or overlaps
-between categorical annotations (GO etc) of genomic features.
+The package provides various tools for cross-correlating genome
+segmentations and annotations. 
 
-The library provides coordinate indexing and sequencing/feature
-handling utilities for the
-[vsRGB genome browser](https://gitlab.com/raim/genomeBrowser).
+`segmenTools' were developed specifically for analysis of genome-wide
+time-series data, more specifically time series with periodic properties
+such as circadian data sets. But many functionalities are broadly applicable.
 
-The repository currently also holds the command-line scripts
-(directory `scripts`) that were used for running and analyses of results
-from [Karl, the segmenTier](https://github.com/raim/segmenTier), a
+The package provides coordinate indexing and sequencing/feature
+handling utilities used in various publications (see *Capabilities*),
+and by the [vsRGB genome
+browser](https://gitlab.com/raim/genomeBrowser).
+
+The git repository also holds the command-line scripts (directory
+`scripts`) that were used for running and analyses of results from
+[Karl, the segmenTier](https://github.com/raim/segmenTier), a
 (genomic) segmentation algorithm working with abstract similarities,
-e.g., derived from RNA-seq time series
-([Machne, Murray & Stadler 2017](http://www.nature.com/articles/s41598-017-12401-8)).
+e.g., derived from RNA-seq time series ([Machne, Murray & Stadler
+2017](http://www.nature.com/articles/s41598-017-12401-8)).
 
 
 ## Installation
@@ -27,16 +31,9 @@ install_github("raim/segmenTools")
 
 ## Capabilities
 
-The package provides various tools for cross-correlating genomic
-segmentations and annotations. 
-
-`segmenTools' were developed specifically for analysis of genome-wide
-time-series data, more specifically time series with periodic properties
-such as circadian data sets. But many functionalities are broadly applicable.
-
 ### Gene-Based
 
-#### Time-Series Analysis for Features
+#### Time-Series Analysis 
 
 Fourier-based clustering of periodic time-series, after [Machne &
 Murray 2012](https://doi.org/10.1371/journal.pone.0037906) and as used
