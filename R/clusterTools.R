@@ -186,7 +186,7 @@ clusterAnnotation <- function(cls, data,
         if (verbose) cat(paste(j, "-",name, ", ", sep=""))
         
         ## cumulative hypergeometric distribution
-        tmp <- clusterCluster(bins, cls, req.vals=c("greater"), ...)
+        tmp <- clusterCluster(bins, cls, req.vals=c("greater"))
        
         # get overlap and p.values in original bin order
         if ( !is.null(tmp) ) {
