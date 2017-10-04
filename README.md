@@ -7,9 +7,9 @@ segmentations and annotations.
 time-series data, more specifically time series with periodic properties
 such as circadian data sets. But many functionalities are broadly applicable.
 
-The package provides coordinate indexing and sequencing/feature
-handling utilities used in various publications (see *Capabilities*),
-and by [u'r gene bro](https://gitlab.com/raim/genomeBrowser).
+Its coordinate indexing and feature annotation
+utilities used in various publications (see *Capabilities*), and by
+[u'r gene bro](https://gitlab.com/raim/genomeBrowser).
 
 The git repository also holds the command-line scripts (directory
 `scripts`) that were used for running and analyses of results from
@@ -18,6 +18,9 @@ The git repository also holds the command-line scripts (directory
 e.g., derived from RNA-seq time series ([Machne, Murray & Stadler
 2017](http://www.nature.com/articles/s41598-017-12401-8)).
 
+The drawing is the most unconstrained method of modeling in biology,
+therefore many functionalities in `segmenTools' provide exploratory as well
+as publication-quality plotting utilities.
 
 ## Installation
 
@@ -44,7 +47,7 @@ similarity-based segmentation of coordinate-based time-series
 
 TODO: Cluster-wise oscillation parameters and time-series plots.
 
-#### Categorical Analysis
+#### Categorical Analysis 
 
 Comparing different gene categories (clusters) by cumulative
 hypergeometric distribution tests, and plotting overlap enrichments
