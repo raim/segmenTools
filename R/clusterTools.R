@@ -75,8 +75,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
       
       for ( j in 1:length(f2) ) { # balls drawn
           
-          q <- sum(cl1==f1[i] & cl2==f2[j]); # white balls drawn
-          k <- sum(cl2==f2[j]); # number of balls drawn
+          q <- sum(cl1==f1[i] & cl2==f2[j]) # white balls drawn
+          k <- sum(cl2==f2[j]) # number of balls drawn
           
           overlap[i,j] <- q
           percent[i,j] <- round(100*q/k, digits = 2)
@@ -86,7 +86,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
           ## enrichment:  p-value of finding q or more white balls,
           ## P[X >= x]
           if ( do.prich ) {
-              prich[i,j] <- phyper(q=q-1, m=m, n=n, k=k, lower.tail=F)
+              prich[i,j] <- phyper(q=q-1, m=m, n=n, k=k, lower.tail=FALSE)
               if ( is.na(prich[i,j]) ) 
                 prich[i,j]=1
           }
@@ -95,9 +95,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
           ## deprivation: p-value for finding q or less white balls,
           ## P[X <= x]
           if ( do.ppoor ) {
-              ppoor[i,j] <- phyper(q=q, m=m, n=n, k=k, lower.tail=T);
+              ppoor[i,j] <- phyper(q=q, m=m, n=n, k=k, lower.tail=TRUE)
               if ( is.na(ppoor[i,j]) )
-                ppoor[i,j]=1;
+                ppoor[i,j]=1
           }
       }
   }
@@ -122,43 +122,35 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   return(result)
 }
 
-## Does hypergeometric distribution tests between a given clustering
-## and a table of diverse other clusterings (character/factor table),
-## e.g. single GO annotations, or other classifications.
-## TODO : fuse with SCI and externalStats.
-## TODO : fuse with contStatTable and switch via req.vals
-## ARGUMENTS
-## cls: a character or numeric vector with the main clustering
-## data: a matrix with other clusterings (nrow(data)==length(cluster)
-## to which the main clustering; or e.g. a TRUE/FALSE table
-## TODO: generalize the latter case
-## should be compared, hypergeometric distribution will be tested
-## for all combinations of clusters
-## summary.table: construct summary tables of 
-## summary.filter: a regex pattern for classifications NOT to be included
-## in the results summary, e.g. "FALSE" in simple logical tables
-## add.expected: for simple binary tables with values "TRUE"/"FALSE" or
-## colnames(data)/"not_".colnames(data), add both values to
-## results, even if a given clustering in data contains only one of those!
-## ...: arguments to clusterCluster, e.g. plot.type
+#' Clustering enrichment scan
+#' Scans for overlap enrichments of a clustering in a matrix of
+#' clusterings, potentially simply a TRUE/FALSE table, eg. indicating
+#' annotation with a specific Gene Ontology or other term. It reports
+#' tables of all overlap sizes and their enrichment p-values. The
+#' function is a wrapper around \code{\link{clusterCluster}}, which
+#' performs cumulative hypergeometric distribution tests between
+#' two clusterings.
+## TODO : re-activate and align usage with contStatTable for continuous data
 ## TODO 2017: move away from T/F table, use simple ;-sep string of
-## annotation terms instead; make nicer report as for lehmann13_geneClusters.R
-## and provide pval table for image_matrix
-clusterAnnotation <- function(cls, data, cls.srt,
-                              summary.table=FALSE, summary.filter="^not_",
-                              summary.val="enrichment",
-                              add.expected=FALSE,
-                              p.thresh=0.01, 
-                              verbose=TRUE,
-                              ...) {
+## annotation terms instead;
+## * generalize T/F table usage
+## provide pval table for image_matrix
+#' @param cls a character or numeric vector with the main clustering
+#' @param cls.srt a numeric ar string vector indicating a cluster sorting,
+#' allows also to analyze only a subset of clusters in argument \code{cls}
+#' @param data a string, numeric or logical matrix with other categorizations
+#' of genes. Data rows must correspond to clustering in argument \code{cls}
+#' @param p.thresh p-value threshold for cluster summary table
+#' @param verbose print progress messages
+#' @export
+clusterAnnotation <- function(cls, data,
+                              cls.srt, p.thresh=0.01, verbose=TRUE) {
 
     ## sorted list of clusters!
     if ( missing(cls.srt) ) {
         cls.srt <- unique(cls)
 
         ## sort numeric if clusters can be converted!
-        ## TODO: find better way to find whether clusters can be cast to numeric
-        ## TODO: repair for cases where clusters contain NA
         if ( all(!is.na(as.numeric(cls.srt[!is.na(cls.srt)]))) ) {
             numeric.sorting <- as.numeric(cls.srt[!is.na(cls.srt)])
             cls.srt <- as.character(sort(numeric.sorting))
@@ -177,10 +169,11 @@ clusterAnnotation <- function(cls, data, cls.srt,
     
 
     ## PERFORM HYPERGEOMETRIC DISTRIBUTION TESTS
+    ## TODO: generate matrix and dont use rbind; or generate as list
+    ## sum(cls.num*length(expected))
     overlap <- NULL ## CONTIGENCY TABLE!
     pvalues <- NULL ## hypergeometric distribution test p.value
     hyp.names <- NULL
-    hyp.img <- NULL # store images to link from tables
     ## TODO : parallelize this
     if (verbose) cat(paste("HYPERGEOMETRIC STATISTICS FOR:\n",
                            ncol(data), "categories\t:\n"))
@@ -189,14 +182,6 @@ clusterAnnotation <- function(cls, data, cls.srt,
         name <- colnames(data)[j]
         expected <- unique(bins)
 
-        if ( add.expected ) {
-            ## TRUE/FALSE
-            if ( sum(expected %in% c("TRUE","FALSE" ))>0 )
-              expected <- unique(c(expected, "TRUE","FALSE"))
-            ## name and "not_".name
-            else
-              expected <- unique(c(expected, name, paste("not",name,sep="_")))
-        }
 
         if (verbose) cat(paste(j, "-",name, ", ", sep=""))
         
@@ -207,17 +192,6 @@ clusterAnnotation <- function(cls, data, cls.srt,
         if ( !is.null(tmp) ) {
             ovl <- tmp$overlap # contingency table
             pvl <- tmp$p.value
-            ## add expected values!
-            if ( add.expected )
-              for ( exp in expected )
-                if ( ! exp %in% rownames(ovl) ) {
-                    nam <- rownames(ovl)
-                    ovl <- rbind(ovl, rep(0, ncol(ovl)))
-                    pvl <- rbind(pvl, rep(1, ncol(ovl)))
-                    rownames(ovl) <- c(nam,exp)
-                    rownames(pvl) <- c(nam,exp)
-                }
-              
             overlap <- rbind(overlap, ovl)
             pvalues <- rbind(pvalues, pvl)
             # copy name in same size to allow easy cbind below
@@ -226,7 +200,7 @@ clusterAnnotation <- function(cls, data, cls.srt,
             if (verbose)
               cat(paste("WARNING: hypergeo test failed for bin:", name, "\n"))
           }
-      }
+    }
     if (verbose) {
         cat(paste("... done\nFINISHED STATISTIC ANALYSIS:\n"))
         cat(paste("\toverlaps  \t", nrow(pvalues), "\n"))
@@ -309,7 +283,7 @@ clusterAnnotation <- function(cls, data, cls.srt,
                                           signif(p.values),
                                           stringsAsFactors=FALSE)
         
-            colnames(hyp.table) <- c("rank", "data name", "bin", 
+            colnames(hyp.table) <- c("rank", "category", "bin", 
                                      "bin in genome",  "bin in cluster",
                                      "% of genome", "% of cluster",
                                      "enrichment",
@@ -321,39 +295,8 @@ clusterAnnotation <- function(cls, data, cls.srt,
         hyp.tables <- append(hyp.tables, list(hyp.table=hyp.table))
         
         if (verbose) cat(paste(" ... done;\n"))
-      }
-    names(hyp.tables) <- cls.srt
-
-    ## collect results into one table
-    ## for amounts of each cluster/category overlap
-    ## and one table for a p-value of this overlap
-    if ( summary.table ) {
-        for ( k in 1:length(hyp.tables) ) {            
-            tab <- hyp.tables[[k]]
-
-            if ( k==1 ) {
-                bins <- tab[,"bin"]
-                if ( summary.filter != "" )
-                  bins <- grep(summary.filter, bins, invert=TRUE, value=TRUE)
-                
-                bin.cls <- matrix(NA, nrow=length(hyp.tables),
-                                   ncol=length(bins))
-                rownames(bin.cls) <- names(hyp.tables)
-                colnames(bin.cls) <- bins
-                # convert to logic filter
-                bins <- tab[,"bin"] %in% bins
-                bin.pvl <- bin.cls
-                bin.tot <- bin.cls
-                
-            }
-            
-            bin.cls[k,] <- as.numeric(tab[bins,summary.val]) # eg. "enrichment"
-            bin.tot[k,] <- as.numeric(tab[bins,"bin in cluster"]) 
-            bin.pvl[k,] <- as.numeric(tab[bins,"p-value"])
-        }
-        summary.table <- list(type=summary.val,
-                              statistic=bin.cls, p.value=bin.pvl, total=bin.tot)
     }
+    names(hyp.tables) <- cls.srt
 
     if (verbose) cat(paste(" ... done;\n"))
     
@@ -362,8 +305,7 @@ clusterAnnotation <- function(cls, data, cls.srt,
     only.clusters <- rownames(psig)!="total" 
     psig["avg",] <- rowMeans(t( psig[only.clusters, ] ),na.rm=T)
     
-    return(list(psig=psig, summary=summary.table,
-                tables=hyp.tables, images=hyp.img))
+    return(list(tables=hyp.tables, psig=psig))
            
 }
 
