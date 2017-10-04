@@ -123,7 +123,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 
 #' parse an annotation file (a bidirectional map)
 #' parses a bidirectional map of feature IDs vs. annotation terms, e.g.
-#' the GO annotation file at \link{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}
+#' the GO annotation file at \url{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}
 #' @param got input table, e.g. a GO annotation 
 #' @param idcol column where feature IDs can be found 
 #' @param keycol column where annotation terms are found 
