@@ -131,6 +131,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' terms is found; will only be used if keycol and termcol are a constant map,
 #' ie. each key is always associated with the same term; TODO: terminology?
 #' @param rm.empty rm all empty annotations; TODO: why does this occur?
+#' @export
 parseAnnotation <- function(got, idcol=1, keycol=6, termcol, rm.empty=TRUE) {
     ## EXAMPLE DATA are file
     ## ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz
