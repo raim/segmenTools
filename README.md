@@ -9,8 +9,7 @@ such as circadian data sets. But many functionalities are broadly applicable.
 
 The package provides coordinate indexing and sequencing/feature
 handling utilities used in various publications (see *Capabilities*),
-and by the [vsRGB genome
-browser](https://gitlab.com/raim/genomeBrowser).
+and by [u'r gene bro](https://gitlab.com/raim/genomeBrowser).
 
 The git repository also holds the command-line scripts (directory
 `scripts`) that were used for running and analyses of results from
@@ -60,7 +59,7 @@ of segmentations by [Karl](https://github.com/raim/segmenTier).
 #### Genomic Coordinate Indexing
 
 Accessing genomic coordinates efficiently by indexing, used by
-[vsRGB genome browser](https://gitlab.com/raim/genomeBrowser) and
+[u'r gene bro](https://gitlab.com/raim/genomeBrowser) and
 [Karl](https://github.com/raim/segmenTier).
 
 #### Sequence Spectra 
