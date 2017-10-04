@@ -3,6 +3,7 @@
 export(annotateTarget)
 export(ash)
 export(ci95)
+export(clusterAnnotation)
 export(clusterCluster)
 export(collectOvlStats)
 export(coor2index)
