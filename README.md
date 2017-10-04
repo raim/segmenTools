@@ -34,17 +34,22 @@ install_github("raim/segmenTools")
 
 #### Time-Series Analysis 
 
-Fourier-based clustering of periodic time-series, after [Machne &
-Murray 2012](https://doi.org/10.1371/journal.pone.0037906) and as
-extended in [Machne, Murray & Stadler
+Via [Karl](https://github.com/raim/segmenTier): Fourier-based
+clustering of periodic time-series, after [Machne & Murray
+2012](https://doi.org/10.1371/journal.pone.0037906) and as extended in
+[Machne, Murray & Stadler
 2017](http://www.nature.com/articles/s41598-017-12401-8) for
 similarity-based segmentation of coordinate-based time-series
 (RNA-seq).
 
+TODO: Cluster-wise oscillation parameters and time-series plots.
+
 #### Categorical Analysis
 
 Comparing different gene categories (clusters) by cumulative
-hypergeometric distribution tests, and plotting overlap enrichments.
+hypergeometric distribution tests, and plotting overlap enrichments
+after [Machne & Murray
+2012](https://doi.org/10.1371/journal.pone.0037906).
 
 ### Coordinate-Based
 
