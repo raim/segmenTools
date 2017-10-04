@@ -11,7 +11,8 @@ function is a wrapper around \code{\link{clusterCluster}}, which
 performs cumulative hypergeometric distribution tests between
 two clusterings.}
 \usage{
-clusterAnnotation(cls, data, cls.srt, p.thresh = 0.01, verbose = TRUE)
+clusterAnnotation(cls, data, p = 1, cls.srt, terms = NULL, bin.filter,
+  verbose = TRUE)
 }
 \arguments{
 \item{cls}{a character or numeric vector with the main clustering}
@@ -19,10 +20,16 @@ clusterAnnotation(cls, data, cls.srt, p.thresh = 0.01, verbose = TRUE)
 \item{data}{a string, numeric or logical matrix with other categorizations
 of genes. Data rows must correspond to clustering in argument \code{cls}}
 
+\item{p}{p-value threshold reporting overlaps}
+
 \item{cls.srt}{a numeric ar string vector indicating a cluster sorting,
 allows also to analyze only a subset of clusters in argument \code{cls}}
 
-\item{p.thresh}{p-value threshold for cluster summary table}
+\item{terms}{optional map of annotation key to descriptions}
+
+\item{bin.filter}{string, indicating bins (categories in \code{data})
+to be globally omitted; useful eg. for logical data to omit
+all enrichments with category "FALSE" (indicating deprivement)}
 
 \item{verbose}{print progress messages}
 }
