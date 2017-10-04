@@ -114,13 +114,56 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
     for ( prow in 1:nrow(prich) )
       for ( pcol in 1:ncol(prich) )
         p.value[prow,pcol] <- min(prich[prow,pcol],ppoor[prow,pcol])
-  
+
+    ## TODO: add test number for later bonferroni correction
   result <- append(result, list(p.value=p.value))
-  
-  
   class(result) <- "clusterOverlaps"
   return(result)
 }
+
+#' parse an annotation file (a bidirectional map)
+#' parses a bidirectional map of feature IDs vs. annotation terms, e.g.
+#' the GO annotation file at \link{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}
+#' @param got input table, e.g. a GO annotation 
+#' @param idcol column where feature IDs can be found 
+#' @param keycol column where annotation terms are found 
+#' @param termcol optional column where a readable description of annotation
+#' terms is found; will only be used if keycol and termcol are a constant map,
+#' ie. each key is always associated with the same term; TODO: terminology?
+#' @param rm.empty rm all empty annotations; TODO: why does this occur?
+parseAnnotation <- function(got, idcol=1, keycol=6, termcol, rm.empty=TRUE) {
+    ## EXAMPLE DATA are file
+    ## ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz
+    ## TODO: allow use of evidence filter
+    ## TODO: handle specifier in column 4 ("is downregulated by")
+    ## TODO: handle GO category in column 8 
+    ## map terms
+    gokeys <- unique(got[,keycol]) # no terms; for other columns; TODO: cleaner
+    ## readable description - only works for GO terms
+    goterms <- unique(got[,termcol])
+    if ( length(gokeys)!=length(goterms) )
+        goterms <- NULL
+    else names(goterms) <- gokeys
+    
+    ## reduce to unique IDs
+    got <- got[!is.na(got[,idcol]),]
+    ## generate T/F table
+    genes <- unique(got[,idcol])
+    gotable <- matrix(FALSE,nrow=length(genes),ncol=length(gokeys))
+    rownames(gotable) <- genes
+    colnames(gotable) <- gokeys
+    for ( gok in gokeys ) 
+        gotable[as.character(got[got[,keycol]==gok,idcol]),gok] <- TRUE
+    if ( rm.empty ) {
+        keep <- apply(gotable,2,any)
+        gotable <- gotable[,keep]
+        gokeys <- gokeys[keep]
+        if ( !is.null(goterms) )
+            goterms <- goterms[gokeys]
+    }
+    list(table=gotable, terms=goterms)
+}
+
 
 #' Clustering enrichment scan
 #' Scans for overlap enrichments of a clustering in a matrix of
@@ -140,11 +183,15 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' allows also to analyze only a subset of clusters in argument \code{cls}
 #' @param data a string, numeric or logical matrix with other categorizations
 #' of genes. Data rows must correspond to clustering in argument \code{cls}
-#' @param p.thresh p-value threshold for cluster summary table
+#' @param p p-value threshold reporting overlaps
+#' @param terms optional map of annotation key to descriptions
+#' @param bin.filter string, indicating bins (categories in \code{data})
+#' to be globally omitted; useful eg. for logical data to omit
+#' all enrichments with category "FALSE" (indicating deprivement)
 #' @param verbose print progress messages
 #' @export
-clusterAnnotation <- function(cls, data,
-                              cls.srt, p.thresh=0.01, verbose=TRUE) {
+clusterAnnotation <- function(cls, data, p=1,
+                              cls.srt, terms=NULL, bin.filter, verbose=TRUE) {
 
     ## sorted list of clusters!
     if ( missing(cls.srt) ) {
@@ -186,6 +233,8 @@ clusterAnnotation <- function(cls, data,
         if (verbose) cat(paste(j, "-",name, ", ", sep=""))
         
         ## cumulative hypergeometric distribution
+        ## TODO: take sum of bonferroni correction factors
+        ## correct below in bin.filter
         tmp <- clusterCluster(bins, cls, req.vals=c("greater"))
        
         # get overlap and p.values in original bin order
@@ -197,8 +246,7 @@ clusterAnnotation <- function(cls, data,
             # copy name in same size to allow easy cbind below
             hyp.names<-c(hyp.names, rep(name, nrow(ovl)))
           } else {
-            if (verbose)
-              cat(paste("WARNING: hypergeo test failed for bin:", name, "\n"))
+              warning(paste("WARNING: hypergeo test failed for bin:", name))
           }
     }
     if (verbose) {
@@ -215,7 +263,7 @@ clusterAnnotation <- function(cls, data,
 
     ## CLUSTER EVALUATION
     ##  COLLECT FRACTION OF SIGNIFICANT P-VALUES PER CLUSTER
-    # fraction of significant (by option p.thresh) p-values
+    # fraction of significant (by option p) p-values
 
     # column for each cluster and one column for total fraction
     psig <- matrix(NA, nrow=(cls.num + 2), ncol=2)
@@ -236,7 +284,7 @@ clusterAnnotation <- function(cls, data,
 
 
     # store fraction of significant
-    psig["total",] <- c(total.clustered, sum(hp<p.thresh)/length(hp))
+    psig["total",] <- c(total.clustered, sum(hp<p)/length(hp))
 
     ## EVALUATE EACH CLUSTER
     if (verbose) cat(paste("EVALUATING EACH CLUSTER:\n"))
@@ -262,8 +310,8 @@ clusterAnnotation <- function(cls, data,
             rank <- order(order(pvalues[,j],decreasing=FALSE))
 
             # store fraction of hypergeo p-values below threshold
-            #filter <- pvalues[, j] < p.thresh
-            psig[j, "h"] <- sum(pvalues[, j] < p.thresh)/nrow(pvalues)
+            #filter <- pvalues[, j] < p
+            psig[j, "h"] <- sum(pvalues[, j] < p)/nrow(pvalues)
 
             if (verbose) cat(paste(" table "))
 
@@ -299,13 +347,28 @@ clusterAnnotation <- function(cls, data,
     names(hyp.tables) <- cls.srt
 
     if (verbose) cat(paste(" ... done;\n"))
-    
-    
-    # cluster averages
+
+    ## cluster averages in summary table
     only.clusters <- rownames(psig)!="total" 
     psig["avg",] <- rowMeans(t( psig[only.clusters, ] ),na.rm=T)
+
+    ## FILTER BY P-VALUE, BINS and add DESCRIPTIONS
+    ## TODO: add GO classes (MF,CC,BP)
+    ## filter significant and order by p-value
+    if ( p<1 )
+        sig <- lapply(hyp.tables, function(x) {
+            x <- x[x[,"p-value"] <= p,] #smaller then passed p-value threshold?
+            x[order(x[,"p-value"]),]})
+    ## filter by bins
+    if ( !missing(bin.filter) )
+        sig <- lapply(sig, function(x) x[!x[,"bin"]%in%bin.filter,] )
+        
+    ## add description of terms
+    if ( !is.null(terms) ) # not required for other columns (no keys)
+        sig <- lapply(sig, function(x)
+            cbind.data.frame(description=terms[x[,"category"]],x))
     
-    return(list(tables=hyp.tables, psig=psig))
+    return(list(tables=sig, psig=psig))
            
 }
 
