@@ -499,11 +499,12 @@ clusterAverages <- function(ts, cls, cls.srt,
 #' values, extended \code{ylim.scale}
 #' @param ylim.scale if ylim is missing, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
+#' @param ... arguments to plot
 #' @export
 plot.clusteraverages <- function(avg, cls.srt, cls.col,
                                 each=FALSE, polygon=TRUE,
                                 xlab, time, 
-                                ylab="average",ylim,ylim.scale=.1) {
+                                ylab="average",ylim,ylim.scale=.1,...) {
 
     ## x-axis
     if ( missing(time) ) {
@@ -544,7 +545,7 @@ plot.clusteraverages <- function(avg, cls.srt, cls.col,
     } else {
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
-             ylab=ylab,ylim=ylim)
+             ylab=ylab,ylim=ylim, ...)
         axis(1);axis(2)
         axis(3, at=time, labels=FALSE)
         mtext("samples", 3, 1.2)
@@ -553,7 +554,7 @@ plot.clusteraverages <- function(avg, cls.srt, cls.col,
     for ( cl in cls.srt ) {
         if ( each ) {
             plot(1,col=NA,axes=FALSE, xlab=NA,xlim=range(time),
-                 ylab=paste(ylab,cl,sep=" - "),ylim=ylim)
+                 ylab=paste(ylab,cl,sep=" - "),ylim=ylim, ...)
             axis(1);axis(2)
         }
         if ( polygon )
