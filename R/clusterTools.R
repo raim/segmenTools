@@ -11,6 +11,7 @@
 ### COMPARE CLUSTERINGS
 
 #' calculates overlaps between two clusterings
+#' 
 #' calculates mutual overlaps between two clusterings of the same data set
 #' using hypergeometric distribution statistics for significantly
 #' enriched or deprived mutual overlaps
@@ -122,6 +123,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 }
 
 #' parse an annotation file (a bidirectional map)
+#' 
 #' parses a bidirectional map of feature IDs vs. annotation terms, e.g.
 #' the GO annotation file at \url{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}
 #' @param got input table, e.g. a GO annotation 
@@ -166,7 +168,8 @@ parseAnnotation <- function(got, idcol=1, keycol=6, termcol, rm.empty=TRUE) {
 }
 
 
-#' Clustering enrichment scan
+#' clustering enrichment scan
+#' 
 #' Scans for overlap enrichments of a clustering in a matrix of
 #' clusterings, potentially simply a TRUE/FALSE table, eg. indicating
 #' annotation with a specific Gene Ontology or other term. It reports
@@ -374,7 +377,8 @@ clusterAnnotation <- function(cls, data, p=1,
 }
 
 ### PLOT cluster-cluster overlaps
-
+#' data.matrix `as-is' wrapper for \code{\link[graphics]{image}}
+#' 
 #' Wrapper around \code{\link[graphics]{image}} to plot a matrix as
 #' it is displayed in R console, i.e. the field \code{dat[1,1]}
 #' is at the top left corner. It further allows to plot text
@@ -438,6 +442,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 
 
 #' calculates cluster averages
+#' 
 #' calculates average values and distributions for each cluster
 #' and time point of a time series
 #' @param ts a matrix of time series, with time points in columns
@@ -483,6 +488,7 @@ clusterAverages <- function(ts, cls, cls.srt,
 }
 
 #' plots cluster averages
+#' 
 #' plots average time series of clusters as calculated by
 #' \code{\link{clusterAverages}}, including the variations around the mean
 #' as polygons
