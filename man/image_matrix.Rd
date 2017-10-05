@@ -2,10 +2,7 @@
 % Please edit documentation in R/clusterTools.R
 \name{image_matrix}
 \alias{image_matrix}
-\title{Wrapper around \code{\link[graphics]{image}} to plot a matrix as
-it is displayed in R console, i.e. the field \code{dat[1,1]}
-is at the top left corner. It further allows to plot text
-into individual fields and have colored axis tick labels.}
+\title{data.matrix `as-is' wrapper for \code{\link[graphics]{image}}}
 \usage{
 image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col,
   axis.cex = 1.5, ...)

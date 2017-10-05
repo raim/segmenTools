@@ -2,9 +2,7 @@
 % Please edit documentation in R/clusterTools.R
 \name{clusterAverages}
 \alias{clusterAverages}
-\title{calculates cluster averages
-calculates average values and distributions for each cluster
-and time point of a time series}
+\title{calculates cluster averages}
 \usage{
 clusterAverages(ts, cls, cls.srt, avg = get("median", mode = "function"),
   dev = get("sd", mode = "function"), q = 0.1)
@@ -30,7 +28,6 @@ of reported quantile time-series `high' and `low' will cover
 of the time series are larger then the reported values.}
 }
 \description{
-calculates cluster averages
 calculates average values and distributions for each cluster
 and time point of a time series
 }

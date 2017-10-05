@@ -2,9 +2,7 @@
 % Please edit documentation in R/clusterTools.R
 \name{parseAnnotation}
 \alias{parseAnnotation}
-\title{parse an annotation file (a bidirectional map)
-parses a bidirectional map of feature IDs vs. annotation terms, e.g.
-the GO annotation file at \url{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}}
+\title{parse an annotation file (a bidirectional map)}
 \usage{
 parseAnnotation(got, idcol = 1, keycol = 6, termcol, rm.empty = TRUE)
 }
@@ -22,7 +20,6 @@ ie. each key is always associated with the same term; TODO: terminology?}
 \item{rm.empty}{rm all empty annotations; TODO: why does this occur?}
 }
 \description{
-parse an annotation file (a bidirectional map)
 parses a bidirectional map of feature IDs vs. annotation terms, e.g.
 the GO annotation file at \url{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}
 }

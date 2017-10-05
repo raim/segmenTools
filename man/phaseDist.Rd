@@ -2,12 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{phaseDist}
 \alias{phaseDist}
-\title{Calculates phase distributions
-calculates the circular mean and R statistics, copied from from package
-\code{CircStats} and after
-http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
-https://en.wikipedia.org/wiki/Mean_of_circular_quantities
-TODO: recognize bimodal?}
+\title{Calculates phase distributions.}
 \usage{
 phaseDist(phs, w)
 }
@@ -17,7 +12,6 @@ phaseDist(phs, w)
 \item{w}{optional weights for weighted mean}
 }
 \description{
-Calculates phase distributions
 calculates the circular mean and R statistics, copied from from package
 \code{CircStats} and after
 http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and

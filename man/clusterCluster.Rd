@@ -2,10 +2,7 @@
 % Please edit documentation in R/clusterTools.R
 \name{clusterCluster}
 \alias{clusterCluster}
-\title{calculates overlaps between two clusterings
-calculates mutual overlaps between two clusterings of the same data set
-using hypergeometric distribution statistics for significantly
-enriched or deprived mutual overlaps}
+\title{calculates overlaps between two clusterings}
 \usage{
 clusterCluster(cl1, cl2, na.string = "na", cl1.srt, cl2.srt,
   req.vals = c("greater"))
@@ -26,7 +23,6 @@ or `two-sided' to calculate enrichment, depletion or the more
 more signficant of both, respectively}
 }
 \description{
-calculates overlaps between two clusterings
 calculates mutual overlaps between two clusterings of the same data set
 using hypergeometric distribution statistics for significantly
 enriched or deprived mutual overlaps

@@ -2,13 +2,11 @@
 % Please edit documentation in R/clusterTools.R
 \name{plot.clusteraverages}
 \alias{plot.clusteraverages}
-\title{plots cluster averages
-plots average time series of clusters as calculated by
-\code{\link{clusterAverages}}, including the variations around the mean
-as polygons}
+\title{plots cluster averages}
 \usage{
-plot.clusteraverages(x, cls.srt, cls.col, each = FALSE, polygon = TRUE,
-  xlab, time, ylab = "average", ylim, ylim.scale = 0.1, ...)
+\method{plot}{clusteraverages}(x, cls.srt, cls.col, each = FALSE,
+  polygon = TRUE, xlab, time, ylab = "average", ylim = ifelse(each, "avg",
+  "rng"), ylim.scale = 0.1, ...)
 }
 \arguments{
 \item{x}{cluster time series average object as calculated by
@@ -32,16 +30,16 @@ averages on one panel (\code{FALSE}) or each cluster on a separate panel
 
 \item{ylab}{y-axis label}
 
-\item{ylim}{range of the y-axis, will be calculated from the average
-values, extended \code{ylim.scale}}
+\item{ylim}{either conventional range of the y-axis, or a string
+specifying whether ylim should be calculated from the average
+(\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})}
 
-\item{ylim.scale}{if ylim is missing, the calculated ylim will be
+\item{ylim.scale}{if \code{ylim=="avg"}, the calculated ylim will be
 extended by this fraction of the total range on both sides}
 
 \item{...}{arguments to plot}
 }
 \description{
-plots cluster averages
 plots average time series of clusters as calculated by
 \code{\link{clusterAverages}}, including the variations around the mean
 as polygons

@@ -2,8 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{pvalDist}
 \alias{pvalDist}
-\title{calculates the mean of p-values and number of significant
-p-values (<\code{threshold}) and number of NA values}
+\title{cluster p-value summary}
 \usage{
 pvalDist(pvs, threshold = 0.01)
 }
