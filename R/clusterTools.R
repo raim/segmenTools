@@ -482,7 +482,7 @@ clusterAverages <- function(ts, cls, cls.srt,
 #' plots average time series of clusters as calculated by
 #' \code{\link{getClsAvg}}, including the variations around the mean
 #' as polygons
-#' @param avg cluster time series average object as calculated by
+#' @param x cluster time series average object as calculated by
 #' \code{\link{getClsAvg}}
 #' @param cls.srt optional sorting of clusters; clusters will be plotted
 #' in this order, i.e. the last in \code{cls.srt} is plotted last
@@ -501,11 +501,11 @@ clusterAverages <- function(ts, cls, cls.srt,
 #' extended by this fraction of the total range on both sides
 #' @param ... arguments to plot
 #' @export
-plot.clusteraverages <- function(avg, cls.srt, cls.col,
+plot.clusteraverages <- function(x, cls.srt, cls.col,
                                 each=FALSE, polygon=TRUE,
                                 xlab, time, 
                                 ylab="average",ylim,ylim.scale=.1,...) {
-
+    avg <- x
     ## x-axis
     if ( missing(time) ) {
         time <- 1:ncol(avg$avg)
