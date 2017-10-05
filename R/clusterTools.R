@@ -505,14 +505,17 @@ clusterAverages <- function(ts, cls, cls.srt,
 #' @param xlab x-axis label
 #' @param time optional time-points of the x-axis
 #' @param ylab y-axis label
-#' @param ylim range of the y-axis, will be calculated from the average
-#' values, extended \code{ylim.scale}
+#' @param ylim either conventional range of the y-axis, or a string
+#' specifying whether ylim should be calculated from the average
+#' (\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})
+#' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
+#' extended by this fraction of the total range on both sides
 #' @param ... arguments to plot
 #' @export
 plot.clusteraverages <- function(x, cls.srt, cls.col,
                                 each=FALSE, polygon=TRUE,
                                 xlab, time, 
-                                ylab="average",ylim,...) {
+                                ylab="average",ylim="avg",ylim.scale=.1,...) {
     avg <- x
     ## x-axis
     if ( missing(time) ) {
@@ -537,12 +540,18 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     pol.col <- add.alphas(cls.col,rep(.2,length(cls.col)))
     avg.col <- add.alphas(cls.col,rep(1,length(cls.col)))
 
-    ## calculate ylim from full ranges
-    if ( missing(ylim) ) 
-        ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
-                  max(avg$high[cls.srt,],na.rm=TRUE))
+    ## calculate ylim from full ranges? 
+    if ( typeof(ylim)=="character") ) {
+        if ( ylim == "rng" )
+            ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
+                      max(avg$high[cls.srt,],na.rm=TRUE))
+        if ( ylim == "avg" ) {
+            ylim <- range(avg$avg[cls.srt,])
+            ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
+                      ylim[2]+diff(ylim)*ylim.scale)
+        }
+    }
     
-
     ## plot each cluster on separate panel?
     if ( each ) {
         mai <- par("mai")
