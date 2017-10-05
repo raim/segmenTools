@@ -8,7 +8,7 @@ plots average time series of clusters as calculated by
 as polygons}
 \usage{
 plotClsAvg(avg, cls.srt, cls.col, each = FALSE, polygon = TRUE, xlab, time,
-  ylab = "average", ylim)
+  ylab = "average", ylim, ylim.scale = 0.1)
 }
 \arguments{
 \item{avg}{cluster time series average object as calculated by
@@ -32,7 +32,11 @@ averages on one panel (\code{FALSE}) or each cluster on a separate panel
 
 \item{ylab}{y-axis label}
 
-\item{ylim}{range of the y-axis}
+\item{ylim}{range of the y-axis, will be calculated from the average
+values, extended \code{ylim.scale}}
+
+\item{ylim.scale}{if ylim is missing, the calculated ylim will be
+extended by this fraction of the total range on both sides}
 }
 \description{
 plots cluster averages
