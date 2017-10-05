@@ -541,7 +541,7 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     avg.col <- add.alphas(cls.col,rep(1,length(cls.col)))
 
     ## calculate ylim from full ranges? 
-    if ( typeof(ylim)=="character") ) {
+    if ( typeof(ylim)=="character" ) {
         if ( ylim == "rng" )
             ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
                       max(avg$high[cls.srt,],na.rm=TRUE))
