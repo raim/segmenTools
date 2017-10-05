@@ -454,9 +454,9 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' (1- 2q) of all values in the cluster
 #' of the time series are larger then the reported values.
 #' @export
-getClsAvg <- function(ts, cls, cls.srt,
-                      avg=get("median", mode="function"),
-                      dev=get("sd", mode="function"), q=.1) {
+clusterAverages <- function(ts, cls, cls.srt,
+                            avg=get("median", mode="function"),
+                            dev=get("sd", mode="function"), q=.1) {
 
     if ( missing(cls.srt) )
       cls.srt <- sort(unique(cls))
@@ -474,7 +474,8 @@ getClsAvg <- function(ts, cls, cls.srt,
                            function(x) quantile(x,1-q,na.rm=T))
         
     }
-    list(avg=clavg, std=clstd, low=cllow, high=clhig)
+    res <- list(avg=clavg, std=clstd, low=cllow, high=clhig)
+    class(res) <- "clusteraverages"
 }
 
 #' plots cluster averages
@@ -499,10 +500,10 @@ getClsAvg <- function(ts, cls, cls.srt,
 #' @param ylim.scale if ylim is missing, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
 #' @export
-plotClsAvg <- function(avg, cls.srt, cls.col,
-                       each=FALSE, polygon=TRUE,
-                       xlab, time, 
-                       ylab="average",ylim,ylim.scale=.1) {
+plot.clusteraverages <- function(avg, cls.srt, cls.col,
+                                each=FALSE, polygon=TRUE,
+                                xlab, time, 
+                                ylab="average",ylim,ylim.scale=.1) {
 
     ## x-axis
     if ( missing(time) ) {
