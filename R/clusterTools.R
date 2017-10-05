@@ -480,10 +480,10 @@ clusterAverages <- function(ts, cls, cls.srt,
 
 #' plots cluster averages
 #' plots average time series of clusters as calculated by
-#' \code{\link{getClsAvg}}, including the variations around the mean
+#' \code{\link{clusterAverages}}, including the variations around the mean
 #' as polygons
 #' @param x cluster time series average object as calculated by
-#' \code{\link{getClsAvg}}
+#' \code{\link{clusterAverages}}
 #' @param cls.srt optional sorting of clusters; clusters will be plotted
 #' in this order, i.e. the last in \code{cls.srt} is plotted last
 #' @param cls.col optional coloring of clusters
