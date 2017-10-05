@@ -771,6 +771,8 @@ phaseDist <- function(phs, w) {
     if ( !missing(w) ) names(avg) <- paste("w",names(avg),sep=".")
     avg
 }
+#' cluster p-value summary
+#' 
 #' calculates the mean of p-values and number of significant
 #' p-values (<\code{threshold}) and number of NA values
 #' @param pvs vector of p-values

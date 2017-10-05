@@ -507,14 +507,12 @@ clusterAverages <- function(ts, cls, cls.srt,
 #' @param ylab y-axis label
 #' @param ylim range of the y-axis, will be calculated from the average
 #' values, extended \code{ylim.scale}
-#' @param ylim.scale if ylim is missing, the calculated ylim will be
-#' extended by this fraction of the total range on both sides
 #' @param ... arguments to plot
 #' @export
 plot.clusteraverages <- function(x, cls.srt, cls.col,
                                 each=FALSE, polygon=TRUE,
                                 xlab, time, 
-                                ylab="average",ylim,ylim.scale=.1,...) {
+                                ylab="average",ylim,...) {
     avg <- x
     ## x-axis
     if ( missing(time) ) {
@@ -539,13 +537,11 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     pol.col <- add.alphas(cls.col,rep(.2,length(cls.col)))
     avg.col <- add.alphas(cls.col,rep(1,length(cls.col)))
 
-    ## calculate ylim
-    ## TODO: use ranges?
-    if ( missing(ylim) ) {
-      ylim <- range(avg$avg[cls.srt,])
-      ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
-                ylim[2]+diff(ylim)*ylim.scale)
-    }
+    ## calculate ylim from full ranges
+    if ( missing(ylim) ) 
+        ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
+                  max(avg$high[cls.srt,],na.rm=TRUE))
+    
 
     ## plot each cluster on separate panel?
     if ( each ) {
