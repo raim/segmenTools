@@ -494,13 +494,17 @@ getClsAvg <- function(ts, cls, cls.srt,
 #' @param xlab x-axis label
 #' @param time optional time-points of the x-axis
 #' @param ylab y-axis label
-#' @param ylim range of the y-axis
+#' @param ylim range of the y-axis, will be calculated from the average
+#' values, extended \code{ylim.scale}
+#' @param ylim.scale if ylim is missing, the calculated ylim will be
+#' extended by this fraction of the total range on both sides
 #' @export
 plotClsAvg <- function(avg, cls.srt, cls.col,
                        each=FALSE, polygon=TRUE,
                        xlab, time, 
-                       ylab="average",ylim) {
+                       ylab="average",ylim,ylim.scale=.1) {
 
+    ## x-axis
     if ( missing(time) ) {
         time <- 1:ncol(avg$avg)
         if ( missing(xlab) )
@@ -509,9 +513,11 @@ plotClsAvg <- function(avg, cls.srt, cls.col,
     if ( missing(xlab) )
       xlab <- "time"
 
+    ## cluster sorting
     if ( missing(cls.srt) )
       cls.srt <- rownames(avg$avg)
 
+    ## cluster colors
     if ( missing(cls.col) ) {
         cls.col <- rainbow(length(cls.srt))
         names(cls.col) <- cls.srt
@@ -521,9 +527,15 @@ plotClsAvg <- function(avg, cls.srt, cls.col,
     pol.col <- add.alphas(cls.col,rep(.2,length(cls.col)))
     avg.col <- add.alphas(cls.col,rep(1,length(cls.col)))
 
-    if ( missing(ylim) )
-      ylim <- range(avg$avg[cls.srt,])*1
+    ## calculate ylim
+    ## TODO: use ranges?
+    if ( missing(ylim) ) {
+      ylim <- range(avg$avg[cls.srt,])
+      ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
+                ylim[2]+diff(ylim)*ylim.scale)
+    }
 
+    ## plot each cluster on separate panel?
     if ( each ) {
         mai <- par("mai")
         mai[c(1,3)] <- 0
@@ -536,6 +548,7 @@ plotClsAvg <- function(avg, cls.srt, cls.col,
         axis(3, at=time, labels=FALSE)
         mtext("samples", 3, 1.2)
     }
+    ## plot each cluster in cls.srt
     for ( cl in cls.srt ) {
         if ( each ) {
             plot(1,col=NA,axes=FALSE, xlab=NA,xlim=range(time),
