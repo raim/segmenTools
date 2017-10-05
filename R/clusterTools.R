@@ -547,7 +547,7 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
         if ( ylim == "rng" )
             ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
                       max(avg$high[cls.srt,],na.rm=TRUE))
-        if ( ylim == "avg" ) {
+        else if ( ylim == "avg" ) {
             ylim <- range(avg$avg[cls.srt,])
             ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
                       ylim[2]+diff(ylim)*ylim.scale)
