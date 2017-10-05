@@ -476,6 +476,7 @@ clusterAverages <- function(ts, cls, cls.srt,
     }
     res <- list(avg=clavg, std=clstd, low=cllow, high=clhig)
     class(res) <- "clusteraverages"
+    res
 }
 
 #' plots cluster averages
