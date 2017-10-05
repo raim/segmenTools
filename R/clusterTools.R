@@ -515,7 +515,9 @@ clusterAverages <- function(ts, cls, cls.srt,
 plot.clusteraverages <- function(x, cls.srt, cls.col,
                                 each=FALSE, polygon=TRUE,
                                 xlab, time, 
-                                ylab="average",ylim="avg",ylim.scale=.1,...) {
+                                ylab="average",
+                                ylim=ifelse(each,"avg","rng"),
+                                ylim.scale=.1,...) {
     avg <- x
     ## x-axis
     if ( missing(time) ) {
