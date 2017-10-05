@@ -466,15 +466,18 @@ clusterAverages <- function(ts, cls, cls.srt,
     clstd  <- cllow <- clhig <- clavg
 
     for ( cl in cls.srt ) {
+        ## average and deviation
         clavg[cl,] <- apply(ts[cls==cl,],2, function(x) avg(x,na.rm=T))
         clstd[cl,] <- apply(ts[cls==cl,],2, function(x) dev(x,na.rm=T))
+        ## upper/lower quantiles
         cllow[cl,]<- apply(ts[cls==cl,],2,
                            function(x) quantile(x,  q,na.rm=T))
         clhig[cl,]<- apply(ts[cls==cl,],2,
                            function(x) quantile(x,1-q,na.rm=T))
         
     }
-    res <- list(avg=clavg, std=clstd, low=cllow, high=clhig)
+    res <- list(avg=clavg, std=clstd, low=cllow, high=clhig,
+                functions=list(average=avg, deviation=dev))
     class(res) <- "clusteraverages"
     res
 }
