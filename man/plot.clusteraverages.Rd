@@ -7,9 +7,8 @@ plots average time series of clusters as calculated by
 \code{\link{clusterAverages}}, including the variations around the mean
 as polygons}
 \usage{
-\method{plot}{clusteraverages}(x, cls.srt, cls.col, each = FALSE,
-  polygon = TRUE, xlab, time, ylab = "average", ylim, ylim.scale = 0.1,
-  ...)
+plot.clusteraverages(x, cls.srt, cls.col, each = FALSE, polygon = TRUE,
+  xlab, time, ylab = "average", ylim, ylim.scale = 0.1, ...)
 }
 \arguments{
 \item{x}{cluster time series average object as calculated by
