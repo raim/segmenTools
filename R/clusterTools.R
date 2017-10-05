@@ -440,7 +440,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' calculates cluster averages
 #' calculates average values and distributions for each cluster
 #' and time point of a time series
-#' @param ts a time series, with time points in columns
+#' @param ts a matrix of time series, with time points in columns
 #' @param cls a clustering of the time series, \code{length(cls)}
 #' must equal \code{nrow(cls)}
 #' @param cls.srt optional sorting of the clusters
