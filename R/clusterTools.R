@@ -539,8 +539,8 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     }
 
     ## average and polygon colors
-    pol.col <- add.alphas(cls.col,rep(.2,length(cls.col)))
-    avg.col <- add.alphas(cls.col,rep(1,length(cls.col)))
+    pol.col <- add_alphas(cls.col,rep(.2,length(cls.col)))
+    avg.col <- add_alphas(cls.col,rep(1,length(cls.col)))
 
     ## calculate ylim from full ranges? 
     if ( typeof(ylim)=="character" ) {
@@ -584,9 +584,16 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     ##pol.col
 }
 
-## util to add/replace alpha values of color vectors
-## after http://www.magesblog.com/2013/04/how-to-change-alpha-value-of-colours-in.html
-add.alphas <- function(col, alpha=rep(1,length(col))){
+#' replace alpha values of an RGB string color vector
+#'
+#' adds (or replaces existing) alpha values (from 0 to 1) to
+#' RGB string colors; extended to vectors from \url{http://www.magesblog.com/2013/04/how-to-change-alpha-value-of-colours-in.html}
+#' @param col a string vector of RGB color specifiers with ("#FF0000AA ")
+#' or without ("#FF0000") existing alpha values
+#' @param alpha a numeric vector of equal length as argument \code{col}
+#' providing new alpha values from 0 to 1
+#' @export
+add_alphas <- function(col, alpha=rep(1,length(col))){
     nms <- names(col)
     lcol <- lapply(col, function(x) c(col2rgb(x)/255))
     col <- sapply(1:length(col), function(x) {
