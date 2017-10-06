@@ -116,3 +116,80 @@ testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
     abline(v=rephases*T/360,col=1:nrow(y)) ## plot re-covered phases
 }
 
+## time-series processing
+# function taken from FLUSH.LVS.bundle/R/normalize_LVS.R and via tataProject.R
+# http://www.meb.ki.se/~yudpaw/
+# http://www.ncbi.nlm.nih.gov/pubmed/18318917
+normalize.los <- function(x,los.id,norm.ref=c("median","mean"),norm.type=c("loess","smooth","scale"), add.maximum=FALSE, reset.extrema=FALSE, extend.max=FALSE) {
+  require("matrixStats") ## TODO: replace by apply
+  if(missing(los.id))
+    stop("must provide index (logical or numerical) for LOS genes")
+  
+  if(!is.logical(los.id) && !is.numeric(los.id))
+    stop("los.id must be a vector either logical or numeric")
+  
+  ## generate reference data: mean/median for each reference probe
+  norm.ref <- match.arg(norm.ref)
+  ref.data <- switch(norm.ref,"median"=rowMedians(x),rowMeans(x))
+  
+  out <- matrix(NA, ncol=ncol(x), nrow=nrow(x))
+
+  ## SIMPLE SCALING
+  if ( norm.type=="scale" ) {
+    out <- t(t(x) * rowMeans(t(ref.data[los]/x[los,])))
+    colnames(out) <- colnames(x)
+    rownames(out) <- rownames(x)
+    return(out)       
+  }
+    
+  for ( i in 1:ncol(x) ) {
+    los <- los.id
+    ## add all individual array maxima to extend fitting curve
+    if ( add.maximum ) {
+      if ( is.logical(los)) los[x[,i]>=max(x[los,i])]<-TRUE
+      if ( is.numeric(los)) los<-c(los,which(x[,i]>=max(x[los,i])))
+    }
+    if ( norm.type=="loess" ) {
+      ## fit polynomial of degree 2 for reference data points
+      sm <- loess(x[los,i]~ref.data[los], degree = 2)
+
+      ## sm$x IS ref.data[los] , i.e. time-series medians/means
+      ## sm$fitted IS x[los,i] curve??
+            
+      ## linearly interpolate fitted curve at raw data points,
+      ## rule=2: extrapolate at maxima to last value (rule=1:
+      ## extrapolate as NA)
+      a <- approx(x=sm$fitted, y=sm$x, xout=x[,i], rule = 2)$y
+    } else if ( norm.type=="smooth") {
+      ## generate a smoothed spline for reference data points
+      sm <- smooth.spline(y=x[los,i] , x= ref.data[los])
+      ## as above
+      a <- approx(x=sm$y, y=sm$x, xout=x[,i], rule = 2)$y
+    }
+    
+    ## HANDLE DATA BEYONG APPROX RANGE, x>=max(los)
+    if ( reset.extrema ) {
+      
+      ## TODO: instead use simple scaling with highest LOS value
+      ##max.los <- which(los & x[,i] == max(x[los,i]))
+      ##a[x[,i]>=max(x[los,i])] <- x[x[,i]>=max(x[los,i]),i] * a[max.los]/x[max.los,i]))
+      
+      ## TODO: was >= and <= correct(er) ??
+      a[x[,i] > max(x[los,i])] <- x[x[,i] > max(x[los,i]),i]
+      a[x[,i] < min(x[los,i])] <- x[x[,i] < min(x[los,i]),i]  
+    } else if ( extend.max ) {
+      ## use simple scaling with highest LOS value
+      max.los <- which(los & x[,i] == max(x[los,i]))
+      a[  x[,i] > max(x[los,i]) ] <-
+        x[x[,i] > max(x[los,i]),i] * a[max.los]/x[max.los,i]
+      ## TODO: x[,i]<=min(x[los,i]) !!??
+      
+    }
+    out[,i] <- a
+  }
+    
+  colnames(out) <- colnames(x)
+  rownames(out) <- rownames(x)
+  
+  return(out)
+}
