@@ -6,7 +6,7 @@
 #'@importFrom utils write.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
-#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap
+#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm
 NULL # this just ends the global package documentation
 
 
@@ -14,19 +14,9 @@ NULL # this just ends the global package documentation
 
 ### DATA STAT & TRANSFORMATION UTILS
 
-#' perform Discrete Fourier Transformation using \code{mvfft} from
-#' the \code{stats} package, and returning the non-redundant (for
-#' real numbers) first half of the transform, i.e., from the DC
-#' (direct current) component to the Nyquist frequency
-#' @param x data to be transformed
-#' @export
-get.fft <- function(x) {
-    n <- floor(ncol(x)/2) +1 ## Nyquist-freq
-    fft <- t(stats::mvfft(t(x)))[,1:n]
-    colnames(fft) <- c("DC",as.character(1:(n-1)))
-    fft
-}
 
+#' asinh data transformation
+#'
 #' asinh trafo, an alternative to log transformation that has less
 #' (compressing) effects on the extreme values (low and high values),
 #' and naturally handles negative numbers and 0
@@ -89,6 +79,8 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::jpeg(file.name, width=width, height=height, units="in", res=res)
 }
 
+#' plot multiple cumulative distribution functions
+#' 
 #' plot multiple cumulative distribution functions of overlap statistics, as
 #' provided by function \code{\link{getOverlapStats}}
 #' @param x x-values for which cumulative distribution functions of overlap characteristics are plotted
@@ -155,7 +147,8 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), 
 whichSegment <- function(pos, seg) 
     which(seg[,"start"]<= pos & seg[,"end"]>=pos)
 
-
+#' splits segmenTier classes into a table
+#' 
 #' specifically tailored to segment strings in segmenTier;
 #' splits a list of strings by a separator and constructs
 #' a table from the entries.
@@ -200,6 +193,8 @@ getSegmentClassTable <- function(sgtypes, sep="_", gsep=":") {
     cltab
 }
 
+#' splits segmenTier segment class strings into classes
+#' 
 #' specifically tailored to segment strings in segmenTier
 #' @param sgtypes a list of strings, that is converted to a table
 #' of classes based on a string separator (\code{sep})
@@ -236,6 +231,8 @@ annotateQuery <- function(query, target, col) {
     ## TODO: fix this, make real annotate query
 }
 
+#' annotate target segments by overlapping query segments
+#' 
 #' wrapper around \code{\link{segmentOverlap}}, used to 
 #' annotate the target set by a column in the query set
 #' @param query the query set of segments (genomic intervals)
@@ -350,7 +347,10 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ##}
 }
 
-#' Collect stats from a nested list of overlap statistics in lists
+#' Collect statistics from from \code{\link{segmentOverlap}}
+#' 
+#' Collect statistics from from \code{\link{segmentOverlap}},
+#' a nested list of overlap statistics in lists
 #' and vectors for a given segment \code{type}
 #' @param ovlStatLst list of overlap statistics, where individual
 #' entries come from \code{\link{segmentOverlap}}
@@ -401,6 +401,8 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 ### MAIN ALGORITHM - FINDS OVERLAPS BETWEEN TWO SETS
 ### CHROMOSOMAL SEGMENTS
 
+#' Overlaps between two sets of chromosome segments
+#' 
 #' Simple sweeping algorithm to find overlapping intervals. Both
 #' intervals must be in continuous index (coor2index) and start<end,
 #' with strand information implied in the continuous index position.
@@ -735,7 +737,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 
 ### SEGMENT READ STATISTICS
 
-#' Calculates phase distributions.
+#' Calculates phase distributions
 #' 
 #' calculates the circular mean and R statistics, copied from from package
 #' \code{CircStats} and after
@@ -800,7 +802,9 @@ readDist <- function(rds) {
   avg
 }
 
-#' Average read-count  time-series of a genomic interval (segment). Note
+#' Average read-counts of segments
+#' 
+#' Average read-count time-series of a genomic interval (segment). Note
 #' that the diverse attempts to smooth or filter read-counts before
 #' taking the averages did not give good results, and we remained using
 #' avg="mean" and no other transformations.
@@ -976,6 +980,8 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
     rownames(all) <- NULL
     all[order(all[,"target"]),]
 }
+
+### PRE-SEGMENTATION
 
 #' Pre-segmentation of the time-series
 #' 
@@ -1219,9 +1225,12 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
     primseg
 }
 
+#' write out segment data to individual files
+#' 
 #' writing out data for segments to files, used for writing the primary
 #' segments by \code{\link{presegment}} to single files that are
-#' then further processed by segmenTier.
+#' then further processed by segmenTier. This avoids loading the
+#' complete data set and allows parallel usage of \code{segmenTier}.
 #' @param data a data matrix to which coordinates in \code{segments}
 #' refer to
 #' @param segments a matrix that must contain "start" and "end" (columns)
@@ -1231,7 +1240,7 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
 #' files will end up in the current working directory (`getwd`)
 #' @param name name used as prefix in file names 
 #' @export
-writeSegments <- function(data, segments, name="segment", path) {
+writeSegments <- function(data, segments, path, name="segment") {
 
     for ( i in 1:nrow(segments) ) {
         rng <- segments[i,"start"]:segments[i,"end"]
