@@ -30,18 +30,17 @@ get.fft <- function(x) {
 #' @param degrees logical to indicate whether phases should be reported
 #' in degrees (0 - 360) or radians (0 - 2*pi)
 #' @export
-phase <- function(x, cycles, degrees=TRUE) {
+calculatePhase <- function(x, cycles, degrees=TRUE) {
 
-    if ( class(x)!="timeseries" ) {
-        if ( class(x)!="matrix" )
-            x <- data.matrix(x)
-        x <- processTimeseries(x, use.fft=TRUE, use.snr=FALSE)
-    }
+    if ( class(x)=="timeseries" ) # segmenTier class !
+        dft <- x$dft
+    else dft <- get.fft(data.matrix(x))
+
     if ( missing(cycles) )
-        cycles <- 2:ncol(x$dft)
+        cycles <- 2:ncol(dft)
     else cycles <- cycles +1
 
-    phase <- x$dft[,cycles,drop=FALSE]
+    phase <- dft[,cycles,drop=FALSE]
     ## TODO: check whether sign is correct?
     ## atan2 gives phase shifts relative to a cosine, from -pi (delay)
     ## to pi (advance) wrt peak
@@ -59,7 +58,7 @@ phase <- function(x, cycles, degrees=TRUE) {
     phase
 }
 
-#' tests phase recovery by \code{\link{phase}}
+#' tests phase recovery by \code{\link{calculatePhase}}
 #'
 #' @param n number of cosines to generate
 #' @param cyc numbers of cycles to generate
