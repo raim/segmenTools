@@ -2,8 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{collectOvlStats}
 \alias{collectOvlStats}
-\title{Collect stats from a nested list of overlap statistics in lists
-and vectors for a given segment \code{type}}
+\title{Collect statistics from from \code{\link{segmentOverlap}}}
 \usage{
 collectOvlStats(ovlStatLst, type)
 }
@@ -14,6 +13,7 @@ entries come from \code{\link{segmentOverlap}}}
 \item{type}{name of the overlap statistics list first level}
 }
 \description{
-Collect stats from a nested list of overlap statistics in lists
+Collect statistics from from \code{\link{segmentOverlap}},
+a nested list of overlap statistics in lists
 and vectors for a given segment \code{type}
 }

@@ -2,11 +2,9 @@
 % Please edit documentation in R/segmenTools.R
 \name{writeSegments}
 \alias{writeSegments}
-\title{writing out data for segments to files, used for writing the primary
-segments by \code{\link{presegment}} to single files that are
-then further processed by segmenTier.}
+\title{write out segment data to individual files}
 \usage{
-writeSegments(data, segments, name = "segment", path)
+writeSegments(data, segments, path, name = "segment")
 }
 \arguments{
 \item{data}{a data matrix to which coordinates in \code{segments}
@@ -16,13 +14,14 @@ refer to}
 of segments; these coordinates will be extracted from \code{data}
 and written to individual files, numbered by the row number in segments.}
 
-\item{name}{name used as prefix in file names}
-
 \item{path}{optional output path where files will be written, if not supplied
 files will end up in the current working directory (`getwd`)}
+
+\item{name}{name used as prefix in file names}
 }
 \description{
 writing out data for segments to files, used for writing the primary
 segments by \code{\link{presegment}} to single files that are
-then further processed by segmenTier.
+then further processed by segmenTier. This avoids loading the
+complete data set and allows parallel usage of \code{segmenTier}.
 }

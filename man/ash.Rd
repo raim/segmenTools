@@ -2,9 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{ash}
 \alias{ash}
-\title{asinh trafo, an alternative to log transformation that has less
-(compressing) effects on the extreme values (low and high values),
-and naturally handles negative numbers and 0}
+\title{asinh data transformation}
 \usage{
 ash(x)
 }

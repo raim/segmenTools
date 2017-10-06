@@ -2,14 +2,16 @@
 % Please edit documentation in R/segmenTools.R
 \name{phaseDist}
 \alias{phaseDist}
-\title{Calculates phase distributions.}
+\title{Calculates phase distributions}
 \usage{
-phaseDist(phs, w)
+phaseDist(phs, w, degrees = TRUE)
 }
 \arguments{
 \item{phs}{vector of phases in degrees}
 
 \item{w}{optional weights for weighted mean}
+
+\item{degrees}{phases are in degrees (0-360), set FALSE for radians}
 }
 \description{
 calculates the circular mean and R statistics, copied from from package

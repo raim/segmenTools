@@ -2,9 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{getSegmentClassTable}
 \alias{getSegmentClassTable}
-\title{specifically tailored to segment strings in segmenTier;
-splits a list of strings by a separator and constructs
-a table from the entries.}
+\title{splits segmenTier classes into a table}
 \usage{
 getSegmentClassTable(sgtypes, sep = "_", gsep = ":")
 }

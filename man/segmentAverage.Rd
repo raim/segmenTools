@@ -2,10 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{segmentAverage}
 \alias{segmentAverage}
-\title{Average read-count  time-series of a genomic interval (segment). Note
-that the diverse attempts to smooth or filter read-counts before
-taking the averages did not give good results, and we remained using
-avg="mean" and no other transformations.}
+\title{Average read-counts of segments}
 \usage{
 segmentAverage(rds, avg = "mean", mean.ratio = FALSE, rm.extreme = FALSE,
   endcut = 0, k = 1, endrule = "median")
@@ -33,7 +30,7 @@ only if \code{k>1}}
 function \code{\link[stats]{runmed}}}
 }
 \description{
-Average read-count  time-series of a genomic interval (segment). Note
+Average read-count time-series of a genomic interval (segment). Note
 that the diverse attempts to smooth or filter read-counts before
 taking the averages did not give good results, and we remained using
 avg="mean" and no other transformations.

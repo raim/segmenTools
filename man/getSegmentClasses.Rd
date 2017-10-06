@@ -2,7 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{getSegmentClasses}
 \alias{getSegmentClasses}
-\title{specifically tailored to segment strings in segmenTier}
+\title{splits segmenTier segment class strings into classes}
 \usage{
 getSegmentClasses(sgtypes, sep = "_", gsep = ":")
 }

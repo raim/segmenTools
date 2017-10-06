@@ -2,8 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{annotateTarget}
 \alias{annotateTarget}
-\title{wrapper around \code{\link{segmentOverlap}}, used to 
-annotate the target set by a column in the query set}
+\title{annotate target segments by overlapping query segments}
 \usage{
 annotateTarget(query, target, qcol = colnames(query), tcol, prefix,
   details = FALSE, only.best = TRUE, minJaccard, collapse = TRUE,
