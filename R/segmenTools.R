@@ -746,14 +746,16 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' TODO: recognize bimodal?
 #' @param phs vector of phases in degrees
 #' @param w optional weights for weighted mean
+#' @param degrees phases are in degrees (0-360), set FALSE for radians
 #' @export
-phaseDist <- function(phs, w) {
+phaseDist <- function(phs, w, degrees=TRUE) {
     
     avg <- c(mean=NA, r=NA, na=sum(is.na(phs))/length(phs))
 
     ## removing NA
     if ( !missing(w) ) w <- w[!is.na(phs)]
-    phs <- phs[!is.na(phs)] * pi/180 # convert degree to radian
+    if ( degrees ) 
+        phs <- phs[!is.na(phs)] * pi/180 # convert degree to radian
     
     if ( length(phs)>0 ) {
         if ( !missing(w) ) {
@@ -766,8 +768,11 @@ phaseDist <- function(phs, w) {
             n <- length(phs)
         }
         r <- sqrt(c^2 + s^2)/n
-        mean <- atan2(s, c) *180/pi # convert back to degree
-        mean <- ifelse(mean<=  0,mean + 360, mean)
+        mean <- atan2(s, c)
+        if ( degrees ) {
+            mean <- mean*180/pi # convert back to degree
+            mean <- ifelse(mean<=  0,mean + 360, mean)
+        }
         avg[1:2] <- c(mean=mean, r=r)
     }
     if ( !missing(w) ) names(avg) <- paste("w",names(avg),sep=".")
