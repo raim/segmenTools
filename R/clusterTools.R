@@ -451,43 +451,226 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' @param cls.srt optional sorting of the clusters
 #' @param avg a function for calculating an `average' value for
 #' each cluster; default is the \code{median}
-#' @param dev a function for calculating deviation from the
-#' the average, default is the standard deviation (\code{sd})
-#' @param q the \code{\link{quantile}} cut-off, a real number between 0 and 1;
-#' \code{1-q} of the time-series are smaller and \code{q}; the range
-#' of reported quantile time-series `high' and `low' will cover
-#' (1- 2q) of all values in the cluster
-#' of the time series are larger then the reported values.
+## @param dev a function for calculating deviation from the the average,
+## default is the standard deviation (‘sd’)
+#' @param q either numeric 0-1, the fraction of data for which high
+#' and low data cut-offs are calculated, or a function name for
+#' calculating variance (eg. "sd", "var"), which will be added and
+#' subtracted from the average (argument \code{avg}) for high
+#' and low data cut-offs
 #' @export
-clusterAverages <- function(ts, cls, cls.srt,
-                            avg=get("median", mode="function"),
-                            dev=get("sd", mode="function"), q=.1) {
+clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
 
+    ## get requested functions
+    avg <- get(avg, mode="function")
+    #dev <- get(dev, mode="function")
+    
     if ( missing(cls.srt) )
       cls.srt <- sort(unique(cls))
     
     clavg <- matrix(NA, ncol=ncol(ts), nrow=length(cls.srt))
     rownames(clavg) <- cls.srt
-    clstd  <- cllow <- clhig <- clavg
+    cllow <- clhig <- clavg
 
+    if ( is.numeric(q) )
+        qf <- (1-q)/2
+    else qf <- get(q, mode="function")
+    
     for ( cl in cls.srt ) {
         ## average and deviation
         clavg[cl,] <- apply(ts[cls==cl,],2, function(x) avg(x,na.rm=T))
-        clstd[cl,] <- apply(ts[cls==cl,],2, function(x) dev(x,na.rm=T))
-        ## upper/lower quantiles
-        cllow[cl,]<- apply(ts[cls==cl,],2,
-                           function(x) quantile(x,  q,na.rm=T))
-        clhig[cl,]<- apply(ts[cls==cl,],2,
-                           function(x) quantile(x,1-q,na.rm=T))
-        
+        if ( is.numeric(q) ) {
+            ## upper/lower quantiles
+            cllow[cl,]<- apply(ts[cls==cl,],2,
+                               function(x) quantile(x,  qf,na.rm=T))
+            clhig[cl,]<- apply(ts[cls==cl,],2,
+                               function(x) quantile(x,1-qf,na.rm=T))
+        } else  {
+            df <- apply(ts[cls==cl,],2, function(x) qf(x,na.rm=T))
+            cllow[cl,] <- clavg[cl,] - df
+            clhig[cl,] <- clavg[cl,] + df
+        }
     }
-    res <- list(avg=clavg, std=clstd, low=cllow, high=clhig,
-                functions=list(average=avg, deviation=dev))
+    res <- list(avg=clavg, low=cllow, high=clhig,
+                functions=list(average=avg, q=q))
     class(res) <- "clusteraverages"
     res
 }
 
-#' plots cluster averages
+#' plots cluster averages 
+#'
+#' as \code{\link{plot.clusteraverages}} but using
+#' package \link[segmenTier]{segmenTier}'s time series and clustering object
+#' as input; calls, and plots and returns results from
+#' \code{\link{clusterAverages}}.
+#' @param x either a simple data matrix with time points (x-axis) in columns,
+#' or a processed time-series as provided by
+#' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
+#' @param cls eiter a vector (length(cls)==nrow(x) or a structure of
+#' class 'clustering' as returned by segmenTier's
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param K integer or string specifiying to clustering (K: cluster numbers)
+#' to be used if cls is of class 'clustering'; if missing (default) the
+#' `selected' clustering from \code{cls} (cls$selected) is chosen
+#' @param norm normalization of the time-series data, must be a function
+#' that transforms the data, available via \link{segmenTools} are
+#' \code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations
+#' @param avg a function for calculating an `average' value for
+#' each cluster; default is the \code{median}
+#' @param q either numeric 0-1, the fraction of data to be shown,
+#' or a function name for calculating variance (eg. "sd", "var")
+#' @param cls.srt optional cluster sorting, can be used for selection of
+#' subsets of clusters; if cls is of class 'clustering' it is taken
+#' from there
+#' @param type string specifying the type of plot: "rng" for plotting
+#' only data ranges (see argument \code{q}) or "all" to plot
+#' each individual time-course (as thin lines)
+#' @param cls.col optional named cluster color vector, where names indicate
+#' the clusters (as.caracter(cls)); if cls is of class 'clustering' it
+#' is taken from there
+#' @param each logical value indicating whether to plot all cluster
+#' averages on one panel (\code{FALSE}) or each cluster on a separate panel
+#' (\code{TRUE})
+#' @param time optional numeric vector specifiying x-axis time coordinates
+#' @param xlab x-axis label (auto-selected if missing)
+#' @param ylab y-axis label (only used if \code{each==FALSE})
+#' @param ylim either conventional range of the y-axis, or a string
+#' specifying whether ylim should be calculated from the average
+#' (\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})
+#' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
+#' extended by this fraction of the total range on both sides
+#' @param avg.col color for average line; used only if \code{rng="all"}
+#' @param ... further arguments to \code{\link{plot.clusteraverages}} 
+## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
+## plot.clusteraverages should become a function of plot.clustering,
+## and clusterAverages can be a private function!
+## make function `timeseriesPlot' or `clusterPlot', that takes
+## either tset/cset or matrix/vector
+#' @export
+plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng", 
+                         norm, avg="median",  q=.9,
+                         ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
+                         time, xlab, avg.col="#000000", ...) {
+
+    
+    if ( class(cls)=="clustering" ) {
+
+        if ( missing(K) )
+            K <- cls$selected
+        if ( is.numeric(K) )
+            K <- paste("K:",K,sep="")
+
+        ## TODO: why import problem in R CMD check?
+        ##if ( !"colors" %in% names(cls) )
+        ##    cls <- segmenTier::colorClusters(cls)
+        ##if ( !"sorting" %in% names(cls) )
+        ##    cls <- segmenTier::sortClusters(cls)
+        cls.col <- cls$colors[[K]]
+        if( missing(cls.srt) )
+            cls.srt <- cls$sorting[[K]]
+
+        cls <- cls$clusters[,K]
+    } else {
+
+        ## cluster sorting
+        if ( missing(cls.srt) )
+            cls.srt <- sort(unique(cls))
+        ## cluster colors
+        if ( missing(cls.col) ) {
+            cls.col <- rainbow(length(cls.srt))
+            names(cls.col) <- cls.srt
+        }
+    }
+    cls.sze <- table(cls)
+    
+    ## average and polygon colors
+    pol.col <- add_alphas(cls.col,rep(.2,length(cls.col)))
+    if ( type=="rng" ) 
+        avg.col <- add_alphas(cls.col,rep(1,length(cls.col)))
+    if ( type=="all" ) {
+        avg.col <- rep(avg.col, length(cls.col))
+        names(avg.col) <- names(cls.col)
+    }
+
+    ## TIME SERIES
+    if ( class(x)=="timeseries" )
+        ts <- x$ts
+    else ts <- data.matrix(x)
+
+    ## normalize
+    if ( !missing(norm) )
+        ts <- get(norm,mode="function")(ts)
+    else norm <- "raw"
+    
+    ## x-axis
+    if ( missing(time) ) {
+        time <- 1:ncol(ts)
+        if ( missing(xlab) )
+            xlab <- "index"
+    } 
+    if ( missing(xlab) )
+        xlab <- "time"
+    
+    
+    ## average values
+    if ( type=="all" ) q <- 1
+    avg <- clusterAverages(ts, cls=cls, cls.srt=cls.srt, avg=avg, q=q)
+
+    ## calculate ylim from full ranges? 
+    if ( typeof(ylim)=="character" ) {
+        if ( ylim == "rng" )
+            ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
+                      max(avg$high[cls.srt,],na.rm=TRUE))
+        else if ( ylim == "avg" ) {
+            ylim <- range(avg$avg[cls.srt,])
+            ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
+                      ylim[2]+diff(ylim)*ylim.scale)
+        }
+        else if ( ylim=="all" ) {
+            ylim <- range(ts, na.rm=TRUE)
+        }
+    }
+
+    ## PLOT
+    ## plot each cluster on separate panel?
+    if ( each ) {
+        mai <- par("mai")
+        mai[c(1,3)] <- 0
+        old.par <- par(mfcol=c(length(cls.srt),1),mai=mai)
+    } else {
+        plot(1,col=NA,axes=FALSE,
+             xlab=xlab,xlim=range(time),
+             ylab=norm,ylim=ylim, ...)
+        axis(1);axis(2)
+        axis(3, at=time, labels=FALSE)
+        mtext("samples", 3, 1.2)
+    }
+    ## plot each cluster in cls.srt
+    for ( cl in cls.srt ) {
+        if ( each ) {
+            plot(1,col=NA,axes=FALSE, xlab=NA,xlim=range(time),
+                 ylab=paste(cl," (",cls.sze[cl],")",sep=""),ylim=ylim, ...)
+            axis(1);axis(2)
+        }
+        if ( type=="rng" ) ## polygon
+          polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
+                  col=pol.col[cl],border=NA)
+        if ( type=="all" )
+            matplot(time, t(ts[cls==cl,]), add=TRUE,
+                    type="l", lty=1, col=pol.col[cl], lwd=.5)
+        lines(time, avg$avg[cl,], lwd=3, col=avg.col[cl]) ## average last
+        points(time, avg$avg[cl,], col=avg.col[cl])
+    }
+    ## reset plot pars
+    if ( each ) par(old.par)
+
+    avg$normalization <- norm
+    avg$ylim <- ylim
+    invisible(avg) # silent return of averages
+    #avg.col
+}
+
+#' plots cluster averages 
 #' 
 #' plots average time series of clusters as calculated by
 #' \code{\link{clusterAverages}}, including the variations around the mean
@@ -495,7 +678,8 @@ clusterAverages <- function(ts, cls, cls.srt,
 #' @param x cluster time series average object as calculated by
 #' \code{\link{clusterAverages}}
 #' @param cls.srt optional sorting of clusters; clusters will be plotted
-#' in this order, i.e. the last in \code{cls.srt} is plotted last
+#' in this order, i.e. the last in \code{cls.srt} is plotted last;
+#' can be used for selecting a subset of clusters
 #' @param cls.col optional coloring of clusters
 #' @param each logical value indicating whether to plot all cluster
 #' averages on one panel (\code{FALSE}) or each cluster on a separate panel
@@ -515,8 +699,7 @@ clusterAverages <- function(ts, cls, cls.srt,
 plot.clusteraverages <- function(x, cls.srt, cls.col,
                                 each=FALSE, polygon=TRUE,
                                 xlab, time, 
-                                ylab="average",
-                                ylim=ifelse(each,"avg","rng"),
+                                ylab="average", ylim=ifelse(each,"avg","rng"),
                                 ylim.scale=.1,...) {
     avg <- x
     ## x-axis
@@ -574,10 +757,10 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
                  ylab=paste(ylab,cl,sep=" - "),ylim=ylim, ...)
             axis(1);axis(2)
         }
-        if ( polygon )
+        if ( polygon ) ## polygon
           polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
                   col=pol.col[cl],border=NA)
-        lines(time, avg$avg[cl,], col=avg.col[cl], lwd=3)
+        lines(time, avg$avg[cl,], col=avg.col[cl], lwd=3) ## average last
     }
     ## reset plot pars
     if ( each ) par(old.par)
