@@ -9,6 +9,9 @@ ash(x)
 \arguments{
 \item{x}{data to be transformed}
 }
+\value{
+log(x+sqrt(x^2+1))
+}
 \description{
 asinh trafo, an alternative to log transformation that has less
 (compressing) effects on the extreme values (low and high values),

@@ -13,7 +13,8 @@
 \code{\link{clusterAverages}}}
 
 \item{cls.srt}{optional sorting of clusters; clusters will be plotted
-in this order, i.e. the last in \code{cls.srt} is plotted last}
+in this order, i.e. the last in \code{cls.srt} is plotted last;
+can be used for selecting a subset of clusters}
 
 \item{cls.col}{optional coloring of clusters}
 

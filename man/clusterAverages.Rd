@@ -4,8 +4,7 @@
 \alias{clusterAverages}
 \title{calculates cluster averages}
 \usage{
-clusterAverages(ts, cls, cls.srt, avg = get("median", mode = "function"),
-  dev = get("sd", mode = "function"), q = 0.1)
+clusterAverages(ts, cls, cls.srt, avg = "median", q = 0.9)
 }
 \arguments{
 \item{ts}{a matrix of time series, with time points in columns}
@@ -18,14 +17,11 @@ must equal \code{nrow(cls)}}
 \item{avg}{a function for calculating an `average' value for
 each cluster; default is the \code{median}}
 
-\item{dev}{a function for calculating deviation from the
-the average, default is the standard deviation (\code{sd})}
-
-\item{q}{the \code{\link{quantile}} cut-off, a real number between 0 and 1;
-\code{1-q} of the time-series are smaller and \code{q}; the range
-of reported quantile time-series `high' and `low' will cover
-(1- 2q) of all values in the cluster
-of the time series are larger then the reported values.}
+\item{q}{either numeric 0-1, the fraction of data for which high
+and low data cut-offs are calculated, or a function name for
+calculating variance (eg. "sd", "var"), which will be added and
+subtracted from the average (argument \code{avg}) for high
+and low data cut-offs}
 }
 \description{
 calculates average values and distributions for each cluster
