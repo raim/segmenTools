@@ -7,6 +7,7 @@
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm
+##@importFrom segmenTier colorClusters
 NULL # this just ends the global package documentation
 
 
@@ -21,6 +22,7 @@ NULL # this just ends the global package documentation
 #' (compressing) effects on the extreme values (low and high values),
 #' and naturally handles negative numbers and 0
 #' @param x data to be transformed
+#' @return log(x+sqrt(x^2+1))
 #' @export
 ash <- function(x) log(x+sqrt(x^2+1))
 #' log trafo handling zeros by adding 1
@@ -28,6 +30,20 @@ ash <- function(x) log(x+sqrt(x^2+1))
 #' @return log(x+1)
 #' @export
 log_1 <- function(x) log(x+1)
+
+#' mean-0 normalization
+#' @param x data to be transformed
+#' @return log2(x/apply(x,1,mean))
+#' @export
+meanzero <- function(x) t(apply(x,1,scale))
+#' log2 ratio normalization
+#'
+#' @param x data to be transformed
+#' @return log2(x/apply(x,1,mean))
+#' @export
+lg2r <- function(x) log2(x/apply(x,1,mean))
+
+
 
 #' moving average using \code{\link[stats]{filter}}
 #' @param x data vector along which a moving average will be calculated
