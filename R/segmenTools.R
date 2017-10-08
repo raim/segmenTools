@@ -41,7 +41,7 @@ meanzero <- function(x) t(apply(x,1,scale))
 #' @param x data to be transformed
 #' @return log2(x/apply(x,1,mean))
 #' @export
-lg2r <- function(x) log2(x/apply(x,1,mean))
+lg2r <- function(x,na.rm=TRUE) log2(x/apply(x,1,mean,na.rm=na.rm))
 
 
 
