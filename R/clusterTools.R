@@ -558,7 +558,7 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
     if ( class(cls)=="clustering" ) {
 
         if ( missing(K) )
-            K <- cls$selected
+            K <- paste("K:",cls$selected,sep="")
         if ( is.numeric(K) )
             K <- paste("K:",K,sep="")
 
