@@ -47,7 +47,7 @@ similarity-based segmentation of coordinate-based time-series
 
 TODO: Cluster-wise oscillation parameters
 
-```{r}
+```R
 library(segmenTier) # for clustering 
 library(segmenTools) # for plots
 
