@@ -467,6 +467,8 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
     
     if ( missing(cls.srt) )
       cls.srt <- sort(unique(cls))
+    ## ensure use of rownames
+    cls.srt <- as.character(cls.srt)
     
     clavg <- matrix(NA, ncol=ncol(ts), nrow=length(cls.srt))
     rownames(clavg) <- cls.srt
@@ -581,6 +583,9 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
             names(cls.col) <- cls.srt
         }
     }
+    ## convert to character for use as rownames
+    cls.srt <- as.character(cls.srt)
+    cls <- as.character(cls)
     cls.sze <- table(cls)
     
     ## average and polygon colors
