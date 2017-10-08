@@ -61,13 +61,20 @@ dat <- read.delim(gzfile(rawdata),comment.char="!",row.names=1)
 ## process time-series (Discrete Fourier Transform)
 tset <- processTimeseries(dat, use.fft=TRUE, dc.trafo="ash",use.snr=TRUE)
 ## cluster (by kmeans)
-cset <- clusterTimeseries(tset,K=7:25) # CLUSTERING! takes a while
+## Note that function flowclusterTimeseries uses
+## model-based clustering in flowClust and usually provides
+## better clusterings and a good indicator of best 
+## cluster number (at max. BIC), but is even slower and
+## often fails; 
+cset <- clusterTimeseries(tset,K=7) # CLUSTERING! takes a while
+
 ## and inspect clustered time-series via the versatile
 ## cluster time series plotter
 pdf("edwards06.pdf")
-plotClusters(tset, cset, norm="lg2r", each=TRUE, q=0.8)
 plotClusters(tset, cset, norm="lg2r", each=TRUE, type="all", ylim="all")
-plotClusters(tset, cset, norm="lg2r", each=FALSE, type="rng", cls.srt=c(2,4,7))
+plotClusters(tset, cset, norm="lg2r", each=TRUE, q=0.8)
+## selected clusters in all-in-one plo
+plotClusters(tset, cset, norm="lg2r", each=FALSE, type="rng", cls.srt=c(3,5,7))
 dev.off()
 ```
 
