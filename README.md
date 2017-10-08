@@ -45,7 +45,26 @@ clustering of periodic time-series, after [Machne & Murray
 similarity-based segmentation of coordinate-based time-series
 (RNA-seq).
 
-TODO: Cluster-wise oscillation parameters and time-series plots.
+TODO: Cluster-wise oscillation parameters
+
+```{r}
+library(segmenTier) # for clustering 
+library(segmenTools) # for plots
+
+## download & parse data
+rawdata.url <- "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE5nnn/GSE5612/matrix/GSE5612_series_matrix.txt.gz"
+rawdata <- gsub( ".*/","",rawdata.url)
+if ( !file.exists(rawdata) )
+  utils::download.file(url=rawdata.url, dest=rawdata)
+dat <- read.delim(gzfile(rawdata),comment.char="!",row.names=1)
+
+## process time-series (Discrete Fourier Transform)
+tset <- processTimeseries(dat, use.fft=TRUE, dc.trafo="ash",use.snr=TRUE)
+## cluster (by kmeans)
+kcls <- clusterTimeseries(tset,K=7:20) # CLUSTERING! takes a while
+## and inspect clustered time-series
+plotClusters(tset,cset,norm="lg2r", each=TRUE, q=0.8)
+```
 
 #### Categorical Analysis 
 
