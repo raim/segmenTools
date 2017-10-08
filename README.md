@@ -61,11 +61,6 @@ dat <- read.delim(gzfile(rawdata),comment.char="!",row.names=1)
 ## process time-series (Discrete Fourier Transform)
 tset <- processTimeseries(dat, use.fft=TRUE, dc.trafo="ash",use.snr=TRUE)
 ## cluster (by kmeans)
-## Note that function flowclusterTimeseries uses
-## model-based clustering in flowClust and usually provides
-## better clusterings and a good indicator of best 
-## cluster number (at max. BIC), but is even slower and
-## often fails; 
 cset <- clusterTimeseries(tset,K=7) # CLUSTERING! takes a while
 
 ## and inspect clustered time-series via the versatile
