@@ -61,9 +61,14 @@ dat <- read.delim(gzfile(rawdata),comment.char="!",row.names=1)
 ## process time-series (Discrete Fourier Transform)
 tset <- processTimeseries(dat, use.fft=TRUE, dc.trafo="ash",use.snr=TRUE)
 ## cluster (by kmeans)
-kcls <- clusterTimeseries(tset,K=7:20) # CLUSTERING! takes a while
-## and inspect clustered time-series
-plotClusters(tset,cset,norm="lg2r", each=TRUE, q=0.8)
+cset <- clusterTimeseries(tset,K=7:25) # CLUSTERING! takes a while
+## and inspect clustered time-series via the versatile
+## cluster time series plotter
+pdf("edwards06.pdf")
+plotClusters(tset, cset, norm="lg2r", each=TRUE, q=0.8)
+plotClusters(tset, cset, norm="lg2r", each=TRUE, type="all", ylim="all")
+plotClusters(tset, cset, norm="lg2r", each=FALSE, type="rng", cls.srt=c(2,4,7))
+dev.off()
 ```
 
 #### Categorical Analysis 
