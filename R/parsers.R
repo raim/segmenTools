@@ -73,6 +73,8 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 #' Multiples probes for the same features (same string in column ID) will
 #' then be summarized by the function in argument \code{avg}
 #' (default: median).
+#' TODO: implement light-weight link to more sophisticated summarization as
+#' eg. farms, \url{https://www.bioconductor.org/packages/release/bioc/html/farms.html}.
 #' @param data a list as returned by function \code{\link{parseGEOSoft}}
 #' @param id a column ID; probes with equal strings in this column will
 #' be summarized
