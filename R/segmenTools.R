@@ -3,9 +3,10 @@
 #'@docType package
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
-#'@importFrom utils write.table
+#'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
+#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm
 ##@importFrom segmenTier colorClusters
 NULL # this just ends the global package documentation
