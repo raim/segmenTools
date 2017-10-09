@@ -82,9 +82,10 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 #' copying the probe ID
 #' @param avg a string specifying a function to be used for calculating
 #' probe averages
+#' @param verb print messages
 #' @param ... arguments to the function specified in \code{avg}
 #' @export
-summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ...) {
+summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", verb=TRUE, ...) {
     ## get summarization function
     avgf <- get(avg, mode="function")
     
@@ -95,21 +96,37 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ...
     ids <- data$ids
     ## fill up empty names - NOTE: none present
     ## fill empty names
+    empty <- ids[,id]==""
     if ( keep.empty ) {
-        empty <- ids[,id]==""
+        if ( verb )
+            cat(paste("adding", sum(empty),
+                      "features with empty field in column", id, "\n"))
         ids[empty,id] <- rownames(ids)[empty]
-    }
+    } else if ( verb )
+        cat(paste("discarding", sum(empty),
+                  "features with empty field in column", id, "\n"))
 
     ## rm duplicates
     uids <- unique(ids[,id])
+    uids <- uids[uids!=""] # rm empty
     udat <- matrix(NA,ncol=ncol(dat),nrow=length(uids))
     rownames(udat) <- uids
     colnames(udat) <- colnames(dat)
+    if ( verb )
+        cat(paste("mapping", nrow(ids), "probes to", length(uids),
+                  "features in column", id, "\n"))
     ## and calculate averages
     for ( i in 1:length(uids) ) 
         udat[i,] <- apply(dat[ids[,id]%in%uids[i],,drop=FALSE],2,avgf,...)
-    ## return
-    udat
+    ## copy, all, replace data and return
+    res <- data
+    res$data <- udat
+    res$mappedto <- id
+    res$avg_function <- list(name=avg,
+                             argument=paste(names(list(...)),
+                                            deparse(substitute(...))))
+    res$empty <- sum(empty)
+    res
 }
 
 ## parse GFF file 

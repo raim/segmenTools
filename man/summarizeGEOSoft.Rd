@@ -5,7 +5,7 @@
 \title{summarize GEOSoft probes}
 \usage{
 summarizeGEOSoft(data, id = "ORF", keep.empty = FALSE, avg = "median",
-  ...)
+  verb = TRUE, ...)
 }
 \arguments{
 \item{data}{a list as returned by function \code{\link{parseGEOSoft}}}
@@ -18,6 +18,8 @@ copying the probe ID}
 
 \item{avg}{a string specifying a function to be used for calculating
 probe averages}
+
+\item{verb}{print messages}
 
 \item{...}{arguments to the function specified in \code{avg}}
 }
