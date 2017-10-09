@@ -507,9 +507,11 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
 #'
 #' plot indivividual time-courses (GOI: genes of interest) from
 #' timeseries and clustering object (simple list)
-#' @param tset "timeseries" object from function
-#' \code{\link[segmenTier:processTimeseries]{\processTimeseries}}
+#' @param x "timeseries" object from function
+#' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
 #' @param cls "clustering" object (simple list)
+#' @param goi list of feature ids (rownames in cls$clusters) to plot
+#' @export
 plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",...) {
     ## TODO: set all genes
     ## in cls$cluster to "-1"

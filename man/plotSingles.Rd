@@ -7,10 +7,12 @@
 plotSingles(x, cls, goi, each, lwd = 2, leg.xy = "topleft", ...)
 }
 \arguments{
+\item{x}{"timeseries" object from function
+\code{\link[segmenTier:processTimeseries]{processTimeseries}}}
+
 \item{cls}{"clustering" object (simple list)}
 
-\item{tset}{"timeseries" object from function
-\code{\link[segmenTier:processTimeseries]{\processTimeseries}}}
+\item{goi}{list of feature ids (rownames in cls$clusters) to plot}
 }
 \description{
 plot indivividual time-courses (GOI: genes of interest) from
