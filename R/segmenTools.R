@@ -36,9 +36,11 @@ log_1 <- function(x) log(x+1)
 #' @return log2(x/apply(x,1,mean))
 #' @export
 meanzero <- function(x) t(apply(x,1,scale))
+
 #' log2 ratio normalization
 #'
 #' @param x data to be transformed
+#' @param na.rm remove NA values for mean calculation
 #' @return log2(x/apply(x,1,mean))
 #' @export
 lg2r <- function(x,na.rm=TRUE) log2(x/apply(x,1,mean,na.rm=na.rm))

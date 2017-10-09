@@ -4,10 +4,12 @@
 \alias{lg2r}
 \title{log2 ratio normalization}
 \usage{
-lg2r(x)
+lg2r(x, na.rm = TRUE)
 }
 \arguments{
 \item{x}{data to be transformed}
+
+\item{na.rm}{remove NA values for mean calculation}
 }
 \value{
 log2(x/apply(x,1,mean))
