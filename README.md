@@ -112,5 +112,7 @@ parameters, after [Lehmann, Machne & Herzel
 * `parseGEOSoft` parses GEO Soft family files of microarray data sets
 into data matrices, and accompanying probe-ID mapping, and sample/data
 annotation
+* `summarizeGEOSoft` offers a light-weight summarization function, to
+average probe data for features with multiple probes 
 * `gff2tab` parses a GFF file into tabular format, including
 collection of attributes into data columns
