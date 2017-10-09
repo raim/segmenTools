@@ -105,14 +105,18 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ver
     } else if ( verb ) {
         cat(paste("discarding", sum(empty),
                   "features with empty field in column", id, "\n"))
-        ids <- ids[!empty,]
-        dat <- dat[!empty,]
+        ids <- ids[!empty,,drop=FALSE]
+        dat <- dat[!empty,,drop=FALSE]
     }
 
     ## find duplicates
     uids <- ids[,id]
     dups <- duplicated(uids)
     dids <- unique(uids[dups])
+    if ( verb )
+        cat(paste("mapping", nrow(ids), "probes to",
+                  sum(!dups), "features in column", id, "\n"))
+    
     ## summarize duplicates (into first row where it occurs)
     idx <- sapply(dids, function(x) which(ids[,id]%in%x))
     for ( i in idx ) 
