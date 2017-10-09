@@ -6,7 +6,8 @@
 \usage{
 plotClusters(x, cls, K, cls.col, cls.srt, each = TRUE, type = "rng", norm,
   avg = "median", q = 0.9, ylab, ylim = ifelse(each, "avg", "rng"),
-  ylim.scale = 0.1, time, xlab, avg.col = "#000000", ...)
+  ylim.scale = 0.1, time, xlab, avg.col = "#000000", lwd = 0.5,
+  lwd.avg = 3, use.lty = FALSE, alpha = 0.2, ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,

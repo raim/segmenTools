@@ -467,6 +467,9 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
     
     if ( missing(cls.srt) )
       cls.srt <- sort(unique(cls))
+    ## ensure present
+    cls.srt <- cls.srt[cls.srt%in%cls]
+
     ## ensure use of rownames
     cls.srt <- as.character(cls.srt)
     
@@ -480,23 +483,50 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
     
     for ( cl in cls.srt ) {
         ## average and deviation
-        clavg[cl,] <- apply(ts[cls==cl,],2, function(x) avg(x,na.rm=T))
+        clavg[cl,] <- apply(ts[cls==cl,,drop=F],2, function(x) avg(x,na.rm=T))
         if ( is.numeric(q) ) {
             ## upper/lower quantiles
-            cllow[cl,]<- apply(ts[cls==cl,],2,
+            cllow[cl,]<- apply(ts[cls==cl,,drop=F],2,
                                function(x) quantile(x,  qf,na.rm=T))
-            clhig[cl,]<- apply(ts[cls==cl,],2,
+            clhig[cl,]<- apply(ts[cls==cl,,drop=F],2,
                                function(x) quantile(x,1-qf,na.rm=T))
         } else  {
-            df <- apply(ts[cls==cl,],2, function(x) qf(x,na.rm=T))
+            df <- apply(ts[cls==cl,,drop=F],2, function(x) qf(x,na.rm=T))
             cllow[cl,] <- clavg[cl,] - df
             clhig[cl,] <- clavg[cl,] + df
         }
+        #cat(paste(cl,"\n"))
     }
     res <- list(avg=clavg, low=cllow, high=clhig,
                 functions=list(average=avg, q=q))
     class(res) <- "clusteraverages"
     res
+}
+
+#' plot indivividual time-courses
+#'
+#' plot indivividual time-courses (GOI: genes of interest) from
+#' timeseries and clustering object (simple list)
+#' @param tset "timeseries" object from function
+#' \code{\link[segmenTier:processTimeseries]{\processTimeseries}}
+#' @param cls "clustering" object (simple list)
+plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",...) {
+    ## TODO: set all genes
+    ## in cls$cluster to "-1"
+    rm <- !goi%in%rownames(cls$clusters)
+    cat(paste(paste(goi[rm],collapse=";"),"not found\n"))
+    goi <- goi[!rm]
+    if ( length(goi)==0 )
+        stop()
+    cls$clusters[!rownames(cls$clusters)%in%goi,] <- -1
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), ...)
+    leg <- do.call(rbind,avg$legend)
+    if ( !is.null(names(goi)) )
+        leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
+    legend(leg.xy, legend=leg[,"id"], lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
+           bg="#FFFFFFAA",bty="o")
+    #invisible(avg)
+    leg
 }
 
 #' plots cluster averages 
@@ -550,9 +580,10 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
 ## either tset/cset or matrix/vector
 #' @export
 plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng", 
-                         norm, avg="median",  q=.9,
+                         norm, avg="median",  q=.9, 
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
-                         time, xlab, avg.col="#000000", ...) {
+                         time, xlab, avg.col="#000000",
+                         lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2, ...) {
 
     
     if ( class(cls)=="clustering" ) {
@@ -586,13 +617,16 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
     ## convert to character for use as rownames
     cls.srt <- as.character(cls.srt)
     cls <- as.character(cls)
+
+    ## filter for present clusters (allows plotSingles)
+    cls.srt <- cls.srt[cls.srt%in%unique(cls)]
     cls.sze <- table(cls)
     
     ## average and polygon colors
-    pol.col <- add_alphas(cls.col,rep(.2,length(cls.col)))
-    if ( type=="rng" ) 
+    pol.col <- add_alphas(cls.col,rep(alpha,length(cls.col)))
+    if ( type[1]=="rng" ) 
         avg.col <- add_alphas(cls.col,rep(1,length(cls.col)))
-    if ( type=="all" ) {
+    if ( type[1]=="all" ) {
         avg.col <- rep(avg.col, length(cls.col))
         names(avg.col) <- names(cls.col)
     }
@@ -615,11 +649,20 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
     } 
     if ( missing(xlab) )
         xlab <- "time"
-    
+
+    ## set all but goi to 
+    #if ( !missing(goi) ) {
+    #    #cls.col[rownames(ts)%in%goi
+    #}
+
+    #if ( 
+    all.col <- pol.col[cls]
+    all.lty <- rep(1, length(cls))
     
     ## average values
-    if ( type=="all" ) q <- 1
+    if ( type[1]=="all" ) q <- 1
     avg <- clusterAverages(ts, cls=cls, cls.srt=cls.srt, avg=avg, q=q)
+    #cat(paste(cls.srt))
 
     ## calculate ylim from full ranges? 
     if ( typeof(ylim)=="character" ) {
@@ -651,26 +694,39 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
         mtext("samples", 3, 1.2)
     }
     ## plot each cluster in cls.srt
+    used.pars <- rep(list(NA), length(cls.srt))
+    names(used.pars) <- cls.srt
     for ( cl in cls.srt ) {
         if ( each ) {
-            plot(1,col=NA,axes=FALSE, xlab=NA,xlim=range(time),
+            plot(1,col=NA,axes=FALSE, xlab=NA, xlim=range(time),
                  ylab=paste(cl," (",cls.sze[cl],")",sep=""),ylim=ylim, ...)
             axis(1);axis(2)
         }
-        if ( type=="rng" ) ## polygon
+        if ( "rng"%in%type ) ## polygon
           polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
                   col=pol.col[cl],border=NA)
-        if ( type=="all" )
-            matplot(time, t(ts[cls==cl,]), add=TRUE,
-                    type="l", lty=1, col=pol.col[cl], lwd=.5)
-        lines(time, avg$avg[cl,], lwd=3, col=avg.col[cl]) ## average last
+        if ( "all"%in%type ) {
+            idx <- cls==cl
+            if ( use.lty )
+                lty <- rep(1:6, len=sum(idx))
+            else lty <- all.lty[idx]
+            matplot(time, t(ts[idx,,drop=F]), add=TRUE,
+                    type="l", lty=lty,
+                    col=all.col[idx], lwd=lwd)
+            ## store
+            used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
+                                          lty=lty,col=all.col[idx],
+                                          stringsAsFactors=FALSE)
+        }
+        lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
     }
     ## reset plot pars
-    if ( each ) par(old.par)
+    #if ( each ) par(old.par)
 
     avg$normalization <- norm
     avg$ylim <- ylim
+    avg$legend <- used.pars
     invisible(avg) # silent return of averages
     #avg.col
 }
