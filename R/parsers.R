@@ -59,7 +59,55 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
                           skip=sidx[i], nrow=eidx[i]-sidx[i]-1,row.names=1)
         dat[rownames(tmp),i] <- tmp[,valcol]
     }
-    list(data=dat, ids=ids, title=tit, description=description)
+    res <- list(data=dat, ids=ids, title=tit, description=description)
+    class(res) <- "geosoft"
+    res
+}
+
+#' summarize GEOSoft probes
+#'
+#' takes as input the list returned by \code{\link{parseGEOSoft}},
+#' a GEO microarray data set, including a table of probe mappings,
+#' as provided via GEO soft family files.
+#' Argument \code{id} specifies a probe mapping column ID.
+#' Multiples probes for the same features (same string in column ID) will
+#' then be summarized by the function in argument \code{avg}
+#' (default: median).
+#' @param data a list as returned by function \code{\link{parseGEOSoft}}
+#' @param id a column ID; probes with equal strings in this column will
+#' be summarized
+#' @param keep.empty keep columns with no entry in column ID by
+#' copying the probe ID
+#' @param avg a string specifying a function to be used for calculating
+#' probe averages
+#' @param ... arguments to the function specified in \code{avg}
+#' @export
+summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ...) {
+    ## get summarization function
+    avgf <- get(avg, mode="function")
+    
+    ## get data
+    dat <- data$data
+
+    ## summarize multiple probes per gene
+    ids <- data$ids
+    ## fill up empty names - NOTE: none present
+    ## fill empty names
+    if ( keep.empty ) {
+        empty <- ids[,id]==""
+        ids[empty,id] <- rownames(ids)[empty]
+    }
+
+    ## rm duplicates
+    uids <- unique(ids[,id])
+    udat <- matrix(NA,ncol=ncol(dat),nrow=length(uids))
+    rownames(udat) <- uids
+    colnames(udat) <- colnames(dat)
+    ## and calculate averages
+    for ( i in 1:length(uids) ) 
+        udat[i,] <- apply(dat[ids[,id]%in%uids[i],,drop=FALSE],2,avgf,...)
+    ## return
+    udat
 }
 
 ## parse GFF file 
