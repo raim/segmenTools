@@ -98,9 +98,12 @@ Accessing genomic coordinates efficiently by indexing, used by
 
 #### Sequence Spectra 
 
+... coming soon
+
 Analyzing periodic enrichment of oligomers and DNA structural
 parameters, after [Lehmann, Machne & Herzel
 2014](https://doi.org/10.1093/nar/gku641).
+
 
 ### General Utilities
 
@@ -109,5 +112,5 @@ parameters, after [Lehmann, Machne & Herzel
 * `parseGEOSoft` parses GEO Soft family files of microarray data sets
 into data matrices, and accompanying probe-ID mapping, and sample/data
 annotation
-* `gff2tab` parses a GFF file into tabular formaint, including
+* `gff2tab` parses a GFF file into tabular format, including
 collection of attributes into data columns
