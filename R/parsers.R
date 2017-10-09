@@ -94,7 +94,7 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ver
 
     ## summarize multiple probes per gene
     ids <- data$ids
-    ## fill up empty names - NOTE: none present
+
     ## fill empty names
     empty <- ids[,id]==""
     if ( keep.empty ) {
@@ -102,31 +102,34 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ver
             cat(paste("adding", sum(empty),
                       "features with empty field in column", id, "\n"))
         ids[empty,id] <- rownames(ids)[empty]
-    } else if ( verb )
+    } else if ( verb ) {
         cat(paste("discarding", sum(empty),
                   "features with empty field in column", id, "\n"))
+        ids <- ids[!empty,]
+        dat <- dat[!empty,]
+    }
 
-    ## rm duplicates
-    uids <- unique(ids[,id])
-    uids <- uids[uids!=""] # rm empty
-    udat <- matrix(NA,ncol=ncol(dat),nrow=length(uids))
-    rownames(udat) <- uids
-    colnames(udat) <- colnames(dat)
-    if ( verb )
-        cat(paste("mapping", nrow(ids), "probes to", length(uids),
-                  "features in column", id, "\n"))
-    ## and calculate averages
-    for ( i in 1:length(uids) ) 
-        udat[i,] <- apply(dat[ids[,id]%in%uids[i],,drop=FALSE],2,avgf,...)
-    ## copy, all, replace data and return
-    res <- data
-    res$data <- udat
-    res$mappedto <- id
-    res$avg_function <- list(name=avg,
-                             argument=paste(names(list(...)),
+    ## find duplicates
+    uids <- ids[,id]
+    dups <- duplicated(uids)
+    dids <- unique(uids[dups])
+    ## summarize duplicates (into first row where it occurs)
+    idx <- sapply(dids, function(x) which(ids[,id]%in%x))
+    for ( i in idx ) 
+        dat[i[1],] <- apply(dat[i,],2,avgf,...)
+    ## and rm duplicate rows
+    dat <- dat[!dups,]
+    rownames(dat) <- uids[!dups]
+
+    ## replace data in original list
+    data$data <- dat # replace
+    ## add info
+    data$mappedto <- id
+    data$avg_function <- list(name=avg,
+                             argument=paste(names(list(...)),"=",
                                             deparse(substitute(...))))
-    res$empty <- sum(empty)
-    res
+    data$empty <- sum(empty)
+    data
 }
 
 ## parse GFF file 
