@@ -4,14 +4,12 @@
 \alias{parseGEOSoft}
 \title{parse GO Soft archives}
 \usage{
-parseGEOSoft(file, idcol = "ORF", valcol = "VALUE", title = TRUE,
-  desc = TRUE)
+parseGEOSoft(file, idcol, valcol = "VALUE", title = TRUE, desc = TRUE)
 }
 \arguments{
 \item{file}{a GEO Soft archive file (eg. GSE18902_family.soft.gz)}
 
-\item{idcol}{ID columns from the platform table; NOTE: that the first
-column in this vector}
+\item{idcol}{columns to retrieve from the platform table}
 
 \item{valcol}{value column (currently only 1 is allowed) in the sample tables}
 
