@@ -78,14 +78,20 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 #' @param data a list as returned by function \code{\link{parseGEOSoft}}
 #' @param id a column ID; probes with equal strings in this column will
 #' be summarized
-#' @param keep.empty keep columns with no entry in column ID by
-#' copying the probe ID
 #' @param avg a string specifying a function to be used for calculating
 #' probe averages
+#' @param keep.empty keep columns with no entry in column ID by
+#' copying the probe ID
+#' @param replicate if TRUE probe sets assigned to multiple features
+#' (separated by string provided in rep.sep) will be duplicated to
+#' and each feature will get its own row
+#' @param repsep separator for multiple-feature probes
 #' @param verb print messages
 #' @param ... arguments to the function specified in \code{avg}
 #' @export
-summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", verb=TRUE, ...) {
+summarizeGEOSoft <- function(data, id="ORF", avg="mean",
+                             keep.empty=FALSE, replicate=FALSE, repsep=";",
+                             verb=TRUE, ...) {
     ## get summarization function
     avgf <- get(avg, mode="function")
     
@@ -95,6 +101,7 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ver
     ## summarize multiple probes per gene
     ids <- data$ids
 
+    ## 1) handle empty strings
     ## fill empty names
     empty <- ids[,id]==""
     if ( keep.empty ) {
@@ -109,6 +116,7 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ver
         dat <- dat[!empty,,drop=FALSE]
     }
 
+    ## 2) handle duplicates
     ## find duplicates
     uids <- ids[,id]
     dups <- duplicated(uids)
@@ -125,6 +133,16 @@ summarizeGEOSoft <- function(data, id="ORF", keep.empty=FALSE, avg="median", ver
     dat <- dat[!dups,]
     rownames(dat) <- uids[!dups]
 
+    ## 3) handle duplicate features
+    if ( replicate ) {
+        uids <- rownames(dat)
+        idx <- grep(repsep, uids)
+        fts <- strsplit(rownames(dat), repsep)
+        cat(paste("THIS FEATURE IS NOT YET AVAILABE;",
+                  "set `replicate to FALSE\n"))
+    }
+
+    
     ## replace data in original list
     data$data <- dat # replace
     ## add info
