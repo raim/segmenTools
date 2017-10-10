@@ -106,7 +106,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   result <- list(overlap=overlap,percent=percent)
 
   ## append p-values
-  p.value <- prich
+  #p.value <- prich
   if ( do.prich & !do.ppoor ) p.value <- prich
   if ( do.ppoor & !do.prich ) p.value <- ppoor
 
