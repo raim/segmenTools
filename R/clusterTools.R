@@ -32,14 +32,16 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                            req.vals=c("greater")) {
 
     if ( class(cl1)=="clustering" ) {
+        K <- paste("K:",cl1$selected,sep="")
         if ( missing(cl1.srt) )
-            cl1.srt <- cl1$sorting[[cl1$selected]]
-        cl1 <- cl1$clusters[,cl1$selected]
+            cl1.srt <- cl1$sorting[[K]]
+        cl1 <- cl1$clusters[,K]
     }
     if ( class(cl2)=="clustering" ) {
+        K <- paste("K:",cl2$selected,sep="")
         if ( missing(cl2.srt) )
-            cl2.srt <- cl2$sorting[[cl2$selected]]
-        cl2 <- cl2$clusters[,cl2$selected]
+            cl2.srt <- cl2$sorting[[K]]
+        cl2 <- cl2$clusters[,K]
     }
    
   ## check cluster length
