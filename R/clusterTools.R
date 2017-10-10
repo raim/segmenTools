@@ -525,11 +525,21 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
 #' timeseries and clustering object (simple list)
 #' @param x "timeseries" object from function
 #' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
-#' @param cls "clustering" object (simple list)
+#' @param cls "clustering" object from function
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 #' @param goi list of feature ids (rownames in cls$clusters) to plot
+#' @param grep logical, if TRUE \code{goi} are searched by pattern
+#' match (as argument \code{pattern} in
+#' \code{\link[base:grep]{grep}}) instead of perfect matches; useful
+#' eg. if features in \code{cls}
+#' @param each plot separate panels for each cluster
+#' @param lwd line width of single time-series
+#' @param leg.xy position of the legend, see
+#' @param ... arguments to \code{\link{plotClusters}}
+#' \code{\link[graphics:legend]{legend}}
 #' @export
-plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",
-                        grep=FALSE, ...) {
+plotSingles <- function(x, cls, goi, grep=FALSE,
+                        each, lwd=2, leg.xy="topleft", ...) {
     ## TODO: set all genes
     ## in cls$cluster to "-1"
 
@@ -606,7 +616,12 @@ plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",
 #' (\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})
 #' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
-#' @param avg.col color for average line; used only if \code{rng="all"}
+#' @param avg.col color for average line; used only if \code{type="all"}
+#' @param lwd.avg line width for average plots (if \code{type=="all"})
+#' @param lwd line width for indidiual time series plots (if \code{type=="all"})
+#' @param use.lty use individual line type expansion (if \code{type=="all"})
+#' @param alpha set alpha value of range or individual time series
+#' colors (color opaqueness)
 #' @param ... further arguments to \code{\link{plot.clusteraverages}} 
 ## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
 ## plot.clusteraverages should become a function of plot.clustering,

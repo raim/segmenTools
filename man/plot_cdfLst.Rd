@@ -4,9 +4,9 @@
 \alias{plot_cdfLst}
 \title{plot multiple cumulative distribution functions}
 \usage{
-plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", col, lty, h = c(0.2,
-  0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.", ylim = c(0, 1),
-  range = "polygon", ...)
+plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", range = "polygon",
+  col, lty, h = c(0.2, 0.8), v = c(0.8, 1.2), ylab = "cum.dist.func.",
+  ylim = c(0, 1), ...)
 }
 \arguments{
 \item{x}{x-values for which cumulative distribution functions of overlap characteristics are plotted}
@@ -16,6 +16,20 @@ plot_cdfLst(x = seq(0, 2, 0.05), CDF, type = "rcdf", col, lty, h = c(0.2,
 \item{type}{character indicating the type of the overlap CDF}
 
 \item{range}{draw the range of values either as "polygon" or "lines"}
+
+\item{col}{lines color vector}
+
+\item{lty}{line type vector}
+
+\item{h}{horizontal cut-off lines}
+
+\item{v}{vertical cut-off lines}
+
+\item{ylab}{y-axis label}
+
+\item{ylim}{y-axis limits}
+
+\item{...}{further parameters to plot}
 }
 \description{
 plot multiple cumulative distribution functions of overlap statistics, as

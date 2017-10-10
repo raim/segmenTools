@@ -4,16 +4,31 @@
 \alias{plotSingles}
 \title{plot indivividual time-courses}
 \usage{
-plotSingles(x, cls, goi, each, lwd = 2, leg.xy = "topleft", grep = FALSE,
+plotSingles(x, cls, goi, grep = FALSE, each, lwd = 2, leg.xy = "topleft",
   ...)
 }
 \arguments{
 \item{x}{"timeseries" object from function
 \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
 
-\item{cls}{"clustering" object (simple list)}
+\item{cls}{"clustering" object from function
+\code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 
 \item{goi}{list of feature ids (rownames in cls$clusters) to plot}
+
+\item{grep}{logical, if TRUE \code{goi} are searched by pattern
+match (as argument \code{pattern} in
+\code{\link[base:grep]{grep}}) instead of perfect matches; useful
+eg. if features in \code{cls}}
+
+\item{each}{plot separate panels for each cluster}
+
+\item{lwd}{line width of single time-series}
+
+\item{leg.xy}{position of the legend, see}
+
+\item{...}{arguments to \code{\link{plotClusters}}
+\code{\link[graphics:legend]{legend}}}
 }
 \description{
 plot indivividual time-courses (GOI: genes of interest) from

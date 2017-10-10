@@ -61,7 +61,16 @@ extended by this fraction of the total range on both sides}
 
 \item{xlab}{x-axis label (auto-selected if missing)}
 
-\item{avg.col}{color for average line; used only if \code{rng="all"}}
+\item{avg.col}{color for average line; used only if \code{type="all"}}
+
+\item{lwd}{line width for indidiual time series plots (if \code{type=="all"})}
+
+\item{lwd.avg}{line width for average plots (if \code{type=="all"})}
+
+\item{use.lty}{use individual line type expansion (if \code{type=="all"})}
+
+\item{alpha}{set alpha value of range or individual time series
+colors (color opaqueness)}
 
 \item{...}{further arguments to \code{\link{plot.clusteraverages}}}
 }
