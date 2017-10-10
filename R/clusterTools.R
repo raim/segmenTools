@@ -512,23 +512,40 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
 #' @param cls "clustering" object (simple list)
 #' @param goi list of feature ids (rownames in cls$clusters) to plot
 #' @export
-plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",...) {
+plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",
+                        grep=FALSE, ...) {
     ## TODO: set all genes
     ## in cls$cluster to "-1"
+
+    ## rm none-present goi
     rm <- !goi%in%rownames(cls$clusters)
-    cat(paste(paste(goi[rm],collapse=";"),"not found\n"))
+    if ( grep )
+      rm <- sapply(goi, function(x) length(grep(x, rownames(cls$clusters)))==0)
+    if ( sum(rm) )
+      cat(paste(paste(goi[rm],collapse=";"),"not found\n"))
     goi <- goi[!rm]
+    
     if ( length(goi)==0 )
         stop()
-    cls$clusters[!rownames(cls$clusters)%in%goi,] <- -1
+
+    ## get goi and set all other clusterings to -1
+    kp <- which(rownames(cls$clusters)%in%goi)
+    if ( grep )
+      kp <- sapply(goi, grep, rownames(cls$clusters))
+    cls$clusters[-kp,] <- -1
+    
     avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), ...)
     leg <- do.call(rbind,avg$legend)
-    if ( !is.null(names(goi)) )
-        leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
+    if ( !is.null(names(goi)) ) {
+        if ( grep )
+          leg[,"id"] <- names(goi)[unlist(sapply(goi, grep, leg[,"id"]))]
+        else
+          leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
+    }
     legend(leg.xy, legend=leg[,"id"], lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
            bg="#FFFFFFAA",bty="o")
-    #invisible(avg)
-    leg
+    avg$legend <- leg
+    invisible(avg)
 }
 
 #' plots cluster averages 
