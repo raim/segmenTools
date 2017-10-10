@@ -14,9 +14,13 @@
 #' 
 #' calculates mutual overlaps between two clusterings of the same data set
 #' using hypergeometric distribution statistics for significantly
-#' enriched or deprived mutual overlaps
-#' @param cl1 clustering 1
-#' @param cl2 clustering 2
+#' enriched or deprived mutual overlaps;
+#' TODO: specify wich cl will be rows/columns and to which
+#' percent refers to
+#' @param cl1 clustering 1; a vector of cluster associations or an
+#' object of class "clustering" by segmenTier's
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param cl2 clustering 2; see argument \code{cl1}
 #' @param na.string replace NA or empty strings by `<na.string>'
 #' @param cl1.srt optional cluster sorting of clustering 1
 #' @param cl2.srt optional cluster sorting of clustering 2
@@ -26,6 +30,18 @@
 #'@export
 clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                            req.vals=c("greater")) {
+
+    if ( class(cl1)=="clustering" ) {
+        if ( missing(cl1.srt) )
+            cl1.srt <- cl1$sorting[[cl1$selected]]
+        cl1 <- cl1$clusters[,cl1$selected]
+    }
+    if ( class(cl2)=="clustering" ) {
+        if ( missing(cl2.srt) )
+            cl2.srt <- cl2$sorting[[cl2$selected]]
+        cl2 <- cl2$clusters[,cl2$selected]
+    }
+   
   ## check cluster length
   if ( length(cl1) != length(cl2) ) {
       print(paste("ERROR cluster vectors of different size:",
