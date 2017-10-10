@@ -4,7 +4,8 @@
 \alias{plotSingles}
 \title{plot indivividual time-courses}
 \usage{
-plotSingles(x, cls, goi, each, lwd = 2, leg.xy = "topleft", ...)
+plotSingles(x, cls, goi, each, lwd = 2, leg.xy = "topleft", grep = FALSE,
+  ...)
 }
 \arguments{
 \item{x}{"timeseries" object from function

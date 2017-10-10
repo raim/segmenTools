@@ -4,8 +4,8 @@
 \alias{summarizeGEOSoft}
 \title{summarize GEOSoft probes}
 \usage{
-summarizeGEOSoft(data, id = "ORF", keep.empty = FALSE, avg = "median",
-  verb = TRUE, ...)
+summarizeGEOSoft(data, id = "ORF", avg = "mean", keep.empty = FALSE,
+  replicate = FALSE, repsep = ";", verb = TRUE, ...)
 }
 \arguments{
 \item{data}{a list as returned by function \code{\link{parseGEOSoft}}}
@@ -13,11 +13,17 @@ summarizeGEOSoft(data, id = "ORF", keep.empty = FALSE, avg = "median",
 \item{id}{a column ID; probes with equal strings in this column will
 be summarized}
 
+\item{avg}{a string specifying a function to be used for calculating
+probe averages}
+
 \item{keep.empty}{keep columns with no entry in column ID by
 copying the probe ID}
 
-\item{avg}{a string specifying a function to be used for calculating
-probe averages}
+\item{replicate}{if TRUE probe sets assigned to multiple features
+(separated by string provided in rep.sep) will be duplicated to
+and each feature will get its own row}
+
+\item{repsep}{separator for multiple-feature probes}
 
 \item{verb}{print messages}
 
