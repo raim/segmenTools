@@ -8,9 +8,11 @@ clusterCluster(cl1, cl2, na.string = "na", cl1.srt, cl2.srt,
   req.vals = c("greater"))
 }
 \arguments{
-\item{cl1}{clustering 1}
+\item{cl1}{clustering 1; a vector of cluster associations or an
+object of class "clustering" by segmenTier's
+\code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 
-\item{cl2}{clustering 2}
+\item{cl2}{clustering 2; see argument \code{cl1}}
 
 \item{na.string}{replace NA or empty strings by `<na.string>'}
 
@@ -25,5 +27,7 @@ more signficant of both, respectively}
 \description{
 calculates mutual overlaps between two clusterings of the same data set
 using hypergeometric distribution statistics for significantly
-enriched or deprived mutual overlaps
+enriched or deprived mutual overlaps;
+TODO: specify wich cl will be rows/columns and to which
+percent refers to
 }

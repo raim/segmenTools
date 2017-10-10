@@ -106,8 +106,17 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
 #' @param CDF named list of cumulative distribution functions
 #' @param type character indicating the type of the overlap CDF
 #' @param range draw the range of values either as "polygon" or "lines"
+#' @param col lines color vector
+#' @param lty line type vector
+#' @param h horizontal cut-off lines
+#' @param v vertical cut-off lines
+#' @param ylab y-axis label
+#' @param ylim y-axis limits
+#' @param ... further parameters to plot
 #' @export
-plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", col, lty, h=c(.2,.8), v=c(0.8,1.2), ylab="cum.dist.func.", ylim=c(0,1), range="polygon", ...) {
+plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", range="polygon",
+                        col, lty, h=c(.2,.8), v=c(0.8,1.2),
+                        ylab="cum.dist.func.", ylim=c(0,1), ...) {
 
 
     ## group by colors and plot mean and ci95 as polygon!

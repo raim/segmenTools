@@ -14,9 +14,13 @@
 #' 
 #' calculates mutual overlaps between two clusterings of the same data set
 #' using hypergeometric distribution statistics for significantly
-#' enriched or deprived mutual overlaps
-#' @param cl1 clustering 1
-#' @param cl2 clustering 2
+#' enriched or deprived mutual overlaps;
+#' TODO: specify wich cl will be rows/columns and to which
+#' percent refers to
+#' @param cl1 clustering 1; a vector of cluster associations or an
+#' object of class "clustering" by segmenTier's
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param cl2 clustering 2; see argument \code{cl1}
 #' @param na.string replace NA or empty strings by `<na.string>'
 #' @param cl1.srt optional cluster sorting of clustering 1
 #' @param cl2.srt optional cluster sorting of clustering 2
@@ -26,6 +30,18 @@
 #'@export
 clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                            req.vals=c("greater")) {
+
+    if ( class(cl1)=="clustering" ) {
+        if ( missing(cl1.srt) )
+            cl1.srt <- cl1$sorting[[cl1$selected]]
+        cl1 <- cl1$clusters[,cl1$selected]
+    }
+    if ( class(cl2)=="clustering" ) {
+        if ( missing(cl2.srt) )
+            cl2.srt <- cl2$sorting[[cl2$selected]]
+        cl2 <- cl2$clusters[,cl2$selected]
+    }
+   
   ## check cluster length
   if ( length(cl1) != length(cl2) ) {
       print(paste("ERROR cluster vectors of different size:",
@@ -509,11 +525,21 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
 #' timeseries and clustering object (simple list)
 #' @param x "timeseries" object from function
 #' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
-#' @param cls "clustering" object (simple list)
+#' @param cls "clustering" object from function
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 #' @param goi list of feature ids (rownames in cls$clusters) to plot
+#' @param grep logical, if TRUE \code{goi} are searched by pattern
+#' match (as argument \code{pattern} in
+#' \code{\link[base:grep]{grep}}) instead of perfect matches; useful
+#' eg. if features in \code{cls}
+#' @param each plot separate panels for each cluster
+#' @param lwd line width of single time-series
+#' @param leg.xy position of the legend, see
+#' @param ... arguments to \code{\link{plotClusters}}
+#' \code{\link[graphics:legend]{legend}}
 #' @export
-plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",
-                        grep=FALSE, ...) {
+plotSingles <- function(x, cls, goi, grep=FALSE,
+                        each, lwd=2, leg.xy="topleft", ...) {
     ## TODO: set all genes
     ## in cls$cluster to "-1"
 
@@ -590,7 +616,12 @@ plotSingles <- function(x, cls, goi, each, lwd=2, leg.xy="topleft",
 #' (\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})
 #' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
-#' @param avg.col color for average line; used only if \code{rng="all"}
+#' @param avg.col color for average line; used only if \code{type="all"}
+#' @param lwd.avg line width for average plots (if \code{type=="all"})
+#' @param lwd line width for indidiual time series plots (if \code{type=="all"})
+#' @param use.lty use individual line type expansion (if \code{type=="all"})
+#' @param alpha set alpha value of range or individual time series
+#' colors (color opaqueness)
 #' @param ... further arguments to \code{\link{plot.clusteraverages}} 
 ## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
 ## plot.clusteraverages should become a function of plot.clustering,
