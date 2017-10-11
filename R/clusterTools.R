@@ -142,6 +142,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 
     ## TODO: add test number for later bonferroni correction
   result <- append(result, list(p.value=p.value))
+    result$alternative <- alternative
   class(result) <- "clusterOverlaps"
   return(result)
 }
