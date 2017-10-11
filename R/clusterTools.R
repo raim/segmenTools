@@ -24,12 +24,13 @@
 #' @param na.string replace NA or empty strings by `<na.string>'
 #' @param cl1.srt optional cluster sorting of clustering 1
 #' @param cl2.srt optional cluster sorting of clustering 2
-#' @param req.vals requested statistics; one of `greater', `less'
-#' or `two-sided' to calculate enrichment, depletion or the more
-#' more signficant of both, respectively
+#' @param alternative a character string specifying the alternative hypothesis,
+#' must be one of `"greater"' to calculate enrichment (default),
+#' `"less"' to calculate deprivation, or `"two.sided"' to report the more
+#' more signficant p-value of both
 #'@export
 clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
-                           req.vals=c("greater")) {
+                           alternative=c("greater")) {
 
     if ( class(cl1)=="clustering" ) {
         K <- paste("K:",cl1$selected,sep="")
@@ -65,9 +66,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   
   ## get requested values
   ## TODO : name p.value result matrices if both are requested!
-  do.prich <- sum(req.vals=="greater")>0
-  do.ppoor <- sum(req.vals=="less")>0
-  if ( sum(req.vals=="two.sided")>0 )
+  do.prich <- sum(alternative=="greater")>0
+  do.ppoor <- sum(alternative=="less")>0
+  if ( sum(alternative=="two.sided")>0 )
     do.ppoor <- do.prich <- TRUE
   
   ## get clusters
@@ -82,7 +83,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   overlap <- matrix(NA, nrow=length(f1), ncol=length(f2))
   rownames(overlap) <- f1
   colnames(overlap) <- f2
-  percent <- overlap
+    jaccard <- percent <- overlap
   if ( do.prich ) prich <- overlap
   if ( do.ppoor ) ppoor <- overlap
   
@@ -118,10 +119,15 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
               if ( is.na(ppoor[i,j]) )
                 ppoor[i,j]=1
           }
+
+          ## Jaccard:
+          intersect <- q # overlap
+          union <- k+m-q
+          jaccard[i,j] <- intersect/union
       }
   }
   
-  result <- list(overlap=overlap,percent=percent)
+  result <- list(overlap=overlap,percent=percent,jaccard=jaccard)
 
   ## append p-values
   #p.value <- prich
@@ -257,7 +263,7 @@ clusterAnnotation <- function(cls, data, p=1,
         ## cumulative hypergeometric distribution
         ## TODO: take sum of bonferroni correction factors
         ## correct below in bin.filter
-        tmp <- clusterCluster(bins, cls, req.vals=c("greater"))
+        tmp <- clusterCluster(bins, cls, alternative=c("greater"))
        
         # get overlap and p.values in original bin order
         if ( !is.null(tmp) ) {
