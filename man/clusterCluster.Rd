@@ -5,7 +5,7 @@
 \title{calculates overlaps between two clusterings}
 \usage{
 clusterCluster(cl1, cl2, na.string = "na", cl1.srt, cl2.srt,
-  req.vals = c("greater"))
+  alternative = c("greater"))
 }
 \arguments{
 \item{cl1}{clustering 1; a vector of cluster associations or an
@@ -20,9 +20,10 @@ object of class "clustering" by segmenTier's
 
 \item{cl2.srt}{optional cluster sorting of clustering 2}
 
-\item{req.vals}{requested statistics; one of `greater', `less'
-or `two-sided' to calculate enrichment, depletion or the more
-more signficant of both, respectively}
+\item{alternative}{a character string specifying the alternative hypothesis,
+must be one of `"greater"' to calculate enrichment (default),
+`"less"' to calculate deprivation, or `"two.sided"' to report the more
+more signficant p-value of both}
 }
 \description{
 calculates mutual overlaps between two clusterings of the same data set
