@@ -772,7 +772,7 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
             idx <- cls==cl
             if ( use.lty )
                 lty <- rep(1:6, len=sum(idx))
-            else  lty <- 1 #lty <- all.lty[idx]
+            else  lty <- rep(1, sum(idx)) #lty <- all.lty[idx]
             matplot(time, t(ts[idx,,drop=F]), add=TRUE,
                     type="l", lty=lty,
                     col=all.col[idx], lwd=lwd)
