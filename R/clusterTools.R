@@ -635,9 +635,9 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param cls eiter a vector (length(cls)==nrow(x) or a structure of
 #' class 'clustering' as returned by segmenTier's
 #' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
-#' @param K integer or string specifiying to clustering (K: cluster numbers)
+#' @param k integer or string specifiying to clustering (K: cluster numbers)
 #' to be used if cls is of class 'clustering'; if missing (default) the
-#' `selected' clustering from \code{cls} (cls$selected) is chosen
+#' `selected' clustering from \code{cls} is chosen
 #' @param norm normalization of the time-series data, must be a function
 #' that transforms the data, available via \link{segmenTools} are
 #' \code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations
@@ -678,7 +678,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 ## make function `timeseriesPlot' or `clusterPlot', that takes
 ## either tset/cset or matrix/vector
 #' @export
-plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng", 
+plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng", 
                          norm, avg="median",  q=.9, 
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
                          time, xlab, avg.col="#000000",
@@ -687,21 +687,21 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
     
     if ( class(cls)=="clustering" ) {
 
-        if ( missing(K) )
-            K <- paste("K:",cls$selected,sep="")
-        if ( is.numeric(K) )
-            K <- paste("K:",K,sep="")
+        if ( missing(k) )
+            k <- selected(cls$selected, name=TRUE)
+        if ( is.numeric(k) )
+            k <- selected(cls$selected, K=k, name=TRUE)
 
         ## TODO: why import problem in R CMD check?
         ##if ( !"colors" %in% names(cls) )
         ##    cls <- segmenTier::colorClusters(cls)
         ##if ( !"sorting" %in% names(cls) )
         ##    cls <- segmenTier::sortClusters(cls)
-        cls.col <- cls$colors[[K]]
+        cls.col <- cls$colors[[k]]
         if( missing(cls.srt) )
-            cls.srt <- cls$sorting[[K]]
+            cls.srt <- cls$sorting[[k]]
 
-        cls <- cls$clusters[,K]
+        cls <- cls$clusters[,k]
     } else {
 
         ## cluster sorting
@@ -930,15 +930,12 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
 #' plot sorted clustering as color table
 #' @param cset a structure of class 'clustering' as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
-#' @param K cluster number; if missing the `selected' clustering will
-#' be taken
+#' @param k integer or string specifiying to clustering (K: cluster numbers)
+#' to be used if cls is of class 'clustering'; if missing (default) the
+#' `selected' clustering from \code{cls} is chosen
 #' @param ... arguments to \code{\link{image_matrix}}
 #' @export
-image_clustering <- function(cset, K, ...) {
-    if ( missing(K) )
-        k <- selected(cset)
-    else
-        k <- selected(cset, K)
+image_clustering <- function(cset, k=selected(cset), ...) {
     cols <- lapply(cset$colors, function(x) x[as.numeric(names(x))+1])
     mat <- t(cset$clusters[,k,drop=FALSE])
     ## TODO: allow multiple k

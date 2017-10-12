@@ -4,7 +4,7 @@
 \alias{plotClusters}
 \title{plots cluster averages}
 \usage{
-plotClusters(x, cls, K, cls.col, cls.srt, each = TRUE, type = "rng", norm,
+plotClusters(x, cls, k, cls.col, cls.srt, each = TRUE, type = "rng", norm,
   avg = "median", q = 0.9, ylab, ylim = ifelse(each, "avg", "rng"),
   ylim.scale = 0.1, time, xlab, avg.col = "#000000", lwd = 0.5,
   lwd.avg = 3, use.lty = FALSE, alpha = 0.2, ...)
@@ -18,9 +18,9 @@ or a processed time-series as provided by
 class 'clustering' as returned by segmenTier's
 \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 
-\item{K}{integer or string specifiying to clustering (K: cluster numbers)
+\item{k}{integer or string specifiying to clustering (K: cluster numbers)
 to be used if cls is of class 'clustering'; if missing (default) the
-`selected' clustering from \code{cls} (cls$selected) is chosen}
+`selected' clustering from \code{cls} is chosen}
 
 \item{cls.col}{optional named cluster color vector, where names indicate
 the clusters (as.caracter(cls)); if cls is of class 'clustering' it
