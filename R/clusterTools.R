@@ -492,7 +492,7 @@ phasesortClusters <- function(x, cls) {
     names(cls.srt) <- cls.srt
     phase <- calculatePhase(x)
     phase <- sapply(cls.srt, function(x) phaseDist(phase[cls==x,]))
-    names(sort(cls.phase[grep("mean",rownames(cls.phase)),]))
+    names(sort(phase[grep("mean",rownames(phase)),]))
 }
 
 ### PLOT CLUSTERED TIME-SERIES
