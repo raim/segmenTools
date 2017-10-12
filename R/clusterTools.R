@@ -471,7 +471,8 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' @param cset  a structure of class 'clustering' as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 #' @param name logical, if TRUE the name of of the selected clustering
-#' will be returned, if FALSE its index number 
+#' will be returned, if FALSE its index number
+#' @export
 selected <- function(cset, name=TRUE) {
     sel <- cset$selected
     selCol <- paste0("K:",cset$selected)
@@ -922,6 +923,14 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     if ( each ) par(old.par)
     ##pol.col
 }
+
+## plot clusterings as color table
+plotClusterTable <- function(cset, k, ...) {
+    cols <- lapply(cset$colors, function(x) x[as.numeric(names(x))+1])
+    image_matrix(t(cset$clusters[,k,drop=FALSE]), col=cols[[k]], ...)
+}
+
+### UTILS
 
 #' replace alpha values of an RGB string color vector
 #'
