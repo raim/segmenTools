@@ -2,13 +2,16 @@
 % Please edit documentation in R/clusterTools.R
 \name{selected}
 \alias{selected}
-\title{get selected clustering}
+\title{get clustering ID}
 \usage{
-selected(cset, name = TRUE)
+selected(cset, K, name = TRUE)
 }
 \arguments{
 \item{cset}{a structure of class 'clustering' as returned by
 segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
+
+\item{K}{cluster number; if missing the `selected' clustering will
+be taken}
 
 \item{name}{logical, if TRUE the name of of the selected clustering
 will be returned, if FALSE its index number}

@@ -464,22 +464,25 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 
 ### CLUSTERING OBJECT UTILS
 
-#' get selected clustering
+#' get clustering ID
 #'
 #' get the column name or index of the selected
 #' clustering; allows to interface values for the selected clustering
 #' @param cset  a structure of class 'clustering' as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param K cluster number; if missing the `selected' clustering will
+#' be taken
 #' @param name logical, if TRUE the name of of the selected clustering
 #' will be returned, if FALSE its index number
 #' @export
-selected <- function(cset, name=TRUE) {
-    sel <- cset$selected
-    selCol <- paste0("K:",cset$selected)
+selected <- function(cset, K, name=TRUE) {
+    if ( missing(K) )
+        K <- cset$selected
+    kCol <- paste0("K:", K)
     if ( name )
-        return(selCol)
+        return(kCol)
     else
-        return(which(colnames(cset$clusters)==selCol))
+        return(which(colnames(cset$clusters)==kCol))
 }
 
 ## TODO; finish implementation
@@ -924,10 +927,23 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     ##pol.col
 }
 
-## plot clusterings as color table
-plotClusterTable <- function(cset, k, ...) {
+#' plot sorted clustering as color table
+#' @param cset a structure of class 'clustering' as returned by
+#' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param K cluster number; if missing the `selected' clustering will
+#' be taken
+#' @param ... arguments to \code{\link{image_matrix}}
+#' @export
+image_clustering <- function(cset, K, ...) {
+    if ( missing(K) )
+        k <- selected(cset)
+    else
+        k <- selected(cset, K)
     cols <- lapply(cset$colors, function(x) x[as.numeric(names(x))+1])
-    image_matrix(t(cset$clusters[,k,drop=FALSE]), col=cols[[k]], ...)
+    mat <- t(cset$clusters[,k,drop=FALSE])
+    ## TODO: allow multiple k
+    ## (for loop with add=TRUE, and NA in all non-k columns)
+    image_matrix(mat, col=cols[[k]], ...)
 }
 
 ### UTILS
