@@ -483,6 +483,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' calculating variance (eg. "sd", "var"), which will be added and
 #' subtracted from the average (argument \code{avg}) for high
 #' and low data cut-offs
+#' @param rm.inf remove infinite values (e.g. from log transformations)
 #' @export
 clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
