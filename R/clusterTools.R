@@ -688,9 +688,9 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
     if ( class(cls)=="clustering" ) {
 
         if ( missing(k) )
-            k <- selected(cls$selected, name=TRUE)
+            k <- selected(cls, name=TRUE)
         if ( is.numeric(k) )
-            k <- selected(cls$selected, K=k, name=TRUE)
+            k <- selected(cls, K=k, name=TRUE)
 
         ## TODO: why import problem in R CMD check?
         ##if ( !"colors" %in% names(cls) )
@@ -936,11 +936,12 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
 #' @param ... arguments to \code{\link{image_matrix}}
 #' @export
 image_clustering <- function(cset, k=selected(cset), ...) {
-    cols <- lapply(cset$colors, function(x) x[as.numeric(names(x))+1])
-    mat <- t(cset$clusters[,k,drop=FALSE])
+    cols <- lapply(cset$colors,
+                   function(x) x[as.character(sort(as.numeric(names(x))))])
+    mat <- cset$clusters[,k,drop=FALSE] + 1
     ## TODO: allow multiple k
     ## (for loop with add=TRUE, and NA in all non-k columns)
-    image_matrix(mat, col=cols[[k]], ...)
+    image_matrix(t(mat), col=cols[[k]], ...)
 }
 
 ### UTILS
