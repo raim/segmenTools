@@ -462,6 +462,24 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
     }
 } 
 
+### CLUSTERING OBJECT UTILS
+
+#' get selected clustering
+#'
+#' get the column name or index of the selected
+#' clustering; allows to interface values for the selected clustering
+#' @param cset  a structure of class 'clustering' as returned by
+#' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param name logical, if TRUE the name of of the selected clustering
+#' will be returned, if FALSE its index number 
+selected <- function(cset, name=TRUE) {
+    sel <- cset$selected
+    selCol <- paste0("K:",cset$selected)
+    if ( name )
+        return(selCol)
+    else
+        return(which(colnames(cset$clusters)==selCol))
+}
 
 ### PLOT CLUSTERED TIME-SERIES
 
