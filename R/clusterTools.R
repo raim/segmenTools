@@ -481,6 +481,20 @@ selected <- function(cset, name=TRUE) {
         return(which(colnames(cset$clusters)==selCol))
 }
 
+## TODO; finish implementation
+## sort clusters by time series phase
+##
+## takes a time-series and a clustering object,
+## calculates phases for each cluster and sorts clusters
+## by phase
+phasesortClusters <- function(x, cls) {
+    cls.srt <- unique(cls)
+    names(cls.srt) <- cls.srt
+    phase <- calculatePhase(x)
+    phase <- sapply(cls.srt, function(x) phaseDist(phase[cls==x,]))
+    names(sort(cls.phase[grep("mean",rownames(cls.phase)),]))
+}
+
 ### PLOT CLUSTERED TIME-SERIES
 
 
@@ -738,7 +752,7 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
 
     #if ( 
     all.col <- pol.col[cls]
-    all.lty <- rep(1, length(cls))
+    #all.lty <- rep(1, length(cls))
     
     ## average values
     if ( type[1]=="all" ) q <- 1
@@ -789,16 +803,15 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
         if ( "all"%in%type ) {
             idx <- cls==cl
             if ( use.lty )
-                lty <- rep(1:6, len=sum(idx))
-            else  lty <- rep(1, sum(idx)) #lty <- all.lty[idx]
+                lty <- rep(1:6, len=sum(idx,na.rm=TRUE))
+            else  lty <- rep(1, sum(idx,na.rm=TRUE) #lty <- all.lty[idx]
             matplot(time, t(ts[idx,,drop=F]), add=TRUE,
-                    type="l", lty=lty,
-                    col=all.col[idx], lwd=lwd)
+                    type="l", lty=lty, col=all.col[idx], lwd=lwd)
             ## store
-            if ( use.lty )
-                used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
-                                              lty=lty,col=all.col[idx],
-                                              stringsAsFactors=FALSE)
+            #if ( use.lty )
+            used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
+                                          lty=lty,col=all.col[idx],
+                                          stringsAsFactors=FALSE)
         }
         lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
