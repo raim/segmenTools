@@ -484,7 +484,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' subtracted from the average (argument \code{avg}) for high
 #' and low data cut-offs
 #' @export
-clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
+clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
     ## get requested functions
     avg <- get(avg, mode="function")
@@ -505,6 +505,9 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9) {
     if ( is.numeric(q) )
         qf <- (1-q)/2
     else qf <- get(q, mode="function")
+
+    ## rm Inf, eg.
+    ts[is.infinite(ts)] <- NA
     
     for ( cl in cls.srt ) {
         ## average and deviation
@@ -768,14 +771,15 @@ plotClusters <- function(x, cls, K, cls.col, cls.srt, each=TRUE, type="rng",
             idx <- cls==cl
             if ( use.lty )
                 lty <- rep(1:6, len=sum(idx))
-            else lty <- all.lty[idx]
+            else  lty <- 1 #lty <- all.lty[idx]
             matplot(time, t(ts[idx,,drop=F]), add=TRUE,
                     type="l", lty=lty,
                     col=all.col[idx], lwd=lwd)
             ## store
-            used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
-                                          lty=lty,col=all.col[idx],
-                                          stringsAsFactors=FALSE)
+            if ( use.lty )
+                used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
+                                              lty=lty,col=all.col[idx],
+                                              stringsAsFactors=FALSE)
         }
         lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
