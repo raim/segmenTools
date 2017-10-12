@@ -938,10 +938,12 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
 image_clustering <- function(cset, k=selected(cset), ...) {
     cols <- lapply(cset$colors,
                    function(x) x[as.character(sort(as.numeric(names(x))))])
-    mat <- cset$clusters[,k,drop=FALSE] + 1
+    mat <- matrix(cset$clusters[,k,drop=FALSE]-.5, nrow=1)
+    breaks <- as.numeric((names(cols[[k]])))
+    breaks <- c(min(breaks)-1,breaks)
     ## TODO: allow multiple k
     ## (for loop with add=TRUE, and NA in all non-k columns)
-    image_matrix(t(mat), col=cols[[k]], ...)
+    image_matrix(mat, col=cols[[k]], breaks=breaks,...)
 }
 
 ### UTILS
