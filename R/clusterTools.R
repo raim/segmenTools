@@ -933,17 +933,35 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
 #' @param k integer or string specifiying to clustering (K: cluster numbers)
 #' to be used if cls is of class 'clustering'; if missing (default) the
 #' `selected' clustering from \code{cls} is chosen
+#' @param dir direction, "h" for horizontal (default), "v" for vertical; NOT WORKING YET
 #' @param ... arguments to \code{\link{image_matrix}}
 #' @export
-image_clustering <- function(cset, k=selected(cset), ...) {
+image_clustering <- function(cset, k=selected(cset), dir="h", ...) {
+
+    ## sort colors by numeric cluster index
     cols <- lapply(cset$colors,
                    function(x) x[as.character(sort(as.numeric(names(x))))])
+    ## get clusters as matrix and subtract .5
     mat <- matrix(cset$clusters[,k,drop=FALSE]-.5, nrow=1)
-    breaks <- as.numeric((names(cols[[k]])))
+    ## calculate breaks
+    breaks <- as.numeric(names(cols[[k]]))
     breaks <- c(min(breaks)-1,breaks)
     ## TODO: allow multiple k
     ## (for loop with add=TRUE, and NA in all non-k columns)
     image_matrix(mat, col=cols[[k]], breaks=breaks,...)
+    ## TODO: use image_cls below
+    ## image_cls(mat, col=cols[[k]], dir=dir,...)
+}
+
+image_cls <- function(cls, col, dir="h") {
+
+    mat <- matrix(cls-.5, nrow=1)
+    breaks <- sort(as.numeric(unique(cls)))
+    breaks <- c(min(breaks)-1,breaks)
+    ## TODO: allow multiple k
+    ## (for loop with add=TRUE, and NA in all non-k columns)
+    if ( dir=="v") mat <- t(mat)
+    image_matrix(mat, col=col, breaks=breaks,...)
 }
 
 ### UTILS
