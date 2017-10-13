@@ -164,6 +164,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @export
 plotOverlaps <- function(x, p.min=0.01, n=100, ...) {
     txt <- x$overlap
+    txt[txt=="0"] <- ""
     pval <- -log2(x$p.value)
     breaks <- seq(0,-log2(p.min),length.out=n+1)
     colors <- grDevices::gray(seq(1,0,length.out=n))
