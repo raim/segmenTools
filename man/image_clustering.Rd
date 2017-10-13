@@ -4,7 +4,7 @@
 \alias{image_clustering}
 \title{plot sorted clustering as color table}
 \usage{
-image_clustering(cset, k = selected(cset), ...)
+image_clustering(cset, k = selected(cset), dir = "h", ...)
 }
 \arguments{
 \item{cset}{a structure of class 'clustering' as returned by
@@ -13,6 +13,8 @@ segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 \item{k}{integer or string specifiying to clustering (K: cluster numbers)
 to be used if cls is of class 'clustering'; if missing (default) the
 `selected' clustering from \code{cls} is chosen}
+
+\item{dir}{direction, "h" for horizontal (default), "v" for vertical}
 
 \item{...}{arguments to \code{\link{image_matrix}}}
 }
