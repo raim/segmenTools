@@ -149,26 +149,37 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 
 #' plot cluster-cluster overlaps
 #'
-#' plots the significance distribution of a cluster-cluster
-#' overlap statistics provided by \code{\link{clusterCluster}}
+#' Plots the significance distribution of a cluster-cluster
+#' overlap statistics provided by \code{\link{clusterCluster}},
+#' where the a white-black gradient is calculated from \code{-log(p)}.
 #' @param x a `clusterOverlaps' object returned by
 #' \code{\link{clusterCluster}}
 #' @param p.min significance cutoff, p-values equal or smaller to
 #' this cutoff will appear black; TODO: plot legend
 #' @param n number of gray shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
+#' @param p.txt p-value cutoff for showing white text
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: select white text colors close to p.min !
 ## TODO: sort by significance?
 #' @export
-plotOverlaps <- function(x, p.min=0.01, n=100, ...) {
-    txt <- x$overlap
-    txt[txt=="0"] <- ""
-    pval <- -log2(x$p.value)
+plotOverlaps <- function(x, p.min=0.001, n=100, p.txt=-log2(p.min)*.85, ...) {
+
+    ## set up p-value and colors
+    pval <- x$p.value
+    pval[pval<=p.min] <- p.min
+    pval <- -log2(pval)
     breaks <- seq(0,-log2(p.min),length.out=n+1)
     colors <- grDevices::gray(seq(1,0,length.out=n))
-    image_matrix(pval,breaks=breaks,col=colors,axis=1:2,text=txt, ...)
+    ## set up text and text colors
+    txt <- x$overlap
+    txt[txt=="0"] <- ""
+    txt.col <- txt
+    txt.col[] <- "black"
+    txt.col[pval >= -log2(p.txt)] <- "white"
+
+    image_matrix(pval,breaks=breaks,col=colors,axis=1:2,text=txt, text.col=txt.col, ...)
 }
 
 #' parse an annotation file (a bidirectional map)

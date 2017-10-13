@@ -4,7 +4,7 @@
 \alias{plotOverlaps}
 \title{plot cluster-cluster overlaps}
 \usage{
-plotOverlaps(x, p.min = 0.01, n = 100, ...)
+plotOverlaps(x, p.min = 0.001, n = 100, p.txt = -log2(p.min) * 0.85, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -16,9 +16,12 @@ this cutoff will appear black; TODO: plot legend}
 \item{n}{number of gray shades between \code{p=1} (white)
 and \code{p >= p.min} (black)}
 
+\item{p.txt}{p-value cutoff for showing white text}
+
 \item{...}{arguments to \code{\link{image_matrix}}}
 }
 \description{
-plots the significance distribution of a cluster-cluster
-overlap statistics provided by \code{\link{clusterCluster}}
+Plots the significance distribution of a cluster-cluster
+overlap statistics provided by \code{\link{clusterCluster}},
+where the a white-black gradient is calculated from \code{-log(p)}.
 }
