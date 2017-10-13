@@ -164,7 +164,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 ## TODO: select white text colors close to p.min !
 ## TODO: sort by significance?
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=-log2(p.min)*.85, n=100, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
