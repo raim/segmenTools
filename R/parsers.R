@@ -16,6 +16,7 @@
 parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 
     ## working with IDs, set this to false!
+    old <- unlist(options("stringsAsFactors"))
     op <- options(stringsAsFactors=F)
     
     ## parse all lines
@@ -31,18 +32,27 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
     #ids[ids=="",idcol[1]] <- rownames(ids)[ids==""] 
     ## find samples
     idx <- grep("^\\^SAMPLE", lines)
+
+    
+    ## reduce by those with actual data
+    cidx <- grep("^!Sample_data_row_count", lines) ## data rows present?
+    samplecnt <- as.numeric(sub(".*= ","",lines[cidx]))
+    idx <- idx[samplecnt>0]
+
+    ## sample IDs
     sampleids <- sub(".*= ","",lines[idx])
-    sidx <- grep("^!sample_table_begin", lines)
-    eidx <- grep("^!sample_table_end", lines)-1
+    
     ## sample titles
     tit <- NULL
     if ( title ) {
         tcol <- "^!Sample_title = "
         tidx <- grep(tcol, lines)
+        tidx <- tidx[samplecnt>0]
         tit <- sub(tcol,"",lines[tidx])
         names(tit) <- sampleids
     }
-    ## value description
+
+    ## data description - should be only present for samples with data
     description <- NULL
     if ( desc ) {
         descol <- paste("^#",valcol," = ",sep="")
@@ -50,7 +60,10 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
         description <- sub(descol,"",lines[vidx])
         names(description) <- sampleids
     }
-    ## get data
+
+    ## data tables
+    sidx <- grep("^!sample_table_begin", lines)
+    eidx <- grep("^!sample_table_end", lines)-1
     dat <- matrix(NA, nrow=nrow(ids), ncol=length(idx))
     rownames(dat) <- rownames(ids)
     colnames(dat) <- sampleids
@@ -61,6 +74,8 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
     }
     res <- list(data=dat, ids=ids, title=tit, description=description)
     class(res) <- "geosoft"
+    # reset option
+    options(stringsAsFactors=old)
     res
 }
 
