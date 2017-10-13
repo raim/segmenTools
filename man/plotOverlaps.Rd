@@ -4,7 +4,7 @@
 \alias{plotOverlaps}
 \title{plot cluster-cluster overlaps}
 \usage{
-plotOverlaps(x, p.min = 0.01, p.txt = -log2(p.min) * 0.85, n = 100, ...)
+plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
