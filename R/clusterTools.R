@@ -147,6 +147,27 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   return(result)
 }
 
+#' plot cluster-cluster overlaps
+#'
+#' plots the significance distribution of a cluster-cluster
+#' overlap statistics provided by \code{\link{clusterCluster}}
+#' @param x a `clusterOverlaps' object returned by
+#' \code{\link{clusterCluster}}
+#' @param p.min significance cutoff, p-values equal or smaller to
+#' this cutoff will appear black; TODO: plot legend
+#' @param ... arguments to \code{\link{image_matrix}}
+## TODO: define as plot.clusterOverlaps method?
+## TODO: select white text colors close to p.min !
+## TODO: sort by significance?
+#' @export
+plotOverlaps <- function(x, p.min=0.01, ...) {
+    txt <- x$overlap
+    pval <- -log2(x$p.value)
+    breaks <- seq(0,-log2(p.min),length.out=101)
+    colors <- gray.colors(100,start=1,end=0)
+    image_matrix(pval,breaks=breaks,col=colors,axis=1:2,text=txt, ...)
+}
+
 #' parse an annotation file (a bidirectional map)
 #' 
 #' parses a bidirectional map of feature IDs vs. annotation terms, e.g.
@@ -782,8 +803,9 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
     ## plot each cluster on separate panel?
     if ( each ) {
         mai <- par("mai")
+        mfc <- par("mfcol")
         mai[c(1,3)] <- 0
-        old.par <- par(mfcol=c(length(cls.srt),1),mai=mai)
+        par(mfcol=c(length(cls.srt),1),mai=mai)
     } else {
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
@@ -821,8 +843,10 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
         points(time, avg$avg[cl,], col=avg.col[cl])
     }
     ## reset plot pars
-    #if ( each ) par(old.par)
-
+    if ( each ) {
+        par(mai=mai,mfcol=mfc)
+    }
+        
     avg$normalization <- norm
     avg$ylim <- ylim
     avg$legend <- used.pars
@@ -900,8 +924,9 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
     ## plot each cluster on separate panel?
     if ( each ) {
         mai <- par("mai")
+        mfc <- par("mfcol")
         mai[c(1,3)] <- 0
-        old.par <- par(mfcol=c(length(cls.srt),1),mai=mai)
+        par(mfcol=c(length(cls.srt),1),mai=mai)
     } else {
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
@@ -923,8 +948,9 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
         lines(time, avg$avg[cl,], col=avg.col[cl], lwd=3) ## average last
     }
     ## reset plot pars
-    if ( each ) par(old.par)
-    ##pol.col
+    if ( each ) {
+        par(mai=mai,mfcol=mfc)
+    }
 }
 
 #' plot sorted clustering as color table
