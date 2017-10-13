@@ -156,15 +156,15 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' \code{\link{clusterCluster}}
 #' @param p.min significance cutoff, p-values equal or smaller to
 #' this cutoff will appear black; TODO: plot legend
+#' @param p.txt p-value cutoff for showing white text
 #' @param n number of gray shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
-#' @param p.txt p-value cutoff for showing white text
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: select white text colors close to p.min !
 ## TODO: sort by significance?
 #' @export
-plotOverlaps <- function(x, p.min=0.001, n=100, p.txt=-log2(p.min)*.85, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=-log2(p.min)*.85, n=100, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
