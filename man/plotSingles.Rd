@@ -5,7 +5,7 @@
 \title{plot indivividual time-courses}
 \usage{
 plotSingles(x, cls, goi, grep = FALSE, each, lwd = 2, leg.xy = "topleft",
-  ...)
+  y.intersp = 1, ...)
 }
 \arguments{
 \item{x}{"timeseries" object from function

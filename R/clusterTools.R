@@ -619,11 +619,14 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' @param each plot separate panels for each cluster
 #' @param lwd line width of single time-series
 #' @param leg.xy position of the legend, see
+#' @param y.intersp legend line interspacing, see
+#' \code{\link[graphics:legend]{legend}
 #' @param ... arguments to \code{\link{plotClusters}}
 #' \code{\link[graphics:legend]{legend}}
 #' @export
 plotSingles <- function(x, cls, goi, grep=FALSE,
-                        each, lwd=2, leg.xy="topleft", ...) {
+                        each, lwd=2,
+                        leg.xy="topleft", y.intersp=1, ...) {
     ## TODO: set all genes
     ## in cls$cluster to "-1"
 
@@ -643,19 +646,21 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     ## get goi and set all other clusterings to -1
     kp <- which(rownames(cls$clusters)%in%goi)
     if ( grep )
-      kp <- sapply(goi, grep, rownames(cls$clusters))
+      kp <- unlist(sapply(goi, grep, rownames(cls$clusters)))
     cls$clusters[-kp,] <- -1
     
     avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
-        if ( grep )
-          leg[,"id"] <- names(goi)[unlist(sapply(goi, grep, leg[,"id"]))]
-        else
-          leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
+        if ( grep ) {
+            nms <- names(goi)[unlist(sapply(goi, grep, leg[,"id"]))]
+            leg[!is.na(nms),"id"]  <- nms[!is.na(nms)]
+        } else
+            leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
     }
+    ## TODO: auto-select y-intersp if too many goi
     legend(leg.xy, legend=leg[,"id"], lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
-           bg="#FFFFFFAA",bty="o")
+           bg="#FFFFFFAA",bty="o", y.intersp=y.intersp)
     avg$legend <- leg
     invisible(avg)
 }
