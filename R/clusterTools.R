@@ -619,10 +619,10 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' @param each plot separate panels for each cluster
 #' @param lwd line width of single time-series
 #' @param leg.xy position of the legend, see
-#' @param y.intersp legend line interspacing, see
-#' \code{\link[graphics:legend]{legend}
-#' @param ... arguments to \code{\link{plotClusters}}
 #' \code{\link[graphics:legend]{legend}}
+#' @param y.intersp legend line interspacing, see
+#' \code{\link[graphics:legend]{legend}}
+#' @param ... arguments to \code{\link{plotClusters}}
 #' @export
 plotSingles <- function(x, cls, goi, grep=FALSE,
                         each, lwd=2,

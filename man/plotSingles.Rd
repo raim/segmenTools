@@ -25,10 +25,13 @@ eg. if features in \code{cls}}
 
 \item{lwd}{line width of single time-series}
 
-\item{leg.xy}{position of the legend, see}
-
-\item{...}{arguments to \code{\link{plotClusters}}
+\item{leg.xy}{position of the legend, see
 \code{\link[graphics:legend]{legend}}}
+
+\item{y.intersp}{legend line interspacing, see
+\code{\link[graphics:legend]{legend}}}
+
+\item{...}{arguments to \code{\link{plotClusters}}}
 }
 \description{
 plot indivividual time-courses (GOI: genes of interest) from
