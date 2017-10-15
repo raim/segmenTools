@@ -635,8 +635,10 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
       cat(paste(paste(goi[rm],collapse=";"),"not found\n"))
     goi <- goi[!rm]
     
-    if ( length(goi)==0 )
-        stop()
+    if ( length(goi)==0 ) {
+        cat(paste("no GOI found"))
+        return(NULL)
+    }
 
     ## get goi and set all other clusterings to -1
     kp <- which(rownames(cls$clusters)%in%goi)
