@@ -7,7 +7,8 @@
 plotClusters(x, cls, k, cls.col, cls.srt, each = TRUE, type = "rng", norm,
   avg = "median", q = 0.9, ylab, ylim = ifelse(each, "avg", "rng"),
   ylim.scale = 0.1, time, xlab, avg.col = "#000000", lwd = 0.5,
-  lwd.avg = 3, use.lty = FALSE, alpha = 0.2, ...)
+  lwd.avg = 3, use.lty = FALSE, alpha = 0.2, plot.legend = FALSE,
+  leg.xy = "topleft", ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
@@ -71,6 +72,12 @@ extended by this fraction of the total range on both sides}
 
 \item{alpha}{set alpha value of range or individual time series
 colors (color opaqueness)}
+
+\item{plot.legend}{add a legend, useful for very small clusters and mainly
+used for the plotSingles interface}
+
+\item{leg.xy}{position of the legend, see
+\code{\link[graphics:legend]{legend}}}
 
 \item{...}{further arguments to \code{\link{plot.clusteraverages}}}
 }

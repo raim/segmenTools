@@ -649,7 +649,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
       kp <- unlist(sapply(goi, grep, rownames(cls$clusters)))
     cls$clusters[-kp,] <- -1
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
@@ -659,8 +659,10 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
             leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
     }
     ## TODO: auto-select y-intersp if too many goi
-    legend(leg.xy, legend=leg[,"id"], lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
-           bg="#FFFFFFAA",bty="o", y.intersp=y.intersp)
+    if ( !each )
+      legend(leg.xy, legend=leg[,"id"],
+             lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
+             bg="#FFFFFFAA",bty="o", y.intersp=y.intersp)
     avg$legend <- leg
     invisible(avg)
 }
@@ -713,6 +715,10 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param use.lty use individual line type expansion (if \code{type=="all"})
 #' @param alpha set alpha value of range or individual time series
 #' colors (color opaqueness)
+#' @param plot.legend add a legend, useful for very small clusters and mainly
+#' used for the plotSingles interface
+#' @param leg.xy position of the legend, see
+#' \code{\link[graphics:legend]{legend}}
 #' @param ... further arguments to \code{\link{plot.clusteraverages}} 
 ## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
 ## plot.clusteraverages should become a function of plot.clustering,
@@ -724,7 +730,8 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
                          norm, avg="median",  q=.9, 
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
                          time, xlab, avg.col="#000000",
-                         lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2, ...) {
+                         lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2,
+                         plot.legend=FALSE, leg.xy="topleft", ...) {
 
     
     if ( class(cls)=="clustering" ) {
@@ -854,18 +861,22 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
             else  lty <- rep(1, sum(idx,na.rm=TRUE)) #lty <- all.lty[idx]
             matplot(time, t(ts[idx,,drop=F]), add=TRUE,
                     type="l", lty=lty, col=all.col[idx], lwd=lwd)
-            ## store
-            #if ( use.lty )
+
+            ## store for external legend (eg. plotSingles with each=FALSE)
             used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
                                           lty=lty,col=all.col[idx],
                                           stringsAsFactors=FALSE)
+            if ( plot.legend )
+              legend(leg.xy, rownames(ts)[idx], bg="#FFFFFFAA",bty="o",
+                     col=all.col[idx], lty=lty, lwd=lwd)
         }
         lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
     }
     ## reset plot pars
     if ( each ) {
-        par(mai=mai,mfcol=mfc)
+        ## this reset prohibits plotting of legends etc.
+        ##par(mai=mai,mfcol=mfc)
     }
         
     avg$normalization <- norm
