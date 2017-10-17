@@ -116,3 +116,8 @@ annotation
 average probe data for features with multiple probes 
 * `gff2tab` parses a GFF file into tabular format, including
 collection of attributes into data columns
+
+## TODO
+
+* in segmenTier, handle 0-valued rows or 0-var rows better
+* in segmenTools, clusterCluster add fields for statistical corrections
