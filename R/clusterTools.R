@@ -649,7 +649,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
       kp <- unlist(sapply(goi, grep, rownames(cls$clusters)))
     cls$clusters[-kp,] <- -1
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, leg.ids=goi, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
@@ -719,6 +719,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' used for the plotSingles interface
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
+#' @param leg.ids a named vector providing alternative IDs for legends
 #' @param ... further arguments to \code{\link{plot.clusteraverages}} 
 ## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
 ## plot.clusteraverages should become a function of plot.clustering,
@@ -731,7 +732,7 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
                          time, xlab, avg.col="#000000",
                          lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2,
-                         plot.legend=FALSE, leg.xy="topleft", ...) {
+                         plot.legend=FALSE, leg.xy="topleft", leg.ids, ...) {
 
     
     if ( class(cls)=="clustering" ) {
@@ -866,9 +867,15 @@ plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng",
             used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
                                           lty=lty,col=all.col[idx],
                                           stringsAsFactors=FALSE)
-            if ( plot.legend )
-              legend(leg.xy, rownames(ts)[idx], bg="#FFFFFFAA",bty="o",
-                     col=all.col[idx], lty=lty, lwd=lwd)
+            if ( plot.legend ) {
+                nms <- rownames(ts)[idx]
+                if ( !missing(leg.ids) ) {
+                    nms[nms%in%names(leg.ids)] <-
+                        leg.ids[nms[nms%in%names(leg.ids)]]
+                }
+                legend(leg.xy, nms, bg="#FFFFFFAA",bty="o",
+                       col=all.col[idx], lty=lty, lwd=lwd)
+            }
         }
         lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
