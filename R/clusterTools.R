@@ -650,6 +650,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     cls$clusters[-kp,] <- -1
 
     ## remap goi names to use for legend ids
+    if ( is.null(names(goi)) )
+        names(goi) <- goi
     leg.ids <- names(goi)
     names(leg.ids) <- goi
     
