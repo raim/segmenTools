@@ -46,10 +46,11 @@ meanzero <- function(x) t(apply(x,1,scale))
 #' @export
 lg2r <- function(x,na.rm=TRUE) {
 	y=as.matrix(log2(x/apply(x,1,mean,na.rm=na.rm)))
+	if(sum(is.infinite(y))>0)
+        warning("generate -Inf -> convert to NaN")
 	y[!is.finite(y)]=NaN
 	return(y)
 	}
-
 
 
 #' moving average using \code{\link[stats]{filter}}
