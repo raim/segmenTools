@@ -119,7 +119,10 @@ collection of attributes into data columns
 
 ## TODO
 
-* in segmenTier, handle 0-valued rows or 0-var rows better
-* in segmenTools, clusterCluster add fields for statistical corrections
-* in segmenTier, re-cluster cset by kmeans with centers initialized
-by flowclust cluster centers 
+segmenTools:
+* clusterCluster: add fields for statistical corrections
+* plotClusters: allow reference data (L/D or DOT)
+
+segmenTier:
+* processTimeseries: handle 0-valued rows or 0-var rows better
+* clusterTimeseries: re-cluster cset by kmeans with centers initialized by flowclust cluster centers 
