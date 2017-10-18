@@ -79,7 +79,7 @@ used for the plotSingles interface}
 \item{leg.xy}{position of the legend, see
 \code{\link[graphics:legend]{legend}}}
 
-\item{leg.ids}{a named vector providing alternative IDs for legends}
+\item{leg.ids}{a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}}
 
 \item{...}{further arguments to \code{\link{plot.clusteraverages}}}
 }

@@ -648,8 +648,12 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     if ( grep )
       kp <- unlist(sapply(goi, grep, rownames(cls$clusters)))
     cls$clusters[-kp,] <- -1
+
+    ## remap goi names to use for legend ids
+    leg.ids <- names(goi)
+    names(leg.ids) <- goi
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, leg.ids=goi, ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, leg.ids=leg.ids, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
@@ -719,7 +723,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' used for the plotSingles interface
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
-#' @param leg.ids a named vector providing alternative IDs for legends
+#' @param leg.ids a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}
 #' @param ... further arguments to \code{\link{plot.clusteraverages}} 
 ## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
 ## plot.clusteraverages should become a function of plot.clustering,
