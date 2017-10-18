@@ -121,3 +121,5 @@ collection of attributes into data columns
 
 * in segmenTier, handle 0-valued rows or 0-var rows better
 * in segmenTools, clusterCluster add fields for statistical corrections
+* in segmenTier, re-cluster cset by kmeans with centers initialized
+by flowclust cluster centers 
