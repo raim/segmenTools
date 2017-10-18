@@ -74,6 +74,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   ## get clusters
   f1 <- levels(as.factor(cl1))
   f2 <- levels(as.factor(cl2))
+    ## TODO: remember if any was not sorted;
+    ## and sort those by sortClusters at the end; sort smaller first
   if ( !missing(cl1.srt) ) f1 <-  cl1.srt
   if ( !missing(cl2.srt) ) f2 <-  cl2.srt
 
@@ -180,6 +182,50 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, ...) {
     txt.col[pval >= -log2(p.txt)] <- "white"
 
     image_matrix(pval,breaks=breaks,col=colors,axis=1:2,text=txt, text.col=txt.col, ...)
+}
+
+#' sorts cluster overlap structure by p-values
+#' 
+#' Sorts one dimension of a cluster overlap structure
+#' by their p-values along the sorting of the other axis.
+#' For each cluster along the pre-sorted (non-selected) axis,
+#' the most significant overlaps (\code{p<p.min}) are chosen
+#' and moved to the top of the matrix.
+#' TODO: align axis selection with nomenclature in clusterCluster
+#' @param ovl a `clusterOverlaps' object returned by
+#' \code{\link{clusterCluster}}
+#' @param p.min significance cutoff during sorting
+#' @param axis axis to sort (2 for y-axis/rows, 1 for x-axis/columns)
+#' @export
+sortOverlaps <- function(ovl, p.min=.05, axis=2) {
+
+    ## transpose all, if sorting of x-axis (1) is requested
+    if ( axis==1 )
+        ovl <- lapply(ovl, t)
+
+    pvl <- ovl$p.value
+    cls.srt <- colnames(pvl)
+    sig.srt <- NULL
+    ## first, get highly signficant
+    for ( cl in cls.srt ) {
+        tmp.srt <- order(pvl[,cl], decreasing=FALSE)
+        sig.srt <- c(sig.srt, tmp.srt[tmp.srt %in% which(pvl[,cl]<p.min)])
+    }
+    ## second, sort rest by increasing pval
+    rest.srt <- which(!(1:nrow(pvl)) %in% sig.srt)
+    rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),decreasing=FALSE)]
+    new.srt <- c(sig.srt[!duplicated(sig.srt)], rest.srt)
+
+    ## resort all matrices in overlap structure
+    for ( i in 1:length(ovl) )
+        if ( class(ovl[[i]])=="matrix" )
+            ovl[[i]] <- ovl[[i]][new.srt,]
+
+    ## transpose back
+    if ( axis==1 )
+        ovl <- lapply(ovl, t)
+
+    ovl
 }
 
 #' parse an annotation file (a bidirectional map)
@@ -639,7 +685,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     goi <- goi[!rm]
     
     if ( length(goi)==0 ) {
-        cat(paste("no GOI found"))
+        cat(paste("no GOI found\n"))
         return(NULL)
     }
 
