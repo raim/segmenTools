@@ -4,8 +4,8 @@
 \alias{summarizeGEOSoft}
 \title{summarize GEOSoft probes}
 \usage{
-summarizeGEOSoft(data, id = "ORF", avg = "mean", keep.empty = FALSE,
-  replicate = FALSE, repsep = ";", verb = TRUE, ...)
+summarizeGEOSoft(data, id = "ORF", avg = "mean", farms = FALSE,
+  keep.empty = FALSE, replicate = FALSE, repsep = ";", verb = TRUE, ...)
 }
 \arguments{
 \item{data}{a list as returned by function \code{\link{parseGEOSoft}}}
@@ -15,6 +15,9 @@ be summarized}
 
 \item{avg}{a string specifying a function to be used for calculating
 probe averages}
+
+\item{farms}{logical to indicate to use the bioconductor package
+\pkg{farms} for probe summarization (function \code{\link[farms:generateExprVal.method.farms]{generateExprVal.method.farms}})}
 
 \item{keep.empty}{keep columns with no entry in column ID by
 copying the probe ID}
@@ -27,7 +30,8 @@ and each feature will get its own row}
 
 \item{verb}{print messages}
 
-\item{...}{arguments to the function specified in \code{avg}}
+\item{...}{arguments to the function specified in \code{avg} or for
+function \code{\link[farms:generateExprVal.method.farms]{generateExprVal.method.farms}} if \code{farms==TRUE}}
 }
 \description{
 takes as input the list returned by \code{\link{parseGEOSoft}},
@@ -36,7 +40,7 @@ as provided via GEO soft family files.
 Argument \code{id} specifies a probe mapping column ID.
 Multiples probes for the same features (same string in column ID) will
 then be summarized by the function in argument \code{avg}
-(default: median).
-TODO: implement light-weight link to more sophisticated summarization as
-eg. farms, \url{https://www.bioconductor.org/packages/release/bioc/html/farms.html}.
+(default: median). If the package \pkg{farms} installed, the more
+sophisticated probe summarization of this package can be used
+\url{https://www.bioconductor.org/packages/release/bioc/html/farms.html}.
 }

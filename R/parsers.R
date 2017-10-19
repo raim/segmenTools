@@ -87,14 +87,16 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 #' Argument \code{id} specifies a probe mapping column ID.
 #' Multiples probes for the same features (same string in column ID) will
 #' then be summarized by the function in argument \code{avg}
-#' (default: median).
-#' TODO: implement light-weight link to more sophisticated summarization as
-#' eg. farms, \url{https://www.bioconductor.org/packages/release/bioc/html/farms.html}.
+#' (default: median). If the package \pkg{farms} installed, the more
+#' sophisticated probe summarization of this package can be used
+#' \url{https://www.bioconductor.org/packages/release/bioc/html/farms.html}.
 #' @param data a list as returned by function \code{\link{parseGEOSoft}}
 #' @param id a column ID; probes with equal strings in this column will
 #' be summarized
 #' @param avg a string specifying a function to be used for calculating
 #' probe averages
+#' @param farms logical to indicate to use the bioconductor package
+#' \pkg{farms} for probe summarization (function \code{\link[farms:generateExprVal.method.farms]{generateExprVal.method.farms}})
 #' @param keep.empty keep columns with no entry in column ID by
 #' copying the probe ID
 #' @param replicate if TRUE probe sets assigned to multiple features
@@ -102,13 +104,16 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 #' and each feature will get its own row
 #' @param repsep separator for multiple-feature probes
 #' @param verb print messages
-#' @param ... arguments to the function specified in \code{avg}
+#' @param ... arguments to the function specified in \code{avg} or for
+#' function \code{\link[farms:generateExprVal.method.farms]{generateExprVal.method.farms}} if \code{farms==TRUE}
 #' @export
-summarizeGEOSoft <- function(data, id="ORF", avg="mean",
+summarizeGEOSoft <- function(data, id="ORF", avg="mean", farms=FALSE,
                              keep.empty=FALSE, replicate=FALSE, repsep=";",
                              verb=TRUE, ...) {
     ## get summarization function
-    avgf <- get(avg, mode="function")
+    if ( mode(avg)!="function" )
+        avgf <- get(avg, mode="function")
+    else avgf <- avg
     
     ## get data
     dat <- data$data
@@ -141,9 +146,14 @@ summarizeGEOSoft <- function(data, id="ORF", avg="mean",
                   sum(!dups), "features in column", id, "\n"))
     
     ## summarize duplicates (into first row where it occurs)
+    ## TODO: for farms; should data be mean/median-centered first?
     idx <- sapply(dids, function(x) which(ids[,id]%in%x))
-    for ( i in idx ) 
-        dat[i[1],] <- apply(dat[i,],2,avgf,...)
+    for ( i in idx ) {
+        if ( farms ) ## USING FARMS
+            dat[i[1],] <- 2^farms::generateExprVal.method.farms(dat[i,],...)$exprs
+        else ## or a simple averaging function
+            dat[i[1],] <- apply(dat[i,],2,avgf,...)
+    }
     ## and rm duplicate rows
     dat <- dat[!dups,]
     rownames(dat) <- uids[!dups]
@@ -162,6 +172,7 @@ summarizeGEOSoft <- function(data, id="ORF", avg="mean",
     data$data <- dat # replace
     ## add info
     data$mappedto <- id
+    if ( farms ) avg <- "farms::generateExprVal.method.farms"
     data$avg_function <- list(name=avg,
                              argument=paste(names(list(...)),"=",
                                             deparse(substitute(...))))
