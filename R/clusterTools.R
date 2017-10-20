@@ -33,13 +33,13 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                            alternative=c("greater")) {
 
     if ( class(cl1)=="clustering" ) {
-        K <- paste("K:",cl1$selected,sep="")
+        K <- selected(cl1)
         if ( missing(cl1.srt) )
             cl1.srt <- cl1$sorting[[K]]
         cl1 <- cl1$clusters[,K]
     }
     if ( class(cl2)=="clustering" ) {
-        K <- paste("K:",cl2$selected,sep="")
+        K <- selected(cl2)
         if ( missing(cl2.srt) )
             cl2.srt <- cl2$sorting[[K]]
         cl2 <- cl2$clusters[,K]
@@ -558,12 +558,59 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' @export
 selected <- function(cset, K, name=TRUE) {
     if ( missing(K) )
-        K <- cset$selected
-    kCol <- paste0("K:", K)
+      K <- cset$selected
+    if ( typeof(K)=="integer" )
+      kCol <- paste0("K:", K)
+    else kCol <- K
     if ( name )
         return(kCol)
     else
         return(which(colnames(cset$clusters)==kCol))
+}
+
+#' re-cluster clustering by \code{\link[stats:kmeans]{kmeans}}
+#'
+#' Use cluster centers from an initial clustering to initialize
+#' \code{\link[stats:kmeans]{kmeans}}. This is still experimental,
+#' and used to re-associated data rows to cluster centers from
+#' a best clustering found by
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}.
+#' While the latter clustering works best to extract specific time-courses
+#' from the data set, it often comes with a high fraction of badly
+#' associated individual data sets. Re-clustering with
+#' \code{\link[stats:kmeans]{kmeans}} seems to clean this up, e.g., the
+#' phase distributions of re-clustered clusterings are often tighter.
+#' TODO: store clsuter centers and calculate matrices!
+#' @param tset the `timeseries' object from segmenTier's
+#' \code{\link[segmenTier:processTimeseries]{processTimeseries}} used
+#' for initial clustering
+#' @param cset the `clustering' object from segmenTier's 
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
+#' @param k colum name or index of the clustering that should be
+#' re-clustered; defaults to the pre-selected clustering if missing
+#' @param select use the re-clustered clustering as the new pre-selected
+#' clustering
+#' @param ... parameters to \code{\link[stats:kmeans]{kmeans}}
+#' @export
+reCluster <- function(tset, cset, k, select=TRUE, ...) {
+
+    if ( missing(k) )
+      k <- selected(cset, name=TRUE)
+
+    recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]])
+    
+    cls <- rep(0, nrow(cset$clusters))
+    cls[!tset$rm.vals] <- recls$cluster
+    cset$clusters <- cbind(cset$clusters,cls)
+    cset$sorting <- append(cset$sorting, cset$sorting[k])
+    cset$colors <- append(cset$colors, cset$colors[k])
+    newKcol <- paste0(k,"_re")
+    idx <- ncol(cset$clusters)
+    colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <- names(cset$colors)[idx] <- newKcol
+    if ( select )
+    cset$selected <- newKcol
+    cset
+
 }
 
 ## TODO; finish implementation
