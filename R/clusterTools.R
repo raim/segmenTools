@@ -605,6 +605,7 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]],
                            algorithm="Hartigan-Wong")
     ## use alternative algo if this error occured
+    warn <- NULL
     if (recls$ifault==4) {
         recls <- stats::kmeans(tset$dat[!tset$rm.vals,],
                                centers=cset$centers[[k]],
@@ -621,18 +622,19 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     cset$colors <- append(cset$colors, cset$colors[k])
 
     K <- nrow(cset$centers[[k]])
+    N <- length(cls)
     ## add cluster data
     cset$K <- c(cset$K, K)
     cset$usedk <- c(cset$usedk, K)
     ## cluster centers
-    cset$centers <- append(cset$centers, recls$centers)
+    cset$centers <- append(cset$centers, list(recls$centers))
     ## C(c,c) - cluster X cluster cross-correlation matrix
-    cset$Ccc <- append(cset$Ccc, stats::cor(t(recls$centers)))
+    cset$Ccc <- append(cset$Ccc, list(stats::cor(t(recls$centers))))
     ## P(c,i) - position X cluster correlation
-    P <- matrix(NA,nrow=length(cls), ncol=K)
+    P <- matrix(NA,nrow=N, ncol=K)
     P[!tset$rm.vals,] <- segmenTier::clusterCor_c(tset$dat[!tset$rm.vals,],
                                                   recls$centers)
-    cset$Pci <- append(cset$Ccc, P)
+    cset$Pci <- append(cset$Pci, list(P))
     ## warning message from kmeans
     cset$warn <- c(cset$warn, warn)
 
