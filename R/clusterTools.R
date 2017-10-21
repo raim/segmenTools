@@ -636,9 +636,10 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
                                                   recls$centers)
     cset$Pci <- append(cset$Pci, list(P))
     ## warning message from kmeans
-    if ( "warn" %in% names(cset) )
-        cset$warn <- c(cset$warn, warn)
-    else cset$warn <- warn
+    if ( !is.null(warn) )
+        if ( "warn" %in% names(cset) )
+            cset$warn <- c(cset$warn, warn)
+        else cset$warn <- warn
 
     ## TODO: BIC, ICL? calculate or add NA
 
