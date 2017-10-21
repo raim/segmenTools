@@ -640,7 +640,7 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
         cset$warn <- c(cset$warn, warn)
     else cset$warn <- warn
 
-    ## TODO: BIC, ICL?
+    ## TODO: BIC, ICL? calculate or add NA
 
     ## add name
     newKcol <- paste0(k,"_re")
