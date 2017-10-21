@@ -564,7 +564,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 selected <- function(cset, K, name=TRUE) {
     if ( missing(K) )
       K <- cset$selected
-    if ( typeof(K)=="integer" )
+    if ( is.numeric(K) )
       kCol <- paste0("K:", K)
     else kCol <- K
     if ( name )
