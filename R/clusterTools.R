@@ -871,6 +871,10 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' colors (color opaqueness)
 #' @param plot.legend add a legend, useful for very small clusters and mainly
 #' used in the \code{\link{plotSingles}} wrapper
+#' @param embed logical, if TRUE and argument \code{each=TRUE} (one plot for
+#' each cluster), the automatic is suppressed allowing to embed multiple
+#' plots (for each cluster) into external \code{\link[graphics:layout]{layout}}
+#' or \code{par(mfcol/mfrow)} setups
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
 #' @param leg.ids a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}
@@ -888,6 +892,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
                          xlab, avg.col="#000000",
                          lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2,
+                         embed=FALSE,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, ...) {
 
     
@@ -990,8 +995,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
         mai <- par("mai")
         mfc <- par("mfcol")
         mai[c(1,3)] <- 0
-        par(mfcol=c(length(cls.srt),1),mai=mai)
-    } else {
+        if ( !embed ) # don't set mfcol, to embed into externally set layouts
+            par(mfcol=c(length(cls.srt),1),mai=mai)
+     } else {
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
              ylab=norm,ylim=ylim, ...)
