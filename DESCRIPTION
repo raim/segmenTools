@@ -6,6 +6,7 @@ Description: tools and scripts for analysis of gene clusters and genome segmenta
 Depends:
     R (>= 3.2.3)
 Suggests:
+    segmenTier, 
     farms
 License: GPL (>= 2)
 Encoding: UTF-8

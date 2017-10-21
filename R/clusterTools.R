@@ -602,16 +602,46 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     if ( missing(k) )
       k <- selected(cset, name=TRUE)
 
-    recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]])
+    recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]],
+                           algorithm="Hartigan-Wong")
+    ## use alternative algo if this error occured
+    if (recls$ifault==4) {
+        recls <- stats::kmeans(tset$dat[!tset$rm.vals,],
+                               centers=cset$centers[[k]],
+                               algorithm="MacQueen")
+        warn <- "quick-transfer error in kmeans algorithm Hartigan-Wong, taking MacQueen"
+        warning(warn)
+    }
     
     cls <- rep(0, nrow(cset$clusters))
     cls[!tset$rm.vals] <- recls$cluster
     cset$clusters <- cbind(cset$clusters,cls)
+    ## copy existing sorting and coloring
     cset$sorting <- append(cset$sorting, cset$sorting[k])
     cset$colors <- append(cset$colors, cset$colors[k])
+
+    K <- nrow(cset$centers[[k]])
+    ## add cluster data
+    cset$K <- c(cset$K, K)
+    cset$usedk <- c(cset$usedk, K)
+    ## cluster centers
+    cset$centers <- append(cset$centers, recls$centers)
+    ## C(c,c) - cluster X cluster cross-correlation matrix
+    cset$Ccc <- append(cset$Ccc, stats::cor(t(recls$centers)))
+    ## P(c,i) - position X cluster correlation
+    P <- matrix(NA,nrow=length(cls), ncol=K)
+    P[!tset$rm.vals,] <- segmenTier::clusterCor_c(tset$dat[!tset$rm.vals,],
+                                                  recls$centers)
+    cset$Pci <- append(cset$Ccc, P)
+    ## warning message from kmeans
+    cset$warn <- c(cset$warn, warn)
+
+    ## TODO: BIC, ICL?
+
+    ## add name
     newKcol <- paste0(k,"_re")
     idx <- ncol(cset$clusters)
-    colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <- names(cset$colors)[idx] <- newKcol
+    colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <- names(cset$colors)[idx] <- names(cset$centers)[idx] <- names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- newKcol
     if ( select )
     cset$selected <- newKcol
     cset

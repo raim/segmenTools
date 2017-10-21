@@ -7,7 +7,7 @@
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans
-##@importFrom segmenTier colorClusters
+##@importFrom segmenTier clusterCor_c 
 NULL # this just ends the global package documentation
 
 
