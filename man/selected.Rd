@@ -18,5 +18,10 @@ will be returned, if FALSE its index number}
 }
 \description{
 get the column name or index of the selected
-clustering; allows to interface values for the selected clustering
+clustering from a `clustering' object from segmenTier's
+clustering wrappers
+\code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}) and
+\code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}).
+The retuned integer or string allows to interface data for this clustering
+from the `clustering' object.
 }

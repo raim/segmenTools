@@ -4,32 +4,25 @@
 \alias{plotClusters}
 \title{plots cluster averages}
 \usage{
-plotClusters(x, cls, k, cls.col, cls.srt, each = TRUE, type = "rng", norm,
-  avg = "median", q = 0.9, ylab, ylim = ifelse(each, "avg", "rng"),
-  ylim.scale = 0.1, time, xlab, avg.col = "#000000", lwd = 0.5,
-  lwd.avg = 3, use.lty = FALSE, alpha = 0.2, plot.legend = FALSE,
-  leg.xy = "topleft", leg.ids, ...)
+plotClusters(x, cls, k, each = TRUE, type = "rng", time, avg = "median",
+  q = 0.9, norm, cls.col, cls.srt, ylab, ylim = ifelse(each, "avg", "rng"),
+  ylim.scale = 0.1, xlab, avg.col = "#000000", lwd = 0.5, lwd.avg = 3,
+  use.lty = FALSE, alpha = 0.2, plot.legend = FALSE, leg.xy = "topleft",
+  leg.ids, ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
 or a processed time-series as provided by
 \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
 
-\item{cls}{eiter a vector (length(cls)==nrow(x) or a structure of
+\item{cls}{eiter a vector (\code{length(cls)==nrow(x)}) or a structure of
 class 'clustering' as returned by segmenTier's
 \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 
-\item{k}{integer or string specifiying to clustering (K: cluster numbers)
-to be used if cls is of class 'clustering'; if missing (default) the
-`selected' clustering from \code{cls} is chosen}
-
-\item{cls.col}{optional named cluster color vector, where names indicate
-the clusters (as.caracter(cls)); if cls is of class 'clustering' it
-is taken from there}
-
-\item{cls.srt}{optional cluster sorting, can be used for selection of
-subsets of clusters; if cls is of class 'clustering' it is taken
-from there}
+\item{k}{integer or string specifiying the clustering (k:
+cluster numbers) to be used if cls is of class 'clustering';
+if missing (default) the `selected' clustering from \code{cls} is chosen
+(see \code{\link{selected}}).}
 
 \item{each}{logical value indicating whether to plot all cluster
 averages on one panel (\code{FALSE}) or each cluster on a separate panel
@@ -39,26 +32,39 @@ averages on one panel (\code{FALSE}) or each cluster on a separate panel
 only data ranges (see argument \code{q}) or "all" to plot
 each individual time-course (as thin lines)}
 
+\item{time}{optional numeric vector specifiying x-axis time coordinates}
+
+\item{avg}{a function (or the name of a function as a string)
+for calculating an `average' value for each cluster; default is
+the \code{median}}
+
+\item{q}{the fraction of data to be shown in the ranges plots: either
+numeric 0-1, or a function name for calculating variance (eg. "sd", "var").
+Note that this parameter can also influence \code{ylim}, the limits
+of the y axis}
+
 \item{norm}{normalization of the time-series data, must be a function
 that transforms the data, available via \link{segmenTools} are
 \code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations}
 
-\item{avg}{a function for calculating an `average' value for
-each cluster; default is the \code{median}}
+\item{cls.col}{optional named cluster color vector, where names indicate
+the clusters (as.caracter(cls)); if cls is of class 'clustering' it
+is taken from there}
 
-\item{q}{either numeric 0-1, the fraction of data to be shown,
-or a function name for calculating variance (eg. "sd", "var")}
+\item{cls.srt}{optional cluster sorting, can be used for selection of
+subsets of clusters; if cls is of class 'clustering' it is taken
+from there}
 
 \item{ylab}{y-axis label (only used if \code{each==FALSE})}
 
 \item{ylim}{either conventional range of the y-axis, or a string
 specifying whether ylim should be calculated from the average
-(\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})}
+(\code{ylim="avg"}), for all data (\code{ylim="all"}), or from the
+lower/upper ranges (\code{ylim="rng"}); in the latter case the y-axis
+depends on argument \code{q}}
 
 \item{ylim.scale}{if \code{ylim=="avg"}, the calculated ylim will be
 extended by this fraction of the total range on both sides}
-
-\item{time}{optional numeric vector specifiying x-axis time coordinates}
 
 \item{xlab}{x-axis label (auto-selected if missing)}
 
@@ -68,24 +74,28 @@ extended by this fraction of the total range on both sides}
 
 \item{lwd.avg}{line width for average plots (if \code{type=="all"})}
 
-\item{use.lty}{use individual line type expansion (if \code{type=="all"})}
+\item{use.lty}{use individual line types (if \code{type=="all"}); this
+is only useful for very small clusters and is mainly used
+in the \code{\link{plotSingles}} wrapper}
 
 \item{alpha}{set alpha value of range or individual time series
 colors (color opaqueness)}
 
 \item{plot.legend}{add a legend, useful for very small clusters and mainly
-used for the plotSingles interface}
+used in the \code{\link{plotSingles}} wrapper}
 
 \item{leg.xy}{position of the legend, see
 \code{\link[graphics:legend]{legend}}}
 
 \item{leg.ids}{a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}}
 
-\item{...}{further arguments to \code{\link{plot.clusteraverages}}}
+\item{...}{further arguments to the basic setup call to
+\code{\link[graphics:plot]{plot}}}
 }
 \description{
-as \code{\link{plot.clusteraverages}} but using
-package \link[segmenTier]{segmenTier}'s time series and clustering object
-as input; calls, and plots and returns results from
-\code{\link{clusterAverages}}.
+plots average time series of clusters as calculated by
+\code{\link{clusterAverages}}, including 
+variations around the average as transparent areas, or all individual data.
+The function is quite flexible and allows to normalize the data and
+set automatic y-limit selections.
 }

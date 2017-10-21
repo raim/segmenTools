@@ -2,24 +2,25 @@
 % Please edit documentation in R/clusterTools.R
 \name{plotSingles}
 \alias{plotSingles}
-\title{plot indivividual time-courses}
+\title{plot indivividual time series in cluster context}
 \usage{
 plotSingles(x, cls, goi, grep = FALSE, each, lwd = 2, leg.xy = "topleft",
   y.intersp = 1, ...)
 }
 \arguments{
-\item{x}{"timeseries" object from function
+\item{x}{either a simple data matrix with time points (x-axis) in columns,
+or a processed time-series as provided by
 \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
 
 \item{cls}{"clustering" object from function
-\code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
+\code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}} or
+\code{\link[segmenTier:flowclusterTimeseries]{clusterTimeseries}}}
 
-\item{goi}{list of feature ids (rownames in cls$clusters) to plot}
+\item{goi}{list of feature ids (rownames in cls$clusters !) to plot}
 
 \item{grep}{logical, if TRUE \code{goi} are searched by pattern
 match (as argument \code{pattern} in
-\code{\link[base:grep]{grep}}) instead of perfect matches; useful
-eg. if features in \code{cls}}
+\code{\link[base:grep]{grep}}) instead of perfect matches}
 
 \item{each}{plot separate panels for each cluster}
 
@@ -34,6 +35,9 @@ eg. if features in \code{cls}}
 \item{...}{arguments to \code{\link{plotClusters}}}
 }
 \description{
-plot indivividual time-courses (GOI: genes of interest) from
-timeseries and clustering object (simple list)
+plot indivividual time series (GOI: genes of interest) from
+timeseries and clustering objects; a wrapper for \code{\link{plotClusters}},
+allowing to only plot individual time series in their cluster context
+(colors and individual panels for clusters) and using the same style and
+providing all functionality from \code{\link{plotClusters}}.
 }

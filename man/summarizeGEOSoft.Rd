@@ -13,8 +13,9 @@ summarizeGEOSoft(data, id = "ORF", avg = "mean", farms = FALSE,
 \item{id}{a column ID; probes with equal strings in this column will
 be summarized}
 
-\item{avg}{a string specifying a function to be used for calculating
-probe averages}
+\item{avg}{a function (or the name of a function as a string)
+for calculating an `average' value for each cluster; default is
+the \code{mean}}
 
 \item{farms}{logical to indicate to use the bioconductor package
 \pkg{farms} for probe summarization (function \code{\link[farms:generateExprVal.method.farms]{generateExprVal.method.farms}})}

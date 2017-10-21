@@ -14,8 +14,9 @@ must equal \code{nrow(cls)}}
 
 \item{cls.srt}{optional sorting of the clusters}
 
-\item{avg}{a function for calculating an `average' value for
-each cluster; default is the \code{median}}
+\item{avg}{a function (or the name of a function as a string)
+for calculating an `average' value for each cluster; default is
+the \code{median}}
 
 \item{q}{either numeric 0-1, the fraction of data for which high
 and low data cut-offs are calculated, or a function name for

@@ -548,7 +548,12 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
 #' get clustering ID
 #'
 #' get the column name or index of the selected
-#' clustering; allows to interface values for the selected clustering
+#' clustering from a `clustering' object from segmenTier's
+#' clustering wrappers
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}) and
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}).
+#' The retuned integer or string allows to interface data for this clustering
+#' from the `clustering' object.
 #' @param cset  a structure of class 'clustering' as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 #' @param K cluster number; if missing the `selected' clustering will
@@ -638,8 +643,9 @@ phasesortClusters <- function(x, cls) {
 #' @param cls a clustering of the time series, \code{length(cls)}
 #' must equal \code{nrow(cls)}
 #' @param cls.srt optional sorting of the clusters
-#' @param avg a function for calculating an `average' value for
-#' each cluster; default is the \code{median}
+#' @param avg a function (or the name of a function as a string)
+#' for calculating an `average' value for each cluster; default is
+#' the \code{median}
 ## @param dev a function for calculating deviation from the the average,
 ## default is the standard deviation (‘sd’)
 #' @param q either numeric 0-1, the fraction of data for which high
@@ -652,8 +658,8 @@ phasesortClusters <- function(x, cls) {
 clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
     ## get requested functions
-    avg <- get(avg, mode="function")
-    #dev <- get(dev, mode="function")
+    if ( mode(avg)!="function" )
+        avg <- get(avg, mode="function")
     
     if ( missing(cls.srt) )
       cls.srt <- sort(unique(cls))
@@ -696,19 +702,23 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
     res
 }
 
-#' plot indivividual time-courses
+#' plot indivividual time series in cluster context
 #'
-#' plot indivividual time-courses (GOI: genes of interest) from
-#' timeseries and clustering object (simple list)
-#' @param x "timeseries" object from function
+#' plot indivividual time series (GOI: genes of interest) from
+#' timeseries and clustering objects; a wrapper for \code{\link{plotClusters}},
+#' allowing to only plot individual time series in their cluster context
+#' (colors and individual panels for clusters) and using the same style and
+#' providing all functionality from \code{\link{plotClusters}}.
+#' @param x either a simple data matrix with time points (x-axis) in columns,
+#' or a processed time-series as provided by
 #' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
 #' @param cls "clustering" object from function
-#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
-#' @param goi list of feature ids (rownames in cls$clusters) to plot
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}} or
+#' \code{\link[segmenTier:flowclusterTimeseries]{clusterTimeseries}}
+#' @param goi list of feature ids (rownames in cls$clusters !) to plot
 #' @param grep logical, if TRUE \code{goi} are searched by pattern
 #' match (as argument \code{pattern} in
-#' \code{\link[base:grep]{grep}}) instead of perfect matches; useful
-#' eg. if features in \code{cls}
+#' \code{\link[base:grep]{grep}}) instead of perfect matches
 #' @param each plot separate panels for each cluster
 #' @param lwd line width of single time-series
 #' @param leg.xy position of the legend, see
@@ -768,68 +778,79 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 
 #' plots cluster averages 
 #'
-#' as \code{\link{plot.clusteraverages}} but using
-#' package \link[segmenTier]{segmenTier}'s time series and clustering object
-#' as input; calls, and plots and returns results from
-#' \code{\link{clusterAverages}}.
+#' plots average time series of clusters as calculated by
+#' \code{\link{clusterAverages}}, including 
+#' variations around the average as transparent areas, or all individual data.
+#' The function is quite flexible and allows to normalize the data and
+#' set automatic y-limit selections.
 #' @param x either a simple data matrix with time points (x-axis) in columns,
 #' or a processed time-series as provided by
 #' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
-#' @param cls eiter a vector (length(cls)==nrow(x) or a structure of
+#' @param cls eiter a vector (\code{length(cls)==nrow(x)}) or a structure of
 #' class 'clustering' as returned by segmenTier's
 #' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
-#' @param k integer or string specifiying to clustering (K: cluster numbers)
-#' to be used if cls is of class 'clustering'; if missing (default) the
-#' `selected' clustering from \code{cls} is chosen
-#' @param norm normalization of the time-series data, must be a function
-#' that transforms the data, available via \link{segmenTools} are
-#' \code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations
-#' @param avg a function for calculating an `average' value for
-#' each cluster; default is the \code{median}
-#' @param q either numeric 0-1, the fraction of data to be shown,
-#' or a function name for calculating variance (eg. "sd", "var")
-#' @param cls.srt optional cluster sorting, can be used for selection of
-#' subsets of clusters; if cls is of class 'clustering' it is taken
-#' from there
+#' @param k integer or string specifiying the clustering (k:
+#' cluster numbers) to be used if cls is of class 'clustering';
+#' if missing (default) the `selected' clustering from \code{cls} is chosen
+#' (see \code{\link{selected}}).
 #' @param type string specifying the type of plot: "rng" for plotting
 #' only data ranges (see argument \code{q}) or "all" to plot
 #' each individual time-course (as thin lines)
-#' @param cls.col optional named cluster color vector, where names indicate
-#' the clusters (as.caracter(cls)); if cls is of class 'clustering' it
-#' is taken from there
 #' @param each logical value indicating whether to plot all cluster
 #' averages on one panel (\code{FALSE}) or each cluster on a separate panel
 #' (\code{TRUE})
 #' @param time optional numeric vector specifiying x-axis time coordinates
+#' @param avg a function (or the name of a function as a string)
+#' for calculating an `average' value for each cluster; default is
+#' the \code{median}
+#' @param norm normalization of the time-series data, must be a function
+#' that transforms the data, available via \link{segmenTools} are
+#' \code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations
+#' @param q the fraction of data to be shown in the ranges plots: either
+#' numeric 0-1, or a function name for calculating variance (eg. "sd", "var").
+#' Note that this parameter can also influence \code{ylim}, the limits
+#' of the y axis
+#' @param cls.srt optional cluster sorting, can be used for selection of
+#' subsets of clusters; if cls is of class 'clustering' it is taken
+#' from there
+#' @param cls.col optional named cluster color vector, where names indicate
+#' the clusters (as.caracter(cls)); if cls is of class 'clustering' it
+#' is taken from there
 #' @param xlab x-axis label (auto-selected if missing)
 #' @param ylab y-axis label (only used if \code{each==FALSE})
 #' @param ylim either conventional range of the y-axis, or a string
 #' specifying whether ylim should be calculated from the average
-#' (\code{ylim="avg"}) or from the lower/upper ranges (\code{ylim="rng"})
+#' (\code{ylim="avg"}), for all data (\code{ylim="all"}), or from the
+#' lower/upper ranges (\code{ylim="rng"}); in the latter case the y-axis
+#' depends on argument \code{q}
 #' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
 #' @param avg.col color for average line; used only if \code{type="all"}
 #' @param lwd.avg line width for average plots (if \code{type=="all"})
 #' @param lwd line width for indidiual time series plots (if \code{type=="all"})
-#' @param use.lty use individual line type expansion (if \code{type=="all"})
+#' @param use.lty use individual line types (if \code{type=="all"}); this
+#' is only useful for very small clusters and is mainly used
+#' in the \code{\link{plotSingles}} wrapper
 #' @param alpha set alpha value of range or individual time series
 #' colors (color opaqueness)
 #' @param plot.legend add a legend, useful for very small clusters and mainly
-#' used for the plotSingles interface
+#' used in the \code{\link{plotSingles}} wrapper
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
 #' @param leg.ids a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}
-#' @param ... further arguments to \code{\link{plot.clusteraverages}} 
+#' @param ... further arguments to the basic setup call to
+#' \code{\link[graphics:plot]{plot}}
 ## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
 ## plot.clusteraverages should become a function of plot.clustering,
 ## and clusterAverages can be a private function!
 ## make function `timeseriesPlot' or `clusterPlot', that takes
 ## either tset/cset or matrix/vector
 #' @export
-plotClusters <- function(x, cls, k, cls.col, cls.srt, each=TRUE, type="rng", 
-                         norm, avg="median",  q=.9, 
+plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
+                         avg="median",  q=.9, norm, 
+                         cls.col, cls.srt,  
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
-                         time, xlab, avg.col="#000000",
+                         xlab, avg.col="#000000",
                          lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, ...) {
 
