@@ -1,7 +1,7 @@
 
 #' Discrete Fourier Transformation
 #' 
-#' A simple wrapper around \code{\link[stats]{mvfft}} to perform
+#' A simple wrapper around \code{\link[stats:mvfft]{mvfft}} to perform
 #' Discrete Fourier Transformation, discard redundant components
 #' (for real numbers only, the second half of the transform),
 #' and name columns by `DC` (direct current, a term from electrical
@@ -22,7 +22,7 @@ get_fft <- function(x) {
 #' convert complex numbers to degrees
 #'
 #' convert complex number representation of polar coordinates
-#' (such as provided by \code{\link[stats]{mvfft}} or segmenTools'
+#' (such as provided by \code{\link[stats:mvfft]{mvfft}} or segmenTools'
 #' wrapper \code{\link{get_fft}}
 #' to degrees, and map to 0-360 representing the first cycle
 #' in an experiment
