@@ -836,6 +836,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' averages on one panel (\code{FALSE}) or each cluster on a separate panel
 #' (\code{TRUE})
 #' @param time optional numeric vector specifiying x-axis time coordinates
+#' @param time.at argument \code{at} for the x-axis (\code{axis(1, at=time.at)})
 #' @param avg a function (or the name of a function as a string)
 #' for calculating an `average' value for each cluster; default is
 #' the \code{median}
@@ -886,7 +887,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 ## make function `timeseriesPlot' or `clusterPlot', that takes
 ## either tset/cset or matrix/vector
 #' @export
-plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
+plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
@@ -959,6 +960,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
     } 
     if ( missing(xlab) )
         xlab <- "time"
+    if ( missing(time.at) )
+        time.at <- pretty(time)
 
     ## set all but goi to 
     #if ( !missing(goi) ) {
@@ -1001,7 +1004,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
              ylab=norm,ylim=ylim, ...)
-        axis(1);axis(2)
+        axis(1, at=time.at);axis(2)
         axis(3, at=time, labels=FALSE)
         mtext("samples", 3, 1.2)
     }
@@ -1012,7 +1015,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time,
         if ( each ) {
             plot(1,col=NA,axes=FALSE, xlab=NA, xlim=range(time),
                  ylab=paste(cl," (",cls.sze[cl],")",sep=""),ylim=ylim, ...)
-            axis(1);axis(2)
+            axis(1, at=time.at);axis(2)
         }
         if ( "rng"%in%type ) ## polygon
           polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
