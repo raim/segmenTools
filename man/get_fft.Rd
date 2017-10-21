@@ -10,7 +10,7 @@ get_fft(x)
 \item{x}{data to be transformed}
 }
 \description{
-A simple wrapper around \code{\link[stats]{mvfft}} to perform
+A simple wrapper around \code{\link[stats:mvfft]{mvfft}} to perform
 Discrete Fourier Transformation, discard redundant components
 (for real numbers only, the second half of the transform),
 and name columns by `DC` (direct current, a term from electrical
