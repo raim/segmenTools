@@ -636,7 +636,9 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
                                                   recls$centers)
     cset$Pci <- append(cset$Pci, list(P))
     ## warning message from kmeans
-    cset$warn <- c(cset$warn, warn)
+    if ( "warn" %in% names(cset) )
+        cset$warn <- c(cset$warn, warn)
+    else cset$warn <- warn
 
     ## TODO: BIC, ICL?
 
@@ -644,8 +646,9 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     newKcol <- paste0(k,"_re")
     idx <- ncol(cset$clusters)
     colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <- names(cset$colors)[idx] <- names(cset$centers)[idx] <- names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- newKcol
+    
     if ( select )
-    cset$selected <- newKcol
+        cset$selected <- newKcol
     cset
 
 }
