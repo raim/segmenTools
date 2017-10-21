@@ -11,7 +11,7 @@ complex2degree(x)
 }
 \description{
 convert complex number representation of polar coordinates
-(such as provided by \code{\link[stats:mvfft]{mvfft}} or segmenTools'
+(such as provided by \code{\link[stats:fft]{mvfft}} or segmenTools'
 wrapper \code{\link{get_fft}}
 to degrees, and map to 0-360 representing the first cycle
 in an experiment
