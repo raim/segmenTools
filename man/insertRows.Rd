@@ -2,10 +2,7 @@
 % Please edit documentation in R/coor2index.R
 \name{insertRows}
 \alias{insertRows}
-\title{Util to insert multiple rows at specified positions
-in a \code{data.frame}, expanding single-row code by user
-Ari B. Friedman at
-\url{https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appendedlooping through new rows}}
+\title{insert rows as specified positions}
 \usage{
 insertRows(existingDF, newrows, r)
 }
@@ -14,7 +11,7 @@ insertRows(existingDF, newrows, r)
 
 \item{newrows}{rows to add to \code{existingDF}}
 
-\item{r}{positions at which rows are to be inserted, \code{length(r)}
+\item{r}{positions below which rows are to be inserted, \code{length(r)}
 must equal \code{nrow(newrows)}, and \code{r<=nrow(existingDF)}}
 }
 \description{
