@@ -209,8 +209,21 @@ readGFF <- function(gffFile, nrows = -1) {
 tab2gff <- function(tab,
                     columns=c(seqid="chr", "source"="source", type="type",
                               start="start", end="end", score="score",
-                              strand="strand", phase="phase",
-                              attributes="ID;Name;Alias;Parent")) {
+                              strand="strand",phase="phase"),
+                    attributes=c(ID="ID",Name="name",Alias="alias",
+                                 Parent="parent",color="color")) {
+    miscol <- columns[!columns%in%colnames(tab)]
+    cols <- columns[columns%in%colnames(tab)]
+    out <- tab[,cols]
+    colnames(out) <- names(cols)
+    ## TODO: add frame/phase column
+    ## TODO: add score column
+    ## TODO: add translation?
+    ## TODO: parse attributes into
+    ## 1) parse known attributes
+    ## 2) collect unknown attributes
+    ## 3) parse color and convert to snapgene "note"
+    out
 }
 
 #' parse a GFF3 file into a table
