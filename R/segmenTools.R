@@ -51,6 +51,19 @@ lg2r <- function(x,na.rm=TRUE) {
 	return(y)
 	}
 
+## TODO: box-cox trafo for negative values (Bickel and Doksum 1981)
+## as used in flowclust
+bc <- function(x,lambda) (sign(x)*abs(x)^lambda-1)/lambda
+testbc <- function(dat,lambda=.9, cycle=2) {
+
+    xy <- dat[,c(paste0("Re_",cycle),paste0("Im_",cycle))]
+    
+    par(mfcol=c(2,1),mai=c(.7,.7,.01,.01),mgp=c(1,.25,0))
+    plot(xy,cex=.5,col="#000000AA")
+    plot(bc(xy,lambda),cex=.5,col="#000000AA")
+    abline(v=bc(0,lambda))
+    abline(h=bc(0,lambda))
+}
 
 #' moving average using \code{\link[stats]{filter}}
 #' @param x data vector along which a moving average will be calculated
