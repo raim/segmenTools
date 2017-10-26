@@ -878,6 +878,10 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' or \code{par(mfcol/mfrow)} setups
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
+#' @param vline adds a vertical line at position x[i]
+#' @param vl_col color for vertical line (default to cluster colour)
+#' @param vl_lty vertical line type 
+#' @param vl_lwd vertical line width
 #' @param leg.ids a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}
 #' @param ... further arguments to the basic setup call to
 #' \code{\link[graphics:plot]{plot}}
@@ -894,7 +898,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          xlab, avg.col="#000000",
                          lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2,
                          embed=FALSE,
-                         plot.legend=FALSE, leg.xy="topleft", leg.ids, ...) {
+                         plot.legend=FALSE, leg.xy="topleft", leg.ids, 
+			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,...) 
+{
 
     
     if ( class(cls)=="clustering" ) {
@@ -1044,6 +1050,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
         }
         lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
+	if(vl_col==0) abline(v=vline,col=cls.col[cl],lwd=vl_lwd,lty=vl_lty)
+	else abline(v=vline,col=vl_col,lwd=vl_lwd,lty=vl_lty)
     }
     ## reset plot pars
     if ( each ) {
