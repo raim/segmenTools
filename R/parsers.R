@@ -203,6 +203,16 @@ readGFF <- function(gffFile, nrows = -1) {
     return(gff)
  }
 
+## TODO: goal is to create a gff file that can be converted
+## to snapgene-genbank with gff_to_genbank.py
+## note: for gff_to_genbank.py strand must be in +/-
+tab2gff <- function(tab,
+                    columns=c(seqid="chr", "source"="source", type="type",
+                              start="start", end="end", score="score",
+                              strand="strand", phase="phase",
+                              attributes="ID;Name;Alias;Parent")) {
+}
+
 #' parse a GFF3 file into a table
 #' 
 #' parse gff3 files into tables, including conversion of all attributes
