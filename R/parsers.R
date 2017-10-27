@@ -230,6 +230,7 @@ tab2gff <- function(tab,
                               strand="strand",phase="phase"),
                     attributes=c(ID="ID",Name="name",Alias="alias",
                                  Parent="parent",color="color"),
+                    source=c("chromosome","plasmid"),
                     sep=";") {
     miscol <- columns[!columns%in%colnames(tab)]
     cols <- columns[columns%in%colnames(tab)]
@@ -249,7 +250,12 @@ tab2gff <- function(tab,
     ## 1) parse known attributes
     ## 2) collect unknown attributes
     ## 3) parse color and convert to snapgene "note"
-    out <- cbind.data.frame(out, attributes=rep(".", nrow(out)),
+
+    ## tag chromosomes as source
+    idx <- out[,"type"]%in%source
+    out[idx,"type"] <- "source"
+    
+    out <- cbind.data.frame(out, attributes=paste0("ID=",tab[,"ID"]),
                             stringsAsFactors = FALSE)
     ## final sort
     out <- out[,c(names(columns),"attributes")]
