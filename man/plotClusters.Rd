@@ -9,7 +9,7 @@ plotClusters(x, cls, k, each = TRUE, type = "rng", time, time.at,
   ylim = ifelse(each, "avg", "rng"), ylim.scale = 0.1, xlab,
   avg.col = "#000000", lwd = 0.5, lwd.avg = 3, use.lty = FALSE,
   alpha = 0.2, embed = FALSE, plot.legend = FALSE, leg.xy = "topleft",
-  leg.ids, ...)
+  leg.ids, vline = "", vl_col = 0, vl_lwd = 3, vl_lty = 1, ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
@@ -96,6 +96,14 @@ used in the \code{\link{plotSingles}} wrapper}
 \code{\link[graphics:legend]{legend}}}
 
 \item{leg.ids}{a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}}
+
+\item{vline}{adds a vertical line at position x[i]}
+
+\item{vl_col}{color for vertical line (default to cluster colour)}
+
+\item{vl_lwd}{vertical line width}
+
+\item{vl_lty}{vertical line type}
 
 \item{...}{further arguments to the basic setup call to
 \code{\link[graphics:plot]{plot}}}
