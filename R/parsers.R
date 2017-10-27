@@ -233,15 +233,26 @@ tab2gff <- function(tab,
                     sep=";") {
     miscol <- columns[!columns%in%colnames(tab)]
     cols <- columns[columns%in%colnames(tab)]
-    out <- tab[,cols]
+    out <- as.data.frame(tab[,cols],stringsAsFactors = FALSE)
     colnames(out) <- names(cols)
     ## TODO: add frame/phase column
     ## TODO: add score column
-    ## TODO: add translation?
+    if ( !"score"%in%colnames(out) )
+        out <- cbind.data.frame(out, score=rep(".", nrow(out)),
+                                stringsAsFactors = FALSE)
+    if ( !"phase"%in%colnames(out) ) {
+        out <- cbind.data.frame(out, phase=rep(".", nrow(out)),
+                                stringsAsFactors = FALSE)
+        out[out[,"type"]=="CDS","phase"] <- "0"
+    }
     ## TODO: parse attributes into
     ## 1) parse known attributes
     ## 2) collect unknown attributes
     ## 3) parse color and convert to snapgene "note"
+    out <- cbind.data.frame(out, attributes=rep(".", nrow(out)),
+                            stringsAsFactors = FALSE)
+    ## final sort
+    out <- out[,c(names(columns),"attributes")]
     out
 }
 
