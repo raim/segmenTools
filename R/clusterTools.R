@@ -32,6 +32,11 @@
 clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                            alternative=c("greater")) {
 
+   # read and return cluster variable name names
+   # can be important for plot Overlaps
+   vn1=deparse(substitute(cl1))
+   vn2=deparse(substitute(cl2))	 	
+	 
     if ( class(cl1)=="clustering" ) {
         K <- selected(cl1)
         if ( missing(cl1.srt) )
@@ -145,6 +150,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
     ## TODO: add test number for later bonferroni correction
   result <- append(result, list(p.value=p.value))
     result$alternative <- alternative
+    result$varnames=c(vn1,vn2)
   class(result) <- "clusterOverlaps"
   return(result)
 }
