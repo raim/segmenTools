@@ -8,7 +8,7 @@ tab2gff(tab, columns = c(seqid = "chr", source = "source", type = "type",
   start = "start", end = "end", score = "score", strand = "strand", phase =
   "phase"), attributes = c(ID = "ID", Name = "name", Alias = "alias", Parent =
   "parent", color = "color"), source = c("chromosome", "plasmid"),
-  sep = ";")
+  sep = "; ")
 }
 \arguments{
 \item{tab}{input table of genomic features with chromosome coordinate

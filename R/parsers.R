@@ -232,7 +232,7 @@ tab2gff <- function(tab,
                     attributes=c(ID="ID",Name="name",Alias="alias",
                                  Parent="parent",color="color"),
                     source=c("chromosome","plasmid"),
-                    sep=";") {
+                    sep="; ") {
     miscol <- columns[!columns%in%colnames(tab)]
     cols <- columns[columns%in%colnames(tab)]
     out <- as.data.frame(tab[,cols],stringsAsFactors = FALSE)
@@ -255,8 +255,18 @@ tab2gff <- function(tab,
     ## tag chromosomes as source
     idx <- out[,"type"]%in%source
     out[idx,"type"] <- "source"
+
+    attributes <- attributes[attributes%in%colnames(tab)]
+    atts <- matrix(NA,nrow(out),ncol=length(attributes))
+    for ( i in 1:length(attributes) ) {
+        colid <- attributes[i]
+        colnm <- names(attributes)[i]
+        isna <- is.na(tab[,colid])
+        atts[!isna,i] <- paste(colnm,tab[!isna,colid],sep="=")
+    }
+    attl <- apply(atts, 1, function(x) paste(x[!is.na(x)],collapse=sep))
     
-    out <- cbind.data.frame(out, attributes=paste0("ID=",tab[,"ID"]),
+    out <- cbind.data.frame(out, attributes=attl,
                             stringsAsFactors = FALSE)
     ## final sort
     out <- out[,c(names(columns),"attributes")]
