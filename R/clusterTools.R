@@ -1064,9 +1064,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
 	else abline(v=vline,col=vl_col,lwd=vl_lwd,lty=vl_lty)
     }
     ## reset plot pars
-    if ( each ) {
+    if ( each & !embed) {
         ## this reset prohibits plotting of legends etc.
-        ##par(mai=mai,mfcol=mfc)
+        par(mai=mai,mfcol=mfc)
     }
         
     avg$normalization <- norm
