@@ -203,15 +203,34 @@ readGFF <- function(gffFile, nrows = -1) {
     return(gff)
  }
 
+#' creates a gff3-like table
+#'
+#' Creates a table with columns as present in gff3 genome
+#' annotation files, including ;-separated attribute lists.
+#' Columns with RGB colors can be used to create \code{snapgene}-specific
+#' note in attributes.
+#' @param tab input table of genomic features with chromosome coordinate
+#' information
+#' @param columns a named string vector mapping from columns in
+#' \code{tab} (values) to the first 7 columns required for
+#' the gff3 file (names)
+#' @param attributes a named string vector mapping  from columns in
+#' \code{tab} (values) to values in the attribute list; the names of
+#' the vector will become the key in the attribute list
+#' ("<key> = <value>") and attributes will be separated by
+#' arugment \code{sep}
+#' @param sep separator for attribute list
 ## TODO: goal is to create a gff file that can be converted
 ## to snapgene-genbank with gff_to_genbank.py
 ## note: for gff_to_genbank.py strand must be in +/-
+#'@export
 tab2gff <- function(tab,
                     columns=c(seqid="chr", "source"="source", type="type",
                               start="start", end="end", score="score",
                               strand="strand",phase="phase"),
                     attributes=c(ID="ID",Name="name",Alias="alias",
-                                 Parent="parent",color="color")) {
+                                 Parent="parent",color="color"),
+                    sep=";") {
     miscol <- columns[!columns%in%colnames(tab)]
     cols <- columns[columns%in%colnames(tab)]
     out <- tab[,cols]
