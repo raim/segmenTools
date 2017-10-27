@@ -167,7 +167,8 @@ removeCircularFeatures <- function(features,
                                    coorCols=c("chr","start","end","strand"),
                                    idTag="-circ2",
                                    idCols=c(ID="ID",type="type",
-                                            parent="parent"), rmParent=TRUE) {
+                                     parent="parent"),
+                                   rmParent=TRUE) {
     idCols <- idCols[idCols%in%colnames(features)]
     if ( length(idCols)==0 )
         stop("no columns present to scan for idTag, use argument idCols")
