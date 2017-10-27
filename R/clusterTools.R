@@ -959,6 +959,10 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
         ts <- x$ts
     else ts <- data.matrix(x)
 
+    ## add rownames if missing
+    if ( any(is.null(rownames(ts))) )
+      rownames(ts) <- 1:nrow(ts)
+    
     ## normalize
     if ( !missing(norm) )
         ts <- get(norm,mode="function")(ts)

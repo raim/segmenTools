@@ -220,6 +220,7 @@ readGFF <- function(gffFile, nrows = -1) {
 #' ("<key> = <value>") and attributes will be separated by
 #' arugment \code{sep}
 #' @param sep separator for attribute list
+#' @param source identifier of main source feature (chromosome)
 ## TODO: goal is to create a gff file that can be converted
 ## to snapgene-genbank with gff_to_genbank.py
 ## note: for gff_to_genbank.py strand must be in +/-
