@@ -712,7 +712,8 @@ phasesortClusters <- function(x, cls) {
 #' alternatively,  `clustering' object as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 #' with coloring information
-#' @param ... arguments to the base \code{\link[graphics:plot]{plot}} function
+#' @param ... arguments to the base \code{\link[graphics:plot]{plot}} 
+#' and/or \code{\link[graphics:points]{points}} functions
 #' @export
 plotDFT <- function(dft, cycle=3, col, ...) {
 
@@ -728,10 +729,11 @@ plotDFT <- function(dft, cycle=3, col, ...) {
     else if ( class(col)=="clustering" )
         col <- clusterColors(col)
     
-    plot(dft[,cycle+1], col=col,
+    plot(dft[,cycle+1], col=NA,
          xlab=paste0("Re_",cycle),ylab=paste0("Im_",cycle), ...)
     abline(v=0,col=1,lwd=2)
     abline(h=0,col=1,lwd=2)
+    points(dft[,cycle+1], col=col, ...)
 }
 
 
