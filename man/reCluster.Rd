@@ -33,5 +33,6 @@ from the data set, it often comes with a high fraction of badly
 associated individual data sets. Re-clustering with
 \code{\link[stats:kmeans]{kmeans}} seems to clean this up, e.g., the
 phase distributions of re-clustered clusterings are often tighter.
-TODO: store clsuter centers and calculate matrices!
+TODO: allow to generate cluster centers from novel data, to
+account for different/more data then during clustering!
 }
