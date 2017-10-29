@@ -64,17 +64,20 @@ bcdft <- function(x, lambda) {
     sf <- (y-min(y,na.rm=T))/abs(x)
     x*sf
 }
+## show effect of Box-Cox transformation
+## on amplitude of complex DFT components
 testbcdft <- function(tset, cset, lambda=.5, cycle=3) {
     ## bsp. mit ts/csets 
-    yft <- bcdft(ts$dft,lambda)
+    yft <- bcdft(tset$dft,lambda)
 
     #png("test_amplitude_boxcox.png",units="in",res=100,width=4.7,height=9)
     par(mfcol=c(2,1),mai=c(.5,.7,0,0), mgp=c(1,.2,0))
-    plot(ts$dft[,cycle],col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
+    plot(tset$dft[,cycle],col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
     plot(yft[,cycle], col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
     #dev.off()
 }
-
+## show effect of Box-Cox transformation in
+## separate DFT components (dat is tset$dat)
 testbc <- function(dat,lambda=.9, cycle=2, col=rep("#00000077",nrow(dat))) {
 
     xy <- dat[,c(paste0("Re_",cycle),paste0("Im_",cycle))]
