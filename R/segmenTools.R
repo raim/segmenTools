@@ -66,7 +66,7 @@ bcdft <- function(x, lambda) {
 }
 ## show effect of Box-Cox transformation
 ## on amplitude of complex DFT components
-testbcdft <- function(tset, cset, lambda=.5, cycle=3, col) {
+testbcdft <- function(tset, lambda=.5, cycle=3, col) {
     ## bsp. mit ts/csets 
     yft <- bcdft(tset$dft,lambda)
 
@@ -74,7 +74,7 @@ testbcdft <- function(tset, cset, lambda=.5, cycle=3, col) {
     if ( missing(col) )
         col <- rep("#00000077",nrow(tset$dat))
     else if ( class(col)=="clustering" )
-        col <- col$colors[[selected(col)]][as.character(col$clusters[,selected(col)])]
+        col <- clusterColors(col)
 
     #png("test_amplitude_boxcox.png",units="in",res=100,width=4.7,height=9)
     par(mfcol=c(2,1),mai=c(.5,.7,.01,.01), mgp=c(1,.25,0))
@@ -99,7 +99,7 @@ testbc <- function(tset, lambda=.9, cycle=2, col) {
     if ( missing(col) )
         col <- rep("#00000077",nrow(tset$dat))
     else if ( class(col)=="clustering" )
-        col <- col$colors[[selected(col)]][as.character(col$clusters[,selected(col)])]
+        col <- clusterColors(col)
 
     par(mfcol=c(2,1),mai=c(.5,.7,.01,.01),mgp=c(1,.25,0))
     plot(xy,cex=.5,col=col)
