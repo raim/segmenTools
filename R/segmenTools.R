@@ -66,29 +66,48 @@ bcdft <- function(x, lambda) {
 }
 ## show effect of Box-Cox transformation
 ## on amplitude of complex DFT components
-testbcdft <- function(tset, cset, lambda=.5, cycle=3) {
+testbcdft <- function(tset, cset, lambda=.5, cycle=3, col) {
     ## bsp. mit ts/csets 
     yft <- bcdft(tset$dft,lambda)
 
+    ## colors
+    if ( missing(col) )
+        col <- rep("#00000077",nrow(tset$dat))
+    else if ( class(col)=="clustering" )
+        col <- col$colors[[selected(col)]][as.character(col$clusters[,selected(col)])]
+
     #png("test_amplitude_boxcox.png",units="in",res=100,width=4.7,height=9)
-    par(mfcol=c(2,1),mai=c(.5,.7,0,0), mgp=c(1,.2,0))
-    plot(tset$dft[,cycle],col=cset$colors[[selected(cset)]][as.character(cset$clusters[,selected(cset)])])
-    plot(yft[,cycle], col=cset$colors[[selected(cset)]][as.character(cset$clusters[,selected(cset)])])
+    par(mfcol=c(2,1),mai=c(.5,.7,.01,.01), mgp=c(1,.25,0))
+    plot(tset$dft[,cycle+1],cex=.5, col=col,
+         xlab=paste0("Re_",cycle),ylab=paste0("Im_",cycle))
+    abline(v=0,col=1,lwd=2)
+    abline(h=0,col=1,lwd=2)
+    plot(yft[,cycle+1],cex=.5, col=col,
+         xlab=paste0("Re_",cycle),ylab=paste0("Im_",cycle))
+    abline(v=0,col=1,lwd=2)
+    abline(h=0,col=1,lwd=2)
     #dev.off()
 }
 ## show effect of Box-Cox transformation in
 ## separate DFT components (dat is tset$dat)
-testbc <- function(dat,lambda=.9, cycle=2, col=rep("#00000077",nrow(dat))) {
+testbc <- function(tset, lambda=.9, cycle=2, col) {
 
+    dat <- tset$dat
     xy <- dat[,c(paste0("Re_",cycle),paste0("Im_",cycle))]
     
-    par(mfcol=c(2,1),mai=c(.7,.7,.01,.01),mgp=c(1,.25,0))
+    ## colors
+    if ( missing(col) )
+        col <- rep("#00000077",nrow(tset$dat))
+    else if ( class(col)=="clustering" )
+        col <- col$colors[[selected(col)]][as.character(col$clusters[,selected(col)])]
+
+    par(mfcol=c(2,1),mai=c(.5,.7,.01,.01),mgp=c(1,.25,0))
     plot(xy,cex=.5,col=col)
-    abline(v=0,col=2)
-    abline(h=0,col=2)
+    abline(v=0,col=1,lwd=2)
+    abline(h=0,col=1,lwd=2)
     plot(bc(xy,lambda),cex=.5,col=col)
-    abline(v=bc(0,lambda))
-    abline(h=bc(0,lambda))
+    abline(v=bc(0,lambda),col=2,lwd=2)
+    abline(h=bc(0,lambda),col=2,lwd=2)
 }
 
 #' moving average using \code{\link[stats]{filter}}
