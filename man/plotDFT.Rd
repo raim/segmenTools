@@ -21,7 +21,8 @@ alternatively,  `clustering' object as returned by
 segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 with coloring information}
 
-\item{...}{arguments to the base \code{\link[graphics:plot]{plot}} function}
+\item{...}{arguments to the base \code{\link[graphics:plot]{plot}} 
+and/or \code{\link[graphics:points]{points}} functions}
 }
 \description{
 Plots the components of a Discrete Fourier Transform (DFT)
