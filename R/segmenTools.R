@@ -51,9 +51,30 @@ lg2r <- function(x,na.rm=TRUE) {
 	return(y)
 	}
 
-## TODO: box-cox trafo for negative values (Bickel and Doksum 1981)
+## box-cox trafo for negative values (Bickel and Doksum 1981)
 ## as used in flowclust
 bc <- function(x,lambda) (sign(x)*abs(x)^lambda-1)/lambda
+## amplitude box-cox trafo for complex polar coordinates 
+bcdft <- function(x, lambda) {
+    if ( class(x)=="matrix" )
+        return(apply(x,2, bcdft, lambda))
+    ## Box-Cox transform amplitude
+    y <- bc(abs(x), lambda)
+    ## amplitude scaling factor
+    sf <- (y-min(y,na.rm=T))/abs(x)
+    x*sf
+}
+testbcdft <- function(tset, cset, lambda=.5, cycle=3) {
+    ## bsp. mit ts/csets 
+    yft <- bcdft(ts$dft,lambda)
+
+    #png("test_amplitude_boxcox.png",units="in",res=100,width=4.7,height=9)
+    par(mfcol=c(2,1),mai=c(.5,.7,0,0), mgp=c(1,.2,0))
+    plot(ts$dft[,cycle],col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
+    plot(yft[,cycle], col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
+    #dev.off()
+}
+
 testbc <- function(dat,lambda=.9, cycle=2, col=rep("#00000077",nrow(dat))) {
 
     xy <- dat[,c(paste0("Re_",cycle),paste0("Im_",cycle))]
