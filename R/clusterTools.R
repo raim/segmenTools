@@ -579,6 +579,24 @@ selected <- function(cset, K, name=TRUE) {
         return(which(colnames(cset$clusters)==kCol))
 }
 
+#' get color vector for clustered features
+#'
+#' Retrieves a color vector for clustered features from
+#' segmenTier's clustering object. Default is to return colors for the
+#' pre-selected clustering via option \code{K} to function
+#' \code{\link{selected}}. Not to mix up with segmenTier's
+#' function \code{\link[segmenTier:colorClusters]{colorClusters}} which
+#' assigns a cluster coloring scheme.
+#' @param cset a structure of class 'clustering' as returned by
+#' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param ... arguments to cluster selection with function
+#' \code{\link{selected}}, e.g., cluster number K 
+#' @export
+clusterColors <- function(cset, ...) {
+    K <- selected(cset, ...)
+    cset$colors[[K]][as.character(cset$clusters[,K])]
+}
+
 #' re-cluster clustering by \code{\link[stats:kmeans]{kmeans}}
 #'
 #' Use cluster centers from an initial clustering to initialize
