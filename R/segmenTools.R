@@ -72,8 +72,8 @@ testbcdft <- function(tset, cset, lambda=.5, cycle=3) {
 
     #png("test_amplitude_boxcox.png",units="in",res=100,width=4.7,height=9)
     par(mfcol=c(2,1),mai=c(.5,.7,0,0), mgp=c(1,.2,0))
-    plot(tset$dft[,cycle],col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
-    plot(yft[,cycle], col=cset$colors[["K:4"]][cset$clusters[,"K:4"]])
+    plot(tset$dft[,cycle],col=cset$colors[[selected(cset)]][as.character(cset$clusters[,selected(cset)])])
+    plot(yft[,cycle], col=cset$colors[[selected(cset)]][as.character(cset$clusters[,selected(cset)])])
     #dev.off()
 }
 ## show effect of Box-Cox transformation in
