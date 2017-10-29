@@ -695,6 +695,45 @@ phasesortClusters <- function(x, cls) {
 
 ### PLOT CLUSTERED TIME-SERIES
 
+#' plot polar coordinates
+#'
+#' Plots the components of a Discrete Fourier Transform (DFT)
+#' as polar coordinates (Re and Im of the complex numbers in the DFT).
+#' Arguments \code{dft} and \code{col} can be segmenTier timeseries
+#' and clustering objects.
+#' @param dft the Fourier transform of a time series as returned
+#' by \code{t(mvfft(t(timeseries)))}, or alternatively, a `timeseries' object
+#' from segmenTier's
+#' \code{\link[segmenTier:processTimeseries]{processTimeseries}} when
+#' run with (\code{use.fft=TRUE})
+#' @param cycle the number of cycles (index of non-DC DFT component)
+#' to be plotted
+#' @param col a color vector for the rows in argument \code{dft} or
+#' alternatively,  `clustering' object as returned by
+#' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' with coloring information
+#' @param ... arguments to the base \code{\link[graphics:plot]{plot}} function
+#' @export
+plotDFT <- function(dft, cycle=3, col, ...) {
+
+    ## dft
+    ## can be a segmenTier timeseries object
+    if ( class(dft)=="timeseries" )
+        dft <- dft$dft
+ 
+    ## colors
+    ## can be a segmenTier clustering object with colorings!
+    if ( missing(col) )
+        col <- rep("#00000077",nrow(dft))
+    else if ( class(col)=="clustering" )
+        col <- clusterColors(col)
+    
+    plot(dft[,cycle+1], col=col,
+         xlab=paste0("Re_",cycle),ylab=paste0("Im_",cycle), ...)
+    abline(v=0,col=1,lwd=2)
+    abline(h=0,col=1,lwd=2)
+}
+
 
 #' calculates cluster averages
 #' 
