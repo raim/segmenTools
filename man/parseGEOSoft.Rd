@@ -18,6 +18,10 @@ parseGEOSoft(file, idcol, valcol = "VALUE", title = TRUE, desc = TRUE)
 \item{desc}{if TRUE, value descriptions in field "#<valcol>" will be retrieved}
 }
 \description{
-parses GEO Soft microarray experiment archives into a
-data matrix and an ID-probe mapping table
+Parses GEO Soft microarray experiment archives into a
+data matrix and an ID-probe mapping table. Probes can be further
+summarized for features with \code{\link{summarizeGEOSoft}}.
+}
+\seealso{
+\code{\link{summarizeGEOSoft}}
 }

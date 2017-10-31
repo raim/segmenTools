@@ -45,3 +45,6 @@ then be summarized by the function in argument \code{avg}
 sophisticated probe summarization of this package can be used
 \url{https://www.bioconductor.org/packages/release/bioc/html/farms.html}.
 }
+\seealso{
+\code{\link{parseGEOSoft}}
+}

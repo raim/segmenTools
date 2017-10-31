@@ -5,13 +5,15 @@
 
 #' parse GO Soft archives
 #'
-#' parses GEO Soft microarray experiment archives into a
-#' data matrix and an ID-probe mapping table
+#' Parses GEO Soft microarray experiment archives into a
+#' data matrix and an ID-probe mapping table. Probes can be further
+#' summarized for features with \code{\link{summarizeGEOSoft}}.
 #' @param file a GEO Soft archive file (eg. GSE18902_family.soft.gz)
 #' @param idcol columns to retrieve from the platform table
 #' @param valcol value column (currently only 1 is allowed) in the sample tables
 #' @param title if TRUE a sample title will be retrieved
 #' @param desc if TRUE, value descriptions in field "#<valcol>" will be retrieved
+#' @seealso \code{\link{summarizeGEOSoft}}
 #' @export
 parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 
@@ -107,6 +109,7 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
 #' @param verb print messages
 #' @param ... arguments to the function specified in \code{avg} or for
 #' function \code{\link[farms:generateExprVal.method.farms]{generateExprVal.method.farms}} if \code{farms==TRUE}
+#' @seealso \code{\link{parseGEOSoft}}
 #' @export
 summarizeGEOSoft <- function(data, id="ORF", avg="mean", farms=FALSE,
                              keep.empty=FALSE, replicate=FALSE, repsep=";",
@@ -148,7 +151,8 @@ summarizeGEOSoft <- function(data, id="ORF", avg="mean", farms=FALSE,
     
     ## summarize duplicates (into first row where it occurs)
     ## TODO: for farms; should data be mean/median-centered first?
-    idx <- sapply(dids, function(x) which(ids[,id]%in%x))
+    idx <- lapply(dids, function(x) which(ids[,id]%in%x))
+    names(idx) <- dids
     for ( i in idx ) {
         if ( farms ) ## USING FARMS
             dat[i[1],] <- 2^farms::generateExprVal.method.farms(dat[i,],...)$exprs
