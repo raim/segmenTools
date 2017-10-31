@@ -4,11 +4,14 @@
 \alias{clusterColors}
 \title{get color vector for clustered features}
 \usage{
-clusterColors(cset, ...)
+clusterColors(cset, expand = TRUE, ...)
 }
 \arguments{
 \item{cset}{a structure of class 'clustering' as returned by
 segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
+
+\item{expand}{logical indicating whether colors should be expanded
+to all data}
 
 \item{...}{arguments to cluster selection with function
 \code{\link{selected}}, e.g., cluster number K}

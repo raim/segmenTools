@@ -589,12 +589,16 @@ selected <- function(cset, K, name=TRUE) {
 #' assigns a cluster coloring scheme.
 #' @param cset a structure of class 'clustering' as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param expand logical indicating whether colors should be expanded
+#' to all data
 #' @param ... arguments to cluster selection with function
 #' \code{\link{selected}}, e.g., cluster number K 
 #' @export
-clusterColors <- function(cset, ...) {
+clusterColors <- function(cset, expand=TRUE, ...) {
     K <- selected(cset, ...)
-    cset$colors[[K]][as.character(cset$clusters[,K])]
+    if ( expand )
+        return(cset$colors[[K]][as.character(cset$clusters[,K])])
+    else return(cset$colors[[K]][as.character(cset$sorting[[K]])])
 }
 
 #' re-cluster clustering by \code{\link[stats:kmeans]{kmeans}}
