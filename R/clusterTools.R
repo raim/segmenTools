@@ -223,9 +223,11 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     new.srt <- c(sig.srt[!duplicated(sig.srt)], rest.srt)
 
     ## resort all matrices in overlap structure
+    ## TODO: do this nicer
     for ( i in 1:length(ovl) )
-        if ( class(ovl[[i]])=="matrix" )
-            ovl[[i]] <- ovl[[i]][new.srt,]
+        if ( class(ovl[[i]])=="matrix" & !is.null(rownames(ovl[[i]])) )
+            if ( all(rownames(ovl[[i]])%in%as.character(new.srt)) )
+                ovl[[i]] <- ovl[[i]][as.character(new.srt),]
 
     ## transpose back
     if ( axis==1 )
