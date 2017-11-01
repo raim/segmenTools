@@ -1124,9 +1124,19 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
         }
         lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
         points(time, avg$avg[cl,], col=avg.col[cl])
-	if(vl_col==0) abline(v=vline,col=cls.col[cl],lwd=vl_lwd,lty=vl_lty)
-	else abline(v=vline,col=vl_col,lwd=vl_lwd,lty=vl_lty)
+        ## plot decoration
+        if ( each ) {
+            if(vl_col==0) abline(v=vline,col=cls.col[cl],lwd=vl_lwd,lty=vl_lty)
+            else abline(v=vline,col=vl_col,lwd=vl_lwd,lty=vl_lty)
+        }
     }
+    ## plot decoration
+    ## TODO: allow reference data (DO traces, LD phases)
+    if ( !each ) {
+ 	if(vl_col==0) vl_col <- 1
+	abline(v=vline,col=vl_col,lwd=vl_lwd,lty=vl_lty)
+    }
+    
     ## reset plot pars
     if ( each & !embed) {
         ## this reset prohibits plotting of legends etc.
