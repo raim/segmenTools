@@ -7,8 +7,8 @@
 tab2gff(tab, columns = c(seqid = "chr", source = "source", type = "type",
   start = "start", end = "end", score = "score", strand = "strand", phase =
   "phase"), attributes = c(ID = "ID", Name = "name", Alias = "alias", Parent =
-  "parent", color = "color"), source = c("chromosome", "plasmid"),
-  sep = "; ")
+  "parent", color = "color"), notes, sep = "; ", source = c("chromosome",
+  "plasmid"))
 }
 \arguments{
 \item{tab}{input table of genomic features with chromosome coordinate
@@ -24,9 +24,12 @@ the vector will become the key in the attribute list
 ("<key> = <value>") and attributes will be separated by
 arugment \code{sep}}
 
-\item{source}{identifier of main source feature (chromosome)}
+\item{notes}{as \code{arguments} but output will be
+"note=<key>=<value>}
 
 \item{sep}{separator for attribute list}
+
+\item{source}{identifier of main source feature (chromosome)}
 }
 \description{
 Creates a table with columns as present in gff3 genome

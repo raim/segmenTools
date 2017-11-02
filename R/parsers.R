@@ -223,6 +223,8 @@ readGFF <- function(gffFile, nrows = -1) {
 #' the vector will become the key in the attribute list
 #' ("<key> = <value>") and attributes will be separated by
 #' arugment \code{sep}
+#' @param notes as \code{arguments} but output will be
+#' "note=<key>=<value>
 #' @param sep separator for attribute list
 #' @param source identifier of main source feature (chromosome)
 ## TODO: goal is to create a gff file that can be converted
@@ -235,8 +237,9 @@ tab2gff <- function(tab,
                               strand="strand",phase="phase"),
                     attributes=c(ID="ID",Name="name",Alias="alias",
                                  Parent="parent",color="color"),
-                    source=c("chromosome","plasmid"),
-                    sep="; ") {
+                    notes,
+                    sep="; ",
+                    source=c("chromosome","plasmid")) {
     miscol <- columns[!columns%in%colnames(tab)]
     cols <- columns[columns%in%colnames(tab)]
     out <- as.data.frame(tab[,cols],stringsAsFactors = FALSE)
@@ -269,7 +272,19 @@ tab2gff <- function(tab,
         atts[!isna,i] <- paste(colnm,tab[!isna,colid],sep="=")
     }
     attl <- apply(atts, 1, function(x) paste(x[!is.na(x)],collapse=sep))
-    
+    nots <- NULL
+    if ( !missing(notes) ) {
+        nots <- matrix(NA,nrow(out),ncol=length(notes))
+        for ( i in 1:length(notes) ) {
+            colid <- notes[i]
+            colnm <- names(notes)[i]
+            isna <- is.na(tab[,colid])
+            nots[!isna,i] <- paste0("note=\"",colnm,":",tab[!isna,colid], "\"")
+        }
+        notl <- apply(nots, 1, function(x) paste(x[!is.na(x)],collapse=sep))
+        attl[notl!=""] <- paste(attl[notl!=""],notl[notl!=""],sep=sep)
+    }
+     
     out <- cbind.data.frame(out, attributes=attl,
                             stringsAsFactors = FALSE)
     ## final sort
