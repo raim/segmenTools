@@ -866,7 +866,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     leg.ids <- names(goi)
     names(leg.ids) <- goi
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, lwd.avg=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, leg.ids=leg.ids, ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, leg.ids=leg.ids, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
@@ -935,7 +935,9 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
 #' @param avg.col color for average line; used only if \code{type="all"}
-#' @param lwd.avg line width for average plots (if \code{type=="all"})
+#' @param avg.lwd line width for average plots (if \code{type=="all"})
+#' @param avg.pch point symbol for average plots
+#' @param avg.cex point size for average plots 
 #' @param lwd line width for indidiual time series plots (if \code{type=="all"})
 #' @param use.lty use individual line types (if \code{type=="all"}); this
 #' is only useful for very small clusters and is mainly used
@@ -967,8 +969,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
-                         xlab, avg.col="#000000",
-                         lwd=.5, lwd.avg=3, use.lty=FALSE, alpha=.2,
+                         xlab, avg.col="#000000",avg.lwd=3,avg.cex=1,avg.pch=1,
+                         lwd=.5, use.lty=FALSE, alpha=.2,
                          embed=FALSE,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, 
 			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,...) 
@@ -1033,6 +1035,10 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     if ( !missing(norm) )
         ts <- get(norm,mode="function")(ts)
     else norm <- "raw"
+
+    ## y-axis
+    if ( missing(ylab) )
+      ylab <- norm
     
     ## x-axis
     if ( missing(time) ) {
@@ -1085,7 +1091,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
      } else {
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
-             ylab=norm,ylim=ylim, ...)
+             ylab=ylab,ylim=ylim, ...)
         axis(1, at=time.at);axis(2)
         axis(3, at=time, labels=FALSE)
         mtext("samples", 3, 1.2)
@@ -1124,8 +1130,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                        col=all.col[idx], lty=lty, lwd=lwd)
             }
         }
-        lines(time, avg$avg[cl,], lwd=lwd.avg, col=avg.col[cl]) ## average last
-        points(time, avg$avg[cl,], col=avg.col[cl])
+        lines(time, avg$avg[cl,], lwd=avg.lwd, col=avg.col[cl]) ## average last
+        points(time, avg$avg[cl,], pch=avg.pch, cex=avg.cex, col=avg.col[cl])
         ## plot decoration
         if ( each ) {
             if(vl_col==0) abline(v=vline,col=cls.col[cl],lwd=vl_lwd,lty=vl_lty)

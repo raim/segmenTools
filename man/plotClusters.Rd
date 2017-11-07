@@ -7,9 +7,10 @@
 plotClusters(x, cls, k, each = TRUE, type = "rng", time, time.at,
   avg = "median", q = 0.9, norm, cls.col, cls.srt, ylab,
   ylim = ifelse(each, "avg", "rng"), ylim.scale = 0.1, xlab,
-  avg.col = "#000000", lwd = 0.5, lwd.avg = 3, use.lty = FALSE,
-  alpha = 0.2, embed = FALSE, plot.legend = FALSE, leg.xy = "topleft",
-  leg.ids, vline = "", vl_col = 0, vl_lwd = 3, vl_lty = 1, ...)
+  avg.col = "#000000", avg.lwd = 3, avg.cex = 1, avg.pch = 1,
+  lwd = 0.5, use.lty = FALSE, alpha = 0.2, embed = FALSE,
+  plot.legend = FALSE, leg.xy = "topleft", leg.ids, vline = "",
+  vl_col = 0, vl_lwd = 3, vl_lty = 1, ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
@@ -73,9 +74,13 @@ extended by this fraction of the total range on both sides}
 
 \item{avg.col}{color for average line; used only if \code{type="all"}}
 
-\item{lwd}{line width for indidiual time series plots (if \code{type=="all"})}
+\item{avg.lwd}{line width for average plots (if \code{type=="all"})}
 
-\item{lwd.avg}{line width for average plots (if \code{type=="all"})}
+\item{avg.cex}{point size for average plots}
+
+\item{avg.pch}{point symbol for average plots}
+
+\item{lwd}{line width for indidiual time series plots (if \code{type=="all"})}
 
 \item{use.lty}{use individual line types (if \code{type=="all"}); this
 is only useful for very small clusters and is mainly used
