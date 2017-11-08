@@ -10,7 +10,8 @@ plotClusters(x, cls, k, each = TRUE, type = "rng", time, time.at,
   avg.col = "#000000", avg.lwd = 3, avg.cex = 1, avg.pch = 1,
   lwd = 0.5, use.lty = FALSE, alpha = 0.2, embed = FALSE,
   plot.legend = FALSE, leg.xy = "topleft", leg.ids, vline = "",
-  vl_col = 0, vl_lwd = 3, vl_lty = 1, ...)
+  vl_col = 0, vl_lwd = 3, vl_lty = 1, ref.xy, ref.col = "#C0C0C080",
+  ref.ylab = "", ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
@@ -109,6 +110,14 @@ used in the \code{\link{plotSingles}} wrapper}
 \item{vl_lwd}{vertical line width}
 
 \item{vl_lty}{vertical line type}
+
+\item{ref.xy}{reference data (either x or xy coordinates, see
+\code{\link[grDevices:xy.coords]{xy.coords}}) for reference data to be
+plotted in the background, e.g. light/dark phases or dissolved oxygen traces}
+
+\item{ref.col}{color for reference data plot}
+
+\item{ref.ylab}{y-axis label (right y-axis) for reference data}
 
 \item{...}{further arguments to the basic setup call to
 \code{\link[graphics:plot]{plot}}}
