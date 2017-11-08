@@ -956,6 +956,11 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param vl_col color for vertical line (default to cluster colour)
 #' @param vl_lty vertical line type 
 #' @param vl_lwd vertical line width
+#' @param ref.xy reference data (either x or xy coordinates, see
+#' \code{\link[grDevices:xy.coords]{xy.coords}}) for reference data to be
+#' plotted in the background, e.g. light/dark phases or dissolved oxygen traces
+#' @param ref.col color for reference data plot
+#' @param ref.ylab y-axis label (right y-axis) for reference data
 #' @param leg.ids a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}
 #' @param ... further arguments to the basic setup call to
 #' \code{\link[graphics:plot]{plot}}
@@ -973,7 +978,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          lwd=.5, use.lty=FALSE, alpha=.2,
                          embed=FALSE,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, 
-			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,...) 
+			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,
+                         ref.xy, ref.col="#C0C0C080", ref.ylab="", ...) 
 {
 
     
@@ -1089,6 +1095,15 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
         if ( !embed ) # don't set mfcol, to embed into externally set layouts
             par(mfcol=c(length(cls.srt),1),mai=mai)
      } else {
+        if ( !missing(ref.xy) ) {
+            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])))
+            polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
+                    y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
+                    col=ref.col,border=NA)
+            axis(4,at=round(range(ref.xy[,2])))
+            mtext(ref.ylab, 4, .35)
+            par(new=TRUE)
+        }
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=range(time),
              ylab=ylab,ylim=ylim, ...)
@@ -1101,13 +1116,22 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     names(used.pars) <- cls.srt
     for ( cl in cls.srt ) {
         if ( each ) {
+            if ( !missing(ref.xy) ) {
+                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])))
+                polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
+                        y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
+                        col=ref.col,border=NA)
+                axis(4,at=round(range(ref.xy[,2])))
+                mtext(ref.ylab, 4, .35)
+                par(new=TRUE)
+            }
             plot(1,col=NA,axes=FALSE, xlab=NA, xlim=range(time),
                  ylab=paste(cl," (",cls.sze[cl],")",sep=""),ylim=ylim, ...)
             axis(1, at=time.at);axis(2)
         }
         if ( "rng"%in%type ) ## polygon
-          polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                  col=pol.col[cl],border=NA)
+            polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
+                    col=pol.col[cl],border=NA)
         if ( "all"%in%type ) {
             idx <- cls==cl
             if ( use.lty )
@@ -1115,7 +1139,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             else  lty <- rep(1, sum(idx,na.rm=TRUE)) #lty <- all.lty[idx]
             matplot(time, t(ts[idx,,drop=F]), add=TRUE,
                     type="l", lty=lty, col=all.col[idx], lwd=lwd)
-
+            
             ## store for external legend (eg. plotSingles with each=FALSE)
             used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
                                           lty=lty,col=all.col[idx],
