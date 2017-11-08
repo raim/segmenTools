@@ -1096,7 +1096,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             par(mfcol=c(length(cls.srt),1),mai=mai)
      } else {
         if ( !missing(ref.xy) ) {
-            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])))
+            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=range(time))
             polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                     y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                     col=ref.col,border=NA)
@@ -1117,7 +1117,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     for ( cl in cls.srt ) {
         if ( each ) {
             if ( !missing(ref.xy) ) {
-                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])))
+                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=range(time))
                 polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                         y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                         col=ref.col,border=NA)
