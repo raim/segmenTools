@@ -4,7 +4,7 @@
 \alias{plotDFT}
 \title{plot polar coordinates}
 \usage{
-plotDFT(dft, cycle = 3, col, ...)
+plotDFT(dft, col, cycles = 3, lambda = 1, bc = "component", ...)
 }
 \arguments{
 \item{dft}{the Fourier transform of a time series as returned
@@ -13,13 +13,20 @@ from segmenTier's
 \code{\link[segmenTier:processTimeseries]{processTimeseries}} when
 run with (\code{use.fft=TRUE})}
 
-\item{cycle}{the number of cycles (index of non-DC DFT component)
-to be plotted}
-
 \item{col}{a color vector for the rows in argument \code{dft} or
 alternatively,  `clustering' object as returned by
 segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 with coloring information}
+
+\item{cycles}{the number of cycles (index of non-DC DFT component)
+to be plotted}
+
+\item{lambda}{parameter for Box-Cox transformation of DFT data; has no
+effect for \code{lambda==1}}
+
+\item{bc}{type of Box-Cox transformation (\code{if lambda!=1});
+"component": separate transformation of real and imaginary parts of
+the DFT; "amplitude": Box-Cox transformation of the amplitude}
 
 \item{...}{arguments to the base \code{\link[graphics:plot]{plot}} 
 and/or \code{\link[graphics:points]{points}} functions}

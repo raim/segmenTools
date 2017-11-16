@@ -712,16 +712,21 @@ phasesortClusters <- function(x, cls) {
 #' from segmenTier's
 #' \code{\link[segmenTier:processTimeseries]{processTimeseries}} when
 #' run with (\code{use.fft=TRUE})
-#' @param cycle the number of cycles (index of non-DC DFT component)
+#' @param cycles the number of cycles (index of non-DC DFT component)
 #' to be plotted
 #' @param col a color vector for the rows in argument \code{dft} or
 #' alternatively,  `clustering' object as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
 #' with coloring information
+#' @param lambda parameter for Box-Cox transformation of DFT data; has no
+#' effect for \code{lambda==1}
+#' @param bc type of Box-Cox transformation (\code{if lambda!=1});
+#' "component": separate transformation of real and imaginary parts of
+#' the DFT; "amplitude": Box-Cox transformation of the amplitude
 #' @param ... arguments to the base \code{\link[graphics:plot]{plot}} 
 #' and/or \code{\link[graphics:points]{points}} functions
 #' @export
-plotDFT <- function(dft, cycle=3, col, ...) {
+plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
 
     ## dft
     ## can be a segmenTier timeseries object
@@ -729,17 +734,52 @@ plotDFT <- function(dft, cycle=3, col, ...) {
         dft <- dft$dft
  
     ## colors
-    ## can be a segmenTier clustering object with colorings!
     if ( missing(col) )
-        col <- rep("#00000077",nrow(dft))
+        col <- rep("#00000077",nrow(tset$dat))
     else if ( class(col)=="clustering" )
         col <- clusterColors(col)
+
+    ## temporary for exploration of Box-Cox
+    ## box-cox trafo for negative values (Bickel and Doksum 1981)
+    ## as used in flowclust
+    bccmp <- function(x,lambda) (sign(x)*abs(x)^lambda-1)/lambda
+    ## amplitude box-cox trafo for complex polar coordinates 
+    bcdft <- function(x, lambda) {
+        if ( class(x)=="matrix" )
+            return(apply(x,2, bcdft, lambda))
+        ## Box-Cox transform amplitude
+        y <- bccmp(abs(x), lambda)
+        ## amplitude scaling factor
+        sf <- (y-min(y,na.rm=T))/abs(x)
+        x*sf
+    }
+
+    ori.line <- 0
+    if ( lambda!=1 ) {
+        if ( bc == "component" ) {
+            for ( i in 1:ncol(tset$dat) ) 
+                tset$dat[,i] <- bccmp(tset$dat[,i], lambda=lambda)
+            for ( cycle in cycles )
+                tset$dft[,cycle+1] <-
+                    complex(real=tset$dat[,paste0("Re_",cycle)],
+                            imaginary=tset$dat[,paste0("Im_",cycle)])
+            ori.line <- bccmp(0,lambda)
+        }
+        if ( bc == "amplitude" )
+            tset$dft <- bcdft(tset$dft)
+    }
     
-    plot(dft[,cycle+1], col=NA,
-         xlab=paste0("Re_",cycle),ylab=paste0("Im_",cycle), ...)
-    abline(v=0,col=1,lwd=2)
-    abline(h=0,col=1,lwd=2)
-    points(dft[,cycle+1], col=col, ...)
+
+    for ( cycle in cycles ) {
+        plot(tset$dft[,cycle+1],cex=.5, col=NA,
+             xlab=bquote("Real(X"[.(cycle)]~")"),
+             ylab=bquote("Imaginary(X"[.(cycle)]~")"),axes=FALSE)
+        axis(1);axis(2)
+        abline(v=ori.line,col=1,lwd=1)
+        abline(h=ori.line,col=1,lwd=1)
+        points(tset$dft[,cycle+1], col=col, ...)
+     }
+    list(bc=bc, lambda=lambda)
 }
 
 
@@ -1280,6 +1320,9 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
         par(mai=mai,mfcol=mfc)
     }
 }
+
+
+
 
 #' plot sorted clustering as color table
 #' @param cset a structure of class 'clustering' as returned by
