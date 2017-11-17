@@ -739,6 +739,16 @@ plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
     else if ( class(col)=="clustering" )
         col <- clusterColors(col)
 
+    ## split into Re/Im parts
+    re <- Re(dft)
+    colnames(re) <- paste("Re_",colnames(re),sep="")
+    im <- Im(dft)
+    colnames(im) <- paste("Im_",colnames(im),sep="")
+    ## filter 0 imaginary components: DC and Nyquist!
+    im <- im[,apply(im,2,function(x) any(x!=0,na.rm=TRUE))]
+    dat <- cbind(re,im)
+
+    
     ## temporary for exploration of Box-Cox
     ## box-cox trafo for negative values (Bickel and Doksum 1981)
     ## as used in flowclust
@@ -757,27 +767,37 @@ plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
     ori.line <- 0
     if ( lambda!=1 ) {
         if ( bc == "component" ) {
-            for ( i in 1:ncol(tset$dat) ) 
-                tset$dat[,i] <- bccmp(tset$dat[,i], lambda=lambda)
+            for ( i in 1:ncol(dat) ) 
+                dat[,i] <- bccmp(dat[,i], lambda=lambda)
             for ( cycle in cycles )
-                tset$dft[,cycle+1] <-
-                    complex(real=tset$dat[,paste0("Re_",cycle)],
-                            imaginary=tset$dat[,paste0("Im_",cycle)])
+                dft[,cycle+1] <-
+                    complex(real=dat[,paste0("Re_",cycle)],
+                            imaginary=dat[,paste0("Im_",cycle)])
             ori.line <- bccmp(0,lambda)
         }
         if ( bc == "amplitude" )
-            tset$dft <- bcdft(tset$dft)
+            dft <- bcdft(dft,lambda)
     }
     
+    ## angles for drawing circle
+    theta <- seq(0, 2 * pi, length = 200)
 
+    
     for ( cycle in cycles ) {
-        plot(tset$dft[,cycle+1],cex=.5, col=NA,
+        plot(dft[,cycle+1],cex=.5, col=NA,
              xlab=bquote("Real(X"[.(cycle)]~")"),
-             ylab=bquote("Imaginary(X"[.(cycle)]~")"),axes=FALSE)
+             ylab=bquote("Imaginary(X"[.(cycle)]~")"),axes=FALSE,
+             main=paste0("K=",cycle))
         axis(1);axis(2)
         abline(v=ori.line,col=1,lwd=1)
         abline(h=ori.line,col=1,lwd=1)
-        points(tset$dft[,cycle+1], col=col, ...)
+        points(dft[,cycle+1], col=col, ...)
+
+        ## draw circle
+        radius <- quantile(abs(dft[,3+1]),probs=.9,na.rm=T)
+        lines(x = radius * cos(theta) - ori.line,
+              y = radius * sin(theta) - ori.line)
+       
      }
     list(bc=bc, lambda=lambda)
 }
