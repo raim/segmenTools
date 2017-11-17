@@ -797,6 +797,8 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
         points(dft[,cycle+1], col=col, ...)
 
         ## draw circle
+        ## TODO: fix for lambda < 1 where origin
+        ## is not 0:0, and abs(dft) not the real radius
         rd <- quantile(abs(dft[!is.na(col),cycle+1]), probs=radius, na.rm=TRUE)
         lines(x = rd * cos(theta) + ori.line,
               y = rd * sin(theta) + ori.line)
