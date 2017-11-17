@@ -768,23 +768,42 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
         x*sf
     }
 
+    ## angles for drawing circle
+    theta <- seq(0, 2 * pi, length = 200)
+    ## radii - before box cox
+    circles <- rep(list(NA), length(cycles))
+    names(circles) <- cycles
+    for ( cycle in cycles ) {
+        rd <- quantile(abs(dft[!is.na(col),cycle+1]),
+                       probs=radius, na.rm=TRUE)
+        circle <- xy.coords(x = rd * cos(theta),
+                            y = rd * sin(theta))
+        circles[[as.character(cycle)]] <- circle
+    }
+    
+    ## Box-Cox Transformation
     ori.line <- 0
     if ( lambda!=1 ) {
         if ( bc == "component" ) {
+            ## Box-Cox for components
             for ( i in 1:ncol(dat) ) 
                 dat[,i] <- bccmp(dat[,i], lambda=lambda)
-            for ( cycle in cycles )
+            ## re-construct DFT
+            for ( cycle in cycles ) {
                 dft[,cycle+1] <-
                     complex(real=dat[,paste0("Re_",cycle)],
                             imaginary=dat[,paste0("Im_",cycle)])
+                ## box-cox for circles
+                circ <- circles[[as.character(cycle)]]
+                circ$x <- bccmp(circ$x, lambda=lambda)
+                circ$y <- bccmp(circ$y, lambda=lambda)
+                circles[[as.character(cycle)]] <- circ                
+            }
             ori.line <- bccmp(0,lambda)
         }
-        if ( bc == "amplitude" )
+        if ( bc == "amplitude" ) # note: box-cox calculated below
             dft <- bcdft(dft,lambda)
     }
-    
-    ## angles for drawing circle
-    theta <- seq(0, 2 * pi, length = 200)
     
     for ( cycle in cycles ) {
         plot(dft[,cycle+1],col=NA,
@@ -797,12 +816,15 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
         points(dft[,cycle+1], col=col, ...)
 
         ## draw circle
-        ## TODO: fix for lambda < 1 where origin
-        ## is not 0:0, and abs(dft) not the real radius
-        rd <- quantile(abs(dft[!is.na(col),cycle+1]), probs=radius, na.rm=TRUE)
-        lines(x = rd * cos(theta) + ori.line,
-              y = rd * sin(theta) + ori.line)
-       
+        ## calculated above for component Box-Cox
+        if ( bc=="component" | lambda==1)
+            lines(circles[[as.character(cycle)]])
+        else if ( bc=="amplitude" ) {
+            rd <- quantile(abs(dft[!is.na(col),cycle+1]),
+                           probs=radius, na.rm=TRUE)
+            lines(x = rd * cos(theta) + ori.line,
+                  y = rd * sin(theta) + ori.line)
+        }       
      }
     list(bc=bc, lambda=lambda)
 }
