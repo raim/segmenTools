@@ -787,7 +787,7 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
     theta <- seq(0, 2 * pi, length = 200)
     
     for ( cycle in cycles ) {
-        plot(dft[,cycle+1],cex=.5, col=NA,
+        plot(dft[,cycle+1],col=NA,
              xlab=bquote("Real(X"[.(cycle)]~")"),
              ylab=bquote("Imaginary(X"[.(cycle)]~")"),axes=FALSE,
              main=paste0(cycle, " cycle(s)"), ...)
