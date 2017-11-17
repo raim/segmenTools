@@ -739,7 +739,9 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
     if ( missing(col) )
         col <- rep("#00000077",nrow(dft))
     else if ( class(col)=="clustering" )
-        col <- clusterColors(col)
+        col <- clusterColors(col, expand=TRUE)
+    else if ( length(col)==1 )
+        col <- rep(col,nrow(dft))
 
     ## split into Re/Im parts
     re <- Re(dft)
@@ -795,9 +797,9 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
         points(dft[,cycle+1], col=col, ...)
 
         ## draw circle
-        radius <- quantile(abs(dft[!is.na(col),3+1]), probs=radius, na.rm=TRUE)
-        lines(x = radius * cos(theta) + ori.line,
-              y = radius * sin(theta) + ori.line)
+        rd <- quantile(abs(dft[!is.na(col),cycle+1]), probs=radius, na.rm=TRUE)
+        lines(x = rd * cos(theta) + ori.line,
+              y = rd * sin(theta) + ori.line)
        
      }
     list(bc=bc, lambda=lambda)
