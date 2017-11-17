@@ -735,7 +735,7 @@ plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
  
     ## colors
     if ( missing(col) )
-        col <- rep("#00000077",nrow(tset$dat))
+        col <- rep("#00000077",nrow(dft))
     else if ( class(col)=="clustering" )
         col <- clusterColors(col)
 
