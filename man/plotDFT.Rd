@@ -4,7 +4,8 @@
 \alias{plotDFT}
 \title{plot polar coordinates}
 \usage{
-plotDFT(dft, col, cycles = 3, lambda = 1, bc = "component", ...)
+plotDFT(dft, col, cycles = 3, radius = 0.9, lambda = 1,
+  bc = "component", ...)
 }
 \arguments{
 \item{dft}{the Fourier transform of a time series as returned
@@ -20,6 +21,9 @@ with coloring information}
 
 \item{cycles}{the number of cycles (index of non-DC DFT component)
 to be plotted}
+
+\item{radius}{radius of the polar plot circle as a fraction
+of data to be contained within the radius (smaller amplitude)}
 
 \item{lambda}{parameter for Box-Cox transformation of DFT data; has no
 effect for \code{lambda==1}}

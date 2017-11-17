@@ -714,6 +714,8 @@ phasesortClusters <- function(x, cls) {
 #' run with (\code{use.fft=TRUE})
 #' @param cycles the number of cycles (index of non-DC DFT component)
 #' to be plotted
+#' @param radius radius of the polar plot circle as a fraction
+#' of data to be contained within the radius (smaller amplitude)
 #' @param col a color vector for the rows in argument \code{dft} or
 #' alternatively,  `clustering' object as returned by
 #' segmenTier's \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
@@ -726,7 +728,7 @@ phasesortClusters <- function(x, cls) {
 #' @param ... arguments to the base \code{\link[graphics:plot]{plot}} 
 #' and/or \code{\link[graphics:points]{points}} functions
 #' @export
-plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
+plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...) {
 
     ## dft
     ## can be a segmenTier timeseries object
@@ -781,7 +783,6 @@ plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
     
     ## angles for drawing circle
     theta <- seq(0, 2 * pi, length = 200)
-
     
     for ( cycle in cycles ) {
         plot(dft[,cycle+1],cex=.5, col=NA,
@@ -794,7 +795,7 @@ plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
         points(dft[,cycle+1], col=col, ...)
 
         ## draw circle
-        radius <- quantile(abs(dft[,3+1]),probs=.9,na.rm=T)
+        radius <- quantile(abs(dft[!is.na(col),3+1]), probs=radius, na.rm=TRUE)
         lines(x = radius * cos(theta) + ori.line,
               y = radius * sin(theta) + ori.line)
        
