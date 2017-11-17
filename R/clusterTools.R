@@ -795,8 +795,8 @@ plotDFT <- function(dft, col, cycles=3, lambda=1, bc="component", ...) {
 
         ## draw circle
         radius <- quantile(abs(dft[,3+1]),probs=.9,na.rm=T)
-        lines(x = radius * cos(theta) - ori.line,
-              y = radius * sin(theta) - ori.line)
+        lines(x = radius * cos(theta) + ori.line,
+              y = radius * sin(theta) + ori.line)
        
      }
     list(bc=bc, lambda=lambda)
