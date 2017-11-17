@@ -790,7 +790,7 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
         plot(dft[,cycle+1],col=NA,
              xlab=bquote("Real(X"[.(cycle)]~")"),
              ylab=bquote("Imaginary(X"[.(cycle)]~")"),axes=FALSE,
-             main=paste0(cycle, " cycle(s)"), ...)
+             main=paste0(cycle, ifelse(cycle==1," cycle"," cycles")), ...)
         axis(1);axis(2)
         abline(v=ori.line,col=1,lwd=1)
         abline(h=ori.line,col=1,lwd=1)
