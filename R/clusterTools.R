@@ -1164,7 +1164,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
                       max(avg$high[cls.srt,],na.rm=TRUE))
         else if ( ylim == "avg" ) {
-            ylim <- range(avg$avg[cls.srt,])
+            ylim <- range(avg$avg[cls.srt,],na.rm=TRUE)
             ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
                       ylim[2]+diff(ylim)*ylim.scale)
         }
