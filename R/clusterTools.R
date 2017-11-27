@@ -634,13 +634,13 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
       k <- selected(cset, name=TRUE)
 
     recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]],
-                           algorithm="Hartigan-Wong")
+                           algorithm="Hartigan-Wong", ...)
     ## use alternative algo if this error occured
     warn <- NULL
     if (recls$ifault==4) {
         recls <- stats::kmeans(tset$dat[!tset$rm.vals,],
                                centers=cset$centers[[k]],
-                               algorithm="MacQueen")
+                               algorithm="MacQueen", ...)
         warn <- "quick-transfer error in kmeans algorithm Hartigan-Wong, taking MacQueen"
         warning(warn)
     }
