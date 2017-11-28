@@ -633,9 +633,10 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     if ( missing(k) )
       k <- selected(cset, name=TRUE)
 
-    recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]],
-                           algorithm="Hartigan-Wong", ...)
-    ## use alternative algo if this error occured
+    recls <- tryCatch(stats::kmeans(tset$dat[!tset$rm.vals, ], centers = cset$centers[[k]], 
+                         algorithm = "Hartigan-Wong", ...),error = function(e) return(list(ifault=4))
+    )    
+	## use alternative algo if this error occured
     warn <- NULL
     if (recls$ifault==4) {
         recls <- stats::kmeans(tset$dat[!tset$rm.vals,],
