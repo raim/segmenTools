@@ -633,14 +633,15 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     if ( missing(k) )
       k <- selected(cset, name=TRUE)
 
-    recls <- stats::kmeans(tset$dat[!tset$rm.vals,],centers=cset$centers[[k]],
-                           algorithm="Hartigan-Wong")
-    ## use alternative algo if this error occured
+    recls <- tryCatch(stats::kmeans(tset$dat[!tset$rm.vals, ], centers = cset$centers[[k]], 
+                         algorithm = "Hartigan-Wong", ...),error = function(e) return(list(ifault=4))
+    )    
+	## use alternative algo if this error occured
     warn <- NULL
     if (recls$ifault==4) {
         recls <- stats::kmeans(tset$dat[!tset$rm.vals,],
                                centers=cset$centers[[k]],
-                               algorithm="MacQueen")
+                               algorithm="MacQueen", ...)
         warn <- "quick-transfer error in kmeans algorithm Hartigan-Wong, taking MacQueen"
         warning(warn)
     }
@@ -1164,7 +1165,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             ylim <- c(min(avg$low[cls.srt,],na.rm=TRUE),
                       max(avg$high[cls.srt,],na.rm=TRUE))
         else if ( ylim == "avg" ) {
-            ylim <- range(avg$avg[cls.srt,])
+            ylim <- range(avg$avg[cls.srt,],na.rm=TRUE)
             ylim <- c(ylim[1]-diff(ylim)*ylim.scale,
                       ylim[2]+diff(ylim)*ylim.scale)
         }
