@@ -829,7 +829,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 
 #' Calculates phase distributions
 #' 
-#' calculates the circular mean and R statistics, copied from from package
+#' calculates the circular mean and R statistics, copied from package
 #' \code{CircStats} and after
 #' http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
 #' https://en.wikipedia.org/wiki/Mean_of_circular_quantities
