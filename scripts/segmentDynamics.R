@@ -420,6 +420,9 @@ for ( type in sgtypes ) {
     fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K,
                                    B=B, tol=tol, lambda=lambda,
                                    nu=nu, nu.est=nu.est, trans=trans)
+
+    ## TODO: switch to new plot functions; use reCluster instead
+    ## of merge
  
     mselected <- fcset$merged # cluster number of merged clustering
     selected <- as.character(fcset$max.clb) # cluster number of max BIC 
