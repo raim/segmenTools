@@ -14,7 +14,7 @@ phaseDist(phs, w, degrees = TRUE)
 \item{degrees}{phases are in degrees (0-360), set FALSE for radians}
 }
 \description{
-calculates the circular mean and R statistics, copied from from package
+calculates the circular mean and R statistics, copied from package
 \code{CircStats} and after
 http://en.wikipedia.org/wiki/Directional_statistics#Measures_of_location_and_spread and
 https://en.wikipedia.org/wiki/Mean_of_circular_quantities
