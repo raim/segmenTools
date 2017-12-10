@@ -418,16 +418,23 @@ for ( type in sgtypes ) {
 
     ## cluster by flowClust
     fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K,
-                                   B=B, tol=tol, lambda=lambda,
+                                   B=B, tol=tol, lambda=lambda, merge=TRUE,
                                    nu=nu, nu.est=nu.est, trans=trans)
 
+    ## save all as RData
+    ## temporary; until below is fixed
+    if ( save.rdata ) 
+      save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls,
+           file=paste(fname,".RData",sep=""))
     ## TODO: switch to new plot functions; use reCluster instead
     ## of merge
  
     mselected <- fcset$merged # cluster number of merged clustering
-    selected <- as.character(fcset$max.clb) # cluster number of max BIC 
+    selected <- selected(fcset) # cluster number of max BIC 
     mcls <- fcset$clusters[,mselected] # clusters of merged clustering
     cls <- fcset$clusters[,selected] # clusters at max BIC
+    # Error in fcset$clusters[, selected] : subscript out of bounds
+
 
     bic <- fcset$bic  # BIC
     icl <- fcset$icl  # ICL
