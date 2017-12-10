@@ -331,6 +331,10 @@ for ( i in do.sets ) {
     ## TODO: use global clustering and calculate icor locally
     ## TODO: calculate global clustering from "training set"
     ##       e.g. previous clustering of ORF (from microarrays)
+    ## * get cluster gene ranges
+    ## * calculate avg DFT (or DFT of timeseries avg?)
+    ##   by segmentAvg code from segmentDynamics.R
+    ## * pass clustering to clusterTimeseries and calculate Pci
     cset <- clusterTimeseries(tset,K=K, iter.max=iter.max, nstart=nstart,
                               nui.thresh=nui.thresh, verb=verb)
     
