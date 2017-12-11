@@ -418,13 +418,13 @@ for ( type in sgtypes ) {
 
     ## cluster by flowClust
     fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K,
-                                   B=B, tol=tol, lambda=lambda, merge=TRUE,
+                                   B=B, tol=tol, lambda=lambda, #merge=TRUE,
                                    nu=nu, nu.est=nu.est, trans=trans)
 
     ## save all as RData
     ## temporary; until below is fixed
     if ( save.rdata ) 
-      save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls,
+      save(sgs, rds, phs, pvs, dft, tset, fcset, #sgcls,
            file=paste(fname,".RData",sep=""))
     ## TODO: switch to new plot functions; use reCluster instead
     ## of merge
