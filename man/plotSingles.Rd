@@ -14,7 +14,7 @@ or a processed time-series as provided by
 
 \item{cls}{"clustering" object from function
 \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}} or
-\code{\link[segmenTier:flowclusterTimeseries]{clusterTimeseries}}}
+\code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}}
 
 \item{goi}{list of feature ids (rownames in cls$clusters !) to plot}
 
