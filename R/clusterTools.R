@@ -898,6 +898,38 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
     res
 }
 
+#' plot BIC from flowclusterTimeseries
+#'
+#' @param cls "clustering" object from function
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
+#' @export
+plotBIC <- function(cls) {
+    
+    bic <- cls$bic
+    icl <- cls$icl
+    K <- as.numeric(names(bic))
+    max.bic <- max(bic,na.rm=TRUE) # max BIC
+    max.icl <- max(icl, na.rm=T)   # max ICL
+    max.clb <- cls$max.clb
+    max.cli <- cls$max.cli
+    if ( !is.null(cls$merged.K) )
+      mrg.cl <- cls$merged.K 
+    
+    plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",ylab="BIC/ICL")
+    lines(K,bic)
+    points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
+    points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
+    points(K, icl, col=4,cex=.5)
+    points(max.cli, max.icl,lty=2,pch=4,cex=1.5,col=4)
+    legend("right",pch=c(1,1,4,4),lty=c(1,NA,NA,NA),col=c(1,4,2,1),
+           legend=c("BIC","ICL","failed","max. BIC"),pt.cex=c(1,.5,1,1.5))
+    if ( !is.null(cls$merged.K) ) {
+        arrows(x0=as.numeric(max.clb),y0=bic[as.character(max.clb)],
+               x1=mrg.cl,y1=bic[as.character(max.clb)])
+        abline(v=mrg.cl,lty=2)
+    }
+}
+
 #' plot indivividual time series in cluster context
 #'
 #' plot indivividual time series (GOI: genes of interest) from
@@ -910,7 +942,7 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
 #' @param cls "clustering" object from function
 #' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}} or
-#' \code{\link[segmenTier:flowclusterTimeseries]{clusterTimeseries}}
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
 #' @param goi list of feature ids (rownames in cls$clusters !) to plot
 #' @param grep logical, if TRUE \code{goi} are searched by pattern
 #' match (as argument \code{pattern} in
