@@ -97,6 +97,10 @@ option_list <- list(
   make_option("--trans", type="integer", default=1, 
               help="A numeric indicating whether the Box-Cox transformation
           parameter is estimated from the data; 0: no, 1: non-specific, 2: cluster-specific estim. of lambda"), ## TODO: try 2
+  make_option(c("--merge"), action="store_true", default=FALSE,
+              help="use flowMerge to merge best BIC clustering"),
+  make_option(c("--recluster"), action="store_true", default=FALSE,
+              help="use k-means to re-cluster best BIC clustering"),
   ## OUTPUT OPTIONS
   make_option(c("--jobs"), type="character", default="distribution,timeseries,fourier,rain,clustering", 
               help=",-separated list of rseults to save as csv: distributions,timeseries,fourier,clustering; default is to save all, clustering only if specified by separate option --cluster, and fourier results will contain p-values only of --perm was specified and >1"),
@@ -418,40 +422,54 @@ for ( type in sgtypes ) {
 
     ## cluster by flowClust
     fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K,
-                                   B=B, tol=tol, lambda=lambda, #merge=TRUE,
+                                   B=B, tol=tol, lambda=lambda, merge=merge,
                                    nu=nu, nu.est=nu.est, trans=trans)
 
     ## save all as RData
     ## temporary; until below is fixed
-    if ( save.rdata ) 
-      save(sgs, rds, phs, pvs, dft, tset, fcset, #sgcls,
-           file=paste(fname,".RData",sep=""))
-    ## TODO: switch to new plot functions; use reCluster instead
-    ## of merge
- 
-    mselected <- fcset$merged # cluster number of merged clustering
+    #if ( save.rdata ) 
+    #  save(sgs, rds, phs, pvs, dft, tset, fcset, #sgcls,
+    #       file=file.path(out.path,paste0(fname,".RData",sep="")))
+
+    ## get BIC and best clustering
     selected <- selected(fcset) # cluster number of max BIC 
-    mcls <- fcset$clusters[,mselected] # clusters of merged clustering
     cls <- fcset$clusters[,selected] # clusters at max BIC
     # Error in fcset$clusters[, selected] : subscript out of bounds
-
 
     bic <- fcset$bic  # BIC
     icl <- fcset$icl  # ICL
     max.cli <- fcset$max.cli  # cluster number at max ICL
     max.clb <- fcset$max.clb  # cluster number at max BIC
-    mrg.cl <- fcset$merged.K # cluster number of merged clustering
     
     max.bic <- max(bic,na.rm=TRUE) # max BIC
     max.icl <- max(icl, na.rm=T)   # max ICL
 
     ## store cluster number, max BIC, numbers of clustered and total segments
-    clnum[type,] <- c(K=selected, BIC=max.bic,
+    usedk <- as.numeric(sub("K:","",selected))
+    clnum[type,] <- c(K=usedk, BIC=max.bic,
                       NUMCL=sum(!tset$rm.vals), TOT=nrow(avg))
 
     ## and add selected global clustering to segment table
     ## write out clusters
-    sgcls <- data.frame(ID=sgs[,"ID"],sgCL=cls,mCL=mcls)
+    sgcls <- data.frame(ID=sgs[,"ID"],sgCL=cls)
+
+
+    ## add flowMerge result
+    if ( merge ) {
+        mselected <- fcset$merged # cluster number of merged clustering
+        mcls <- fcset$clusters[,mselected] # clusters of merged clustering
+        mrg.cl <- fcset$merged.K # cluster number of merged clustering
+        ## add to data frame
+        sgcls <- cbind.data.frame(sgcls,mCL=mcls)
+    }
+
+    ## re-cluster with kmeans
+    if ( recluster ) {
+        fcset <- reCluster(tset, fcset, select=TRUE)
+        rselected <- selected(fcset)
+        sgcls <- cbind.data.frame(sgcls, rCL=fcset$clusters[,rselected])
+    }
+
     file.name <- file.path(out.path,paste(fname,"_clusters",sep=""))
     write.table(sgcls,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
@@ -459,67 +477,48 @@ for ( type in sgtypes ) {
     ## save all as RData
     if ( save.rdata ) 
       save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls,
-           file=paste(fname,".RData",sep=""))
+           file=file.path(out.path,paste0(fname,".RData",sep="")))
     
     ## PLOT CLUSTERING
 
     if ( verb>0 )
         cat(paste("\tplotting time series clustering\t",time(),"\n"))
 
-    ##if ( smooth.time!=smooth.time.plot )
-    ##    tset <- processTimeseries(dat,smooth.time=smooth.time.plot, trafo=trafo,
-    ##                              dft.range=dft.range, dc.trafo=dc.trafo,
-    ##                              use.snr=TRUE,low.thresh=-Inf)
-    
-    ## plot time-courses
-    ## if no smoothing was done, smooth for plots
-    ndat <- tset$ts # avg # 
-    navg <- log2(ndat/apply(ndat,1,mean,na.rm=T))
-
     ## plot BIC
     file.name <- file.path(out.path,paste(fname,"_BIC",sep=""))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
     par(mai=c(.7,.7,0.1,0.1),mgp=c(1.5,.5,0),tcl=-.3)
-    plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",ylab="BIC/ICL")
-    lines(K,bic)
-    points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))),
-           pch=4, col=2)
-    points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
-    points(K, icl, col=4,cex=.5)
-    points(K[which(icl==max.icl)], max.icl,lty=2,pch=4,cex=1.5,col=4)
-    arrows(x0=as.numeric(max.clb),y0=bic[as.character(max.clb)],
-           x1=mrg.cl,y1=bic[as.character(max.clb)])
-    abline(v=mrg.cl,lty=2)
-    legend("right",pch=c(1,1,4,4),lty=c(1,NA,NA,NA),col=c(1,4,2,1),
-           legend=c("BIC","ICL","failed","max. BIC"),pt.cex=c(1,.5,1,1.5))
+    plotBIC(fcset)
     dev.off()
      
+    ## RESORT CLUSTERING
+    ## TODO: sort by phase and re-cluster; use vector phs
+    ## of average segment phases!
+    ## cls.phase <- sapply(cls.srt, function(x)
+    ##   phaseDist(phase[cls==x],w=1-rp[cls==x,"pVal"]))
+    ## cset$sorting[[bestKcol]] <- cls.srt
+    ## ## re-color
+    ## cset <- colorClusters(cset)
 
-    ## plot merged
-    file.name <- file.path(out.path,paste(fname, "_osc_K",mselected,sep=""))
-    plotdev(file.name,width=4,height=9,type=fig.type,res=300)
-    par(mfcol=c(length(unique(mcls)) - 1,1),mai=c(0,.5,0,.1),cex.lab=1.5,
-        mgp=c(1.5,.75,0))
-    for ( i in sort(unique(mcls)) ) {
-        if ( i== 0 ) next
-        matplot(t(navg[mcls==i,]),type="l",lty=1,lwd=.5,col=i,ylim=c(-3,2),
-                ylab=sum(mcls==i))
-        lines(apply(navg[mcls==i,],2,median,na.rm=TRUE),col="white",lwd=3)
-    }
-    dev.off()
     ## plot best BIC
     file.name <- file.path(out.path,paste(fname,"_osc_K",selected,sep=""))
     plotdev(file.name,width=4,height=9,type=fig.type,res=300)
-    par(mfcol=c(length(unique(cls)) - 1,1),mai=c(0,.5,0,.1),cex.lab=1.5,
-        mgp=c(1.5,.75,0))
-    for ( i in sort(unique(cls)) ) {
-        if ( i== 0 ) next
-        matplot(t(navg[cls==i,]),type="l",lty=1,lwd=.5,col=i,ylim=c(-3,2),
-                ylab=sum(cls==i))
-        lines(apply(navg[cls==i,],2,median,na.rm=TRUE),col="white",lwd=3)
-    }
+    plotClusters(tset,fcset,k=selected,norm="meanzero")
     dev.off()
-}
+    ## plot merged
+    if ( merge ) {
+        file.name <- file.path(out.path,paste(fname, "_osc_K",mselected,sep=""))
+        plotdev(file.name,width=4,height=9,type=fig.type,res=300)
+        plotClusters(tset,fcset,k=mselected,norm="meanzero")
+        dev.off()
+    }
+    if ( recluster ) {
+        file.name <- file.path(out.path,paste(fname, "_osc_K",rselected,sep=""))
+        plotdev(file.name,width=4,height=9,type=fig.type,res=300)
+        plotClusters(tset,fcset,k=rselected,norm="meanzero")
+        dev.off()
+    }
+ }
 
 ## write out summary for analysis over segmentation types!
 if ( "clustering" %in% jobs ) {
