@@ -501,19 +501,19 @@ for ( type in sgtypes ) {
     ## cset <- colorClusters(cset)
 
     ## plot best BIC
-    file.name <- file.path(out.path,paste(fname,"_osc_K",selected,sep=""))
+    file.name <- file.path(out.path,paste(fname,"_osc_",selected,sep=""))
     plotdev(file.name,width=4,height=9,type=fig.type,res=300)
     plotClusters(tset,fcset,k=selected,norm="meanzero")
     dev.off()
     ## plot merged
     if ( merge ) {
-        file.name <- file.path(out.path,paste(fname, "_osc_K",mselected,sep=""))
+        file.name <- file.path(out.path,paste(fname, "_osc_",mselected,sep=""))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
         plotClusters(tset,fcset,k=mselected,norm="meanzero")
         dev.off()
     }
     if ( recluster ) {
-        file.name <- file.path(out.path,paste(fname, "_osc_K",rselected,sep=""))
+        file.name <- file.path(out.path,paste(fname, "_osc_",rselected,sep=""))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
         plotClusters(tset,fcset,k=rselected,norm="meanzero")
         dev.off()
