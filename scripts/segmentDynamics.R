@@ -476,7 +476,7 @@ for ( type in sgtypes ) {
 
     ## save all as RData
     if ( save.rdata ) 
-      save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls,
+      save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls, fname,
            file=file.path(out.path,paste0(fname,".RData",sep="")))
     
     ## PLOT CLUSTERING
