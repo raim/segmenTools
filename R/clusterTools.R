@@ -901,17 +901,35 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' plot BIC from flowclusterTimeseries
 #'
 #' @param cls "clustering" object from function
+#' @param norm logical, indicating whether the plotted BIC/ICL values
+#' should be normalized by number of (clustered, \code{cluster!="0"})
+#' data points
 #' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
 #' @export
-plotBIC <- function(cls) {
+plotBIC <- function(cls, norm=FALSE) {
     
+    ## cluster number with max BIC/ICL
+    max.clb <- cls$max.clb
+    max.cli <- cls$max.cli
+
+    ## BIC/ICL
     bic <- cls$bic
     icl <- cls$icl
     K <- as.numeric(names(bic))
     max.bic <- max(bic,na.rm=TRUE) # max BIC
     max.icl <- max(icl, na.rm=T)   # max ICL
-    max.clb <- cls$max.clb
-    max.cli <- cls$max.cli
+
+    if ( norm ) {
+        N <- apply(cls$clusters,2,function(x) sum(x!=0))
+        N <- N[selected(cls, as.numeric(names(bic)))]
+        bic <- bic/N
+        icl <- icl/N
+        max.bic <- bic[as.character(max.clb)]/N[selected(cls,20)]
+        max.icl <- bic[as.character(max.cli)]/N[selected(cls,20)]
+    }
+
+
+    ## flowMerge clusters present?
     if ( !is.null(cls$merged.K) )
       mrg.cl <- cls$merged.K 
     
