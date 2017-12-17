@@ -488,7 +488,7 @@ for ( type in sgtypes ) {
     file.name <- file.path(out.path,paste(fname,"_BIC",sep=""))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
     par(mai=c(.7,.7,0.1,0.1),mgp=c(1.5,.5,0),tcl=-.3)
-    plotBIC(fcset)
+    plotBIC(fcset, norm=TRUE)
     dev.off()
      
     ## RESORT CLUSTERING
