@@ -167,12 +167,13 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param p.txt p-value cutoff for showing white text
 #' @param n number of gray shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
+#' @param short logical, indicating whether to cut higher overlap
+#' numbers; currently: division by 1000 and replacement by \code{k}
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
-## TODO: select white text colors close to p.min !
 ## TODO: sort by significance?
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
@@ -180,12 +181,20 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, ...) {
     pval <- -log2(pval)
     breaks <- seq(0,-log2(p.min),length.out=n+1)
     colors <- grDevices::gray(seq(1,0,length.out=n))
-    ## set up text and text colors
+    ## set up text (overlap numbers) and text colors
     txt <- x$overlap
     txt[txt=="0"] <- ""
     txt.col <- txt
     txt.col[] <- "black"
     txt.col[pval >= -log2(p.txt)] <- "white"
+    ## cut text (high overlap numbers)
+    if ( short ) {
+        txt <- x$overlap
+        hg <-txt>1e3
+        txt[hg] <- signif(txt[hg]/1e3,2)
+        txt[txt=="0"] <- ""
+        txt[hg]  <- paste(txt[hg],"k",sep="")
+    }
 
     image_matrix(pval,breaks=breaks,col=colors,axis=1:2,text=txt, text.col=txt.col, ...)
 }

@@ -4,7 +4,8 @@
 \alias{plotOverlaps}
 \title{plot cluster-cluster overlaps}
 \usage{
-plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, ...)
+plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, short = TRUE,
+  ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -17,6 +18,9 @@ this cutoff will appear black; TODO: plot legend}
 
 \item{n}{number of gray shades between \code{p=1} (white)
 and \code{p >= p.min} (black)}
+
+\item{short}{logical, indicating whether to cut higher overlap
+numbers; currently: division by 1000 and replacement by \code{k}}
 
 \item{...}{arguments to \code{\link{image_matrix}}}
 }
