@@ -904,9 +904,10 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' @param norm logical, indicating whether the plotted BIC/ICL values
 #' should be normalized by number of (clustered, \code{cluster!="0"})
 #' data points
+#' @param ... arguments to plot
 #' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
 #' @export
-plotBIC <- function(cls, norm=FALSE) {
+plotBIC <- function(cls, norm=FALSE, ...) {
     
     ## cluster number with max BIC/ICL
     max.clb <- cls$max.clb
@@ -934,7 +935,7 @@ plotBIC <- function(cls, norm=FALSE) {
       mrg.cl <- cls$merged.K 
     
     plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",
-         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"))
+         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"), ...)
     lines(K,bic)
     points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
     points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
