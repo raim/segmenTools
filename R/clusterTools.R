@@ -933,7 +933,8 @@ plotBIC <- function(cls, norm=FALSE) {
     if ( !is.null(cls$merged.K) )
       mrg.cl <- cls$merged.K 
     
-    plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",ylab="BIC/ICL")
+    plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",
+         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"))
     lines(K,bic)
     points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
     points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
