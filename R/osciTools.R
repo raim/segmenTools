@@ -108,12 +108,16 @@ testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
         y[i,] <- amps[i]*cos(2*pi*time/T - phases[i])
      
     ## phase(dat,cyc) vs. phases*180/pi
-    ## TODO: why is this slightly shifted (.75 degree) wrt original phases?
+    ## TODO: why is this shifted wrt original phases?
+    ## TODO: calculate amplitudes and draw full sine!
     rephases <- calculatePhase(y,cyc)[,1]
-
+    
     matplot(time,t(y),type="l",col=1:nrow(y),xlim=xlim,lty=1)
+    axis(3,at=time,labels=NA)
+    mtext("samples", 3, 1)
     abline(v=seq(0,cyc*T,T),lty=3,col="gray");abline(h=0,lty=3,col="gray") 
     abline(v=rephases*T/360,col=1:nrow(y)) ## plot re-covered phases
+    tmp <- cbind(orig=phases,pred=rephases*2*pi/360)
 }
 
 ## time-series processing
