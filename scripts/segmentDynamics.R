@@ -457,10 +457,12 @@ for ( type in sgtypes ) {
     ## add flowMerge result
     if ( merge ) {
         mselected <- fcset$merged # cluster number of merged clustering
-        mcls <- fcset$clusters[,mselected] # clusters of merged clustering
-        mrg.cl <- fcset$merged.K # cluster number of merged clustering
-        ## add to data frame
-        sgcls <- cbind.data.frame(sgcls,mCL=mcls)
+        if ( !is.null(mselected) ) {
+            mcls <- fcset$clusters[,mselected] # clusters of merged clustering
+            mrg.cl <- fcset$merged.K # cluster number of merged clustering
+            ## add to data frame
+            sgcls <- cbind.data.frame(sgcls,mCL=mcls)
+        }
     }
 
     ## re-cluster with kmeans
@@ -506,7 +508,7 @@ for ( type in sgtypes ) {
     plotClusters(tset,fcset,k=selected,norm="meanzero")
     dev.off()
     ## plot merged
-    if ( merge ) {
+    if ( merge & !is.null(mselected) ) {
         file.name <- file.path(out.path,paste(fname, "_osc_",mselected,sep=""))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
         plotClusters(tset,fcset,k=mselected,norm="meanzero")
