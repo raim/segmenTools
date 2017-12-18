@@ -99,7 +99,7 @@ testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
     time <- seq(0,cyc*T,T/res)
 
     ## generate cosine waves where phase 0 means peak at origin t0
-    phases <- seq(0,pi,length.out=n) # phase shift from time 0 in pi
+    phases <- seq(0,2*pi,length.out=n) # phase shift from time 0 in pi
     amps <- abs(stats::rnorm(n,1,.3)) # amplitude around 1
     
     y <- matrix(NA,ncol=length(time),nrow=length(phases))
@@ -118,6 +118,7 @@ testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
     abline(v=seq(0,cyc*T,T),lty=3,col="gray");abline(h=0,lty=3,col="gray") 
     abline(v=rephases*T/360,col=1:nrow(y)) ## plot re-covered phases
     tmp <- cbind(orig=phases,pred=rephases*2*pi/360)
+    ##plot(tmp,ylim=c(0,2*pi),xlim=c(0,2*pi),xaxs="i",yaxs="i");abline(a=0,b=1)
 }
 
 ## time-series processing
