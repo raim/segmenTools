@@ -888,7 +888,9 @@ pvalDist <- function(pvs,threshold=0.01) {
 #' @param rds vector of read-counts, e.g., within a genomic interval (segment)
 #' @export
 readDist <- function(rds) {
-    avg <- c(r.nrm=sum(rds,na.rm=TRUE)/length(rds),
+    avg <- c(r.tot=sum(rds,na.rm=TRUE),
+             r.len=length(rds),
+             r.nrm=sum(rds,na.rm=TRUE)/length(rds),
              r.mean=mean(rds,na.rm=TRUE),
              r.var=var(rds,na.rm=TRUE),
              r.min=min(rds,na.rm=TRUE),
