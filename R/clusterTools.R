@@ -930,12 +930,17 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     max.icl <- max(icl, na.rm=T)   # max ICL
 
     if ( norm ) {
+        ## TODO: add number of clustered data points
+        ## and size of clustered data to clustering object!
         N <- apply(cls$clusters,2,function(x) sum(x!=0))
         N <- N[selected(cls, as.numeric(names(bic)))]
-        bic <- bic/N
-        icl <- icl/N
-        max.bic <- bic[as.character(max.clb)]/N[selected(cls,20)]
-        max.icl <- bic[as.character(max.cli)]/N[selected(cls,20)]
+        M <- 1
+        if ( "flowClust" %in% names(cls) )
+            M <- length(cls$flowClust[[1]]@varNames)
+        bic <- bic/N/M
+        icl <- icl/N/M
+        max.bic <- bic[as.character(max.clb)]/N[selected(cls,20)]/M
+        max.icl <- bic[as.character(max.cli)]/N[selected(cls,20)]/M
     }
 
 
