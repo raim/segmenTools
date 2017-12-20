@@ -11,7 +11,7 @@
 #' @export
 get_fft <- function(x) {
     n <- floor(ncol(x)/2) +1 ## Nyquist-freq
-    fft <- t(stats::mvfft(t(x)))[,1:n]
+    fft <- t(stats::mvfft(t(x)))[,1:n,drop=FALSE]
     if ( n==1 )
         colnames(fft) <- "DC" # is this necessary or better stop()?
     else
