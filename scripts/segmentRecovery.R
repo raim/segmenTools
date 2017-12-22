@@ -56,7 +56,9 @@ option_list <- list(
     make_option(c("--fig.type"), type="character", default="png",
                 help="figure type, png or pdf [default %default]"),
     make_option(c("--save"), action="store_true", default=FALSE,
-                help="save overlap data as RData file (big!)"))
+                help="save complete overlap data as one RData file (big!)"),
+  make_option(c("--save.rdata"), action="store_true", default=FALSE,
+              help="save overlap data as individual RData files for segment types"))
 
 ## get command line options
 opt <- parse_args(OptionParser(option_list=option_list))
@@ -692,6 +694,17 @@ for ( type in sgtypes ) {
         hitnum[test.type] <-  ovlstats[[test.type]][[type]]$hitnum
         tnum[test.type] <-  ovlstats[[test.type]][[type]]$tnum
         height[test.type,] <- ovlstats[[test.type]][[type]]$height
+    }
+    ## save as RData file for each segmentation
+    if ( save.rdata ) {
+        file.name <- file.path(out.path,testid,"segtypes",
+                               paste0(type,".RData"))
+        overlaps <- list(CDF=CDF,
+                         numhit=numhit,
+                         hitnum=hitnum,
+                         tnum=tnum,
+                         height=height)
+        save(overlaps,file=file.name)
     }
     
     ## plot
