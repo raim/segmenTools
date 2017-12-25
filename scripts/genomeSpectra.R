@@ -105,21 +105,20 @@ if ( is.na(test[1]) ) test <- 1:max(periods[periods <= mx])
 testrng <- periods >= test[1] & periods <= test[2]
 
 
-if ( plot ) {
-  ylim_rng <- c(0,max(spectra[prdrng,],na.rm=TRUE))
-  ylim_all <- c(0,max(spectra[totrng,],na.rm=TRUE))
-  if ( length(grep("y",log))>0 ) {
+ylim_rng <- c(0,max(spectra[prdrng,],na.rm=TRUE))
+ylim_all <- c(0,max(spectra[totrng,],na.rm=TRUE))
+if ( length(grep("y",log))>0 ) {
     ylim_rng[1] <- min(spectra[prdrng,],na.rm=TRUE)
     ylim_all[1] <- min(spectra[totrng,],na.rm=TRUE)
     if ( ylim_rng[1] == 0 ) ylim_rng[1] <- 1e-10
     if ( ylim_all[1] == 0 ) ylim_all[1] <- 1e-10
-  }
-  
-  for ( i in 1:ncol(spectra) ) {
+}
+
+for ( i in 1:ncol(spectra) ) {
     id <- sub("\\.","_",colnames(spectra)[i])
     amps <- spectra[,i]
     
-
+    
     ## plot total range (period <= mx)
     file.name <- paste(o,"_",id,"_genomeSpectrum_all",
                        ifelse(log=="","",paste("_log",log,sep="")),sep="")
@@ -131,21 +130,20 @@ if ( plot ) {
     
     ## plot of selected range, with maximal period indicated
     if ( !is.na(rng[1]) ) {
-      mxpk <- max(amps[testrng])
-      peak <- which(amps[testrng]==mxpk)
-      peak <- periods[testrng][peak]
-      
-      file.name <- paste(o,"_",id,"_genomeSpectrum_range",
-                         ifelse(log=="","",paste("_log",log,sep="")),sep="")
-      if ( verb ) cat(paste("plotting", file.name, "\n"))
-      plotdev(file.name,type="png",res=300,width=5,height=3)
-      par(mai=c(.5,.5,.1,.1),mgp=c(1.3,.5,0))
-      plot(periods[prdrng], amps[prdrng],type="h",xlab="period [bp]",ylab="amplitude",col="gray",log=log,ylim=ylim_rng)
-      points(peak,mxpk)
-      text(peak,mxpk,labels=paste(round(peak,1),"bp"),pos=4)
-      dev.off()
+        mxpk <- max(amps[testrng])
+        peak <- which(amps[testrng]==mxpk)
+        peak <- periods[testrng][peak]
+        
+        file.name <- paste(o,"_",id,"_genomeSpectrum_range",
+                           ifelse(log=="","",paste("_log",log,sep="")),sep="")
+        if ( verb ) cat(paste("plotting", file.name, "\n"))
+        plotdev(file.name,type="png",res=300,width=5,height=3)
+        par(mai=c(.5,.5,.1,.1),mgp=c(1.3,.5,0))
+        plot(periods[prdrng], amps[prdrng],type="h",xlab="period [bp]",ylab="amplitude",col="gray",log=log,ylim=ylim_rng)
+        points(peak,mxpk)
+        text(peak,mxpk,labels=paste(round(peak,1),"bp"),pos=4)
+        dev.off()
     }
-  }
 }
 
 quit(save="no")
