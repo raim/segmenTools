@@ -91,7 +91,7 @@ for ( i in 1:ncol(dat) ) {
 if ( save ) {
     file.name <- paste(o,"_genomeSpectra.RData",sep="")
     if ( verb ) cat(paste("saving results", file.name, "\n"))
-    save('spectra','periods','avgamp',file=file.name)
+    save('spectra','periods',file=file.name)
 }
 
 if ( !plot ) quit(save="no")
