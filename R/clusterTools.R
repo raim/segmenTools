@@ -940,10 +940,8 @@ plotBIC <- function(cls, norm=FALSE, ...) {
             M <- length(cls$flowClust[[1]]@varNames)
         bic <- bic/N/M
         icl <- icl/N/M
-        n <- N[selected(cls,as.numeric(max.clb))]
-        max.bic <- bic[as.character(max.clb)]/n/M
-        n <- N[selected(cls,as.numeric(max.icl))]
-        max.icl <- bic[as.character(max.cli)]/n/M
+        max.bic <- bic[as.character(max.clb)]
+        max.icl <- icl[as.character(max.cli)]
     }
 
 
