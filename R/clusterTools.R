@@ -955,13 +955,14 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
     points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
     points(K, icl, col=4,cex=.5)
-    points(max.cli, max.icl,lty=2,pch=4,cex=1.5,col=4)
-    legend("right",pch=c(1,1,4,4),lty=c(1,NA,NA,NA),col=c(1,4,2,1),
-           legend=c("BIC","ICL","failed","max. BIC"),pt.cex=c(1,.5,1,1.5))
+    points(max.cli, max.icl,lty=2,pch=4,cex=1,col=4)
+    legend("right",pch=c(1,1,4,4,4),lty=c(1,NA,NA,NA,NA),col=c(1,4,2,1,4),
+           legend=c("BIC","ICL","failed","max. BIC","max. ICL"),
+           pt.cex=c(1,.5,1,1.5,1))
     if ( !is.null(cls$merged.K) ) {
-        arrows(x0=as.numeric(max.clb),y0=bic[as.character(max.clb)],
-               x1=mrg.cl,y1=bic[as.character(max.clb)])
+        arrows(x0=as.numeric(max.clb),y0=max.bic, x1=mrg.cl,y1=max.bic)
         abline(v=mrg.cl,lty=2)
+        text(mrg.cl, max.bic,"merge", pos=2,cex=.9)
     }
 }
 
