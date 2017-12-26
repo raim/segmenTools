@@ -65,6 +65,9 @@ if ( length(grep(".RData$", i)) > 0 )  {
 coor <- dat[,cc,drop=FALSE] # is not used anymore, may be skipped!
 dat <- dat[,!colnames(dat)%in%cc,drop=FALSE] ## rm coordinates
 
+## TODO: use only some columns
+#dat <- dat[,1:11,drop=FALSE]
+
 ## PERIODS
 nyq <- floor(nrow(dat)/2)
 periods <- c(0,nrow(dat)/(1:(nyq-1)))
@@ -83,14 +86,41 @@ for ( i in 1:ncol(dat) ) {
   if ( verb ) cat(".\n")
 }
 
+
 ## save results
 if ( save ) {
     file.name <- paste(o,"_genomeSpectra.RData",sep="")
     if ( verb ) cat(paste("saving results", file.name, "\n"))
-    save('spectra','periods',file=file.name)
+    save('spectra','periods','avgamp',file=file.name)
 }
 
 if ( !plot ) quit(save="no")
+
+### DC and average amplitudes:
+## TODO: this depends on p/m strand annotation, get rid of this
+
+## average period vs. DC
+avgamp <- apply(spectra[2:nrow(spectra),,drop=FALSE],2,mean)
+dc <- spectra[1,]
+
+## NOTE: mirror of DC component for forward vs. reverse strand
+## also absent and general difference gets smaller without rRNA
+file.name <- paste(o,"_genomeSpectrum_DC")
+plotdev(file.name,type="png",res=300,width=5,height=3)
+par(mai=c(.5,.5,.1,.1),mgp=c(1.3,.5,0))
+plot(dc[grep("m$",names(dc))],type="l",col=2,ylim=range(dc),
+     ylab="DC component",xlab="sample")
+lines(dc[grep("p$",names(dc))],type="l",col=1)
+legend("topleft",legend=c("plus","minus"),col=1:2,lty=1)
+dev.off()
+file.name <- paste(o,"_genomeSpectrum_avgAmp")
+plotdev(file.name,type="png",res=300,width=5,height=3)
+par(mai=c(.5,.5,.1,.1),mgp=c(1.3,.5,0))
+plot(avgamp[grep("m$",names(avgamp))],type="l",col=2,ylim=range(avgamp),
+     ylab="average amplitude",xlab="sample")
+lines(avgamp[grep("p$",names(avgamp))],type="l",col=1)
+legend("topleft",legend=c("plus","minus"),col=1:2,lty=1)
+dev.off()
 
 ## maximal period in total range plot
 if ( is.infinite(mx) ) mx <- periods[2]
@@ -145,5 +175,6 @@ for ( i in 1:ncol(spectra) ) {
         dev.off()
     }
 }
+
 
 quit(save="no")
