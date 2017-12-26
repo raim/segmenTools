@@ -510,6 +510,7 @@ clusterAnnotation <- function(cls, data, p=1,
 #' @param text a matrix of characters corresponding to \code{dat}
 #' which will be plotted on the image
 #' @param text.col individual colors for text fields
+#' @param text.cex relative font size for text fields
 #' @param axis integer vector, sets whether bottom (1) and/or left
 #' (2) axis are draw; the column and row names of \code{dat} will
 #' be used as tick labels
@@ -521,7 +522,7 @@ clusterAnnotation <- function(cls, data, p=1,
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, axis.cex=1.5, ...) {
+image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, axis2.col, axis.cex=1.5, ...) {
 
     ## reverse columns and transpose
     if ( nrow(dat)>1 )
@@ -535,7 +536,7 @@ image_matrix <- function(dat, text, text.col, axis=1:2, axis1.col, axis2.col, ax
         if ( missing(text.col) )
             text.col <- rep(1, length(c(text)))
         text(x=rep(1:ncol(dat),nrow(dat)), y=rep(nrow(dat):1,each=ncol(dat)),
-             paste(t(text)),col=t(text.col))
+             paste(t(text)),col=t(text.col),cex=text.cex)
     }
     
     ## add axes

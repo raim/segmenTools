@@ -4,8 +4,8 @@
 \alias{image_matrix}
 \title{data.matrix `as-is' wrapper for \code{\link[graphics]{image}}}
 \usage{
-image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col,
-  axis.cex = 1.5, ...)
+image_matrix(dat, text, text.col, text.cex = 1, axis = 1:2, axis1.col,
+  axis2.col, axis.cex = 1.5, ...)
 }
 \arguments{
 \item{dat}{the numeric data matrix to be plotted}
@@ -14,6 +14,8 @@ image_matrix(dat, text, text.col, axis = 1:2, axis1.col, axis2.col,
 which will be plotted on the image}
 
 \item{text.col}{individual colors for text fields}
+
+\item{text.cex}{relative font size for text fields}
 
 \item{axis}{integer vector, sets whether bottom (1) and/or left
 (2) axis are draw; the column and row names of \code{dat} will
