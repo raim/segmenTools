@@ -385,3 +385,58 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
   features
 }
 
+
+#' align genome data at specified coordinates (e.g. TSS)
+#' @param coors genome positions (position, chromosome, strand)
+#' at which data will be aligned
+#' @param data genome data to be aligned; NOTE, that currently this
+#' is required to be fully expanded matrix covering each position
+#' (TODO: allow non-expanded data)
+#' @param dst upstream/downstream length to be aligned
+#' (TODO: allow different upstream and downstream ranges)
+#' @param chrS the chromosome index, indicating the start position
+#' of each chromosome in the continuous index, derived from chromosome length
+#' information, see function \code{\link{getChrSum}}
+## TODO: generalize for not fully expanded data w/o chrS
+## TODO: allow different downstream and upstream ranges
+#' @export
+alignData <- function(coors, data, dst=500, chrS) {
+  
+  starts <- as.numeric(coors[,"coor"])
+  chrs <- as.numeric(coors[,"chr"])
+  strands <- as.character(coors[,"strand"])
+
+  ## add chromosome lengths to get direct index 
+  starts <- chrS[chrs] + starts
+  ## TODO: should rev.strand be shifted by one?
+  rng <- t(apply(t(starts), 2, function(x) (x-dst):(x+dst)))
+  rng <- cbind(strnds=="+",rng)
+  ##  reverse for reverse strand
+  rng <- t(apply(rng,1,function(x)
+                 if (x[1]==1) return(x[2:length(x)])
+                 else return(rev(x[2:length(x)]))))
+
+  ## cut chromosome ends
+  ## TODO: implement circular chromsomes!
+    #chr <- feats[,"chr"] ## THIS NOT PASSED!?
+  rng <- cbind(min=chrS[chrs],max=chrS[chrs+1],rng)
+  rng <- t(apply(rng,1,function(x) {
+    rm <- x[3:length(x)] <= x[1] | x[3:length(x)] >= x[2];
+    x <- x[3:length(x)]; x[rm] <- NA;return(x)}))
+  
+  ## get data!
+  ## split off coordinate columns, if not separately supplied
+  firstcol <- 1
+  if ( sum(c("chr","coor")%in%colnames(data))==2 )
+    firstcol <- 3
+
+  geneData <- list()
+  for ( i in firstcol:ncol(data) ) 
+    geneData <- append(geneData,
+                       list(t(apply(rng, 1, function(x) data[x,i]))))
+  ## relative coordinates
+  xax <- -dst:dst
+  geneData <- lapply(geneData, function(x) {colnames(x) <- xax; x})
+  
+  return(geneData)
+}
