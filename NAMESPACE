@@ -2,6 +2,7 @@
 
 S3method(plot,clusteraverages)
 export(add_alphas)
+export(alignData)
 export(annotateTarget)
 export(ash)
 export(calculatePhase)
