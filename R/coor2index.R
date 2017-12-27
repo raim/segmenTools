@@ -410,7 +410,7 @@ alignData <- function(coors, data, dst=500, chrS) {
   starts <- chrS[chrs] + starts
   ## TODO: should rev.strand be shifted by one?
   rng <- t(apply(t(starts), 2, function(x) (x-dst):(x+dst)))
-  rng <- cbind(strnds=="+",rng)
+  rng <- cbind(strands=="+",rng)
   ##  reverse for reverse strand
   rng <- t(apply(rng,1,function(x)
                  if (x[1]==1) return(x[2:length(x)])
