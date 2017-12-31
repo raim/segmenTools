@@ -96,7 +96,8 @@ calculatePhase <- function(x, cycles, degrees=TRUE) {
 testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
 
     ## time vector
-    time <- seq(0,cyc*T,T/res)
+    ## NOTE: omitting last timepoint
+    time <- seq(0,cyc*T-T/res,T/res)
 
     ## generate cosine waves where phase 0 means peak at origin t0
     phases <- seq(0,2*pi,length.out=n) # phase shift from time 0 in pi
