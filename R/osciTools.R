@@ -109,8 +109,10 @@ testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
         y[i,] <- amps[i]*cos(2*pi*time/T - phases[i])
      
     ## phase(dat,cyc) vs. phases*180/pi
-    ## TODO: why is this shifted wrt original phases?
-    ## TODO: calculate amplitudes and draw full sine!
+    ## TODO: calculate amplitudes and draw full reconstructed sine!
+    ## TODO: calculate phase for time series that are not multiples of
+    ## full cycles; phase error for e.g. one timepoint to much
+    ## seems to be pi/res
     rephases <- calculatePhase(y,cyc)[,1]
     
     matplot(time,t(y),type="l",col=1:nrow(y),xlim=xlim,lty=1)
