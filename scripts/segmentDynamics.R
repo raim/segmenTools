@@ -275,6 +275,21 @@ for ( type in sgtypes ) {
         phs <- t(apply(sgs,1,function(x)
                        phaseDist(phase[x["start"]:x["end"]],
                                  w=wght[x["start"]:x["end"]])))
+
+        ## comparing sg0002_raw_ash_icor_463 with sg0002_raw_ash_icor_464
+        ## from D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:3_M:75_nui:3
+        test.circ.test <- FALSE
+        if (test.circ.test) {
+            idx1 <- grep("sg0002_raw_ash_icor_463",sgs[,"ID"],value=F)
+            idx2 <- grep("sg0002_raw_ash_icor_464",sgs[,"ID"],value=F)
+            x1 <- circular(phase[sgs[idx1,"start"]:sgs[idx1,"end"]],
+                           type="angles",units="degrees")
+            x2 <- circular(phase[sgs[idx2,"start"]:sgs[idx2,"end"]],
+                           type="angles",units="degrees")
+            plot(x1);points(x2,col=2)
+            watson.two.test(x1,x2)
+        }
+        
         ## raw pvalue distribution
         ## NOTE only p.signif is used, fraction of signif. oscill. reads!
         pvs<-t(apply(sgs,1,function(x)
