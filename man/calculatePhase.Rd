@@ -22,6 +22,9 @@ in degrees (0 - 360) or radians (0 - 2*pi)}
 calculate phases via a Discrete Fourier Transformation, but starting
 at the first time point, such that phase 0/360 indicates peak
 at time 0, and phase 180 indicates peak at half of the cycle
+TODO: implement systematic phase error for time series that
+do not cover multiples of full cycles; phase error related to
+pi/resolution, see comments in testPhase
 }
 \seealso{
 \code{\link{get_fft}} and \code{\link{complex2degree}}

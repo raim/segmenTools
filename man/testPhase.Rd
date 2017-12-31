@@ -16,7 +16,7 @@ testPhase(n = 5, cyc = 4, T = 24, res = 6, xlim = c(-T/res, T +
 
 \item{res}{resolution: samples per period}
 
-\item{xlim}{x-axis range to show, defaults to one period}
+\item{xlim}{x-axis range to show, defaults to one period \code{+/- T/res}}
 }
 \description{
 generates cosine waves with fixed periods but random

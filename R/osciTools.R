@@ -46,6 +46,9 @@ complex2degree <- function(x) {
 #' calculate phases via a Discrete Fourier Transformation, but starting
 #' at the first time point, such that phase 0/360 indicates peak
 #' at time 0, and phase 180 indicates peak at half of the cycle
+#' TODO: implement systematic phase error for time series that
+#' do not cover multiples of full cycles; phase error related to
+#' pi/resolution, see comments in testPhase
 #' @param x a time-series matrix with columns as time points,
 #' or a \code{timeseries} object as returned by
 #' \code{\link[segmenTier]{processTimeseries}}
@@ -90,13 +93,13 @@ calculatePhase <- function(x, cycles, degrees=TRUE) {
 #' @param cyc numbers of cycles to generate
 #' @param T period
 #' @param res resolution: samples per period
-#' @param xlim x-axis range to show, defaults to one period
+#' @param xlim x-axis range to show, defaults to one period \code{+/- T/res}
 #' @seealso \code{\link{calculatePhase}}
 #' @export
 testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
 
     ## time vector
-    ## NOTE: omitting last timepoint
+    ## NOTE: omitting last timepoint (-T/res)
     time <- seq(0,cyc*T-T/res,T/res)
 
     ## generate cosine waves where phase 0 means peak at origin t0
