@@ -61,7 +61,7 @@ if ( verb>0 )
     cat(paste("\n"))
 
 
-## load time-series and oscillation data: coor, ts
+## load time-series data: coor, ts
 if ( verb>0 )
     cat(paste("Loading data:", infile, "\n"))
 load(infile)
