@@ -384,7 +384,7 @@ for ( type in sgtypes ) {
     ## use rain
     ## TODO: establish exact period from DO, then use rain
     ## use only first 20 time-points here as well
-    if ( any(c("rain","clustering") %in% jobs) ) {
+    if ( any(c("rain") %in% jobs) ) {
         if ( verb>0 )
           cat(paste("rain osci stastistics\t",time(),"\n"))
         rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
