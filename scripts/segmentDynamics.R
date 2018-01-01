@@ -439,7 +439,13 @@ for ( type in sgtypes ) {
         plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
         unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
 
-    }
+        setwd("/scr/k70san/raim/data/yeast/RNAseq/results/segmentation/segmentTest/20170307_merge/oscillation2/")
+        sgdft <- read.delim(paste0(fname,"_fourier.csv"),
+                            row.names=1)[as.character(sgs[,"ID"]),]
+        ppcdf <- ecdf(sgdft[,"X2_p"])
+        plot(ppcdf)
+
+     }
 
     ## FILTER: maximally three expressed time-points per segment
     fewpoints <- rowSums(dat>0)<=12
@@ -451,7 +457,8 @@ for ( type in sgtypes ) {
     tot <-ash(rds[,"r.mean"])
     tcdf <- ecdf(tot)
     ## TODO: plot cutoff filter
-    ####hist(tot,ylim=c(0,3000),breaks=100)
+    ##hist(tot,ylim=c(0,3000),breaks=100)
+    ##hist(tot,ylim=c(0,500),breaks=50)
     ##plot(tcdf)
     ##points(.05,tcdf(.05))
     lowex <- ash(rds[,"r.mean"])<.05
