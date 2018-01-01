@@ -75,6 +75,8 @@ option_list <- list(
               help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
   make_option(c("--dft.range"), type="character", default="2,3,4,5,6,7", 
               help="DFT components to use for clustering, comma-separated [default %default]"),
+  make_option(c("--cl.filter"), type="character", default="unsig.p", 
+              help="type of segment filter for clustering [default %default]"),
   ##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
   ##                help="as smooth.time but only for plotting clusters not used of analysis"),
   ## FLOWCLUST PARAMETERS
@@ -292,13 +294,13 @@ for ( type in sgtypes ) {
         
         ## raw pvalue distribution
         ## NOTE only p.signif is used, fraction of signif. oscill. reads!
-        pvs<-t(apply(sgs,1,function(x)
-                     pvalDist(pval[x["start"]:x["end"]],pval.thresh.sig)))
+        pvs <- t(apply(sgs,1,function(x)
+            pvalDist(pval[x["start"]:x["end"]],pval.thresh.sig)))
 
         ## total range of expression
         ## NOTE: ONLY TAKING FIRST 20 TIMEPOINTS TO SKIP SHIFT IN THE END?
-        rds <-t(apply(sgs,1,function(x)
-                      readDist(c(ts[x["start"]:x["end"],read.rng]))))
+        rds <- t(apply(sgs,1,function(x)
+            readDist(c(ts[x["start"]:x["end"],read.rng]))))
         
         ## write out phase, pval and read-count distributions
         ## convert back to chromosome coordinates
@@ -382,7 +384,7 @@ for ( type in sgtypes ) {
     ## use rain
     ## TODO: establish exact period from DO, then use rain
     ## use only first 20 time-points here as well
-    if ( any(c("rain") %in% jobs) ) {
+    if ( any(c("rain","clustering") %in% jobs) ) {
         if ( verb>0 )
           cat(paste("rain osci stastistics\t",time(),"\n"))
         rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
@@ -420,10 +422,48 @@ for ( type in sgtypes ) {
     ##lowex <- rds[,"r.0"]>.9        # MINIMAL FRACTION OF READ COUNTS>0
     ##len <- sgs[,"end"]-sgs[,"start"]+1
     ##short <- len < 100             # LONGER THEN 150
+    
     ## TODO: use RAIN as filter??
-    unsig <- pvs[,"p.signif"] == 0 # NO SINGLE SIGNIFICANT NT. pval.thresh.sig
-    rmvals <- unsig #|nonsig #|short #|     # TODO: does short filter help?
+    ## rain segment p-values vs. read-count permutation p-values
+    test.rain <- FALSE
+    unsigr <- rep(FALSE, nrow(dat))
+    if ( test.rain ) {
+        setwd("/scr/k70san/raim/data/yeast/RNAseq/results/segmentation/segmentTest/20170307_merge/rain2/")
+        sgrain <- read.delim(paste0(fname,"_rain.csv"),
+                           row.names=1)[as.character(sgs[,"ID"]),]
+       ## plot(ecdf(pvs[,2]))
+       ## plot(ecdf(pvs[,1]))
+        rpcdf <- ecdf(sgrain[,"pVal"])
+        plot(rpcdf)
+        points(pval.thresh.sig,rpcdf(pval.thresh.sig))
+        plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
+        unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
 
+    }
+
+    ## FILTER: maximally three expressed time-points per segment
+    fewpoints <- rowSums(dat>0)<=12
+
+    ## FILTER: no single significant read-count (< pval.thresh.sig)
+    unsig <- pvs[,"p.signif"] == 0 
+
+    ## FILTER: total expresssion vs. rain
+    tot <-ash(rds[,"r.mean"])
+    tcdf <- ecdf(tot)
+    ## TODO: plot cutoff filter
+    ####hist(tot,ylim=c(0,3000),breaks=100)
+    ##plot(tcdf)
+    ##points(.05,tcdf(.05))
+    lowex <- ash(rds[,"r.mean"])<.05
+
+    filters <- cbind(lowex=lowex, fewpoints=fewpoints,
+                     unsig.p=unsig, unsig.r=unsigr)
+    rmvals <- filters[,cl.filter]
+    
+    ## TODO: lowly expressed AND non-signficant oscillation LOOKS good!!
+    ##table(lowex,unsigr)
+    ##rmvals <- lowex&unsigr
+    
     if ( verb>0 ) {
         cat(paste("clustered segments\t",sum(!rmvals),"\n"))
         cat(paste("noise segments\t",sum(rmvals),"\n"))
@@ -501,6 +541,12 @@ for ( type in sgtypes ) {
     if ( verb>0 )
         cat(paste("\tplotting time series clustering\t",time(),"\n"))
 
+    ## re-do tset without removing unsignificant!
+    ## "plot-tset"
+    pset <- processTimeseries(avg,smooth.time=smooth.time, trafo=trafo,
+                              perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
+                              use.snr=TRUE,low.thresh=-Inf)
+
     ## plot BIC
     file.name <- file.path(out.path,paste(fname,"_BIC",sep=""))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
@@ -520,19 +566,19 @@ for ( type in sgtypes ) {
     ## plot best BIC
     file.name <- file.path(out.path,paste(fname,"_osc_",selected,sep=""))
     plotdev(file.name,width=4,height=9,type=fig.type,res=300)
-    plotClusters(tset,fcset,k=selected,norm="meanzero")
+    plotClusters(pset,fcset,k=selected,norm="meanzero")
     dev.off()
     ## plot merged
     if ( merge & !is.null(mselected) ) {
         file.name <- file.path(out.path,paste(fname, "_osc_",mselected,sep=""))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
-        plotClusters(tset,fcset,k=mselected,norm="meanzero")
+        plotClusters(pset,fcset,k=mselected,norm="meanzero")
         dev.off()
     }
     if ( recluster ) {
         file.name <- file.path(out.path,paste(fname, "_osc_",rselected,sep=""))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
-        plotClusters(tset,fcset,k=rselected,norm="meanzero")
+        plotClusters(pset,fcset,k=rselected,norm="meanzero")
         dev.off()
     }
  }
