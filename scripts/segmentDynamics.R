@@ -49,7 +49,7 @@ option_list <- list(
   make_option("--phase.weight", action="store_true", default=FALSE,
               help="use weight for calculating average phases of segments: 1-p.value [default %default]"),
   make_option("--pval.thresh.sig", default=1,
-              help="pvals above will be counted as non-significant [default %default]"),
+              help="pvals above will be counted as non-significant; optionally used in segment averaging (option --filter.reads), and segment filtering before clustering (options --with.rain or --with.permutation, and --cl.filter) [default %default]"),
   make_option("--read.rng", type="character", default="",
               help="range of time-points for total read-count, Fourier and rain calculations (but not used for clustering!), comma-separated list of integers"),
   ## SEGMENT AVERAGING
@@ -77,6 +77,11 @@ option_list <- list(
               help="DFT components to use for clustering, comma-separated [default %default]"),
   make_option(c("--cl.filter"), type="character", default="unsig.p", 
               help="type of segment filter for clustering [default %default]"),
+  
+  make_option(c("--with.rain"), type="character", default="", 
+              help="path for prior calculation of `rain' p-values for segment filtering, p < pval.thresh.sig [default %default]"),
+  make_option(c("--with.permutation"), type="character", default="", 
+              help="path for prior calculation of `permutation' p-values for segment filtering, p < pval.thresh.sig [default %default]"),
   ##    make_option("--smooth.time.plot", type="integer", default=3, # so far best! 
   ##                help="as smooth.time but only for plotting clusters not used of analysis"),
   ## FLOWCLUST PARAMETERS
@@ -407,7 +412,6 @@ for ( type in sgtypes ) {
     ## TODO: use permutation results as filter; optionally load
     ## permutation from previous run!
     ## TODO: move back to unsig! was the most sensible!
-    dat <- avg 
 
     ## FILTERS
     ## NOTE: 20170118
@@ -423,28 +427,37 @@ for ( type in sgtypes ) {
     ##len <- sgs[,"end"]-sgs[,"start"]+1
     ##short <- len < 100             # LONGER THEN 150
     
-    ## TODO: use RAIN as filter??
-    ## rain segment p-values vs. read-count permutation p-values
-    test.rain <- FALSE
+    ## use prior RAIN calculation as filter
     unsigr <- rep(FALSE, nrow(dat))
-    if ( test.rain ) {
-        setwd("/scr/k70san/raim/data/yeast/RNAseq/results/segmentation/segmentTest/20170307_merge/rain2/")
-        sgrain <- read.delim(paste0(fname,"_rain.csv"),
+    if ( with.rain!="" ) {
+        sgrain <- read.delim(file.path(with.rain,paste0(fname,"_rain.csv")),
                            row.names=1)[as.character(sgs[,"ID"]),]
-       ## plot(ecdf(pvs[,2]))
-       ## plot(ecdf(pvs[,1]))
+        file.name <- file.path(out.path,paste(fname,"_rain_pvalues",sep=""))
+        plotdev(file.name,width=4,height=4,type=fig.type,res=300)
         rpcdf <- ecdf(sgrain[,"pVal"])
         plot(rpcdf)
         points(pval.thresh.sig,rpcdf(pval.thresh.sig))
-        plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
+        dev.off()
+        #plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
+
+        ## FILTER
         unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
-
-        setwd("/scr/k70san/raim/data/yeast/RNAseq/results/segmentation/segmentTest/20170307_merge/oscillation2/")
-        sgdft <- read.delim(paste0(fname,"_fourier.csv"),
+    }
+    ## use prior permutation calculation as filter
+    unsigp <- rep(FALSE, nrow(dat))
+    if ( with.permutation!="" ) {
+        sgdft <- read.delim(file.path(with.permutation,
+                                      paste0(fname,"_fourier.csv")),
                             row.names=1)[as.character(sgs[,"ID"]),]
-        ppcdf <- ecdf(sgdft[,"X2_p"])
+        file.name <- file.path(out.path,paste(fname,"_permutation_pvalues",sep=""))
+        plotdev(file.name,width=4,height=4,type=fig.type,res=300)
+        ppcdf <- ecdf(sgrain[,"X2_p"]) ## TODO: this must be argument
         plot(ppcdf)
-
+        points(pval.thresh.sig,ppcdf(pval.thresh.sig))
+        dev.off()
+        
+        ## FILTER
+        unsigp <- sgrain[,"X2_p"] >= pval.thresh.sig
      }
 
     ## FILTER: maximally three expressed time-points per segment
@@ -461,11 +474,14 @@ for ( type in sgtypes ) {
     ##hist(tot,ylim=c(0,500),breaks=50)
     ##plot(tcdf)
     ##points(.05,tcdf(.05))
-    lowex <- ash(rds[,"r.mean"])<.05
+    lowex <- tot<.05
 
+    ## SELECT FILTER
     filters <- cbind(lowex=lowex, fewpoints=fewpoints,
-                     unsig.p=unsig, unsig.r=unsigr)
+                     unsig=unsig, unsig.r=unsigr, unsig.p=unsigp)
     rmvals <- filters[,cl.filter]
+    dat <- avg 
+    dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
     
     ## TODO: lowly expressed AND non-signficant oscillation LOOKS good!!
     ##table(lowex,unsigr)
@@ -476,7 +492,6 @@ for ( type in sgtypes ) {
         cat(paste("noise segments\t",sum(rmvals),"\n"))
     }
 
-    dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
     tset <- processTimeseries(dat,smooth.time=smooth.time, trafo=trafo,
                               perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
                               use.snr=TRUE,low.thresh=-Inf)
