@@ -428,7 +428,7 @@ for ( type in sgtypes ) {
     ##short <- len < 100             # LONGER THEN 150
     
     ## use prior RAIN calculation as filter
-    unsigr <- rep(FALSE, nrow(dat))
+    unsigr <- rep(FALSE, nrow(avg))
     if ( with.rain!="" ) {
         sgrain <- read.delim(file.path(with.rain,paste0(fname,"_rain.csv")),
                            row.names=1)[as.character(sgs[,"ID"]),]
@@ -444,7 +444,7 @@ for ( type in sgtypes ) {
         unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
     }
     ## use prior permutation calculation as filter
-    unsigp <- rep(FALSE, nrow(dat))
+    unsigp <- rep(FALSE, nrow(avg))
     if ( with.permutation!="" ) {
         sgdft <- read.delim(file.path(with.permutation,
                                       paste0(fname,"_fourier.csv")),
@@ -461,7 +461,7 @@ for ( type in sgtypes ) {
      }
 
     ## FILTER: maximally three expressed time-points per segment
-    fewpoints <- rowSums(dat>0)<=12
+    fewpoints <- rowSums(avg>0)<=12
 
     ## FILTER: no single significant read-count (< pval.thresh.sig)
     unsig <- pvs[,"p.signif"] == 0 
