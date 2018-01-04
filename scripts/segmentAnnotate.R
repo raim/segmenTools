@@ -57,7 +57,7 @@ either start (start;-1000:100) or end (end;-1000:100) coordinates"),
 #              help="if divergent > 0: search matches on reverse strand transcribed in divergent direction, with maximal distance between pairs set by the argument (>0); can be combined with argument shift to include overlapping divergent pairs [default: %default]"),
   make_option(c("--only.best"), action="store_true", default=FALSE,
               help="include only the top-ranking query hit (highest jaccard=intersect/union); if FALSE all matching queries will be collapsed into ;-separated lists; multiple best hits for one target will always be collapsed into ;-separated lists"),
-  make_option(c("--each.hit"), action="store_true", default=FALSE,
+  make_option(c("--each.query"), action="store_true", default=FALSE,
               help="multiple query hit will be exported as separate rows instead of collapsing them into ;-separated lists"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
@@ -68,8 +68,8 @@ either start (start;-1000:100) or end (end;-1000:100) coordinates"),
               help="name of column with sub-set annotation"),
   make_option(c("--tcol"), type="character", default="", 
               help="columns in targets to write to result table"),
-  make_option(c("--include.empty"), action="store_true", default=FALSE,
-              help="include targets without query hits from result table; if TRUE and each.hit is FALSE, the result table will have matching rows with the target table"),
+  make_option(c("--each.target"), action="store_true", default=FALSE,
+              help="include targets without query hits from result table; if TRUE and each.query is FALSE, the result table will have matching rows with the target table"),
   ## OUTPUT
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
@@ -170,7 +170,7 @@ if ( verb>0 )
 ## TODO: allow collapse as argument / requires to add row number
 ## of target and use merge
 result <- annotateTarget(query=query, target=target,
-                         collapse=!each.hit, 
+                         collapse=!each.query, 
                          details=details, only.best=only.best,
                          qcol=qcol, prefix=prefix, msgfile=msgfile)
 
@@ -218,7 +218,7 @@ if ( length(tcol)==0 )
 result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
 ## remove empty targets (no hit)
-if ( !include.empty ) {
+if ( !each.target ) {
     qCol <- ifelse(prefix=="", "qlen",
                    paste(paste(prefix,"qlen",sep="_")))
     result <- result[as.character(result[,qCol])!="0",] # char allows collapse
