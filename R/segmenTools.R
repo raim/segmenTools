@@ -598,10 +598,15 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
         ovl <- NULL
         tps <- NULL
         for ( id in idx ) {
+
+            ## query coors
             qurng <- query[id,"start"]:query[id,"end"]
             qlen <- length(qurng)
-            intersect <- length(intersect(tgrng,qurng)) 
-            union <- diff(range(c(qurng,tgrng))) +1 
+
+            ## INTERSECT/UNION
+            intersect <- length(intersect(tgrng,qurng))
+            union <- length(union(qurng,tgrng))
+
             ## store overlaps of target k with query
             ## values to calculate ratios in \code{getOverlapStats(ovl)}:
             ## Jaccard measure: J(query,target) = intersect/union
