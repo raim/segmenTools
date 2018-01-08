@@ -5,8 +5,8 @@
 
 
 ## interactive debug: command-line call with parameters
-## R --args  -q /home/raim/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/analysis4/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3_annotated.csv --qclass mCL --tclass mCL --antisense --chrfile /home/raim/programs/tataProject/yeast/chromosomes/sequenceIndex_R64-1-1_20110208.csv -o test.csv
-## R --args -q /home/raim/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/analysis4/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3_annotated.csv --qclass mCL -t /home/raim/programs/tataProject/yeast/feature_R64-1-1_20110208_withclusters.csv --tclass CL_rdx --antisense --chrfile /home/raim/programs/tataProject/yeast/chromosomes/sequenceIndex_R64-1-1_20110208.csv -o test.csv
+## R --args  -q /home/raim/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/analysis4/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3_annotated.csv --qclass mCL --tclass mCL --antisense --chrfile /home/raim/programs/tataProject/yeast/chromosomes/sequenceIndex_R64-1-1_20110208.csv -o test.Rdata
+## R --args -q /home/raim/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/analysis4/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3_annotated.csv --qclass mCL -t /home/raim/programs/tataProject/yeast/feature_R64-1-1_20110208_withclusters.csv --tclass CL_rdx --antisense --chrfile /home/raim/programs/tataProject/yeast/chromosomes/sequenceIndex_R64-1-1_20110208.csv -o test.RData
 
 library(segmenTools)
 
@@ -243,3 +243,4 @@ ovl$p.value <- J.pval
 
 plotOverlaps(ovl)
 
+save.image(file=outfile)
