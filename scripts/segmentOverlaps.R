@@ -189,7 +189,6 @@ J.real <- getJaccard(query, target, qclass, tclass)
 
 ## randomize queries
 
-perm <- 100
 J.pval <- J.real
 J.pval[] <- 0
 for ( i in 1:perm ) {
