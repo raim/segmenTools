@@ -32,6 +32,8 @@ option_list <- list(
               help="target classes to test"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
+  make_option(c("--perm"), type="integer", default=100, 
+              help="number of permutations"),
   ## OUTPUT
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
