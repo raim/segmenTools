@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
-## ANNOTATING SEGMENTS BY GENOMIC FEATURES THEY COVER
+## SEGMENT CLASSES OVERLAP STATISTIC
+## by permutation test analysis
 
 library(segmenTools)
 ##segtools <- "~/programs/segmenTools/"
@@ -11,20 +12,6 @@ library(segmenTools)
 time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
 ## messages
 msg <- function(x) cat(x, file=msgfile)
-
-## required options:
-## 1: input segments 'allsegs.csv'
-## 2: annotation, use a keyword from genomeData 'annotation' or load table/bed;
-##    select types (ORF, etc.)
-## 3: upstream and downstream ranges of targets?
-## output:
-## input segments with added columns, giving semicolon-separated lists
-## of covered features; mutual coverages and
-## relative position (covers,left,right,inside)
-
-## output feeds into test:
-## calculate cumulative dist function (rcdf and rrcdf); and get recovery
-## number
 
 
 suppressPackageStartupMessages(library(optparse))
