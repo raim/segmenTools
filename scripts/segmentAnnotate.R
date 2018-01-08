@@ -50,8 +50,7 @@ option_list <- list(
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
   make_option(c("--qrange"), type="character", default="", 
-              help="instead of start:end coordinates, use a range around
-either start (start;-1000:100) or end (end;-1000:100) coordinates"),
+              help="instead of start:end coordinates, use a range around either start (start;-1000:100) or end (end;-1000:100) coordinates"),
   ## divergent can be done with a range on target
 #  make_option(c("--divergent"), type="integer", default=0,
 #              help="if divergent > 0: search matches on reverse strand transcribed in divergent direction, with maximal distance between pairs set by the argument (>0); can be combined with argument shift to include overlapping divergent pairs [default: %default]"),
