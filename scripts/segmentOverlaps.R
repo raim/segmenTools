@@ -242,6 +242,8 @@ ovl <- list()
 ovl$overlap <- round(1000*J.real)
 ovl$p.value <- J.pval
 
+pdf(paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,".pdf"))
 plotOverlaps(ovl)
+dev.off()
 
 save.image(file=outfile)
