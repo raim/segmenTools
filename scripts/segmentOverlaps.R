@@ -263,7 +263,7 @@ ovl$overlap <- round(1000*J.real)
 ovl$p.value <- J.pval
 
 pdf(paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,".pdf"))
-plotOverlaps(ovl,p.min=.001,main="Jaccard Index, permutation test",ylab=qlab,xlab=tlab)
+plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab)
 dev.off()
 
 ## store
