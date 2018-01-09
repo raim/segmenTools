@@ -29,7 +29,11 @@ option_list <- list(
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
   make_option(c("--tclass"), type="character", default="", 
-              help="target classes to test"),
+              help="name of column target classes to test"),
+  make_option(c("--ttypes"), type="character", default="", 
+              help="sub-sets of testset to use for testing"),
+  make_option(c("--ttypcol"), type="character", default="type", 
+              help="name of column with sub-set annotation"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
   make_option(c("--perm"), type="integer", default=100, 
@@ -44,15 +48,16 @@ option_list <- list(
 opt <- parse_args(OptionParser(option_list=option_list))
 
 ## process comma-separated list arguments
-#lst.args <- c()
-#for ( i in 1:length(lst.args) ) {
-#    idx <- which(names(opt)==names(lst.args)[i])
-#    opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
-#    for ( j in 1:length(opt[[idx]]) ) {
-#        tmp <- strsplit(opt[[idx]][j], ":")
-#    }
-#    mode(opt[[idx]]) <- lst.args[i]
-#}
+lst.args <- c(ttypes="character")
+for ( i in 1:length(lst.args) ) {
+    idx <- which(names(opt)==names(lst.args)[i])
+    opt[[idx]] <- unlist(strsplit(opt[[idx]], ","))
+    for ( j in 1:length(opt[[idx]]) ) {
+        tmp <- strsplit(opt[[idx]][j], ":")
+    }
+    mode(opt[[idx]]) <- lst.args[i]
+}
+
 ## promote options to main environment 
 for ( i in 1:length(opt) ) {
     arg <- names(opt)[i]
@@ -103,12 +108,13 @@ if ( target=="" & antisense ) {
     target <- query
     samesame <- TRUE
     ## only compare forward and reverse strands for auto-target
-    query <- query[query[,"strand"]==frw.str]
+    query <- query[query[,"strand"]==frw.str,]
     target <- target[target[,"strand"]==rev.str,]
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
-    ## TODO: readd ttype filter
-    target <- target[target[,"type"]=="gene",]
+    ## FILTER targets
+    if ( ttype!="" )
+      target <- target[target[,ttypcol]%in%ttypes,]
 }
 
 if ( verb>0 )
