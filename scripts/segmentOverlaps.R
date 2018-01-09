@@ -113,7 +113,7 @@ if ( target=="" & antisense ) {
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
     ## FILTER targets
-    if ( ttype!="" )
+    if ( ttypes!="" )
       target <- target[target[,ttypcol]%in%ttypes,]
 }
 
@@ -242,14 +242,20 @@ for ( i in 1:perm ) {
     J.rnd <- getJaccard(rquery, target, qclass="type", tclass)
     J.pval <- J.pval + as.numeric(J.rnd >= J.real)
 }
+cat(paste("\n"))
+
+## p-value
 J.pval <- J.pval/perm
 
+
+## plot
 ovl <- list()
 ovl$overlap <- round(1000*J.real)
 ovl$p.value <- J.pval
 
 pdf(paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,".pdf"))
-plotOverlaps(ovl)
+plotOverlaps(ovl,p.min=.001,main="Jaccard Index, permutation test")
 dev.off()
 
+## store
 save.image(file=outfile)
