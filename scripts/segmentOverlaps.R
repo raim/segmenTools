@@ -110,11 +110,20 @@ if ( target=="" & antisense ) {
     ## only compare forward and reverse strands for auto-target
     query <- query[query[,"strand"]==frw.str,]
     target <- target[target[,"strand"]==rev.str,]
+    tclass <- qclass
+    ## plot axis labels
+    qlab <- paste0("query: ", qclass, ", strand", frw.str)
+    tlab <- paste0("target: ", tclass, ", strand", rev.str)
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
     ## FILTER targets
     if ( ttypes!="" )
       target <- target[target[,ttypcol]%in%ttypes,]
+
+    ## plot axis labels
+    qlab <- paste0("query: ", qclass)
+    tlab <- paste0("target: ", tclass)
+   
 }
 
 if ( verb>0 )
@@ -254,7 +263,7 @@ ovl$overlap <- round(1000*J.real)
 ovl$p.value <- J.pval
 
 pdf(paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,".pdf"))
-plotOverlaps(ovl,p.min=.001,main="Jaccard Index, permutation test")
+plotOverlaps(ovl,p.min=.001,main="Jaccard Index, permutation test",ylab=qlab,xlab=tlab)
 dev.off()
 
 ## store
