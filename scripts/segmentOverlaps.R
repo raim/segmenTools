@@ -266,5 +266,5 @@ pdf(paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,".pdf"))
 plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab)
 dev.off()
 
-## store
+## store - TODO: align file names
 save.image(file=outfile)
