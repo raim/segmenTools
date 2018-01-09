@@ -36,6 +36,8 @@ option_list <- list(
               help="name of column with sub-set annotation"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
+  make_option(c("--upstream"), type="integer", default=0,
+              help="search range upstream of target (in nt.)"),
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   ## OUTPUT
@@ -100,30 +102,66 @@ query <- read.delim(query, stringsAsFactors=FALSE)
 
 if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 
+## TODO: align strand columns to - -> -1 and + -> 1 
+
+## plot axis labels
+qlab <- paste0("query: ", qclass)
+tlab <- paste0("target: ", tclass)
+
 ## target = antisense of query?
 samesame <- FALSE # only do forward or reverse strand if testing against self?
 frw.str <- 1
 rev.str <- -1
-if ( target=="" & antisense ) {
+## comparison with self!
+if ( target=="" & (antisense|upstream!=0) ) {
     target <- query
-    samesame <- TRUE
-    ## only compare forward and reverse strands for auto-target
-    query <- query[query[,"strand"]==frw.str,]
-    target <- target[target[,"strand"]==rev.str,]
     tclass <- qclass
-    ## plot axis labels
-    qlab <- paste0("query: ", qclass, ", strand", frw.str)
-    tlab <- paste0("target: ", tclass, ", strand", rev.str)
+    
+    ## only compare forward and reverse strands for auto-target antisense
+    if ( antisense ) {
+        samesame <- TRUE
+        query <- query[query[,"strand"]==frw.str,]
+        target <- target[target[,"strand"]==rev.str,]
+        ## plot axis labels
+        qlab <- paste0("query: ", qclass, ", strand ", frw.str)
+        tlab <- paste0("target: ", tclass, ", strand ", rev.str)
+    }
+    if ( upstream!=0 ) {
+        ## plot axis labels
+        qlab <- paste0("query: ", qclass)
+        tlab <- paste0("target: ", tclass, "upstream", upstream)
+    }
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
     ## FILTER targets
     if ( ttypes!="" )
       target <- target[target[,ttypcol]%in%ttypes,]
 
-    ## plot axis labels
-    qlab <- paste0("query: ", qclass)
-    tlab <- paste0("target: ", tclass)
-   
+}
+
+## scan for range around targets
+if ( upstream!=0 ) {
+
+    if ( antisense )
+        stop("Options `--antisense' and `--upstream' are not compatible!")
+
+    ## make sure start < end for both strands
+    ## (only valid for non-circular DNA!!)
+    utarget <- target[,c("start","end","strand")]
+    str <- utarget[,"strand"]
+    start <- utarget[,"start"]
+    end <- utarget[,"end"]
+    ## order start<end 
+    if ( any(end<start & str==frw.str) ) 
+        stop("`end' must be larger then segment `start' on forward strand")
+    start[str==rev.str] <- apply(utarget[str==rev.str,c("start","end")],1,min)
+    end[str==rev.str] <- apply(utarget[str==rev.str,c("start","end")],1,max)
+    
+    utarget[str== frw.str, c("start","end")] <-
+        cbind(start-upstream,start-1)[str==frw.str,]
+    utarget[str== rev.str, c("start","end")] <-
+        cbind(end+1,end+upstream)[str==rev.str,]
+    target[,c("start","end","strand")] <- utarget
 }
 
 if ( verb>0 )
@@ -256,15 +294,18 @@ cat(paste("\n"))
 ## p-value
 J.pval <- J.pval/perm
 
+file.name <- paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,
+                    ifelse(antisense,"_antisense",""),
+                    ifelse(upstream!=0, paste0("_upstream",upstream),""))
 
 ## plot
 ovl <- list()
 ovl$overlap <- round(1000*J.real)
 ovl$p.value <- J.pval
 
-pdf(paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,".pdf"))
+pdf(paste0(file.name,".pdf"))
 plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab)
 dev.off()
 
 ## store - TODO: align file names
-save.image(file=outfile)
+save.image(file=paste0(file.name,".RData"))
