@@ -115,7 +115,8 @@ rev.str <- -1
 ## comparison with self!
 if ( target=="" & (antisense|upstream!=0) ) {
     target <- query
-    tclass <- qclass
+    if ( tclass=="" )
+        tclass <- qclass
     
     ## only compare forward and reverse strands for auto-target antisense
     if ( antisense ) {
