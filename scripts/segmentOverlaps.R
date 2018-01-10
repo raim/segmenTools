@@ -229,7 +229,7 @@ getJaccard <- function(query, target, qclass, tclass) {
     colnames(jc) <- tcls.srt
     rownames(jc) <- qcls.srt
     for ( i in 1:qN ) {
-        for ( j in 1:tN ) { ## asymmetric only for target = antisense of query?
+        for ( j in 1:tN ) { 
             is <- length(intersect(qcls.rng[[i]],tcls.rng[[j]]))
             un <- length(union(qcls.rng[[i]],tcls.rng[[j]]))
             jc[i,j] <- is/un
@@ -294,9 +294,13 @@ cat(paste("\n"))
 ## p-value
 J.pval <- J.pval/perm
 
-file.name <- paste0(sub(".RData","",basename(outfile)),"_",qclass,"_",tclass,
+file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
+
+## store data
+## TODO: only store data
+save.image(file=paste0(file.name,".RData"))
 
 ## plot
 ovl <- list()
@@ -307,5 +311,3 @@ pdf(paste0(file.name,".pdf"))
 plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab)
 dev.off()
 
-## store - TODO: align file names
-save.image(file=paste0(file.name,".RData"))
