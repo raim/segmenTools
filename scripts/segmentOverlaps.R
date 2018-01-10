@@ -129,7 +129,7 @@ if ( target=="" & (antisense|upstream!=0) ) {
     if ( upstream!=0 ) {
         ## plot axis labels
         qlab <- paste0("query: ", qclass)
-        tlab <- paste0("target: ", tclass, "upstream", upstream)
+        tlab <- paste0("target: ", tclass, "upstream ", upstream)
     }
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
