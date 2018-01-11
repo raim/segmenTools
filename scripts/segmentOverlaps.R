@@ -109,29 +109,17 @@ qlab <- paste0("query: ", qclass)
 tlab <- paste0("target: ", tclass)
 
 ## target = antisense of query?
-samesame <- FALSE # only do forward or reverse strand if testing against self?
 frw.str <- c("1","+")
 rev.str <- c("-1","-")
 ## comparison with self!
 if ( target=="" & (antisense|upstream!=0) ) {
     target <- query
     if ( tclass=="" )
-        tclass <- qclass
-    
-    ## only compare forward and reverse strands for auto-target antisense
+      tclass <- qclass
     if ( antisense ) {
-        samesame <- TRUE
         query <- query[as.character(query[,"strand"])%in%frw.str,]
         target <- target[as.character(target[,"strand"])%in%rev.str,]
-        ## plot axis labels
-        qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
-        tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
-    }
-    if ( upstream!=0 ) {
-        ## plot axis labels
-        qlab <- paste0("query: ", qclass)
-        tlab <- paste0("target: ", tclass, "upstream ", upstream)
-    }
+    }    
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
     ## FILTER targets
@@ -164,6 +152,18 @@ if ( upstream!=0 ) {
     utarget[str%in%rev.str, c("start","end")] <-
         cbind(end+1,end+upstream)[str%in%rev.str,]
     target[,c("start","end","strand")] <- utarget
+}
+
+## only compare forward and reverse strands for auto-target antisense
+if ( antisense ) {
+    ## plot axis labels
+    qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
+    tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
+}
+if ( upstream!=0 ) {
+    ## plot axis labels
+    qlab <- paste0("query: ", qclass)
+    tlab <- paste0("target: ", tclass, ", upstream ", upstream)
 }
 
 if ( verb>0 )
