@@ -110,8 +110,8 @@ tlab <- paste0("target: ", tclass)
 
 ## target = antisense of query?
 samesame <- FALSE # only do forward or reverse strand if testing against self?
-frw.str <- 1
-rev.str <- -1
+frw.str <- c("1","+")
+rev.str <- c("-1","-")
 ## comparison with self!
 if ( target=="" & (antisense|upstream!=0) ) {
     target <- query
@@ -121,11 +121,11 @@ if ( target=="" & (antisense|upstream!=0) ) {
     ## only compare forward and reverse strands for auto-target antisense
     if ( antisense ) {
         samesame <- TRUE
-        query <- query[query[,"strand"]==frw.str,]
-        target <- target[target[,"strand"]==rev.str,]
+        query <- query[as.character(query[,"strand"])%in%frw.str,]
+        target <- target[as.character(target[,"strand"])%in%rev.str,]
         ## plot axis labels
-        qlab <- paste0("query: ", qclass, ", strand ", frw.str)
-        tlab <- paste0("target: ", tclass, ", strand ", rev.str)
+        qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
+        tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
     }
     if ( upstream!=0 ) {
         ## plot axis labels
@@ -149,19 +149,20 @@ if ( upstream!=0 ) {
     ## make sure start < end for both strands
     ## (only valid for non-circular DNA!!)
     utarget <- target[,c("start","end","strand")]
-    str <- utarget[,"strand"]
+    str <- as.character(utarget[,"strand"])
     start <- utarget[,"start"]
     end <- utarget[,"end"]
     ## order start<end 
-    if ( any(end<start & str==frw.str) ) 
+    if ( any(end<start & str%in%frw.str) ) 
         stop("`end' must be larger then segment `start' on forward strand")
-    start[str==rev.str] <- apply(utarget[str==rev.str,c("start","end")],1,min)
-    end[str==rev.str] <- apply(utarget[str==rev.str,c("start","end")],1,max)
+    start[str%in%rev.str] <-
+        apply(utarget[str%in%rev.str,c("start","end")],1,min)
+    end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)
     
-    utarget[str== frw.str, c("start","end")] <-
-        cbind(start-upstream,start-1)[str==frw.str,]
-    utarget[str== rev.str, c("start","end")] <-
-        cbind(end+1,end+upstream)[str==rev.str,]
+    utarget[str%in%frw.str, c("start","end")] <-
+        cbind(start-upstream,start-1)[str%in%frw.str,]
+    utarget[str%in%rev.str, c("start","end")] <-
+        cbind(end+1,end+upstream)[str%in%rev.str,]
     target[,c("start","end","strand")] <- utarget
 }
 
