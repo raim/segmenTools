@@ -519,10 +519,12 @@ clusterAnnotation <- function(cls, data, p=1,
 #' @param axis2.col invididual colors for y-axis tick labels, length must
 #' equal the number of rows of \code{dat}
 #' @param axis.cex if axis[1|2].col is provided, this sets the tick label size
+#' @param axis1.las parameter \code{las} (tick label orientation) for x axis
+#' @param axis2.las parameter \code{las} (tick label orientation) for y axis
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, axis2.col, axis.cex=1.5, ...) {
+image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, axis1.las=2, axis2.col, axis2.las=2, axis.cex=1.5, ...) {
 
     ## reverse columns and transpose
     if ( nrow(dat)>1 )
@@ -547,17 +549,17 @@ image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, a
                 for ( i in 1:ncol(dat) )
                     axis(1, at=i,colnames(dat)[i],
                          col.axis=axis1.col[i], col=axis1.col[i],
-                         las=2, cex.axis=axis.cex, lwd=2)
+                         las=axis1.las, cex.axis=axis.cex, lwd=2)
             else
-                axis(1, at=1:ncol(dat), labels=colnames(dat), las=2)
+                axis(1, at=1:ncol(dat), labels=colnames(dat), las=axis1.las)
         if ( 2 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
                 for ( i in 1:nrow(dat) )
                         axis(2, at=nrow(dat)-i+1, rownames(dat)[i],
                              col.axis=axis2.col[i], col=axis2.col[i],
-                             las=2, cex.axis=axis.cex, lwd=2)
+                             las=axis2.las, cex.axis=axis.cex, lwd=2)
             else
-                axis(2, at=nrow(dat):1, rownames(dat),las=2)        
+                axis(2, at=nrow(dat):1, rownames(dat),las=axis2.las)        
     }
 } 
 

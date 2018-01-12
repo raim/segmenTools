@@ -5,7 +5,7 @@
 \title{data.matrix `as-is' wrapper for \code{\link[graphics]{image}}}
 \usage{
 image_matrix(dat, text, text.col, text.cex = 1, axis = 1:2, axis1.col,
-  axis2.col, axis.cex = 1.5, ...)
+  axis1.las = 2, axis2.col, axis2.las = 2, axis.cex = 1.5, ...)
 }
 \arguments{
 \item{dat}{the numeric data matrix to be plotted}
@@ -24,8 +24,12 @@ be used as tick labels}
 \item{axis1.col}{invididual colors for x-axis tick labels, length must
 equal the number of columns of \code{dat}}
 
+\item{axis1.las}{parameter \code{las} (tick label orientation) for x axis}
+
 \item{axis2.col}{invididual colors for y-axis tick labels, length must
 equal the number of rows of \code{dat}}
+
+\item{axis2.las}{parameter \code{las} (tick label orientation) for y axis}
 
 \item{axis.cex}{if axis[1|2].col is provided, this sets the tick label size}
 
