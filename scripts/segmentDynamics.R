@@ -136,13 +136,13 @@ for ( i in 1:length(lst.args) ) {
     ## get individual values
     tmp <- as.list(unlist(strsplit(opt[[idx]], ",")))
     ## expand ranges
-    if ( lst.args[i]=="numeric" )
+    if ( lst.args[i]=="numeric" & length(tmp)>0 )
         for ( j in 1:length(tmp) ) { # only for numeric modes
             tmp2 <- unlist(strsplit(tmp[[j]], ":"))
             if ( length(tmp2)>1 ) {
                 tmp2 <- as.numeric(tmp2)
                 tmp[[j]] <- tmp2[1]:tmp2[2]
-            }
+                }
         }
     if ( length(tmp)>0 )
         opt[[idx]] <- unlist(tmp)
@@ -192,7 +192,7 @@ if ( verb>0 )
 load(datafile)
 
 ## set missing read range to all!
-if ( length(read.rng)==0 ) 
+if ( length(read.rng)==0 | is.na(read.rng) ) 
   read.rng <- 1:ncol(ts)
 
 
@@ -258,7 +258,7 @@ if ( "clustering" %in% jobs ) {
 for ( type in sgtypes ) {
 
     if ( !exists("type", mode="character") )
-      type <- sgtypes[1] ## NOTE: DEVEL HELPER - NOT REQUIRED
+      type <- sgtypes[3] ## NOTE: DEVEL HELPER - NOT REQUIRED
 
     if ( verb>0 )
         cat(paste(type, "\t",time(),"\n"))
@@ -303,7 +303,7 @@ for ( type in sgtypes ) {
             pvalDist(pval[x["start"]:x["end"]],pval.thresh.sig)))
 
         ## total range of expression
-        ## NOTE: ONLY TAKING FIRST 20 TIMEPOINTS TO SKIP SHIFT IN THE END?
+        ## NOTE: ONLY TAKING FIRST 19/20 TIMEPOINTS TO SKIP SHIFT IN THE END?
         rds <- t(apply(sgs,1,function(x)
             readDist(c(ts[x["start"]:x["end"],read.rng]))))
         
