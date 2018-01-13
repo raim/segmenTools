@@ -258,7 +258,7 @@ if ( "clustering" %in% jobs ) {
 for ( type in sgtypes ) {
 
     if ( !exists("type", mode="character") )
-      type <- sgtypes[3] ## NOTE: DEVEL HELPER - NOT REQUIRED
+      type <- sgtypes[1] ## NOTE: DEVEL HELPER - NOT REQUIRED
 
     if ( verb>0 )
         cat(paste(type, "\t",time(),"\n"))
@@ -432,6 +432,8 @@ for ( type in sgtypes ) {
     if ( with.rain!="" ) {
         sgrain <- read.delim(file.path(with.rain,paste0(fname,"_rain.csv")),
                            row.names=1)[as.character(sgs[,"ID"]),]
+
+        ## TODO: this is used in paper; make fit for supplementary material
         file.name <- file.path(out.path,paste(fname,"_rain_pvalues",sep=""))
         plotdev(file.name,width=4,height=4,type=fig.type,res=300)
         rpcdf <- ecdf(sgrain[,"pVal"])
@@ -451,13 +453,14 @@ for ( type in sgtypes ) {
                             row.names=1)[as.character(sgs[,"ID"]),]
         file.name <- file.path(out.path,paste(fname,"_permutation_pvalues",sep=""))
         plotdev(file.name,width=4,height=4,type=fig.type,res=300)
-        ppcdf <- ecdf(sgrain[,"X2_p"]) ## TODO: this must be argument
+        ppcdf <- ecdf(sgdft[,"X2_p"]) ## TODO: this must be argument
         plot(ppcdf)
         points(pval.thresh.sig,ppcdf(pval.thresh.sig))
         dev.off()
         
         ## FILTER
-        unsigp <- sgrain[,"X2_p"] >= pval.thresh.sig
+        sgdft[is.na(sgdft[,"X2_p"]),"X2_p"] <- 1
+        unsigp <- sgdft[,"X2_p"] >= pval.thresh.sig
      }
 
     ## FILTER: maximally three expressed time-points per segment
