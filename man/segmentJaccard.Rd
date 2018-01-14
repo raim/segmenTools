@@ -12,10 +12,10 @@ segmentJaccard(query, target, qclass, tclass, total, perm = 0, verb = 1)
 \item{target}{target set of segments}
 
 \item{qclass}{column name which holds a sub-classification (clustering) of
-the query segments}
+the query segments, omit or pass empty string ("") to use all}
 
 \item{tclass}{column name which holds a sub-classification (clustering) of
-the target segments}
+the target segments, omit or pass empty string ("") to use all}
 
 \item{total}{total length of the query range (genome length), if missing
 the start of the first segment is also used as end}

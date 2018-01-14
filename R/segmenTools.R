@@ -850,20 +850,21 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' @param query query set of segments
 #' @param target target set of segments
 #' @param qclass column name which holds a sub-classification (clustering) of
-#' the query segments
+#' the query segments, omit or pass empty string ("") to use all
 #' @param tclass column name which holds a sub-classification (clustering) of
-#' the target segments
+#' the target segments, omit or pass empty string ("") to use all
 #' @param total total length of the query range (genome length), if missing
 #' the start of the first segment is also used as end
 #' @param perm number of permutations to perform
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
 segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1) {
+    if ( missing(qclass) ) qclass <- ""
+    if ( missing(tclass) ) tclass <- ""
 
     ## query classes
-    if ( missing(qclass) ) {
-        qclass <- "query"
-        qcls <- as.factor(rep(qclass, nrow(query)))
+    if ( qclass=="" ) {
+        qcls <- as.factor(rep("query", nrow(query)))
     } else {
         qcls <- as.factor(query[,qclass])
     }
@@ -871,9 +872,8 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     qN <- length(qcls.srt)
     
     ## target classes
-    if ( missing(tclass) ) {
-        qclass <- "target"
-        qcls <- as.factor(rep(tclass, nrow(query)))
+    if ( tclass=="" ) {
+        tcls <- as.factor(rep("target", nrow(target)))
     } else {
         tcls <- as.factor(target[,tclass])
     }
