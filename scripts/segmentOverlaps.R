@@ -20,6 +20,8 @@ suppressPackageStartupMessages(library(optparse))
 option_list <- list(
   make_option(c("--chrfile"), type="character", default="",
               help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
+#  make_option(c("--chrfile"), type="character", default="",
+#              help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
   ## QUERY OPTIONS
   make_option(c("-q", "--query"), type="character", default="", 
               help="query set of chromosomal segments"),    
@@ -92,7 +94,8 @@ if ( verb>0 )
 ## load chromosome index - DOESNT WORK WITHOUT
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
-cf <- read.table(chrfile,sep="\t",header=FALSE)
+cf <- read.table(chrfile,sep="\t",header=FALSE,stringsAsFactors=FALSE)
+chrMap <- cf[,2]
 chrL <- cf[,3]
 chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 total <- 2*sum(chrL) # both strands!
@@ -126,10 +129,13 @@ if ( target=="" & (antisense|upstream!=0) ) {
     }    
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
-    ## FILTER targets
-    if ( ttypes!="" )
-        target <- target[target[,ttypcol]%in%ttypes,]
+    ## TODO: map chromosome name to index
+    ## perhaps allow to pass chromosome map to coor2index
     
+    ## FILTER targets
+    if ( length(ttypes)>0 )
+        if( ttypes!="" )
+            target <- target[target[,ttypcol]%in%ttypes,]
 }
 
 ## scan for range around targets
@@ -198,17 +204,16 @@ ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
                       verb=1)
 
+if ( tclass=="" ) tclass <- "all"
+if ( qclass=="" ) qclass <- "all"
 
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
 ## store data
-## TODO: only store data
-save.image(file=paste0(file.name,".RData"))
+save(ovl, file=paste0(file.name,".RData"))
 
 ## plot
-#ovl$jaccard <- round(1000*ovl$jaccard)
-
 pdf(paste0(file.name,".pdf"))
 plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
 dev.off()
