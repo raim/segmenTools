@@ -207,7 +207,7 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
 save.image(file=paste0(file.name,".RData"))
 
 ## plot
-ovl$jaccard <- round(1000*ovl$jaccard)
+#ovl$jaccard <- round(1000*ovl$jaccard)
 
 pdf(paste0(file.name,".pdf"))
 plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
