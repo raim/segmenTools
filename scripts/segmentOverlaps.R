@@ -95,6 +95,7 @@ if ( verb>0 )
 cf <- read.table(chrfile,sep="\t",header=FALSE)
 chrL <- cf[,3]
 chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+total <- 2*sum(chrL) # both strands!
 
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 ) msg(paste("Loading query:", query, "\t\n"))
@@ -111,7 +112,8 @@ tlab <- paste0("target: ", tclass)
 ## target = antisense of query?
 frw.str <- c("1","+")
 rev.str <- c("-1","-")
-## comparison with self!
+## comparison with self on reverse strand!
+## compare forward with reverse strand!
 if ( target=="" & (antisense|upstream!=0) ) {
     target <- query
     if ( tclass=="" )
@@ -119,13 +121,15 @@ if ( target=="" & (antisense|upstream!=0) ) {
     if ( antisense ) {
         query <- query[as.character(query[,"strand"])%in%frw.str,]
         target <- target[as.character(target[,"strand"])%in%rev.str,]
+        ## total length: only one strand
+        total <- sum(chrL)
     }    
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
     ## FILTER targets
     if ( ttypes!="" )
-      target <- target[target[,ttypcol]%in%ttypes,]
-
+        target <- target[target[,ttypcol]%in%ttypes,]
+    
 }
 
 ## scan for range around targets
@@ -190,7 +194,9 @@ if ( verb>0 )
 ## for all query classes vs. all target classes
 ## allowing for sense:antisense test WITHIN same segments (query=target)
 
-ovl <- segmentJaccard(query, target, qclass, tclass, perm, verb=1)
+ovl <- segmentJaccard(query=query, target=target,
+                      qclass=qclass, tclass=tclass, perm=perm, total=total,
+                      verb=1)
 
 
 file.name <- paste0(outfile,"_",qclass,"_",tclass,

@@ -831,31 +831,38 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 
 #' Jaccard-Index overlap test for classes of segments (genomic intervals)
 #'
-#' calculates the Jaccard index, including a permutation test, between
+#' calculates the Jaccard index, including a simple permutation test, between
 #' different classes in a query and a target set of segments
 #' (genomic intervals), where coordinates have been converted to a
 #' continuous index over all chromosomes with \code{\link{coor2index}}.
-#' @details A simple permutation is performed, sampling randomly from
+#' @details Reports the Jaccard index (\code{J=intersect/union)}) between
+#' two distinct sets of segments (genomic intervals).
+#' If argument \code{perm>0}, a simple permutation is performed,
+#' sampling randomly from
 #' all inter-segment distances and segment lengths, and ignoring optional
 #' query sub-classifications (argument \code{qclass}). Note, that chromosome
-#' ends are ignored. The function is conceptually similar to
-#' \code{\link{clusterCluster}} and results of the permutaiton
-#' test (argument \code{perm>0}) can be plotted directly with
-#' \code{\link{plotOverlaps}}.
+#' ends are ignored. The total length of the query range (genome length, for
+#' both strands, if both are used) can be passed in argument \code{total},
+#' and if missing the start of the first segment is also used as the distance
+#' of the final segment to the query range end.
+#' The results of the permutation test (argument \code{perm>0}) can be
+#' plotted directly with \code{\link{plotOverlaps}}.
 #' @param query query set of segments
 #' @param target target set of segments
 #' @param qclass column name which holds a sub-classification (clustering) of
 #' the query segments
 #' @param tclass column name which holds a sub-classification (clustering) of
 #' the target segments
+#' @param total total length of the query range (genome length), if missing
+#' the start of the first segment is also used as end
 #' @param perm number of permutations to perform
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-segmentJaccard <- function(query, target, qclass, tclass, perm=0, verb=1) {
+segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1) {
 
     ## query classes
     if ( missing(qclass) ) {
-        qclass <- "q"
+        qclass <- "query"
         qcls <- as.factor(rep(qclass, nrow(query)))
     } else {
         qcls <- as.factor(query[,qclass])
@@ -864,7 +871,12 @@ segmentJaccard <- function(query, target, qclass, tclass, perm=0, verb=1) {
     qN <- length(qcls.srt)
     
     ## target classes
-    tcls <- as.factor(target[,tclass])
+    if ( missing(tclass) ) {
+        qclass <- "target"
+        qcls <- as.factor(rep(tclass, nrow(query)))
+    } else {
+        tcls <- as.factor(target[,tclass])
+    }
     tcls.srt <- sort(unique(tcls))
     tN <- length(tcls.srt)
     
@@ -905,19 +917,21 @@ segmentJaccard <- function(query, target, qclass, tclass, perm=0, verb=1) {
     }
     #J.real
 
+   
     if ( perm>0 ) {
 
         ## randomize queries
 
         J.pval <- J.real
         J.pval[] <- 0
+
+        ## sort query
+        query <- query[order(query$start),]
         for ( i in 1:perm ) {
 
             if ( verb>0 )
                 cat(paste(i/perm," "))
             
-            ## sort
-            query <- query[order(query$start),]
             
             ## segment lengths
             sglen <- apply(query[,c("start","end")], 1, diff)
@@ -928,11 +942,18 @@ segmentJaccard <- function(query, target, qclass, tclass, perm=0, verb=1) {
             qnum <- nrow(query)
             islen <- apply(cbind(query[1:(qnum-1),"end"],
                                  query[2:qnum,"start"]), 1, diff)
-            islen <- c(query[1,"start"], islen, 2*sum(chrL)-query[qnum,"end"]+1)
+            ## NOTE: the start of the first real query segment
+            ## is also used as the distance of the final segment
+            ## unless a total length is explicitly provided as argument
+            ## len; total =  2*sum(chrL)
+            if ( !missing(total) ) end <- total - query[qnum,"end"]+1
+            else end <- query[1,"start"]
+            islen <- c(query[1,"start"], islen, end)
             islen <- islen-1
             
-            ## check (if start and end were added
-            if ( sum(islen)+sum(sglen) != 2*sum(chrL) )
+            ## debug check whether total lengt is reproduced
+            ## TODO: allow this check, but requires chrL to be known!
+            if ( sum(islen)+sum(sglen) != total )
                 stop()
 
             ## RANDOMIZATION

@@ -4,7 +4,7 @@
 \alias{segmentJaccard}
 \title{Jaccard-Index overlap test for classes of segments (genomic intervals)}
 \usage{
-segmentJaccard(query, target, qclass, tclass, perm = 0, verb = 1)
+segmentJaccard(query, target, qclass, tclass, total, perm = 0, verb = 1)
 }
 \arguments{
 \item{query}{query set of segments}
@@ -17,22 +17,30 @@ the query segments}
 \item{tclass}{column name which holds a sub-classification (clustering) of
 the target segments}
 
+\item{total}{total length of the query range (genome length), if missing
+the start of the first segment is also used as end}
+
 \item{perm}{number of permutations to perform}
 
 \item{verb}{integer level of verbosity, 0: no messages, 1: show messages}
 }
 \description{
-calculates the Jaccard index, including a permutation test, between
+calculates the Jaccard index, including a simple permutation test, between
 different classes in a query and a target set of segments
 (genomic intervals), where coordinates have been converted to a
 continuous index over all chromosomes with \code{\link{coor2index}}.
 }
 \details{
-A simple permutation is performed, sampling randomly from
+Reports the Jaccard index (\code{J=intersect/union)}) between
+two distinct sets of segments (genomic intervals).
+If argument \code{perm>0}, a simple permutation is performed,
+sampling randomly from
 all inter-segment distances and segment lengths, and ignoring optional
 query sub-classifications (argument \code{qclass}). Note, that chromosome
-ends are ignored. The function is conceptually similar to
-\code{\link{clusterCluster}} and results of the permutaiton
-test (argument \code{perm>0}) can be plotted directly with
-\code{\link{plotOverlaps}}.
+ends are ignored. The total length of the query range (genome length, for
+both strands, if both are used) can be passed in argument \code{total},
+and if missing the start of the first segment is also used as the distance
+of the final segment to the query range end.
+The results of the permutation test (argument \code{perm>0}) can be
+plotted directly with \code{\link{plotOverlaps}}.
 }
