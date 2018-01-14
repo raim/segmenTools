@@ -4,8 +4,9 @@
 \alias{coor2index}
 \title{convert chromosome coordinates to continuous index}
 \usage{
-coor2index(features, chrS, cols = c("start", "end", "coor"), chrCol = "chr",
-  strandCol = "strand", reverse = c("-", -1), circular = FALSE)
+coor2index(features, chrS, chrMap, cols = c("start", "end", "coor"),
+  chrCol = "chr", strandCol = "strand", reverse = c("-", -1),
+  circular = FALSE)
 }
 \arguments{
 \item{features}{a table of chromosome features that must contain
@@ -15,7 +16,11 @@ positions (option \code{cols}) and strand information (column
 
 \item{chrS}{the chromosome index, indicating the start position
 of each chromosome in the continuous index, derived from chromosome length
-information, see function \code{\link{getChrSum}}}
+information; simply the cumulative lengths of ordered chrosomes,
+see function \code{\link{getChrSum}}}
+
+\item{chrMap}{a vector of chromosome names using \code{features}' chromosome
+column, in the same order as \code{chrS}}
 
 \item{cols}{name of the columns giving coordinates that will be mapped
 to continuous index}
