@@ -190,126 +190,20 @@ if ( verb>0 )
 ## for all query classes vs. all target classes
 ## allowing for sense:antisense test WITHIN same segments (query=target)
 
-getJaccard <- function(query, target, qclass, tclass) {
+ovl <- segmentJaccard(query, target, qclass, tclass, perm, verb=1)
 
-    ## query classes
-    qcls <- as.factor(query[,qclass])
-    qcls.srt <- sort(unique(qcls))
-    qN <- length(qcls.srt)
-    
-    ## target classes
-    tcls <- as.factor(target[,tclass])
-    tcls.srt <- sort(unique(tcls))
-    tN <- length(tcls.srt)
-    
-    ## get full ranges for all query classes
-    qcls.rng <- rep(list(NA), qN)
-    names(qcls.rng) <- qcls.srt
-    for ( i in 1:qN ) {
-        cl <- qcls.srt[i]
-        idx <- qcls==cl
-        rng <- apply(as.matrix(query[idx,c("start","end")]), 1,
-                     function(x) x["start"]:x["end"])
-        names(rng) <- NULL
-        qcls.rng[[cl]] <- unlist(rng)
-    }
-    
-    ## get full ranges for all target classes
-    tcls.rng <- rep(list(NA), tN)
-    names(tcls.rng) <- tcls.srt
-    for ( i in 1:tN ) {
-        cl <- tcls.srt[i]
-        idx <- tcls==cl
-        rng <- apply(as.matrix(target[idx,c("start","end")]), 1,
-                     function(x) x["start"]:x["end"])
-        names(rng) <- NULL
-        tcls.rng[[cl]] <- unlist(rng)
-    }
-
-    ## get intersect/union of all query:target class pairs
-    jc <- matrix(NA, nrow=qN, ncol=tN)
-    colnames(jc) <- tcls.srt
-    rownames(jc) <- qcls.srt
-    for ( i in 1:qN ) {
-        for ( j in 1:tN ) { 
-            is <- length(intersect(qcls.rng[[i]],tcls.rng[[j]]))
-            un <- length(union(qcls.rng[[i]],tcls.rng[[j]]))
-            jc[i,j] <- is/un
-        }
-    }
-    jc
-}
-
-J.real <- getJaccard(query, target, qclass, tclass)
-
-## randomize queries
-
-J.pval <- J.real
-J.pval[] <- 0
-for ( i in 1:perm ) {
-
-    cat(paste(i/perm," "))
-    
-    ## sort
-    query <- query[order(query$start),]
-    
-    ## segment lengths
-    sglen <- apply(query[,c("start","end")], 1, diff)
-    sglen <- sglen+1
-    sgcls <- as.factor(query[,qclass])
-
-    ## inter-segment lengths
-    qnum <- nrow(query)
-    islen <- apply(cbind(query[1:(qnum-1),"end"],query[2:qnum,"start"]), 1, diff)
-    islen <- c(query[1,"start"], islen, 2*sum(chrL)-query[qnum,"end"]+1)
-    islen <- islen-1
-    
-    ## check (if start and end were added
-    if ( sum(islen)+sum(sglen) != 2*sum(chrL) )
-        stop()
-    
-    ## sample segment lengths
-    ridx <- sample(1:qnum)
-    rcls <- sgcls[ridx] # store cluster to keep cluster length dist!
-    rsglen <- sglen[ridx]
-    ## sample intersegment lengths
-    rislen <- sample(islen)
-    
-    ## construct randomized segmentation
-    tot <- length(rsglen)+length(rislen)
-    cumlen <- rep(NA,tot)
-    cumlen[seq(1,tot,2)] <- rislen
-    cumlen[seq(2,tot,2)] <- rsglen
-    cumlen <- cumsum(cumlen)
-    
-    rquery <- data.frame(start=cumlen[seq(1,tot-1,2)],
-                         end=cumlen[seq(2,tot-1,2)],
-                         type=rcls)
-    
-    ## TODO: test cluster length distribution?
-
-    J.rnd <- getJaccard(rquery, target, qclass="type", tclass)
-    J.pval <- J.pval + as.numeric(J.rnd >= J.real)
-}
-cat(paste("\n"))
-
-## p-value
-J.pval <- J.pval/perm
 
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
-
 ## store data
 ## TODO: only store data
 save.image(file=paste0(file.name,".RData"))
 
 ## plot
-ovl <- list()
-ovl$overlap <- round(1000*J.real)
-ovl$p.value <- J.pval
+ovl$jaccard <- round(1000*ovl$jaccard)
 
 pdf(paste0(file.name,".pdf"))
-plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab)
+plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
 dev.off()
 

@@ -8,7 +8,8 @@
 ## plot.hypergeoTables in analyzeSegments_2017.R
 ## integrate GO wrapper for clusterCluster
 
-### COMPARE CLUSTERINGS
+### COMPARE CLUSTERINGS 
+
 
 #' calculates overlaps between two clusterings
 #' 
@@ -155,25 +156,38 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   return(result)
 }
 
-#' plot cluster-cluster overlaps
+#' plot cluster-cluster or segment-segment overlaps
 #'
-#' Plots the significance distribution of a cluster-cluster
-#' overlap statistics provided by \code{\link{clusterCluster}},
-#' where the a white-black gradient is calculated from \code{-log(p)}.
+#' Plots the significance distribution of cluster-cluster or segment-segment
+#' overlap statistics provided by \code{\link{clusterCluster}} or
+#' \code{\link{segmentJaccard}}, where the a white-black gradient is
+#' calculated from \code{-log(p)}, and the text shows the overlap statistics,
+#' i.e., the number of overlapping features for \code{\link{clusterCluster}},
+#' or the Jaccard index for \code{\link{segmentJaccard}}. Note that two
+#' distinct p-value cutoffs can be visualyized: p-values \code{<=p.min}
+#' are shown in black, and p-values \code{p.txt} are shown in white instead
+#' of black text (thus becoming visible on the black of significant
+#' overlaps).
 #' @param x a `clusterOverlaps' object returned by
 #' \code{\link{clusterCluster}}
 #' @param p.min significance cutoff, p-values equal or smaller to
 #' this cutoff will appear black; TODO: plot legend
-#' @param p.txt p-value cutoff for showing white text
+#' @param p.txt p-value cutoff for showing overlap numbers as white instead
+#' of black text
 #' @param n number of gray shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
 #' @param short logical, indicating whether to cut higher overlap
 #' numbers; currently: division by 1000 and replacement by \code{k}
+#' @param scale factor to divide overlap numbers with, useful for
+#' low numbers in Jaccard index
+#' @param round number of digits to round overlap numbers to (useful
+#' for Jaccard index)
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: sort by significance?
+## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=1, round, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
@@ -182,21 +196,32 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, ...) {
     breaks <- seq(0,-log2(p.min),length.out=n+1)
     colors <- grDevices::gray(seq(1,0,length.out=n))
     ## set up text (overlap numbers) and text colors
-    txt <- x$overlap
+    type <- "" # TODO, add info to input results on the name of the statistics
+    if ( "jaccard"%in%names(x) ) {
+        type <- "jaccard"
+        short <- FALSE
+        ## TODO: handle jaccard vs. hypergeo better
+        ## and align scale/round/short options
+    }
+    if ( "overlap"%in%names(x) ) type <- "overlap"
+    txt <- x[[type]]
+    if ( scale>1 ) txt <- txt*scale
+    if ( !missing(round) ) txt <- round(txt,digits=round)
     txt[txt=="0"] <- ""
     txt.col <- txt
     txt.col[] <- "black"
     txt.col[pval >= -log2(p.txt)] <- "white"
     ## cut text (high overlap numbers)
     if ( short ) {
-        txt <- x$overlap
+        txt <- x[[type]]
         hg <-txt>1e3
         txt[hg] <- signif(txt[hg]/1e3,2)
         txt[txt=="0"] <- ""
         txt[hg]  <- paste(txt[hg],"k",sep="")
     }
 
-    image_matrix(pval,breaks=breaks,col=colors,axis=1:2,text=txt, text.col=txt.col, ...)
+    image_matrix(pval, breaks=breaks, col=colors, axis=1:2,
+                 text=txt, text.col=txt.col, ...)
 }
 
 #' sorts cluster overlap structure by p-values

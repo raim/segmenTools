@@ -2,10 +2,10 @@
 % Please edit documentation in R/clusterTools.R
 \name{plotOverlaps}
 \alias{plotOverlaps}
-\title{plot cluster-cluster overlaps}
+\title{plot cluster-cluster or segment-segment overlaps}
 \usage{
 plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, short = TRUE,
-  ...)
+  scale = 1, round, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -14,7 +14,8 @@ plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, short = TRUE,
 \item{p.min}{significance cutoff, p-values equal or smaller to
 this cutoff will appear black; TODO: plot legend}
 
-\item{p.txt}{p-value cutoff for showing white text}
+\item{p.txt}{p-value cutoff for showing overlap numbers as white instead
+of black text}
 
 \item{n}{number of gray shades between \code{p=1} (white)
 and \code{p >= p.min} (black)}
@@ -22,10 +23,23 @@ and \code{p >= p.min} (black)}
 \item{short}{logical, indicating whether to cut higher overlap
 numbers; currently: division by 1000 and replacement by \code{k}}
 
+\item{scale}{factor to divide overlap numbers with, useful for
+low numbers in Jaccard index}
+
+\item{round}{number of digits to round overlap numbers to (useful
+for Jaccard index)}
+
 \item{...}{arguments to \code{\link{image_matrix}}}
 }
 \description{
-Plots the significance distribution of a cluster-cluster
-overlap statistics provided by \code{\link{clusterCluster}},
-where the a white-black gradient is calculated from \code{-log(p)}.
+Plots the significance distribution of cluster-cluster or segment-segment
+overlap statistics provided by \code{\link{clusterCluster}} or
+\code{\link{segmentJaccard}}, where the a white-black gradient is
+calculated from \code{-log(p)}, and the text shows the overlap statistics,
+i.e., the number of overlapping features for \code{\link{clusterCluster}},
+or the Jaccard index for \code{\link{segmentJaccard}}. Note that two
+distinct p-value cutoffs can be visualyized: p-values \code{<=p.min}
+are shown in black, and p-values \code{p.txt} are shown in white instead
+of black text (thus becoming visible on the black of significant
+overlaps).
 }
