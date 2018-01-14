@@ -1451,7 +1451,7 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
 #' @param dir direction, "h" for horizontal (default), "v" for vertical
 #' @param ... arguments to \code{\link{image_matrix}}
 #' @export
-image_clustering <- function(cset, k=selected(cset), dir="h", ...) {
+plotClusterLegend <- function(cset, k=selected(cset), dir="h", ...) {
 
     ## sort colors by numeric cluster index
     cols <- lapply(cset$colors,
