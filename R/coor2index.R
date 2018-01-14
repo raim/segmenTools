@@ -183,7 +183,10 @@ removeCircularFeatures <- function(features,
 #'  \code{strandCol}).
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length
-#' information, see function \code{\link{getChrSum}}
+#' information; simply the cumulative lengths of ordered chrosomes,
+#' see function \code{\link{getChrSum}}
+#' @param chrMap a vector of chromosome names using \code{features}' chromosome
+#' column, in the same order as \code{chrS}
 #' @param cols name of the columns giving coordinates that will be mapped
 #' to continuous index
 #' @param chrCol name of the column that gives the chromosome number
@@ -192,7 +195,7 @@ removeCircularFeatures <- function(features,
 #' @param reverse a vector of possible reverse strand indicators
 #' @param circular suppresses re-sorting to start < end for circular chromosomes
 #' @export
-coor2index <- function(features, chrS,
+coor2index <- function(features, chrS, chrMap,
                        cols=c("start","end","coor"),
                        chrCol="chr", strandCol="strand",
                        reverse=c("-",-1), circular=FALSE) {
@@ -215,9 +218,17 @@ coor2index <- function(features, chrS,
         features[rev,"start"] <- features[rev,"end"]
         features[rev,"end"] <- ends
     }
+    ## chromosome of each feature
+    chr <- features[,chrCol]
+    ## map chromosomes to index
+    if ( !missing(chrMap) ) {
+        chrIdx <- 1:length(chrMap)
+        names(chrIdx) <- chrMap
+        chr <- chrIdx[as.character(chr)]
+    }
     ## convert to index
     for ( col in cols ) {
-        features[,col] <- features[,col]+chrS[features[,chrCol]]
+        features[,col] <- features[,col]+chrS[chr]
         minus <- strand%in%reverse
         features[minus,col] <- features[minus,col]+max(chrS)
     }
