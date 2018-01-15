@@ -43,6 +43,8 @@ option_list <- list(
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   ## OUTPUT
+  make_option(c("--fig.type"), type="character", default="png",
+              help="figure type (png, pdf, eps) [default %default]"),
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
   make_option(c("-v", "--verb"), type="integer", default=1, 
@@ -211,10 +213,11 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
 ## store data
-save(ovl, file=paste0(file.name,".RData"))
+if ( !interactive() ) 
+    save(ovl, file=paste0(file.name,".RData"))
 
 ## plot
-pdf(paste0(file.name,".pdf"))
+plotdev(paste0(file.name),type=fig.type)
 plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
 dev.off()
 
