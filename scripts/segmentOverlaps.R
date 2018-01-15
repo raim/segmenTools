@@ -3,11 +3,6 @@
 ## SEGMENT CLASSES OVERLAP STATISTIC
 ## by permutation test analysis
 
-
-## interactive debug: command-line call with parameters
-## R --args  -q /home/raim/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/analysis4/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3_annotated.csv --qclass mCL --tclass mCL --antisense --chrfile /home/raim/programs/tataProject/yeast/chromosomes/sequenceIndex_R64-1-1_20110208.csv -o test.Rdata
-## R --args -q /home/raim/work/yeastSeq2016/data/segmentation/segmentTest/20170307_merge/analysis4/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3/D.dft1-7.dcash.snr_T.raw_K.12_S.icor_E.3_M.200_nui.3_annotated.csv --qclass mCL -t /home/raim/programs/tataProject/yeast/feature_R64-1-1_20110208_withclusters.csv --tclass CL_rdx --antisense --chrfile /home/raim/programs/tataProject/yeast/chromosomes/sequenceIndex_R64-1-1_20110208.csv -o test.RData
-
 library(segmenTools)
 
 ## nicer timestamp
@@ -20,8 +15,6 @@ suppressPackageStartupMessages(library(optparse))
 option_list <- list(
   make_option(c("--chrfile"), type="character", default="",
               help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
-#  make_option(c("--chrfile"), type="character", default="",
-#              help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
   ## QUERY OPTIONS
   make_option(c("-q", "--query"), type="character", default="", 
               help="query set of chromosomal segments"),    
@@ -198,14 +191,17 @@ if ( antisense )
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 
-## TODO: calculate J_real>J_random
-## for all query classes vs. all target classes
-## allowing for sense:antisense test WITHIN same segments (query=target)
-
+## calculate Jaccard Index and permutation test
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
                       verb=1)
 
+if ( verb>0 )
+  msg(paste0("DONE\t",time(),"\n"))
+if ( verb>0 )
+  msg(paste0("writing results\n"))
+
+## write out results
 if ( tclass=="" ) tclass <- "all"
 if ( qclass=="" ) qclass <- "all"
 
@@ -214,10 +210,11 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
 ## store data
 if ( !interactive() ) 
-    save(ovl, file=paste0(file.name,".RData"))
+  save(ovl, file=paste0(file.name,".RData"))
 
 ## plot
-plotdev(paste0(file.name),type=fig.type)
-plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
-dev.off()
-
+if ( perm>0 ) {
+    plotdev(paste0(file.name),type=fig.type)
+    plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
+    dev.off()
+}
