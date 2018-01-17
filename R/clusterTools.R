@@ -972,6 +972,7 @@ plotBIC <- function(cls, norm=FALSE, ...) {
         ## normalize BIC by N and M
         bic <- bic/N/M
         icl <- icl/N/M
+        sel.bic <- sel.bic/N/M
         max.bic <- bic[as.character(max.clb)]
         max.icl <- icl[as.character(max.cli)]
     }
