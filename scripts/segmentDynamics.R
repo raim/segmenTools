@@ -91,6 +91,8 @@ option_list <- list(
   ##                help="seed for the random number generator before calling flowclust to get stable clustering results (TODO: set.seed, does it work for flowclust?)"),
   make_option(c("--K"), type="character", default="12:20", 
               help="number of clusters to use in flowClust, comma-separated list of integers and colon-separated ranges [default %default]"),
+  make_option(c("--fixedK"), type="integer", default=0, 
+              help="fixed number of clusters to select in flowClust, flowMerge will start from there [default %default]"),
   make_option("--B", type="integer", default=500, 
               help="maximal number of EM iterations of flowClust"),
   make_option("--tol", default=1e-5, 
@@ -501,7 +503,7 @@ for ( type in sgtypes ) {
 
 
     ## cluster by flowClust
-    fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K,
+    fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K, selected=fixedK,
                                    B=B, tol=tol, lambda=lambda, merge=merge,
                                    nu=nu, nu.est=nu.est, trans=trans)
 
