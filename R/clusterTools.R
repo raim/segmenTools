@@ -954,6 +954,7 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     ## cluster number with max BIC/ICL
     max.clb <- cls$max.clb
     max.cli <- cls$max.cli
+    sel <- as.numeric(sub("K:","",selected(cls,name=TRUE)))
 
     ## BIC/ICL
     bic <- cls$bic
@@ -961,23 +962,13 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     K <- as.numeric(names(bic))
     max.bic <- max(bic, na.rm=TRUE) # max BIC
     max.icl <- max(icl, na.rm=TRUE) # max ICL
-
+    sel.bic <- bic[as.character(sel)]
+    
     if ( norm ) {
-        ## TODO: add number of clustered data points
-        ## and size of clustered data to clustering object!
-        if ( "N"%in%names(cls) ) {
-            N <- cls$N
-        } else { # TODO: get rid of this; when N/M wasn't stored
-            N <- apply(cls$clusters,2,function(x) sum(x!=0))
-            N <- N[selected(cls, as.numeric(names(bic)))]
-        }
-        if ( "M"%in%names(cls) ) {
-            M <- cls$M
-        } else {
-            M <- 1
-            if ( "flowClust" %in% names(cls) )
-              M <- length(cls$flowClust[[1]]@varNames)
-        }
+        
+        N <- cls$N  # number of clustered data points
+        M <- cls$M  # data dimension
+
         ## normalize BIC by N and M
         bic <- bic/N/M
         icl <- icl/N/M
@@ -985,10 +976,19 @@ plotBIC <- function(cls, norm=FALSE, ...) {
         max.icl <- icl[as.character(max.cli)]
     }
 
-
+    ## legend
+    leg <- c("BIC","ICL","failed","max. BIC","max. ICL", "selected")
+    lpch <- c(1,1,4,4,4,19)
+    llty <- c(1,NA,NA,NA,NA,NA)
+    lcol <- c(1,4,2,1,4,2)
+    lcex <- c(1,.5,1,1.5,1,1.5)
+    
     ## flowMerge clusters present?
-    if ( !is.null(cls$merged.K) )
-      mrg.cl <- cls$merged.K 
+    if ( !is.null(cls$merged.K) ) {
+        mrg.cl <- cls$merged.K
+        mrg.orig <- cls$merged.origK
+        mrg.bic <- bic[as.character(mrg.orig)]
+    }
     
     plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",
          ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"), ...)
@@ -998,12 +998,11 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     abline(v=max.clb,lty=2)
     points(K, icl, col=4,cex=.5)
     points(max.cli, max.icl,lty=2,pch=4,cex=1,col=4)
-    legend("right",pch=c(1,1,4,4,4),lty=c(1,NA,NA,NA,NA),col=c(1,4,2,1,4),
-           legend=c("BIC","ICL","failed","max. BIC","max. ICL"),
-           pt.cex=c(1,.5,1,1.5,1))
+    points(sel, sel.bic, col=2, pch=19, cex=1.5)
+    legend("right",legend=leg,pch=lpch,lty=llty,col=lcol,pt.cex=lcex)
     if ( !is.null(cls$merged.K) ) {
-        arrows(x0=as.numeric(max.clb),y0=max.bic, x1=mrg.cl,y1=max.bic)
-        abline(v=mrg.cl,lty=2)
+        arrows(x0=mrg.orig,y0=mrg.bic, x1=mrg.cl,y1=mrg.bic)
+        abline(v=c(mrg.orig,mrg.cl),lty=2)
         text(mrg.cl, max.bic,"merge", pos=2,cex=.9)
     }
 }
