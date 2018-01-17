@@ -670,8 +670,10 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     if ( missing(k) )
       k <- selected(cset, name=TRUE)
 
-    recls <- tryCatch(stats::kmeans(tset$dat[!tset$rm.vals, ], centers = cset$centers[[k]], 
-                         algorithm = "Hartigan-Wong", ...),error = function(e) return(list(ifault=4))
+    recls <- tryCatch(stats::kmeans(tset$dat[!tset$rm.vals, ],
+                                    centers = cset$centers[[k]], 
+                                    algorithm ="Hartigan-Wong", ...),
+                      error = function(e) return(list(ifault=4))
     )    
 	## use alternative algo if this error occured
     warn <- NULL
@@ -715,8 +717,11 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     ## add name
     newKcol <- paste0(k,"_re")
     idx <- ncol(cset$clusters)
-    colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <- names(cset$colors)[idx] <- names(cset$centers)[idx] <- names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- newKcol
-    
+    colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <-
+      names(cset$colors)[idx] <- names(cset$centers)[idx] <-
+        names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- newKcol
+
+    cset$reclustered <- newKcol
     if ( select )
         cset$selected <- newKcol
     cset
@@ -954,17 +959,26 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     bic <- cls$bic
     icl <- cls$icl
     K <- as.numeric(names(bic))
-    max.bic <- max(bic,na.rm=TRUE) # max BIC
-    max.icl <- max(icl, na.rm=T)   # max ICL
+    max.bic <- max(bic, na.rm=TRUE) # max BIC
+    max.icl <- max(icl, na.rm=TRUE) # max ICL
 
     if ( norm ) {
         ## TODO: add number of clustered data points
         ## and size of clustered data to clustering object!
-        N <- apply(cls$clusters,2,function(x) sum(x!=0))
-        N <- N[selected(cls, as.numeric(names(bic)))]
-        M <- 1
-        if ( "flowClust" %in% names(cls) )
-            M <- length(cls$flowClust[[1]]@varNames)
+        if ( "N"%in%names(cls) ) {
+            N <- cls$N
+        } else { # TODO: get rid of this; when N/M wasn't stored
+            N <- apply(cls$clusters,2,function(x) sum(x!=0))
+            N <- N[selected(cls, as.numeric(names(bic)))]
+        }
+        if ( "M"%in%names(cls) ) {
+            M <- cls$M
+        } else {
+            M <- 1
+            if ( "flowClust" %in% names(cls) )
+              M <- length(cls$flowClust[[1]]@varNames)
+        }
+        ## normalize BIC by N and M
         bic <- bic/N/M
         icl <- icl/N/M
         max.bic <- bic[as.character(max.clb)]
@@ -981,6 +995,7 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     lines(K,bic)
     points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
     points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
+    abline(v=max.clb,lty=2)
     points(K, icl, col=4,cex=.5)
     points(max.cli, max.icl,lty=2,pch=4,cex=1,col=4)
     legend("right",pch=c(1,1,4,4,4),lty=c(1,NA,NA,NA,NA),col=c(1,4,2,1,4),
