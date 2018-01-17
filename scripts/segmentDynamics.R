@@ -550,7 +550,7 @@ for ( type in sgtypes ) {
     ## re-cluster with kmeans
     if ( recluster ) {
         fcset <- reCluster(tset, fcset, select=FALSE)
-        rselected <- selected(fcset)
+        rselected <- fcset$reclustered
         sgcls <- cbind.data.frame(sgcls, rCL=fcset$clusters[,rselected])
     }
 
