@@ -197,13 +197,14 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=
     colors <- grDevices::gray(seq(1,0,length.out=n))
     ## set up text (overlap numbers) and text colors
     type <- "" # TODO, add info to input results on the name of the statistics
-    if ( "jaccard"%in%names(x) ) {
+    if ( "overlap"%in%names(x) ) {
+        type <- "overlap"
+    } else if ( "jaccard"%in%names(x) ) {
         type <- "jaccard"
         short <- FALSE
         ## TODO: handle jaccard vs. hypergeo better
         ## and align scale/round/short options
     }
-    if ( "overlap"%in%names(x) ) type <- "overlap"
     txt <- x[[type]]
     if ( scale>1 ) txt <- txt*scale
     if ( !missing(round) ) txt <- round(txt,digits=round)
