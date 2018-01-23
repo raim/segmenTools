@@ -445,9 +445,15 @@ alignData <- function(coors, data, dst=500, chrS) {
   for ( i in firstcol:ncol(data) ) 
     geneData <- append(geneData,
                        list(t(apply(rng, 1, function(x) data[x,i]))))
-  ## relative coordinates
+
+  names(geneData) <- colnames(data)[firstcol:ncol(data)]
+    
+  ## relative coordinates as colnames
   xax <- -dst:dst
   geneData <- lapply(geneData, function(x) {colnames(x) <- xax; x})
-  
+
+  ## copy rownames
+  geneData <- lapply(geneData, function(x) {rownames(x) <- rownames(coors);x})
+
   return(geneData)
 }
