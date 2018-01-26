@@ -503,10 +503,18 @@ for ( type in sgtypes ) {
 
 
     ## cluster by flowClust
-    fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K, selected=fixedK,
+    testnew <- TRUE
+    if ( testnew ) {
+        merge <- FALSE
+        fcset <- clusterTimeseries2(tset, K=K, method="flowClust",
+                                   parameters=list(flowClust=c(B,tol,lambda,nu,
+                                                               nu.est,trans)))
+    } else {
+        fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K, selected=fixedK,
                                    B=B, tol=tol, lambda=lambda, merge=merge,
                                    nu=nu, nu.est=nu.est, trans=trans)
-
+    }
+    
     ## save all as RData
     ## temporary; until below is fixed
     #if ( save.rdata ) 

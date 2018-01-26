@@ -613,6 +613,11 @@ selected <- function(cset, K, name=TRUE) {
     if ( is.numeric(K) )
       kCol <- paste0("K:", K)
     else kCol <- K
+    ## add K
+    if ( length(grep("^K:",K))==0)
+        kCol <- paste0("K:", K)
+
+    # return
     if ( name )
         return(kCol)
     else
@@ -639,6 +644,238 @@ clusterColors <- function(cset, expand=TRUE, ...) {
     if ( expand )
         return(cset$colors[[K]][as.character(cset$clusters[,K])])
     else return(cset$colors[[K]][as.character(cset$sorting[[K]])])
+}
+
+
+#' Cluster a processed time-series with k-means or flowClust
+#' 
+#' A wrapper for clustering a time-series object \code{tset} provided by
+#' \code{\link{processTimeseries}},
+#' where specifically the DFT of a time-series and requested data
+#' transformation were calculated. The clustering is performed
+#' on the \code{tset$dat} matrix by \code{\link[stats:kmeans]{kmeans}} or
+#' model-based by packages \pkg{flowClust} & \pkg{flowMerge}.
+#' 
+#' This function attempts to combine the previous separate clustering
+#' wrappers from package \code{segmenTier}, \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}} and k-mean's based \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}, the latter of which is used for
+#' the segmenTier algorithm. Please see the corresponding help files for
+#' details on the clustering parameters in argument \code{parameters}.
+#' @param tset a timeseries processed by \code{\link{processTimeseries}}
+#' @param K selected cluster numbers, the argument \code{centers}
+#' of \code{\link[stats:kmeans]{kmeans}}
+#' @param selected
+#' @param parameters
+#' @param selected a pre-selected cluster number  which is then
+#' used as a start clustering for \code{flowMerge} (if option
+#' \code{merge==TRUE})
+#' @param nui.thresh threshold correlation of a data point to a cluster
+#' center; if below the data point will be added to nuissance cluster 0
+#' @param verb level of verbosity, 0: no output, 1: progress messages
+#' @param ... further parameters to \code{flowClust} or \code{\link[stats:kmeans]{kmeans}}
+#'@export
+clusterTimeseries2 <- function(tset, K=16, selected, method="flowClust",
+                               parameters=list(kmeans=c(iter.max=100000,
+                                                        nstart=100),
+                                               flowClust=c(B=500, tol=1e-5,
+                                                           lambda=1,
+                                                           nu=4, nu.est=0,
+                                                           trans=1,
+                                                           merge=FALSE)),
+                               nui.thresh=-Inf, verb=1, ...) {
+
+    if ( method=="flowClust" ) {
+        ## suppress parallel mode!
+        ncpu=1
+        oldcpu <- unlist(options("cores"))
+        oldcpu2 <- unlist(options("mc.cores"))
+        options(cores=ncpu)
+        options(mc.cores=ncpu)
+    }
+    
+    ## get time series data
+    id <- tset$id
+    dat <- tset$dat
+    rm.vals <- tset$rm.vals
+    N <- nrow(dat)
+
+    ## enought distinct values?
+    ## TODO: issue segment based on low-filter
+    ## OOR: postprocessing - extend segments into low levels?
+    warn <- NULL
+    if ( sum(!rm.vals)<10 ) 
+        warn <- "not enough data"
+    else if ( sum(!duplicated(dat[!rm.vals,]))<2 ) 
+        warn <- "not enough data diversity"
+    if ( !is.null(warn) ) {
+        warning(warn)
+        return(NULL)
+    }
+    
+    ## CLUSTERING
+    ## stored data
+    clusters <- matrix(NA, nrow=nrow(dat), ncol=length(K))
+    rownames(clusters) <- rownames(dat)
+    centers <- Pci <- Ccc <- rep(list(NA), length(K))
+
+    ## BIC/AIC 
+    bic <- rep(NA, length(K))
+    names(bic) <- as.character(K)
+    icl <- aic <- bic
+    
+    if ( verb>0 ) {
+        cat(paste("Timeseries N\t",N,"\n",sep=""))
+        cat(paste("Used datapoints\t",sum(!rm.vals),"\n",sep=""))
+    }
+    
+    usedk <- K
+    for ( k in 1:length(K) ) {
+        
+        ## get cluster number K
+        Kused <- min(c(K[k],sum(!duplicated(dat[!rm.vals,]))))
+        
+        if ( verb>0 )
+            cat(paste("Clusters K\t", Kused, "\n",sep=""))
+        
+        ## cluster
+        if ( method=="kmeans" ) {
+
+            iter.max <- parameters$kmeans["iter.max"]
+            nstart <- parameters$kmeans["nstart"]
+            
+            km <- stats::kmeans(dat[!rm.vals,], Kused, iter.max=iter.max,
+                                nstart=nstart, algorithm="Hartigan-Wong", ...)
+            ## use alternative algo if this error occured
+            if (km$ifault==4) {
+                km <- stats::kmeans(dat[!rm.vals,], Kused,
+                                    iter.max=iter.max,nstart=nstart,
+                                    algorithm="MacQueen")
+                warn <- "quick-transfer error in kmeans algorithm Hartigan-Wong, taking MacQueen"
+                warning(warn)
+            }
+        
+            ## prepare cluster sequence
+            seq <- rep(0, N) ## init. to nuissance cluster 0
+            seq[!rm.vals] <- km$cluster
+            
+            ## store which K was used, the clustering and cluster centers
+            usedk[k] <- Kused
+            clusters[,k] <- seq
+            centers[[k]] <- km$centers
+            
+            ## calculate BIC/AIC
+            bic[k] <- stats::BIC(km)
+            aic[k] <- stats::AIC(km)
+
+        } else if ( method=="flowClust" ) {
+            
+            B <- parameters$flowClust["B"]
+            tol <- parameters$flowClust["tol"]
+            lambda <- parameters$flowClust["lambda"]
+            nu <- parameters$flowClust["nu"]
+            nu.est <- parameters$flowClust["nu.est"]
+            trans <- parameters$flowClust["trans"]
+
+            cat(paste("lambda", lambda, "\n"))
+
+            fc <- flowClust::flowClust(dat[!rm.vals,], K=Kused, B=B, tol=tol,
+                                         lambda=lambda,
+                                         nu=nu, nu.est=nu.est, trans=trans,...)
+
+
+            ## prepare cluster sequence
+            seq <- rep(0, N) ## init. to nuissance cluster 0
+            seq[!rm.vals] <- flowClust::Map(fc,rm.outliers=F)
+            
+            ## store which K was used, the clustering and cluster centers
+            usedk[k] <- as.character(fc@K)
+            clusters[,k] <- seq
+
+            ## get cluster centers!
+            x <- fc@mu
+            rownames(x) <- 1:nrow(x)
+            colnames(x) <- colnames(dat)
+            centers[[k]] <- x
+
+            ## BIC/ICL
+            bic[k] <- fc@BIC
+            icl[k] <- fc@ICL
+
+        }
+
+        ## C(c,c) - cluster X cluster cross-correlation matrix
+        cr <- stats::cor(t(centers[[k]]))
+
+        Ccc[[k]] <- cr
+        
+        ## P(c,i) - position X cluster correlation
+        P <- matrix(NA,nrow=N,ncol=Kused)
+        P[!rm.vals,] <- segmenTier::clusterCor_c(dat[!rm.vals,], centers[[k]])
+
+        Pci[[k]] <- P
+
+    }
+
+    ## re-assign by correlation threshold
+    ## NOTE: this only affects scoring function ccor
+    for ( k in 1:ncol(clusters) ) {
+        cls <- clusters[,k]
+        for ( p in 1:nrow(Pci[[k]]) )
+            if ( !any(Pci[[k]][p,] > nui.thresh, na.rm=TRUE) )
+                cls[p] <- 0
+        clusters[,k] <- cls
+    }           
+    
+    ## count duplicate K
+    if ( any(duplicated(K)) ) {
+        sel <- paste(K,".1",sep="")
+        cnt <- 2
+        while( sum(duplicated(sel)) ) {
+            sel[duplicated(sel)] <- sub("\\..*",paste(".",cnt,sep=""),
+                                        sel[duplicated(sel)])
+            cnt <- cnt+1
+        }
+        K <- sub("\\.1$","",sel)
+    }
+    ## name all results by K, will be used!
+    colnames(clusters) <- names(centers) <-
+        names(Pci) <- names(Ccc) <- paste("K:",K,sep="") #paste(id,"_K:",K,sep="")
+
+    ## max BIC and ICL
+    max.bic <- max(bic, na.rm=T)
+    max.clb <- K[which(bic==max.bic)[1]]
+    max.aic <- max(aic, na.rm=T)
+    max.cla <- K[which(aic==max.aic)[1]]
+    max.icl <- max(icl, na.rm=T)
+    max.cli <- K[which(icl==max.icl)[1]]
+    ## best K selection
+    ## use K with max BIC
+    selected <- max.clb
+    
+    ## clustering data set for use in segmentCluster.batch 
+    cset <- list(clusters=clusters, 
+                 N=sum(!rm.vals), # number of clustered data
+                 M=ncol(dat), # dimension of clustered data
+                 centers=centers, Pci=Pci, Ccc=Ccc,
+                 K=K, usedk=usedk, selected=selected,
+                 bic=bic, aic=aic, icl=icl,
+                 max.clb=max.clb, max.cla=max.cla, max.cli=max.cli,
+                 warn=warn, ids=colnames(clusters),
+                 tsid=rep(id,ncol(clusters)))
+    class(cset) <- "clustering"
+
+    ## add cluster colors
+    cset <- colorClusters(cset)
+
+
+    ##
+    if ( method=="flowClust" ) {
+        options(cores=oldcpu)
+        options(mc.cores=oldcpu2)
+    }
+
+    
+    ## silent return
+    tmp <- cset
 }
 
 #' re-cluster clustering by \code{\link[stats:kmeans]{kmeans}}
