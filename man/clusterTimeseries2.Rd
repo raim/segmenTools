@@ -4,20 +4,25 @@
 \alias{clusterTimeseries2}
 \title{Cluster a processed time-series with k-means or flowClust}
 \usage{
-clusterTimeseries2(tset, K = 16, selected, method = "flowClust",
-  parameters = list(kmeans = c(iter.max = 1e+05, nstart = 100), flowClust =
-  c(B = 500, tol = 1e-05, lambda = 1, nu = 4, nu.est = 0, trans = 1, merge =
-  FALSE)), nui.thresh = -Inf, verb = 1, ...)
+clusterTimeseries2(tset, K = 16, method = "flowClust", selected,
+  parameters = c(iter.max = 1e+05, nstart = 100, B = 500, tol = 1e-05, lambda
+  = 1, nu = 4, nu.est = 0, trans = 1, merge = FALSE), nui.thresh = -Inf,
+  verb = 1, ...)
 }
 \arguments{
-\item{tset}{a timeseries processed by \code{\link{processTimeseries}}}
+\item{tset}{a timeseries processed by \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
 
 \item{K}{selected cluster numbers, the argument \code{centers}
 of \code{\link[stats:kmeans]{kmeans}}}
 
+\item{method}{string specifying the clustering algorithm to use}
+
 \item{selected}{a pre-selected cluster number  which is then
 used as a start clustering for \code{flowMerge} (if option
 \code{merge==TRUE})}
+
+\item{parameters}{named vector of parameters for clustering algorithms,
+currently ALL required parameters MUST be specified}
 
 \item{nui.thresh}{threshold correlation of a data point to a cluster
 center; if below the data point will be added to nuissance cluster 0}
@@ -28,7 +33,7 @@ center; if below the data point will be added to nuissance cluster 0}
 }
 \description{
 A wrapper for clustering a time-series object \code{tset} provided by
-\code{\link{processTimeseries}},
+\code{\link[segmenTier:processTimeseries]{processTimeseries}},
 where specifically the DFT of a time-series and requested data
 transformation were calculated. The clustering is performed
 on the \code{tset$dat} matrix by \code{\link[stats:kmeans]{kmeans}} or

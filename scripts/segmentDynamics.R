@@ -507,8 +507,9 @@ for ( type in sgtypes ) {
     if ( testnew ) {
         merge <- FALSE
         fcset <- clusterTimeseries2(tset, K=K, method="flowClust",
-                                   parameters=list(flowClust=c(B,tol,lambda,nu,
-                                                               nu.est,trans)))
+                                   parameters=c(B=B,tol=tol,lambda=lambda,
+                                                nu=nu,nu.est=nu.est,
+                                                trans=trans))
     } else {
         fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K, selected=fixedK,
                                    B=B, tol=tol, lambda=lambda, merge=merge,

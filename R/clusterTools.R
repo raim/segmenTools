@@ -650,7 +650,7 @@ clusterColors <- function(cset, expand=TRUE, ...) {
 #' Cluster a processed time-series with k-means or flowClust
 #' 
 #' A wrapper for clustering a time-series object \code{tset} provided by
-#' \code{\link{processTimeseries}},
+#' \code{\link[segmenTier:processTimeseries]{processTimeseries}},
 #' where specifically the DFT of a time-series and requested data
 #' transformation were calculated. The clustering is performed
 #' on the \code{tset$dat} matrix by \code{\link[stats:kmeans]{kmeans}} or
@@ -660,11 +660,12 @@ clusterColors <- function(cset, expand=TRUE, ...) {
 #' wrappers from package \code{segmenTier}, \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}} and k-mean's based \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}, the latter of which is used for
 #' the segmenTier algorithm. Please see the corresponding help files for
 #' details on the clustering parameters in argument \code{parameters}.
-#' @param tset a timeseries processed by \code{\link{processTimeseries}}
+#' @param tset a timeseries processed by \code{\link[segmenTier:processTimeseries]{processTimeseries}}
 #' @param K selected cluster numbers, the argument \code{centers}
 #' of \code{\link[stats:kmeans]{kmeans}}
-#' @param selected
-#' @param parameters
+#' @param method string specifying the clustering algorithm to use
+#' @param parameters named vector of parameters for clustering algorithms,
+#' currently ALL required parameters MUST be specified
 #' @param selected a pre-selected cluster number  which is then
 #' used as a start clustering for \code{flowMerge} (if option
 #' \code{merge==TRUE})
@@ -673,14 +674,11 @@ clusterColors <- function(cset, expand=TRUE, ...) {
 #' @param verb level of verbosity, 0: no output, 1: progress messages
 #' @param ... further parameters to \code{flowClust} or \code{\link[stats:kmeans]{kmeans}}
 #'@export
-clusterTimeseries2 <- function(tset, K=16, selected, method="flowClust",
-                               parameters=list(kmeans=c(iter.max=100000,
-                                                        nstart=100),
-                                               flowClust=c(B=500, tol=1e-5,
-                                                           lambda=1,
-                                                           nu=4, nu.est=0,
-                                                           trans=1,
-                                                           merge=FALSE)),
+clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected, 
+                               parameters=c(iter.max=100000, nstart=100,
+                                            B=500, tol=1e-5, lambda=1,
+                                            nu=4, nu.est=0, trans=1,
+                                            merge=FALSE),
                                nui.thresh=-Inf, verb=1, ...) {
 
     if ( method=="flowClust" ) {
@@ -739,8 +737,8 @@ clusterTimeseries2 <- function(tset, K=16, selected, method="flowClust",
         ## cluster
         if ( method=="kmeans" ) {
 
-            iter.max <- parameters$kmeans["iter.max"]
-            nstart <- parameters$kmeans["nstart"]
+            iter.max <- parameters["iter.max"]
+            nstart <- parameters["nstart"]
             
             km <- stats::kmeans(dat[!rm.vals,], Kused, iter.max=iter.max,
                                 nstart=nstart, algorithm="Hartigan-Wong", ...)
@@ -767,15 +765,16 @@ clusterTimeseries2 <- function(tset, K=16, selected, method="flowClust",
             aic[k] <- stats::AIC(km)
 
         } else if ( method=="flowClust" ) {
-            
-            B <- parameters$flowClust["B"]
-            tol <- parameters$flowClust["tol"]
-            lambda <- parameters$flowClust["lambda"]
-            nu <- parameters$flowClust["nu"]
-            nu.est <- parameters$flowClust["nu.est"]
-            trans <- parameters$flowClust["trans"]
 
-            cat(paste("lambda", lambda, "\n"))
+            ## TODO: defaults if missing
+            B <- parameters["B"]
+            tol <- parameters["tol"]
+            lambda <- parameters["lambda"]
+            nu <- parameters["nu"]
+            nu.est <- parameters["nu.est"]
+            trans <- parameters["trans"]
+
+            #cat(paste("lambda", lambda, "\n"))
 
             fc <- flowClust::flowClust(dat[!rm.vals,], K=Kused, B=B, tol=tol,
                                          lambda=lambda,
@@ -864,7 +863,7 @@ clusterTimeseries2 <- function(tset, K=16, selected, method="flowClust",
     class(cset) <- "clustering"
 
     ## add cluster colors
-    cset <- colorClusters(cset)
+    cset <- segmenTier::colorClusters(cset)
 
 
     ##
