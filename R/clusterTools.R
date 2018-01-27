@@ -1188,18 +1188,16 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' @export
 plotBIC <- function(cls, norm=FALSE, ...) {
     
-    ## cluster number with max BIC/ICL
-    max.clb <- cls$max.clb
-    max.cli <- cls$max.cli
-    sel <- as.numeric(sub("K:","",selected(cls,name=TRUE)))
-
     ## BIC/ICL
     bic <- cls$bic
     icl <- cls$icl
     K <- as.numeric(names(bic))
     max.bic <- max(bic, na.rm=TRUE) # max BIC
     max.icl <- max(icl, na.rm=TRUE) # max ICL
-    sel.bic <- bic[as.character(sel)]
+    max.clb <- K[which(cls$K==cls$max.clb)]
+    max.cli <- K[which(cls$K==cls$max.cli)]
+    sel.bic <- bic[which(cls$K==cls$selected)]
+    sel <- K[which(cls$K==cls$selected)]
     
     if ( norm ) {
         
