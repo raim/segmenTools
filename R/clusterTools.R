@@ -1106,7 +1106,8 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
                   y = rd * sin(theta) + ori.line)
         }       
      }
-    list(bc=bc, lambda=lambda)
+    ## silent return
+    invisible(list(bc=bc, lambda=lambda))
 }
 
 
