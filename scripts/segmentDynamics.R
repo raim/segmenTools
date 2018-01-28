@@ -590,6 +590,14 @@ for ( type in sgtypes ) {
     plotBIC(fcset, norm=TRUE)
     dev.off()
      
+    ## plot DFT
+    file.name <- file.path(out.path,paste(fname,"_DFT",sep=""))
+    plotdev(file.name,type=fig.type,res=300,
+            width=round(length(dft.range)),height=4)
+    par(mfcol=c(2,round(length(dft.range)/2)),
+        mai=c(.5,.5,0,0),mgp=c(1.5,.5,0),tcl=-.3)
+    plotDFT(tset, fcset, cycles=dft.range)
+    dev.off()
     ## RESORT CLUSTERING
     ## TODO: sort by phase and re-cluster; use vector phs
     ## of average segment phases!
