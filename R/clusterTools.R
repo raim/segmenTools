@@ -955,15 +955,17 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
 
     ## TODO: BIC, ICL? calculate or add NA
 
+    cset$K <- c(cset$K, paste0(K,"_re")) # character: pre-selected K.duplicates
+    cset$usedk <- c(cset$usedk, K) # numeric: actual K used
+
     ## add name
     newKcol <- paste0(k,"_re")
     idx <- ncol(cset$clusters)
     colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <-
       names(cset$colors)[idx] <- names(cset$centers)[idx] <-
-        names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- newKcol
+        names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <-
+        names(cset$usedk)[idx] <- newKcol
 
-    cset$K <- c(cset$K, paste0(K,"_re")) # character: pre-selected K.duplicates
-    cset$usedk <- c(cset$usedk, K) # numeric: actual K used
 
 
     cset$reclustered <- newKcol
@@ -1044,10 +1046,15 @@ mergeCluster <- function(tset, cset, selected) {
             cset$usedk <- c(cset$usedk, mrg.cl)
             cset$K <- c(cset$K, mrg.id)
             
+            cset$merged <- mrg.id
+            cset$merged.K <- mrg.cl
+            cset$merged.origK <- cset$usedk[selected(cset)]
+
             ## add name
             idx <- ncol(cset$clusters)
             colnames(cset$clusters)[idx] <- names(cset$centers)[idx] <-
-              names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- mrg.id
+              names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <-
+                names(cset$usedk)[idx] <- mrg.id
 
             ## add sorting and colors!
             ## tmp: remove old sorting and colors and redo all
@@ -1056,9 +1063,6 @@ mergeCluster <- function(tset, cset, selected) {
             cset$colors <- NULL
             cset <- segmenTier::colorClusters(cset)
 
-            cset$merged <- mrg.id
-            cset$merged.K <- mrg.cl
-            cset$merged.origK <- selected
             
             cset$results <- append(cset$results,obj)
         } else cat(paste("error: flowObj failed\n")) 
@@ -1295,6 +1299,7 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     bic <- cls$bic
     icl <- cls$icl
     K <- as.numeric(names(bic))
+    krng <- range(K)
     max.bic <- max(bic, na.rm=TRUE) # max BIC
     max.icl <- max(icl, na.rm=TRUE) # max ICL
     max.clb <- K[which(cls$K==cls$max.clb)]
@@ -1327,10 +1332,13 @@ plotBIC <- function(cls, norm=FALSE, ...) {
         mrg.cl <- cls$merged.K
         mrg.orig <- cls$merged.origK
         mrg.bic <- bic[as.character(mrg.orig)]
+        krng <- range(c(krng,mrg.orig,mrg.cl))
     }
     
-    plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",
-         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"), ...)
+    plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",xlim=krng,
+         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"), axes=F, ...)
+    axis(2)
+    axis(1,at=1:max(krng))
     lines(K,bic)
     points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
     points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
