@@ -536,7 +536,7 @@ for ( type in sgtypes ) {
     max.icl <- max(icl, na.rm=T)   # max ICL
 
     ## store cluster number, max BIC, numbers of clustered and total segments
-    usedk <- as.numeric(sub("K:","",selected))
+    usedk <- fcset$usedk[selected] # NOTE: 
     clnum[type,] <- c(K=usedk, BIC=max.bic,
                       NUMCL=sum(!tset$rm.vals), TOT=nrow(avg))
 
@@ -547,6 +547,7 @@ for ( type in sgtypes ) {
 
     ## add flowMerge result
     if ( merge ) {
+        fcset <- mergeCluster(tset, fcset, selected=selected(fcset))
         mselected <- fcset$merged # cluster number of merged clustering
         if ( !is.null(mselected) ) {
             mcls <- fcset$clusters[,mselected] # clusters of merged clustering
