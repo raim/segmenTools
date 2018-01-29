@@ -435,17 +435,20 @@ for ( type in sgtypes ) {
         sgrain <- read.delim(file.path(with.rain,paste0(fname,"_rain.csv")),
                            row.names=1)[as.character(sgs[,"ID"]),]
 
+        ## FILTER
+        unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
+
+        ## plot
         ## TODO: this is used in paper; make fit for supplementary material
         file.name <- file.path(out.path,paste(fname,"_rain_pvalues",sep=""))
         plotdev(file.name,width=4,height=4,type=fig.type,res=300)
         rpcdf <- ecdf(sgrain[,"pVal"])
         plot(rpcdf)
         points(pval.thresh.sig,rpcdf(pval.thresh.sig))
+        legend("top",legend=paste0(sum(!unsigr), " segments"))
         dev.off()
         #plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
 
-        ## FILTER
-        unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
     }
     ## use prior permutation calculation as filter
     unsigp <- rep(FALSE, nrow(avg))
@@ -453,16 +456,19 @@ for ( type in sgtypes ) {
         sgdft <- read.delim(file.path(with.permutation,
                                       paste0(fname,"_fourier.csv")),
                             row.names=1)[as.character(sgs[,"ID"]),]
+        ## FILTER
+        sgdft[is.na(sgdft[,"X2_p"]),"X2_p"] <- 1
+        unsigp <- sgdft[,"X2_p"] >= pval.thresh.sig
+
+        ## plot
         file.name <- file.path(out.path,paste(fname,"_permutation_pvalues",sep=""))
         plotdev(file.name,width=4,height=4,type=fig.type,res=300)
         ppcdf <- ecdf(sgdft[,"X2_p"]) ## TODO: this must be argument
         plot(ppcdf)
         points(pval.thresh.sig,ppcdf(pval.thresh.sig))
+        legend("top",legend=paste0(sum(!unsigp), " segments"))
         dev.off()
         
-        ## FILTER
-        sgdft[is.na(sgdft[,"X2_p"]),"X2_p"] <- 1
-        unsigp <- sgdft[,"X2_p"] >= pval.thresh.sig
      }
 
     ## FILTER: maximally three expressed time-points per segment
