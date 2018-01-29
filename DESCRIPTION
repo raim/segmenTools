@@ -7,7 +7,8 @@ Depends:
     R (>= 3.2.3)
 Suggests:
     segmenTier, 
-    farms
+    farms,
+    flowMerge, flowClust, flowCore
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
