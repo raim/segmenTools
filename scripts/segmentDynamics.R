@@ -610,21 +610,39 @@ for ( type in sgtypes ) {
     ## cset <- colorClusters(cset)
 
     ## plot best BIC
-    file.name <- file.path(out.path,paste(fname,"_osc_",selected,sep=""))
+    file.name <- file.path(out.path,paste0(fname,"_osc_",selected))
     plotdev(file.name,width=4,height=9,type=fig.type,res=300)
     plotClusters(pset,fcset,k=selected,norm="meanzero")
     dev.off()
     ## plot merged
     if ( merge & !is.null(mselected) ) {
-        file.name <- file.path(out.path,paste(fname, "_osc_",mselected,sep=""))
+        file.name <- file.path(out.path,paste0(fname, "_osc_",mselected))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
         plotClusters(pset,fcset,k=mselected,norm="meanzero")
+        dev.off()
+        ## plot DFT
+        file.name <- file.path(out.path,paste0(fname,"_DFT_",mselected))
+        plotdev(file.name,type=fig.type,res=300,
+                width=round(length(dft.range)),height=4)
+        par(mfcol=c(2,round(length(dft.range)/2)),
+            mai=c(.5,.5,0.1,0),mgp=c(1.5,.5,0),tcl=-.3)
+        tmp<-fcset;tmp$selected <- mselected
+        plotDFT(tset, tmp, cycles=dft.range, pch=1, cex=.5)
         dev.off()
     }
     if ( recluster ) {
         file.name <- file.path(out.path,paste(fname, "_osc_",rselected,sep=""))
         plotdev(file.name,width=4,height=9,type=fig.type,res=300)
         plotClusters(pset,fcset,k=rselected,norm="meanzero")
+        dev.off()
+        ## plot DFT
+        file.name <- file.path(out.path,paste0(fname,"_DFT_",rselected))
+        plotdev(file.name,type=fig.type,res=300,
+                width=round(length(dft.range)),height=4)
+        par(mfcol=c(2,round(length(dft.range)/2)),
+            mai=c(.5,.5,0.1,0),mgp=c(1.5,.5,0),tcl=-.3)
+        tmp<-fcset;tmp$selected <- rselected
+        plotDFT(tset, tmp, cycles=dft.range, pch=1, cex=.5)
         dev.off()
     }
  }
