@@ -789,7 +789,7 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
             seq[!rm.vals] <- flowClust::Map(fc,rm.outliers=F)
             
             ## store which K was used, the clustering and cluster centers
-            usedk[k] <- as.character(fc@K)
+            usedk[k] <- fc@K
             clusters[,k] <- seq
 
             ## get cluster centers!
@@ -819,8 +819,6 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
 
     }
 
-    ## TODO: flowMerge and reCluster here, or merge all above?
-    
     ## re-assign by correlation threshold
     ## NOTE: this only affects scoring function ccor
     for ( k in 1:ncol(clusters) ) {
@@ -844,7 +842,7 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
     }
     ## name all results by K, will be used!
     colnames(clusters) <- names(centers) <- names(results) <- 
-        names(Pci) <- names(Ccc) <- paste0("K:",K) 
+        names(Pci) <- names(Ccc) <- names(usedk) <- paste0("K:",K) 
 
     ## max BIC and ICL
     max.bic <- max(bic, na.rm=T)
@@ -870,7 +868,7 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
                  method=method, results=results)
     class(cset) <- "clustering"
 
-    ## add cluster colors
+    ## add cluster sorting & colors
     cset <- segmenTier::colorClusters(cset)
 
 
@@ -940,8 +938,6 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
     K <- nrow(cset$centers[[k]])
     N <- length(cls)
     ## add cluster data
-    cset$K <- c(cset$K, K)
-    cset$usedk <- c(cset$usedk, K)
     ## cluster centers
     cset$centers <- append(cset$centers, list(recls$centers))
     ## C(c,c) - cluster X cluster cross-correlation matrix
@@ -966,12 +962,100 @@ reCluster <- function(tset, cset, k, select=TRUE, ...) {
       names(cset$colors)[idx] <- names(cset$centers)[idx] <-
         names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- newKcol
 
+    cset$K <- c(cset$K, paste0(K,"_re")) # character: pre-selected K.duplicates
+    cset$usedk <- c(cset$usedk, K) # numeric: actual K used
+
+
     cset$reclustered <- newKcol
     if ( select )
         cset$selected <- newKcol
     cset
 
 }
+
+## TODO: use flowMerge to merge selected or best BIC clustering
+## from cset (clusterTimeseries2)
+#' using \pgk{flowMerge} to merge clusterings 
+#' @param tset the `timeseries' object from segmenTier's
+#' \code{\link[segmenTier:processTimeseries]{processTimeseries}} used
+#' for initial clustering
+#' @param cset the `clustering' object from segmenTier's 
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
+#' @param selected optional pre-selection of clustering to merge; if missing
+#' the pre-selected clustering (usually max. BIC)  in \code{cset} will be used
+#'@export
+mergeCluster <- function(tset, fcls, selected) {
+
+    if ( missing(selected) )
+        selected <- selected(fcls)
+
+    ## get original data
+    dat <- tset$dat
+    rm.vals <- tset$rm.vals
+    clsDat <- dat[!rm.vals,]
+
+    ## MERGE CLUSTERS, starting from best BIC by flowMerge
+    mrg.orig <- mrg.cl <- mrg.id <-  mrg.nm <- obj <- NULL
+
+    ## get start clustering
+    K <- fcls$K
+    fc <- fcls$results[[selected]]
+
+
+    ## prepare results
+    mcls <- rep(0, nrow(dat))
+    mrg.id <- mrg.nm <- mrg.cl <- "NA"
+
+    ## initiate flowMerge object
+    obj <- try(flowMerge::flowObj(fc, flowCore::flowFrame(clsDat)))
+
+    ## start flowMerge
+    if ( class(obj)!="try-error" ) {
+        mrg <- try(flowMerge::merge(obj))
+        if ( class(mrg)!="try-error" ) {
+            mrg.cl <- flowMerge::fitPiecewiseLinreg(mrg)
+            obj <- mrg[[mrg.cl]]
+            mcls[!rm.vals] <- flowClust::Map(obj, rm.outliers=F)
+            mrg.id <- paste0(selected,"m",mrg.cl) # merged K
+            mrg.nm <- paste0(selected,"m",mrg.cl) # final column name
+
+            ## NOTE/TODO: rownames of obj@mu contain merge info
+            ## where else? use to get consistent names?
+            ## perhaps in mtree structure?
+            ## see plot(obj@mtree)
+            centers <- obj@mu
+            rownames(centers) <- 1:nrow(centers) # new cluster labels in row order
+            colnames(centers) <- colnames(clsDat)
+            
+            ## add clusters to matrix
+            fcls$clusters <- cbind(fcls$clusters, mcls)
+
+            ## add cluster sorting, colors, centers, Ccc, Pci
+            fcls$centers <- append(fcls$centers, list(centers))
+            ## C(c,c) - cluster X cluster cross-correlation matrix
+            fcls$Ccc <- append(fcls$Ccc, list(stats::cor(t(centers))))
+            ## P(c,i) - position X cluster correlation
+            P <- matrix(NA,nrow=nrow(dat), ncol=mrg.cl)
+            P[!tset$rm.vals,] <-
+                segmenTier::clusterCor_c(tset$dat[!tset$rm.vals,],
+                                         centers)
+            cset$Pci <- append(cset$Pci, list(P))
+
+            fcls$usedk <- c(fcls$usedk, mrg.cl)
+            fcls$K <- c(fcls$K, mrg.id)
+         
+            ## add name
+            idx <- ncol(cset$clusters)
+            colnames(cset$clusters)[idx] <- names(cset$sorting)[idx] <-
+                names(cset$colors)[idx] <- names(cset$centers)[idx] <-
+                names(cset$Ccc)[idx] <- names(cset$Pci)[idx] <- mrg.id
+
+            fcls$results <- append(fcls$results,obj)
+        } ## TODO: error message?
+    } ## TODO: error message?
+    return(fcls)
+}
+
 
 ## TODO; finish implementation
 ## sort clusters by time series phase
