@@ -1058,7 +1058,8 @@ mergeCluster <- function(tset, cset, selected) {
 
             cset$merged <- mrg.id
             cset$merged.K <- mrg.cl
-
+            cset$merged.origK <- selected
+            
             cset$results <- append(cset$results,obj)
         } else cat(paste("error: flowObj failed\n")) 
     } else cat(paste("error: merge failed\n")) 
