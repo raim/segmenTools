@@ -713,7 +713,7 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
     ## stored data
     clusters <- matrix(NA, nrow=nrow(dat), ncol=length(K))
     rownames(clusters) <- rownames(dat)
-    centers <- Pci <- Ccc <- rep(list(NA), length(K))
+    results <- centers <- Pci <- Ccc <- rep(list(NA), length(K))
 
     ## BIC/AIC 
     bic <- rep(NA, length(K))
@@ -764,6 +764,9 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
             bic[k] <- stats::BIC(km)
             aic[k] <- stats::AIC(km)
 
+            ## store full results from kmeans
+            results[[k]] <- km
+
         } else if ( method=="flowClust" ) {
 
             ## TODO: defaults if missing
@@ -799,6 +802,8 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
             bic[k] <- fc@BIC
             icl[k] <- fc@ICL
 
+            ## store full result object from flowCluster
+            results[[k]] <- fc
         }
 
         ## C(c,c) - cluster X cluster cross-correlation matrix
@@ -814,6 +819,8 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
 
     }
 
+    ## TODO: flowMerge and reCluster here, or merge all above?
+    
     ## re-assign by correlation threshold
     ## NOTE: this only affects scoring function ccor
     for ( k in 1:ncol(clusters) ) {
@@ -829,15 +836,15 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
         sel <- paste(K,".1",sep="")
         cnt <- 2
         while( sum(duplicated(sel)) ) {
-            sel[duplicated(sel)] <- sub("\\..*",paste(".",cnt,sep=""),
+            sel[duplicated(sel)] <- sub("\\..*",paste0(".",cnt),
                                         sel[duplicated(sel)])
             cnt <- cnt+1
         }
         K <- sub("\\.1$","",sel)
     }
     ## name all results by K, will be used!
-    colnames(clusters) <- names(centers) <-
-        names(Pci) <- names(Ccc) <- paste("K:",K,sep="") #paste(id,"_K:",K,sep="")
+    colnames(clusters) <- names(centers) <- names(results) <- 
+        names(Pci) <- names(Ccc) <- paste0("K:",K) 
 
     ## max BIC and ICL
     max.bic <- max(bic, na.rm=T)
@@ -859,7 +866,8 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
                  bic=bic, aic=aic, icl=icl,
                  max.clb=max.clb, max.cla=max.cla, max.cli=max.cli,
                  warn=warn, ids=colnames(clusters),
-                 tsid=rep(id,ncol(clusters)))
+                 tsid=rep(id,ncol(clusters)),
+                 method=method, results=results)
     class(cset) <- "clustering"
 
     ## add cluster colors
