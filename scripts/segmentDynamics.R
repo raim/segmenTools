@@ -546,6 +546,7 @@ for ( type in sgtypes ) {
 
 
     ## add flowMerge result
+    mselected <- NULL
     if ( merge ) {
         fcset <- mergeCluster(tset, fcset, selected=selected(fcset))
         mselected <- fcset$merged # cluster number of merged clustering
