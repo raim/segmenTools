@@ -598,7 +598,7 @@ for ( type in sgtypes ) {
             width=round(length(dft.range)),height=4)
     par(mfcol=c(2,round(length(dft.range)/2)),
         mai=c(.5,.5,0,0),mgp=c(1.5,.5,0),tcl=-.3)
-    plotDFT(tset, fcset, cycles=dft.range)
+    plotDFT(tset, fcset, cycles=dft.range, pch=19, cex=.5)
     dev.off()
     ## RESORT CLUSTERING
     ## TODO: sort by phase and re-cluster; use vector phs
