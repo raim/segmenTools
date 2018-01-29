@@ -194,7 +194,7 @@ if ( verb>0 )
 load(datafile)
 
 ## set missing read range to all!
-if ( length(read.rng)==0 | is.na(read.rng) ) 
+if ( length(read.rng)==0 | any(is.na(read.rng)) ) 
   read.rng <- 1:ncol(ts)
 
 
