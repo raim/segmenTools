@@ -4,8 +4,8 @@
 \alias{plotSingles}
 \title{plot indivividual time series in cluster context}
 \usage{
-plotSingles(x, cls, goi, grep = FALSE, each, lwd = 2, leg.xy = "topleft",
-  y.intersp = 1, ...)
+plotSingles(x, cls, goi, grep = FALSE, each = TRUE, plot.legend = each,
+  lwd = 2, leg.xy = "topleft", y.intersp = 1, ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
@@ -23,6 +23,9 @@ match (as argument \code{pattern} in
 \code{\link[base:grep]{grep}}) instead of perfect matches}
 
 \item{each}{plot separate panels for each cluster}
+
+\item{plot.legend}{logical indicating whether to plot feature names in a
+legend}
 
 \item{lwd}{line width of single time-series}
 

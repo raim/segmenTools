@@ -1372,6 +1372,8 @@ plotBIC <- function(cls, norm=FALSE, ...) {
 #' match (as argument \code{pattern} in
 #' \code{\link[base:grep]{grep}}) instead of perfect matches
 #' @param each plot separate panels for each cluster
+#' @param plot.legend logical indicating whether to plot feature names in a
+#' legend
 #' @param lwd line width of single time-series
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
@@ -1380,7 +1382,7 @@ plotBIC <- function(cls, norm=FALSE, ...) {
 #' @param ... arguments to \code{\link{plotClusters}}
 #' @export
 plotSingles <- function(x, cls, goi, grep=FALSE,
-                        each, lwd=2,
+                        each=TRUE, plot.legend=each, lwd=2,
                         leg.xy="topleft", y.intersp=1, ...) {
     ## TODO: set all genes
     ## in cls$cluster to "-1"
@@ -1410,7 +1412,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     leg.ids <- names(goi)
     names(leg.ids) <- goi
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each, leg.xy=leg.xy, leg.ids=leg.ids, ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=plot.legend, leg.xy=leg.xy, leg.ids=leg.ids, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
@@ -1420,7 +1422,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
             leg[,"id"] <- names(goi)[match(leg[,"id"], goi)]
     }
     ## TODO: auto-select y-intersp if too many goi
-    if ( !each )
+    if ( !each & plot.legend )
       legend(leg.xy, legend=leg[,"id"],
              lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
              bg="#FFFFFFAA",bty="o", y.intersp=y.intersp)
