@@ -445,7 +445,8 @@ for ( type in sgtypes ) {
         rpcdf <- ecdf(sgrain[,"pVal"])
         plot(rpcdf)
         points(pval.thresh.sig,rpcdf(pval.thresh.sig))
-        legend("top",legend=paste0(sum(!unsigr), " segments"))
+        legend("top",legend=c(paste0(length(unsigr), " total"),
+                       paste0(sum(!unsigr), " below cutoff")))
         dev.off()
         #plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
 
@@ -466,7 +467,8 @@ for ( type in sgtypes ) {
         ppcdf <- ecdf(sgdft[,"X2_p"]) ## TODO: this must be argument
         plot(ppcdf)
         points(pval.thresh.sig,ppcdf(pval.thresh.sig))
-        legend("top",legend=paste0(sum(!unsigp), " segments"))
+        legend("top",legend=paste0(paste0(length(unsigp), " total"),
+                       sum(!unsigp), " segments"))
         dev.off()
         
      }
