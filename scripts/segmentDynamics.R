@@ -513,7 +513,6 @@ for ( type in sgtypes ) {
     ## cluster by flowClust
     testnew <- TRUE
     if ( testnew ) {
-        #merge <- FALSE
         fcset <- clusterTimeseries2(tset, K=K, method="flowClust",
                                    parameters=c(B=B,tol=tol,lambda=lambda,
                                                 nu=nu,nu.est=nu.est,
@@ -553,7 +552,7 @@ for ( type in sgtypes ) {
     sgcls <- data.frame(ID=sgs[,"ID"],sgCL=cls)
 
 
-    ## add flowMerge result
+    ## flowMerge 
     mselected <- NULL
     if ( merge ) {
         fcset <- mergeCluster(tset, fcset, selected=selected(fcset))
