@@ -440,13 +440,13 @@ for ( type in sgtypes ) {
 
         ## plot
         ## TODO: this is used in paper; make fit for supplementary material
-        file.name <- file.path(out.path,paste(fname,"_rain_pvalues",sep=""))
+        file.name <- file.path(out.path,paste0(fname,"_filter_rain"))
         plotdev(file.name,width=4,height=4,type=fig.type,res=300)
         rpcdf <- ecdf(sgrain[,"pVal"])
-        plot(rpcdf)
+        plot(rpcdf,xlab="rain p-value")
         points(pval.thresh.sig,rpcdf(pval.thresh.sig))
-        legend("top",legend=c(paste0(length(unsigr), " total"),
-                       paste0(sum(!unsigr), " below cutoff")))
+        points(.995,rpcdf(.995))
+        legend("top",legend=c(paste0(sum(!unsigr), " oscillate")))
         dev.off()
         #plot(sgrain[,"pVal"],pvs[,1]) # NOTE slight correlation!
 
@@ -462,36 +462,72 @@ for ( type in sgtypes ) {
         unsigp <- sgdft[,"X2_p"] >= pval.thresh.sig
 
         ## plot
-        file.name <- file.path(out.path,paste(fname,"_permutation_pvalues",sep=""))
+        file.name <- file.path(out.path,paste0(fname,"_filter_permutation"))
         plotdev(file.name,width=4,height=4,type=fig.type,res=300)
         ppcdf <- ecdf(sgdft[,"X2_p"]) ## TODO: this must be argument
-        plot(ppcdf)
+        plot(ppcdf,xlab="permutation p-value")
         points(pval.thresh.sig,ppcdf(pval.thresh.sig))
-        legend("top",legend=paste0(paste0(length(unsigp), " total"),
-                       sum(!unsigp), " segments"))
+        legend("top",legend=c(paste0(sum(!unsigp), " oscillate")))
         dev.off()
         
      }
 
-    ## FILTER: maximally three expressed time-points per segment
-    fewpoints <- rowSums(avg>0)<=12
+    ## FILTER: minimal expressed time-points per segment
+    npoints <- rowSums(avg>0)
+    fewpoints <- npoints<=2
+
+    ## plot fewpoints
+    file.name <- file.path(out.path,paste0(fname,"_filter_numpoints"))
+    plotdev(file.name,width=4,height=4,type=fig.type,res=300)
+    npcdf <- ecdf(npoints)
+    plot(npcdf,xlab="number of expressed timepoints")
+    points(2,npcdf(2),cex=2)
+    legend("top",legend=c(paste0(sum(!fewpoints), " expressed")))
+    dev.off()
 
     ## FILTER: no single significant read-count (< pval.thresh.sig)
     unsig <- pvs[,"p.signif"] == 0 
 
+    file.name <- file.path(out.path,paste0(fname,"_filter_signifraction"))
+    plotdev(file.name,width=4,height=4,type=fig.type,res=300)
+    plot(ecdf(pvs[,"p.signif"]),xlab="fraction of significant reads")
+    points(.01,tcdf(.01))
+    dev.off()
+    
     ## FILTER: total expresssion vs. rain
     tot <-ash(rds[,"r.mean"])
-    tcdf <- ecdf(tot)
-    ## TODO: plot cutoff filter
-    ##hist(tot,ylim=c(0,3000),breaks=100)
-    ##hist(tot,ylim=c(0,500),breaks=50)
-    ##plot(tcdf)
-    ##points(.05,tcdf(.05))
     lowex <- tot<.05
 
+    ## plot total
+    file.name <- file.path(out.path,paste0(fname,"_filter_total"))
+    plotdev(file.name,width=4,height=4,type=fig.type,res=300)
+    tcdf <- ecdf(tot)
+    plot(tcdf,xlab="mean read-count")
+    points(.05,tcdf(.05))
+    legend("right",legend=c(paste0(sum(!lowex), " expressed")))
+    dev.off()
+    
+    ## SHORT
+    minlen <- 90
+    len <- sgs[,"end"]-sgs[,"start"]+1
+    short <- len < minlen             # LONGER THEN 150
+
+    ## plot lengths
+    file.name <- file.path(out.path,paste0(fname,"_filter_length"))
+    plotdev(file.name,width=4,height=4,type=fig.type,res=300)
+    lcdf <- ecdf(len)
+    plot(lcdf,xlab="segment length")
+    points(minlen,lcdf(minlen))
+    legend("right",legend=c(paste0(sum(!short), " long")))
+    dev.off()
+
+    ## filter combination
+    noise <- lowex | short
+
     ## SELECT FILTER
-    filters <- cbind(lowex=lowex, fewpoints=fewpoints,
-                     unsig=unsig, unsig.r=unsigr, unsig.p=unsigp)
+    filters <- cbind(lowex=lowex, fewpoints=fewpoints, short=short, 
+                     unsig=unsig, unsig.r=unsigr, unsig.p=unsigp,
+                     noise=noise)
     rmvals <- filters[,cl.filter]
     dat <- avg 
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
