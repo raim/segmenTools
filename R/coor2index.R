@@ -457,3 +457,22 @@ alignData <- function(coors, data, dst=500, chrS) {
 
   return(geneData)
 }
+
+
+#' find genomic coordinates of amino acid position in a protein on genome
+#' TODO: this does not account for introns
+#'
+#' TODO: to solve this generally, the amino acid sequence of the protein
+#' must be blasted against the genome
+#' @param start start position of the ATG start codon
+#' @param strand coding strand 
+#' @param aa position of the amino acid in the protein
+#'@export
+findAACodon <- function(start, aa, strand) {
+    offset <- (aa-1)*3 ## 3 positions per amino acide; start at one lower
+    if ( as.character(strand)%in%c("1","+","+1") )
+      pos <- (start-1) + offset
+    else if ( as.character(strand)%in%c("-1","-") )
+      pos <- (start+1) - offset
+    pos
+}
