@@ -207,7 +207,9 @@ coor2index <- function(features, chrS, chrMap,
         strand <- features[,strandCol]
     } else {
         strand <- rep("+", nrow(features))
-        strand[features[,"start"]>features[,"end"]] <- "-"
+        ## if start/end are available, infer from from start>end
+        if ( sum(c("start","end")%in%colnames(features))==2 )
+          strand[features[,"start"]>features[,"end"]] <- "-"
     }
     ## re-order start>end; only for non-circular chromosomes
     ## TODO: add circular info to chrS
@@ -459,20 +461,3 @@ alignData <- function(coors, data, dst=500, chrS) {
 }
 
 
-#' find genomic coordinates of amino acid position in a protein on genome
-#' TODO: this does not account for introns
-#'
-#' TODO: to solve this generally, the amino acid sequence of the protein
-#' must be blasted against the genome
-#' @param start start position of the ATG start codon
-#' @param strand coding strand 
-#' @param aa position of the amino acid in the protein
-#'@export
-findAACodon <- function(start, aa, strand) {
-    offset <- (aa-1)*3 ## 3 positions per amino acide; start at one lower
-    if ( as.character(strand)%in%c("1","+","+1") )
-      pos <- (start-1) + offset
-    else if ( as.character(strand)%in%c("-1","-") )
-      pos <- (start+1) - offset
-    pos
-}
