@@ -204,7 +204,7 @@ coor2index <- function(features, chrS, chrMap,
     cols <- cols[cols%in%colnames(features)]
     ## strand column - if not present, infer from start>end
     if ( strandCol%in%colnames(features) ) {
-        strand <- features[,strandCol]
+        strand <- as.character(features[,strandCol])
     } else {
         strand <- rep("+", nrow(features))
         strand[features[,"start"]>features[,"end"]] <- "-"
@@ -408,14 +408,21 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length
 #' information, see function \code{\link{getChrSum}}
+#' @param coorCols ordered string vector providing the column names
+#' of coordinate columns to be used; must be of length 3 and provide in
+#' order: chromosome number (refering to argument \code{chrS}), position 
+#' and strand (see argument \code{reverse})
+#' @param reverse a vector of possible reverse strand indicators
 ## TODO: generalize for not fully expanded data w/o chrS
 ## TODO: allow different downstream and upstream ranges
 #' @export
-alignData <- function(coors, data, dst=500, chrS) {
+alignData <- function(coors, data, dst=500, chrS,
+                      coorCols=c(chr="chr", position="coor", strand="strand"),
+                      reverse=c("-",-1)) {
   
-  starts <- as.numeric(coors[,"coor"])
-  chrs <- as.numeric(coors[,"chr"])
-  strands <- as.character(coors[,"strand"])
+  starts <- as.numeric(coors[,coorCols["position"]])
+  chrs <- as.numeric(coors[,coorCols["chr"]])
+  strands <- as.character(coors[,coorCols["strand"]])
 
   ## add chromosome lengths to get direct index 
   starts <- chrS[chrs] + starts
