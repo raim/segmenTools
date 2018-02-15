@@ -204,7 +204,7 @@ coor2index <- function(features, chrS, chrMap,
     cols <- cols[cols%in%colnames(features)]
     ## strand column - if not present, infer from start>end
     if ( strandCol%in%colnames(features) ) {
-        strand <- features[,strandCol]
+        strand <- as.character(features[,strandCol])
     } else {
         strand <- rep("+", nrow(features))
         ## if start/end are available, infer from from start>end
