@@ -207,7 +207,9 @@ coor2index <- function(features, chrS, chrMap,
         strand <- as.character(features[,strandCol])
     } else {
         strand <- rep("+", nrow(features))
-        strand[features[,"start"]>features[,"end"]] <- "-"
+        ## if start/end are available, infer from from start>end
+        if ( sum(c("start","end")%in%colnames(features))==2 )
+          strand[features[,"start"]>features[,"end"]] <- "-"
     }
     ## re-order start>end; only for non-circular chromosomes
     ## TODO: add circular info to chrS
@@ -466,3 +468,5 @@ alignData <- function(coors, data, dst=500, chrS,
 
   return(geneData)
 }
+
+

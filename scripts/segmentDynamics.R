@@ -473,15 +473,16 @@ for ( type in sgtypes ) {
      }
 
     ## FILTER: minimal expressed time-points per segment
+    mintpt <- 12
     npoints <- rowSums(avg>0)
-    fewpoints <- npoints<=2
+    fewpoints <- npoints <= mintpt
 
     ## plot fewpoints
     file.name <- file.path(out.path,paste0(fname,"_filter_numpoints"))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
     npcdf <- ecdf(npoints)
     plot(npcdf,xlab="number of expressed timepoints")
-    points(2,npcdf(2),cex=2)
+    points(mintpt,npcdf(mintpt),cex=2)
     legend("top",legend=c(paste0(sum(!fewpoints), " expressed")))
     dev.off()
 
@@ -495,15 +496,16 @@ for ( type in sgtypes ) {
     dev.off()
     
     ## FILTER: total expresssion vs. rain
+    minexp <- .05
     tot <-ash(rds[,"r.mean"])
-    lowex <- tot<.05
+    lowex <- tot<minexp
 
     ## plot total
     file.name <- file.path(out.path,paste0(fname,"_filter_total"))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
     tcdf <- ecdf(tot)
     plot(tcdf,xlab="mean read-count")
-    points(.05,tcdf(.05))
+    points(minexp,tcdf(minexp))
     legend("right",legend=c(paste0(sum(!lowex), " expressed")))
     dev.off()
     
@@ -522,12 +524,13 @@ for ( type in sgtypes ) {
     dev.off()
 
     ## filter combination
-    noise <- lowex | short
+    noise <- lowex | short | fewpoints
 
     ## SELECT FILTER
     filters <- cbind(lowex=lowex, fewpoints=fewpoints, short=short, 
                      unsig=unsig, unsig.r=unsigr, unsig.p=unsigp,
                      noise=noise)
+    
     rmvals <- filters[,cl.filter]
     dat <- avg 
     dat[rmvals,] <- 0 # set to zero, will be removed in processTimeseries
