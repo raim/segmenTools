@@ -405,6 +405,7 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
 #' (TODO: allow non-expanded data)
 #' @param dst upstream/downstream length to be aligned
 #' (TODO: allow different upstream and downstream ranges)
+#' (TODO: allow individual ranges)
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length
 #' information, see function \code{\link{getChrSum}}
@@ -412,7 +413,8 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
 #' of coordinate columns to be used; must be of length 3 and provide in
 #' order: chromosome number (refering to argument \code{chrS}), position 
 #' and strand (see argument \code{reverse})
-#' @param reverse a vector of possible reverse strand indicators
+#' @param reverse a vector of possible reverse strand indicators, all other
+#' values in the strand column will be taken as forward strand!
 ## TODO: generalize for not fully expanded data w/o chrS
 ## TODO: allow different downstream and upstream ranges
 #' @export
@@ -428,7 +430,7 @@ alignData <- function(coors, data, dst=500, chrS,
   starts <- chrS[chrs] + starts
   ## TODO: should rev.strand be shifted by one?
   rng <- t(apply(t(starts), 2, function(x) (x-dst):(x+dst)))
-  rng <- cbind(strands=="+",rng)
+  rng <- cbind(!strands%in%reverse,rng)
   ##  reverse for reverse strand
   rng <- t(apply(rng,1,function(x)
                  if (x[1]==1) return(x[2:length(x)])
