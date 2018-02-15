@@ -656,7 +656,8 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
         }
         
         rownames(ovl) <- NULL
-        if ( details )  ovl <- data.frame(ovl,qrank=qrank,qpos=tps)
+        if ( details )  ovl <- data.frame(ovl,qrank=qrank,qpos=tps,
+                                          stringsAsFactors=FALSE)
         else ovl <- data.frame(ovl,qrank=qrank)
 
         ## sort by qrank, top-hit (qrank==1) first
