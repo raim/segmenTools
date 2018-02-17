@@ -1272,6 +1272,8 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' moving average used as cutoff between segments
 #' @param favg as \code{avg}, but a narrower moving average used in
 #' end scanning that can result in fusing back segments w/o good separation
+#' @param border string indicating whether to "expand" or "trim" borders,
+#' using the finer moving average in \code{favg}
 #' @param minds minimum distance between two segments (will be fused otherwise)
 #' @param minsg minimum segment length for fusion with (shorter) neighbor
 #' @param rmlen minimum segment length for removal (shorter segments
@@ -1286,7 +1288,7 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' \code{seg.path} is not provided.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-presegment <- function(ts, chrS, avg=1000, favg=100,
+presegment <- function(ts, chrS, avg=1000, favg=100, border="expand",
                        minrd=8, minds=250, rmlen=250, minsg=5e3,
                        map2chrom=FALSE, seg.path, fig.path, fig.type="png",
                        verb=1) {
@@ -1298,8 +1300,8 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
     numts <- rowSums(ts > 0) ## number timepoints with reads
     
     ## moving averages of read-count presence 
-    avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg
-    avgfn <- ma(numts,n=favg,circular=TRUE) # short mov.avg
+    avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg, initial split
+    avgfn <- ma(numts,n=favg,circular=TRUE) # short mov.avg, end extension
 
     ## main primary segment definition! 
     segs <- avgts > minrd # smoothed total read number is larger then threshold
@@ -1341,6 +1343,7 @@ presegment <- function(ts, chrS, avg=1000, favg=100,
 
     ## (2) expand ends in both directions until mov.avg. (n=10) of signal is 0
     ## TODO: analyze gradients and minima, and add to appropriate segments
+    ## TODO: border expand | trim
     if ( verb>0 )
         cat(paste("Scanning borders ...\n"))
     fused <- 0
