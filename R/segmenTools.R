@@ -1263,9 +1263,6 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' strand rows at the bottom of the matrix. Option \code{chrS} can be
 #' used to handle chromosome ends and to optionally (\code{map2chrom})
 #' map the resulting primary segment coordinates to chromosome coordinates.
-#' @param chrS a chromosome index, indicating at wich positions
-#' chromosomes start; this is required for handling chromosome ends
-#' and forward and reverse strand values, but can be omitted.
 #' @param avg the broad moving average of read-count presence
 #' (number of time-points with >0 reads) for a first broad segmentation
 #' @param minrd the minimal number of time-points with reads in the broad
@@ -1274,10 +1271,14 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' end scanning that can result in fusing back segments w/o good separation
 #' @param border string indicating whether to "expand" or "trim" borders,
 #' using the finer moving average in \code{favg}
-#' @param minds minimum distance between two segments (will be fused otherwise)
-#' @param minsg minimum segment length for fusion with (shorter) neighbor
+#' @param minds minimum distance between two segments (will be fused
+#' if distance is smaller)
 #' @param rmlen minimum segment length for removal (shorter segments
 #' will be dropped)
+#' @param minsg minimum segment length for fusion with (shorter) neighbor
+#' @param chrS a chromosome index, indicating at wich positions
+#' chromosomes start; this is required for handling chromosome ends
+#' and forward and reverse strand values, but can be omitted.
 #' @param map2chrom if true, argument \code{chrS} is required to map
 #' the segment coordinates to chromosomal coordinates
 #' @param fig.path a directory path for plots of the segment end scanning;
@@ -1288,9 +1289,11 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' \code{seg.path} is not provided.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-presegment <- function(ts, chrS, avg=1000, favg=100, border="expand",
-                       minrd=8, minds=250, rmlen=250, minsg=5e3,
-                       map2chrom=FALSE, seg.path, fig.path, fig.type="png",
+presegment <- function(ts, avg=1000, minrd=8,
+                       favg=100, border=c("expand","trim"),
+                       minds=250, rmlen=250, minsg=5e3,
+                       chrS, map2chrom=FALSE,
+                       seg.path, fig.path, fig.type="png",
                        verb=1) {
 
     if ( verb> 0 )
@@ -1301,9 +1304,12 @@ presegment <- function(ts, chrS, avg=1000, favg=100, border="expand",
     
     ## moving averages of read-count presence 
     avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg, initial split
-    avgfn <- ma(numts,n=favg,circular=TRUE) # short mov.avg, end extension
-
-    ## main primary segment definition! 
+    if ( favg>1 )
+        avgfn <- ma(numts,n=favg,circular=TRUE) # short mov.avg, end extension
+    else avgn <- numts
+    
+    ## main primary segment definition!
+    ## TODO: should be >= for "minimal"
     segs <- avgts > minrd # smoothed total read number is larger then threshold
     ## set chromosome ends to FALSE as well
     if ( !missing(chrS) )
@@ -1344,98 +1350,113 @@ presegment <- function(ts, chrS, avg=1000, favg=100, border="expand",
     ## (2) expand ends in both directions until mov.avg. (n=10) of signal is 0
     ## TODO: analyze gradients and minima, and add to appropriate segments
     ## TODO: border expand | trim
-    if ( verb>0 )
-        cat(paste("Scanning borders ...\n"))
-    fused <- 0
-    for ( sg in 2:nrow(primseg) ) {
-        rng <- primseg[sg-1,2]:primseg[sg,1]
-        ## scan from both sides, and if overlapping
-        ## take minimum between
-        k <- j <- min(rng)
-        i <- max(rng)
-        while ( k<(i-1) ) { # expand left segment to right
-            if ( avgfn[k]==0 ) break
-            k <- k+1
-        }
-        while ( i>(j+1) ) { # expand right segment to left
-            if ( avgfn[i]==0 ) break
-            i <- i-1
-        }
-        primseg[sg-1,2] <- k
-        primseg[sg,1] <- i
-        
-        if ( i <= k )  {
-            if (  verb > 1 )
-                cat(paste("segment #",sg,i-k,
-                          "overlap, will be fused with",sg-1,"\n"))
-            fused <- fused +1
-        }
-        
-        if ( missing(fig.path) ) next
+    if ( border=="expand" ) {
+        if ( verb>0 )
+            cat(paste("Scanning borders ...\n"))
+        fused <- 0
+        for ( sg in 2:nrow(primseg) ) {
+            rng <- primseg[sg-1,2]:primseg[sg,1]
+            ## scan from both sides, and if overlapping
+            ## take minimum between
+            k <- j <- min(rng)
+            i <- max(rng)
+            while ( k<(i-1) ) { # expand left segment to right
+                if ( avgfn[k]==0 ) break
+                k <- k+1
+            }
+            while ( i>(j+1) ) { # expand right segment to left
+                if ( avgfn[i]==0 ) break
+                i <- i-1
+            }
+            primseg[sg-1,2] <- k
+            primseg[sg,1] <- i
+            
+            if ( i <= k )  {
+                if (  verb > 1 )
+                    cat(paste("segment #",sg,i-k,
+                              "overlap, will be fused with",sg-1,"\n"))
+                fused <- fused +1
+            }
+            
+            if ( missing(fig.path) ) next
     
-        ## plot borders
-        bord <- range(rng)
-        rng<- max(rng[1]-1000,1):(rng[length(rng)]+1000)
-        file.name <-file.path(fig.path,
-                              ifelse(i<=k,
-                                     paste("fused_",fused,sep=""),
-                                     paste("border_",sg-1-fused,sep="")))
-        plotdev(file.name,width=4,height=4,type=fig.type)
-        plot(rng,numts[rng],type="l",ylim=c(-2,24),main=ifelse(i<=k,"fuse",""))
-        lines(rng,avgts[rng],col=3)
-        lines(rng,avgfn[rng],col=2);
-        graphics::abline(h=8,col=3)
-        if ( bord[1]==bord[2] ) {
-            #cat(paste(sg, "borders equal\n"))
-            graphics::abline(v=bord[1],col=3)
-        }else
-            graphics::arrows(x0=bord[1],x1=bord[2],y0=-2,y1=-2,col=3)
-        if ( k==i ) {
-            #cat(paste(sg, "k==i equal\n"))
-            graphics::abline(v=k,col=3)
-        } else
-            graphics::arrows(x0=k,x1=i,y0=-1,y1=-1,col=2)
-        dev.off()
+            ## plot borders
+            bord <- range(rng)
+            rng<- max(rng[1]-1000,1):(rng[length(rng)]+1000)
+            file.name <-file.path(fig.path,
+                                  ifelse(i<=k,
+                                         paste("fused_",fused,sep=""),
+                                         paste("border_",sg-1-fused,sep="")))
+            plotdev(file.name,width=4,height=4,type=fig.type)
+            plot(rng,numts[rng],type="l",ylim=c(-2,24),
+                 main=ifelse(i<=k,"fuse",""))
+            lines(rng,avgts[rng],col=3)
+            lines(rng,avgfn[rng],col=2);
+            graphics::abline(h=8,col=3)
+            if ( bord[1]==bord[2] ) {
+                #cat(paste(sg, "borders equal\n"))
+                graphics::abline(v=bord[1],col=3)
+            }else
+                graphics::arrows(x0=bord[1],x1=bord[2],y0=-2,y1=-2,col=3)
+            if ( k==i ) {
+                #cat(paste(sg, "k==i equal\n"))
+                graphics::abline(v=k,col=3)
+            } else
+                graphics::arrows(x0=k,x1=i,y0=-1,y1=-1,col=2)
+            dev.off()
+        }
+    
+        ## (3) fuse primary segments with distance <=1, incl.
+        ## those where ends where swapped in end extension
+        start <- primseg[,1]
+        end <- primseg[,2]
+        close <- start[2:length(end)] - end[2:length(end)-1] < 2
+        
+        if ( verb>0 )
+            cat(paste("Fusing close segments\t", sum(close), "\n",sep=""))
+    
+        start <- start[c(TRUE,!close)]
+        end <- end[c(!close,TRUE)]
+
+        ## NOTE: primseg v4 - primseg v3 can be reproduced with minsg==1
+        ## TODO: account for chromosome ends!
+        ## (4) recursively fuse short (<minsg) to shorter neighbor
+        if ( verb>0 )
+            cat(paste("Fusing small segments, <",minsg,
+                      "bp\t", sum(end - start +1 < minsg), "\n",sep=""))
+    
+        while( sum(end - start +1 < minsg) ) {
+            sglen <- end - start +1
+            idx <- which.min(sglen)
+            if ( idx==1 ) # first: fise with next
+                prev <- FALSE 
+            else if ( idx==length(start) ) # last: only previous possible
+                prev <- TRUE
+            else # take shorter neighbor
+                prev <- sglen[idx-1]<sglen[idx+1]
+            ## fuse
+            if ( prev ) {
+                start <- start[-idx]
+                end <- end[-(idx-1)]
+            } else {
+                start <- start[-(idx+1)]
+                end <- end[-idx]
+            }
+        }
+    } else if ( border=="trim" ) {
+        ## use favg to trim ends
+        if ( verb>0 )
+            cat(paste("Trimming segment ends",nrow(primseg),"\n"))
+        for ( sg in 1:nrow(primseg) ) {
+            rng <- primseg[sg,1]:primseg[sg,2]
+            idx <- which(avgfn[rng]>0)
+            primseg[sg,1] <- rng[idx[1]]
+            primseg[sg,2] <- rng[idx[length(idx)]]
+        }
+        start <- primseg[,1]
+        end <- primseg[,2]
     }
 
-    ## (3) fuse primary segments with distance <=1, incl.
-    ## those where ends where swapped in end extension
-    start <- primseg[,1]
-    end <- primseg[,2]
-    close <- start[2:length(end)] - end[2:length(end)-1] < 2
-
-    if ( verb>0 )
-        cat(paste("Fusing close segments\t", sum(close), "\n",sep=""))
-    
-    start <- start[c(TRUE,!close)]
-    end <- end[c(!close,TRUE)]
-    
-
-    ## NOTE: primseg v4 - primseg v3 can be reproduced with minsg==1
-    ## TODO: account for chromosome ends!
-    ## (4) recursively fuse short (<minsg) to shorter neighbor
-    if ( verb>0 )
-      cat(paste("Fusing small segments, <",minsg,
-                "bp\t", sum(end - start +1 < minsg), "\n",sep=""))
-    
-    while( sum(end - start +1 < minsg) ) {
-        sglen <- end - start +1
-        idx <- which.min(sglen)
-        if ( idx==1 ) # first: fise with next
-            prev <- FALSE 
-        else if ( idx==length(start) ) # last: only previous possible
-            prev <- TRUE
-        else # take shorter neighbor
-            prev <- sglen[idx-1]<sglen[idx+1]
-        ## fuse
-        if ( prev ) {
-            start <- start[-idx]
-            end <- end[-(idx-1)]
-        } else {
-            start <- start[-(idx+1)]
-            end <- end[-idx]
-        }
-    }
 
     ## TODO: split too long segments
     ## while ( sglen>maxsg ) {}
