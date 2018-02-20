@@ -4,7 +4,8 @@
 \alias{alignData}
 \title{align genome data at specified coordinates (e.g. TSS)}
 \usage{
-alignData(coors, data, dst = 500, chrS)
+alignData(coors, data, dst = 500, chrS, coorCols = c(chr = "chr", position =
+  "coor", strand = "strand"), reverse = c("-", -1))
 }
 \arguments{
 \item{coors}{genome positions (position, chromosome, strand)
@@ -15,11 +16,20 @@ is required to be fully expanded matrix covering each position
 (TODO: allow non-expanded data)}
 
 \item{dst}{upstream/downstream length to be aligned
-(TODO: allow different upstream and downstream ranges)}
+(TODO: allow different upstream and downstream ranges)
+(TODO: allow individual ranges)}
 
 \item{chrS}{the chromosome index, indicating the start position
 of each chromosome in the continuous index, derived from chromosome length
 information, see function \code{\link{getChrSum}}}
+
+\item{coorCols}{ordered string vector providing the column names
+of coordinate columns to be used; must be of length 3 and provide in
+order: chromosome number (refering to argument \code{chrS}), position 
+and strand (see argument \code{reverse})}
+
+\item{reverse}{a vector of possible reverse strand indicators, all other
+values in the strand column will be taken as forward strand!}
 }
 \description{
 align genome data at specified coordinates (e.g. TSS)
