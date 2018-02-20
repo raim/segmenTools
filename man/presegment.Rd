@@ -4,9 +4,9 @@
 \alias{presegment}
 \title{Pre-segmentation of the time-series}
 \usage{
-presegment(ts, chrS, avg = 1000, favg = 100, minrd = 8, minds = 250,
-  rmlen = 250, minsg = 5000, map2chrom = FALSE, seg.path, fig.path,
-  fig.type = "png", verb = 1)
+presegment(ts, avg = 1000, minrd = 8, favg = 100, border = c("expand",
+  "trim"), minds = 250, rmlen = 250, minsg = 5000, chrS,
+  map2chrom = FALSE, seg.path, fig.path, fig.type = "png", verb = 1)
 }
 \arguments{
 \item{ts}{the time-series of readcounts for the complete chromosome,
@@ -15,25 +15,29 @@ strand rows at the bottom of the matrix. Option \code{chrS} can be
 used to handle chromosome ends and to optionally (\code{map2chrom})
 map the resulting primary segment coordinates to chromosome coordinates.}
 
-\item{chrS}{a chromosome index, indicating at wich positions
-chromosomes start; this is required for handling chromosome ends
-and forward and reverse strand values, but can be omitted.}
-
 \item{avg}{the broad moving average of read-count presence
 (number of time-points with >0 reads) for a first broad segmentation}
-
-\item{favg}{as \code{avg}, but a narrower moving average used in
-end scanning that can result in fusing back segments w/o good separation}
 
 \item{minrd}{the minimal number of time-points with reads in the broad
 moving average used as cutoff between segments}
 
-\item{minds}{minimum distance between two segments (will be fused otherwise)}
+\item{favg}{as \code{avg}, but a narrower moving average used in
+end scanning that can result in fusing back segments w/o good separation}
+
+\item{border}{string indicating whether to "expand" or "trim" borders,
+using the finer moving average in \code{favg}}
+
+\item{minds}{minimum distance between two segments (will be fused
+if distance is smaller)}
 
 \item{rmlen}{minimum segment length for removal (shorter segments
 will be dropped)}
 
 \item{minsg}{minimum segment length for fusion with (shorter) neighbor}
+
+\item{chrS}{a chromosome index, indicating at wich positions
+chromosomes start; this is required for handling chromosome ends
+and forward and reverse strand values, but can be omitted.}
 
 \item{map2chrom}{if true, argument \code{chrS} is required to map
 the segment coordinates to chromosomal coordinates}
