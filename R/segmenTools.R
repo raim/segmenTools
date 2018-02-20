@@ -1306,7 +1306,7 @@ presegment <- function(ts, avg=1000, minrd=8,
     avgts <- ma(numts,n=avg,circular=TRUE) # long mov.avg, initial split
     if ( favg>1 )
         avgfn <- ma(numts,n=favg,circular=TRUE) # short mov.avg, end extension
-    else avgn <- numts
+    else avgfn <- numts
     
     ## main primary segment definition!
     ## TODO: should be >= for "minimal"
@@ -1450,9 +1450,15 @@ presegment <- function(ts, avg=1000, minrd=8,
         for ( sg in 1:nrow(primseg) ) {
             rng <- primseg[sg,1]:primseg[sg,2]
             idx <- which(avgfn[rng]>0)
-            primseg[sg,1] <- rng[idx[1]]
-            primseg[sg,2] <- rng[idx[length(idx)]]
+            if ( length(idx) ) {
+                primseg[sg,1] <- rng[idx[1]]
+                primseg[sg,2] <- rng[idx[length(idx)]]
+            } else primseg[sg,] <- NA
         }
+        ## rm segments below threshold
+        if ( verb>0 )
+            cat(paste("\tremoving",sum(is.na(primseg[,1])),"\n"))
+        primseg <- primseg[!is.na(primseg[,1]),]
         start <- primseg[,1]
         end <- primseg[,2]
     }
