@@ -10,12 +10,13 @@
 #' summarized for features with \code{\link{summarizeGEOSoft}}.
 #' @param file a GEO Soft archive file (eg. GSE18902_family.soft.gz)
 #' @param idcol columns to retrieve from the platform table
+#' @param only.data skip all samples without data
 #' @param valcol value column (currently only 1 is allowed) in the sample tables
 #' @param title if TRUE a sample title will be retrieved
 #' @param desc if TRUE, value descriptions in field "#<valcol>" will be retrieved
 #' @seealso \code{\link{summarizeGEOSoft}}
 #' @export
-parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
+parseGEOSoft <- function(file, idcol, only.data=TRUE, valcol="VALUE", title=TRUE, desc=TRUE) {
 
     ## working with IDs, set this to false!
     old <- unlist(options("stringsAsFactors"))
@@ -27,11 +28,14 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
     ## find probe-ID map
     start <- grep("^!platform_table_begin",lines)
     end <- grep("^!platform_table_end",lines)
-    ids <- read.delim(cnx,skip=start, nrow=end-start-2,row.names=1)
-    if ( missing(idcol) )
-        idcol <- colnames(ids)
-    ids <- ids[,idcol,drop=FALSE]
-    #ids[ids=="",idcol[1]] <- rownames(ids)[ids==""] 
+    ids <- NULL
+    if ( length(start)>0 & length(end)>0 ) {
+        ids <- read.delim(cnx, skip=start, nrow=end-start-2, row.names=1)
+        if ( missing(idcol) )
+          idcol <- colnames(ids)
+        ids <- ids[,idcol,drop=FALSE]
+        ##ids[ids=="",idcol[1]] <- rownames(ids)[ids==""]
+    } else cat(paste("no data!\n"))
     ## find samples
     idx <- grep("^\\^SAMPLE", lines)
 
@@ -39,7 +43,8 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
     ## reduce by those with actual data
     cidx <- grep("^!Sample_data_row_count", lines) ## data rows present?
     samplecnt <- as.numeric(sub(".*= ","",lines[cidx]))
-    idx <- idx[samplecnt>0]
+    if ( only.data ) 
+      idx <- idx[samplecnt>0]
 
     ## sample IDs
     sampleids <- sub(".*= ","",lines[idx])
@@ -49,7 +54,8 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
     if ( title ) {
         tcol <- "^!Sample_title = "
         tidx <- grep(tcol, lines)
-        tidx <- tidx[samplecnt>0]
+        if ( only.data ) 
+          tidx <- tidx[samplecnt>0]
         tit <- sub(tcol,"",lines[tidx])
         names(tit) <- sampleids
     }
@@ -66,16 +72,22 @@ parseGEOSoft <- function(file, idcol, valcol="VALUE", title=TRUE, desc=TRUE) {
     ## data tables
     sidx <- grep("^!sample_table_begin", lines)
     eidx <- grep("^!sample_table_end", lines)-1
-    dat <- matrix(NA, nrow=nrow(ids), ncol=length(idx))
-    rownames(dat) <- rownames(ids)
-    colnames(dat) <- sampleids
-    for ( i in 1:length(idx) ) {
-        tmp <- read.delim(gzfile(file),
-                          skip=sidx[i], nrow=eidx[i]-sidx[i]-1,row.names=1)
-        dat[rownames(tmp),i] <- tmp[,valcol]
+    if ( !is.null(ids) ) {
+        dat <- matrix(NA, nrow=nrow(ids), ncol=length(idx))
+        rownames(dat) <- rownames(ids)
+        colnames(dat) <- sampleids
+        for ( i in 1:length(idx) ) {
+            tmp <- read.delim(gzfile(file),
+                              skip=sidx[i], nrow=eidx[i]-sidx[i]-1,row.names=1)
+            dat[rownames(tmp),i] <- tmp[,valcol]
+        }
+        
+        res <- list(data=dat, ids=ids, title=tit, description=description)
+        class(res) <- "geosoft"
+    } else {
+        res <- list(ids=sampleids, title=tit, description=description)
+        class(res) <- "geosoft_info"
     }
-    res <- list(data=dat, ids=ids, title=tit, description=description)
-    class(res) <- "geosoft"
     # reset option
     options(stringsAsFactors=old)
     res

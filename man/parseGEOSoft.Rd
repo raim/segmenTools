@@ -4,12 +4,15 @@
 \alias{parseGEOSoft}
 \title{parse GO Soft archives}
 \usage{
-parseGEOSoft(file, idcol, valcol = "VALUE", title = TRUE, desc = TRUE)
+parseGEOSoft(file, idcol, only.data = TRUE, valcol = "VALUE",
+  title = TRUE, desc = TRUE)
 }
 \arguments{
 \item{file}{a GEO Soft archive file (eg. GSE18902_family.soft.gz)}
 
 \item{idcol}{columns to retrieve from the platform table}
+
+\item{only.data}{skip all samples without data}
 
 \item{valcol}{value column (currently only 1 is allowed) in the sample tables}
 
