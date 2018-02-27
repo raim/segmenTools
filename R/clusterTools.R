@@ -1412,7 +1412,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     leg.ids <- names(goi)
     names(leg.ids) <- goi
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=plot.legend, leg.xy=leg.xy, leg.ids=leg.ids, ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each&plot.legend, leg.xy=leg.xy, leg.ids=leg.ids, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
