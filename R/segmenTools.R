@@ -968,6 +968,8 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
 #' of different segment classes. Coordinates have been converted to a
 #' continuous index over all chromosomes with \code{\link{coor2index}}.
 #' Note, that this ignores chromosome borders!
+#' TODO: allow to pass chromosome length index chrS to account
+#' for chromosome borders.
 #'
 #' The function is also used for permutation tests in
 #' \code{\link{segmentJaccard}}.

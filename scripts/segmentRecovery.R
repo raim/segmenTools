@@ -230,6 +230,7 @@ tcols["na"] <- "#939393"
 ovlstats <- rep(list(NA),length(test.types))
 names(ovlstats) <- test.types
 
+randomize <- FALSE # TRUE
 ## loop over targets (transcript and ORF data sets from SGD)
 for ( test.type in test.types ) {
 
@@ -237,6 +238,10 @@ for ( test.type in test.types ) {
         cat(paste(test.type, "\t",time(),"\n"))
     
     target <- trgs[ttypes==test.type,]
+
+    ## TODO: integrate randomization in analysis?
+    if ( randomize ) 
+        target <- randomSegments(target) ## TODO: with total or not?
 
     ## result list: overlap statistics
     ostat <- rep(list(NA),length(sgtypes))
