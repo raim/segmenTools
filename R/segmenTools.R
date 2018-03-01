@@ -836,6 +836,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' different classes in a query and a target set of segments
 #' (genomic intervals), where coordinates have been converted to a
 #' continuous index over all chromosomes with \code{\link{coor2index}}.
+#' Note, that this ignores chromosome borders!
 #' @details Reports the Jaccard index (\code{J=intersect/union)}) between
 #' two distinct sets of segments (genomic intervals).
 #' If argument \code{perm>0}, a simple permutation is performed,
@@ -866,6 +867,10 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     ## query classes
     if ( qclass=="" ) {
         qcls <- as.factor(rep("query", nrow(query)))
+        ## TODO: use this to fix perm use with qclass==""
+        ## see below in permutation
+        #query <- cbind(query,TMPCLASS=qcls)
+        #qclass <- "TMPCLASS"
     } else {
         qcls <- as.factor(query[,qclass])
     }
@@ -932,50 +937,9 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
 
             if ( verb>0 )
                 cat(paste(i/perm," "))
-            
-            
-            ## segment lengths
-            sglen <- apply(query[,c("start","end")], 1, diff)
-            sglen <- sglen+1
-            sgcls <- as.factor(query[,qclass])
-            
-            ## inter-segment lengths
-            qnum <- nrow(query)
-            islen <- apply(cbind(query[1:(qnum-1),"end"],
-                                 query[2:qnum,"start"]), 1, diff)
-            ## NOTE: the start of the first real query segment
-            ## is also used as the distance of the final segment
-            ## unless a total length is explicitly provided as argument
-            ## len; total =  2*sum(chrL)
-            if ( !missing(total) ) end <- total - query[qnum,"end"]+1
-            else end <- query[1,"start"]
-            islen <- c(query[1,"start"], islen, end)
-            islen <- islen-1
-            
-            ## debug check whether total lengt is reproduced
-            ## TODO: allow this check, but requires chrL to be known!
-            if ( sum(islen)+sum(sglen) != total )
-                stop()
 
-            ## RANDOMIZATION
-            ## sample segment lengths
-            ridx <- sample(1:qnum)
-            rcls <- sgcls[ridx] # store cluster to keep cluster length dist!
-            rsglen <- sglen[ridx]
-            ## sample intersegment lengths
-            rislen <- sample(islen)
-            
-            ## construct randomized segmentation
-            tot <- length(rsglen)+length(rislen)
-            cumlen <- rep(NA,tot)
-            cumlen[seq(1,tot,2)] <- rislen
-            cumlen[seq(2,tot,2)] <- rsglen
-            cumlen <- cumsum(cumlen)
-            
-            rquery <- data.frame(start=cumlen[seq(1,tot-1,2)],
-                                 end=cumlen[seq(2,tot-1,2)],
-                                 type=rcls)
-            
+            rquery <- randomSegments(query, qclass=qclass, total=total)
+
             ## TODO: test cluster length distribution?
             
             J.rnd <- segmentJaccard(rquery, target, qclass="type", tclass,
@@ -995,6 +959,86 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
         ovl$p.value <- J.pval
     
     return(ovl)
+}
+
+#' randomize locations of input segments
+#' 
+#' randomizes the locations of input segments, while maintaining
+#' the length distributions, optionally different distributions
+#' of different segment classes. Coordinates have been converted to a
+#' continuous index over all chromosomes with \code{\link{coor2index}}.
+#' Note, that this ignores chromosome borders!
+#'
+#' The function is also used for permutation tests in
+#' \code{\link{segmentJaccard}}.
+#' @param query query set of segments to be randomized
+#' @param qclass column name which holds a sub-classification (clustering) of
+#' the query segments, omit or pass empty string ("") to use all
+#' @param total total length of the query range (genome length), if missing
+#' the start of the first segment is also used as end.
+#' @export
+randomSegments <- function(query, qclass, total) {
+    
+    if ( missing(qclass) ) qclass <- ""
+
+    ## ORDER!
+    query <- query[order(query$start),]
+
+    ## query classes
+    if ( qclass=="" ) {
+        qcls <- as.factor(rep("query", nrow(query)))
+        query <- cbind(query,TMPCLASS=qcls)
+        qclass <- "TMPCLASS"
+    } 
+    qcls <- as.factor(query[,qclass])
+
+    ## segment lengths
+    sglen <- apply(query[,c("start","end")], 1, diff)
+    sglen <- sglen+1
+    sgcls <- as.factor(query[,qclass])
+    
+    ## inter-segment lengths
+    qnum <- nrow(query)
+    islen <- apply(cbind(query[1:(qnum-1),"end"],
+                         query[2:qnum,"start"]), 1, diff)
+    ## NOTE: the start of the first real query segment
+    ## is also used as the distance of the final segment
+    ## unless a total length is explicitly provided as argument
+    ## len; total =  2*sum(chrL)
+    if ( !missing(total) ) end <- total - query[qnum,"end"]+1
+    else {
+        end <- query[1,"start"]
+        total <- max(query[,c("start","end")])+end -1
+    }
+    islen <- c(query[1,"start"], islen, end)
+    islen <- islen-1
+    
+    ## debug check whether total lengt is reproduced
+    ## TODO: allow this check, but requires chrL to be known!
+    if ( sum(islen)+sum(sglen) != total )
+        stop()
+    
+    ## RANDOMIZATION
+    ## sample segment lengths
+    ridx <- sample(1:qnum)
+    rcls <- sgcls[ridx] # store cluster to keep cluster length dist!
+    rsglen <- sglen[ridx]
+    ## sample intersegment lengths
+    rislen <- sample(islen)
+
+    ## TODO: avoid start==0 which can happen for directly adjacent segments!
+    
+    ## construct randomized segmentation
+    tot <- length(rsglen)+length(rislen)
+    cumlen <- rep(NA,tot)
+    cumlen[seq(1,tot,2)] <- rislen
+    cumlen[seq(2,tot,2)] <- rsglen
+    cumlen <- cumsum(cumlen)
+    
+    rquery <- data.frame(start=cumlen[seq(1,tot-1,2)],
+                         end=cumlen[seq(2,tot-1,2)],
+                         type=rcls)
+    rquery
 }
 
 
