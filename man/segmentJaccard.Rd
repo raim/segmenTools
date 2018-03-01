@@ -29,6 +29,7 @@ calculates the Jaccard index, including a simple permutation test, between
 different classes in a query and a target set of segments
 (genomic intervals), where coordinates have been converted to a
 continuous index over all chromosomes with \code{\link{coor2index}}.
+Note, that this ignores chromosome borders!
 }
 \details{
 Reports the Jaccard index (\code{J=intersect/union)}) between
