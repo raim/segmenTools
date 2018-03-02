@@ -550,7 +550,7 @@ for ( type in sgtypes ) {
 
 
     ## cluster by flowClust
-    testnew <- TRUE
+    testnew <- TRUE ## ALLOWS MULTIPLE EQUAL K!
     if ( testnew ) {
         fcset <- clusterTimeseries2(tset, K=K, method="flowClust",
                                    parameters=c(B=B,tol=tol,lambda=lambda,
