@@ -21,6 +21,8 @@ the length distributions, optionally different distributions
 of different segment classes. Coordinates have been converted to a
 continuous index over all chromosomes with \code{\link{coor2index}}.
 Note, that this ignores chromosome borders!
+TODO: allow to pass chromosome length index chrS to account
+for chromosome borders.
 }
 \details{
 The function is also used for permutation tests in
