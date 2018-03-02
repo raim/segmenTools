@@ -303,7 +303,8 @@ for ( test.type in test.types ) {
 if ( save ) 
   save.image(file.path(out.path,testid,"overlaps.RData"))
 
-## COLLECT DATA AND WRITE OUT RESULTS
+
+## COLLATE DATA AND WRITE OUT RESULTS
 ## export hitnum, jaccard, numhit and ratio thresholds 
 for ( test.type in test.types ) {
 
@@ -333,6 +334,41 @@ for ( test.type in test.types ) {
                 col.names=TRUE,row.names=FALSE,quote=FALSE)
 }
 
+## directly compare real vs. random targets
+if ( randomize ) {
+
+    rnd.path <- file.path(out.path,testid,"randomize")
+    dir.create(rnd.path)
+
+    x <- seq(0,4,.01)
+
+    totN <- length(test.types)*length(sgtypes)
+    relative <- rep(list(NA), totN)
+    for ( test.type in test.types ) {
+        for ( type in sgtypes ) {
+            rcdf.real <- ovlstats[[test.type]][[type]]$CDF$rcdf
+            rcdf.rand <- rndstats[[test.type]][[type]]$CDF$rcdf
+            
+            file.name <- file.path(rnd.path,paste0(test.type,"_",type))
+            plotdev(file.name,width=4,height=3.5,type=fig.type)
+            par(mai=c(.5,.5,.5,.1),mgp=c(1.3,.4,0),tcl=-.2)
+            plot(1,col=NA,xlim=range(x),ylim=c(0,1),
+                 main=paste(test.type, "recovery"),
+                 xlab="segment length/target length",ylab="ECDF")
+            abline(h=0:1, lty=2, lwd=.5, col="gray70")
+            abline(h=c(minf,.8), lty=2, lwd=.5, col="gray70")
+            abline(v=c(ovlth,2-ovlth), lty=2, lwd=.5, col="gray70")
+            lines(x, rcdf.real(x), col=1,lty=1,lwd=2)
+            lines(x, rcdf.rand(x), col=2,lty=2,lwd=2)
+            legend("topleft",legend=c("real","random"),lty=1:2,col=1:2,lwd=2,
+                   bty="n")
+            dev.off()
+
+        }
+    }
+}
+
+
 #### PLOT OF OVERLAP STATISTICS
 
 sets <- c("ovl")
@@ -344,11 +380,14 @@ for ( set in sets ) {
     stats <- get(paste0(set,"stats"))
     fname <- ifelse(set=="rnd","_random","")
     
-## remove empty results!
-rm <- unlist(lapply(stats, function (x)
-                    !any(unlist(lapply(x, function(y) y$hitnum))>0)))
-stats <- stats[!rm]
-test.types <- test.types[!rm]
+    ## remove empty results!
+    rm <- unlist(lapply(stats, function (x)
+        !any(unlist(lapply(x, function(y) y$hitnum))>0)))
+
+    
+    
+    stats <- stats[!rm]
+    test.types <- test.types[!rm]
 
 ### PLOT BY TEST TYPES
 for ( test.type in test.types ) {
