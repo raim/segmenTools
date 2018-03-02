@@ -217,7 +217,7 @@ if ( length(tcol)==0 )
 result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
 ## remove empty targets (no hit)
-if ( !each.target ) {
+if ( !each.target & details ) {
     qCol <- ifelse(prefix=="", "qlen",
                    paste(paste(prefix,"qlen",sep="_")))
     result <- result[as.character(result[,qCol])!="0",] # char allows collapse
