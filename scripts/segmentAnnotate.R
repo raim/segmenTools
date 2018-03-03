@@ -172,7 +172,7 @@ result <- annotateTarget(query=query, target=target,
                          collapse=!each.query, 
                          details=details, only.best=only.best,
                          qcol=qcol, prefix=prefix, msgfile=msgfile)
-
+#save.image("tmp.RData")
 ## TODO: QUALITY FILTERS FOR RESULT?
 
 if ( verb>0 )
@@ -189,7 +189,8 @@ tidx <- as.numeric(result[,trgCol])
 
 ## TODO: only required if details
 ## TODO: reduce tmp to coordinate columns and add these to options
-tmp <- cbind(target[tidx,], result[,-which(colnames(result)==trgCol)]) 
+tmp <- cbind(target[tidx,],
+             result[,-which(colnames(result)==trgCol),drop=FALSE]) 
 
 ## TODO: handle strands better here! Expecting +/- factors
 if ( details ) {
