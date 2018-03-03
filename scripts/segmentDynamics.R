@@ -470,7 +470,7 @@ for ( type in sgtypes ) {
         legend("top",legend=c(paste0(sum(!unsigp), " oscillate")))
         dev.off()
         
-     }
+    }
 
     ## FILTER: minimal expressed time-points per segment
     mintpt <- 12
