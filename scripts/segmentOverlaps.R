@@ -112,7 +112,9 @@ frw.str <- c("1","+")
 rev.str <- c("-1","-")
 ## comparison with self on reverse strand!
 ## compare forward with reverse strand!
+self <- FALSE
 if ( target=="" & (antisense|upstream!=0) ) {
+    self <- TRUE
     target <- query
     if ( tclass=="" )
       tclass <- qclass
@@ -160,15 +162,18 @@ if ( upstream!=0 ) {
 }
 
 ## only compare forward and reverse strands for auto-target antisense
-if ( antisense ) {
+if ( antisense & self ) {
     ## plot axis labels
     qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
     tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
 }
+if ( antisense & !self ) {
+    tlab <- paste(tlab, "- antisense")
+}
 if ( upstream!=0 ) {
     ## plot axis labels
-    qlab <- paste0("query: ", qclass)
-    tlab <- paste0("target: ", tclass, ", upstream ", upstream)
+    qlab <- paste("query:", qclass)
+    tlab <- paste("target:", tclass, "- upstream", upstream)
 }
 
 if ( verb>0 )
