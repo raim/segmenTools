@@ -303,6 +303,40 @@ for ( test.type in test.types ) {
 if ( save ) 
   save.image(file.path(out.path,testid,"overlaps.RData"))
 
+## REMOVE EMPTY TESTS
+
+for ( test.type in test.types ) {
+
+    cat(paste("checking", test.type, "\n"))
+    lst <- ovlstats[[test.type]]
+
+    ## rm empty
+    len <- unlist(lapply(lst, function(x) length(x) ))
+    if ( any(len==1) )
+      cat(paste("\tremoving",sum(len==1),"empty tests:",
+                paste(names(lst)[len==1],collapse="; "),"\n"))
+    lst <- lst[len>1]
+
+    ## re-attach
+    ovlstats[[test.type]] <- lst
+
+    if ( randomize ) {
+        
+        cat(paste("\trandomized\n"))
+        lst <- rndstats[[test.type]]
+        
+        ## rm empty
+        len <- unlist(lapply(lst, function(x) length(x) ))
+        if ( any(len==1) )
+          cat(paste("\tremoving",sum(len==1),"empty tests:",
+                    paste(names(lst)[len==1],collapse="; "),"\n"))
+        lst <- lst[len>1]
+        
+        ## re-attach
+        rndstats[[test.type]] <- lst
+    }
+}
+
 
 ## COLLATE DATA AND WRITE OUT RESULTS
 ## export hitnum, jaccard, numhit and ratio thresholds 
@@ -346,8 +380,11 @@ if ( randomize ) {
     relative <- rep(list(NA), totN)
     for ( test.type in test.types ) {
         for ( type in sgtypes ) {
-            rcdf.real <- ovlstats[[test.type]][[type]]$CDF$rcdf
-            rcdf.rand <- rndstats[[test.type]][[type]]$CDF$rcdf
+            rcdf.real <- rcdf.rand <- NULL
+            if ( length(ovlstats[[test.type]][[type]])>1 ) 
+                rcdf.real <- ovlstats[[test.type]][[type]]$CDF$rcdf
+            if ( length(rndstats[[test.type]][[type]])>1 ) 
+                rcdf.rand <- rndstats[[test.type]][[type]]$CDF$rcdf
             
             file.name <- file.path(rnd.path,paste0(test.type,"_",type))
             plotdev(file.name,width=4,height=3.5,type=fig.type)
@@ -358,8 +395,10 @@ if ( randomize ) {
             abline(h=0:1, lty=2, lwd=.5, col="gray70")
             abline(h=c(minf,.8), lty=2, lwd=.5, col="gray70")
             abline(v=c(ovlth,2-ovlth), lty=2, lwd=.5, col="gray70")
-            lines(x, rcdf.real(x), col=1,lty=1,lwd=2)
-            lines(x, rcdf.rand(x), col=2,lty=2,lwd=2)
+            if ( !is.null(rcdf.real) )
+              lines(x, rcdf.real(x), col=1,lty=1,lwd=2)
+            if ( !is.null(rcdf.rand) )
+              lines(x, rcdf.rand(x), col=2,lty=2,lwd=2)
             legend("topleft",legend=c("real","random"),lty=1:2,col=1:2,lwd=2,
                    bty="n")
             dev.off()
@@ -949,5 +988,5 @@ legend("bottomright",leg,col=tcols[leg],lty=1,lwd=2,bty="n")
 dev.off()
 
 
-quit(save="no")
+if ( !interactive() ) quit(save="no")
 
