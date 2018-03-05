@@ -447,25 +447,35 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
 #' @param type name of the overlap statistics list first level
 #' @export
 collectOvlStats <- function(ovlStatLst, type) {
-    CDF <- lapply(ovlStatLst[[type]], function(x) x$CDF)
+
+    lst <- ovlStatLst[[type]]
+    ## rm empty
+    len <- unlist(lapply(lst, function(x) length(x) ))
+    if ( any(len==1) )
+      cat(paste("removing",sum(len==1),"empty tests:",
+                paste(names(lst)[len==1],collapse="; "),"\n"))
+    lst <- lst[len>1]
+    
+    ## collect stats
+    CDF <- lapply(lst, function(x) if ( length(x)>1 ) x$CDF)
     class(CDF) <- "cdfLst"
-    DIST <- lapply(ovlStatLst[[type]], function(x) x$DIST)
-    height <- matrix(unlist(lapply(ovlStatLst[[type]],
+    DIST <- lapply(lst, function(x) if ( length(x)>1 ) x$DIST)
+    height <- matrix(unlist(lapply(lst,
                                    function(x) x$height)),ncol=2,byrow=TRUE)
-    jaccard <- unlist(lapply(ovlStatLst[[type]],
+    jaccard <- unlist(lapply(lst,
                              function(x) x$jaccard))
-    j.prcnt <- unlist(lapply(ovlStatLst[[type]],
+    j.prcnt <- unlist(lapply(lst,
                              function(x) x$j.prcnt))
-    j.cutoff <- unlist(lapply(ovlStatLst[[type]],
+    j.cutoff <- unlist(lapply(lst,
                              function(x) x$j.cutoff))
     #j.prcnt<- covlStats$j.prcnt# percent of targets covered with J>threshold
-    hitnum <- unlist(lapply(ovlStatLst[[type]],
+    hitnum <- unlist(lapply(lst,
                                 function(x) x$hitnum))
-    numhit <- unlist(lapply(ovlStatLst[[type]],
+    numhit <- unlist(lapply(lst,
                             function(x) x$numhit))
-    qnum <- unlist(lapply(ovlStatLst[[type]],
+    qnum <- unlist(lapply(lst,
                           function(x) x$qnum))
-    tnum <- unique(unlist(lapply(ovlStatLst[[type]],
+    tnum <- unique(unlist(lapply(lst,
                                  function(x) x$tnum)))
     nms <- names(CDF)
     names(jaccard) <- names(hitnum) <- names(numhit) <-
