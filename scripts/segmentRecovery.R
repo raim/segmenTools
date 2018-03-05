@@ -178,7 +178,7 @@ sgclpchs <- rep(1:17, len=length(sgclasses)) #only 17 to avoid lty multiple
 sgclltys <- rep(1:6, len=length(sgclasses))
 names(sgclcols) <- names(sgclpchs) <-names(sgclltys) <- sgclasses
 
-## new: segment class table
+## new: segment class table, only used for PAM clustering 
 sgcltab <- getSegmentClassTable(sgtypes, sep="_")
 
 ### START ANALYSIS
@@ -449,7 +449,7 @@ for ( test.type in test.types ) {
     ## MAX vs. MIN CLUSTERING  cluster jaccard vs. numhits vs segment classes
     ## TODO: also include height in clustering?
     pm <- NULL
-    if ( sgnum>5 ) { # TODO: pmcol used below skip if 
+    if ( sgnum>5 & ncol(sgcltab)>1) { # TODO: pmcol used below skip if 
         K <- 7
         dat <- cbind((jaccard-min(jaccard))/(max(jaccard)-min(jaccard)),
                      (numhit-min(numhit))/(max(numhit)-min(numhit)),
@@ -817,6 +817,7 @@ for ( type in sgtypes ) {
     rownames(height) <- names(hitnum) <- names(CDF) <- test.types
     numhit <- tnum <- hitnum
     for ( test.type in test.types ) {
+        if ( is.null(stats[[test.type]][[type]]) ) next
         CDF[[test.type]] <- stats[[test.type]][[type]]$CDF
         CDF[[test.type]]$name <- test.type
         numhit[test.type] <-  stats[[test.type]][[type]]$numhit
@@ -844,18 +845,19 @@ for ( type in sgtypes ) {
     leg <- NULL
     xmax <- 3
     x <- seq(0,xmax,.05)
-    plot(x, CDF[[1]]$rcdf(x),type="l",main=NA,col=NA,lty=1,
+    plot(1,type="l",main=NA,col=NA,lty=1,
          xlab="ratio: query length/target length",xlim=c(0,xmax),
          ylab="cum.dist.func.",ylim=c(0,1.1))
     abline(v=c(ovlth,2-ovlth),lty=2)
     abline(h=c(minf,.8),lty=2)
     abline(h=0:1, lty=2, col="gray",lwd=.75)
     for ( i in 1:length(CDF) ) {
-      col <- tcols[CDF[[i]]$name] # todo: tid
-      if ( !is.null(CDF[[i]]$rcdf) ) {
-        lines(x,CDF[[i]]$rcdf(x),col=paste(col,"AA",sep=""),lty=1,lwd=2) 
-        leg <- c(leg, CDF[[i]]$name) # todo: tid
-      }
+        if ( length(CDF[[i]])<2 ) next
+        col <- tcols[CDF[[i]]$name] # todo: tid
+        if ( !is.null(CDF[[i]]$rcdf) ) {
+            lines(x,CDF[[i]]$rcdf(x),col=paste(col,"AA",sep=""),lty=1,lwd=2) 
+            leg <- c(leg, CDF[[i]]$name) # todo: tid
+        }
     }
     mtext(paste(testid,"recovery by segments"),3,0,cex=1.5)
     legend("bottomright",leg,col=tcols[leg],lty=1,lwd=2,bty="n")
@@ -885,7 +887,7 @@ for ( type in sgtypes ) {
 }
 } # end of loop over real vs. random!
 
-quit(save="no")
+if ( !interactive() ) quit(save="no")
 
 
 ### TEST-SET ANALYSES
