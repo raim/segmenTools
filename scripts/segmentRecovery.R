@@ -169,7 +169,10 @@ sgpchs <- rep(1:17, len=length(sgtypes)) #only 17 of 18 to avoid multiple of lty
 sgltys <- rep(1:6, len=length(sgtypes))
 names(sgcols) <- names(sgpchs) <- names(sgltys) <- sgtypes
 
-## get segment classes 
+## get segment classes
+## TODO: rm sgclasses?
+## this is only used for PAM clustering below and
+## was specific for analysis of segmenTier results 2017
 sgclasses <- getSegmentClasses(sgtypes, sep="_")
 
 ## col, pch and lty for classes
