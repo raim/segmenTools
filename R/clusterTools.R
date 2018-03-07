@@ -1637,9 +1637,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     if ( each ) {
         mai <- par("mai")
         mfc <- par("mfcol")
-        mai[c(1,3)] <- 0
+        newmai <- c(0,mai[2],0,mai[4])
         if ( !embed ) # don't set mfcol, to embed into externally set layouts
-            par(mfcol=c(length(cls.srt),1),mai=mai)
+            par(mfcol=c(length(cls.srt),1),mai=newmai)
      } else {
         if ( !missing(ref.xy) ) {
             plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=range(time))
