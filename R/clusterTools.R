@@ -1095,6 +1095,8 @@ phasesortClusters <- function(x, cls) {
 #' numeric cluster labels reflect this sorting.
 #' @param cls the `clustering' object from segmenTier's 
 #' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
+## TODO: alternatively just add a list of cluster labels
+## to the clustering object and use this in plot functions!
 #' @export
 relabelClusters <- function(cls) {
     if ( class(cls)!="clustering" )
@@ -1114,7 +1116,7 @@ relabelClusters <- function(cls) {
         rownames(cls$Ccc[[k]]) <- colnames(cls$Ccc[[k]]) <- srt
 
         ## add 0-cluster and re-write clusters, sorting and colors
-        if ( 0 %in% srt )
+        if ( !0 %in% srt )
             srt <- c(srt,"0"=0)
 
         cls$clusters[,k] <- srt[as.character(cls$clusters[,k])]
