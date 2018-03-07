@@ -1085,6 +1085,46 @@ phasesortClusters <- function(x, cls) {
     names(sort(phase[grep("mean",rownames(phase)),]))
 }
 
+#' relabels cluster labels by their sorting
+#'
+#' relabels all cluster labels in a `clustering' object (as returned
+#' by \code{\link{clusterTimeseries2}},
+#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}} and
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}})
+#' by the cluster sorting (in \code{cls$sorting}), such that the new
+#' numeric cluster labels reflect this sorting.
+#' @param cls the `clustering' object from segmenTier's 
+#' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
+#' @export
+relabelClusters <- function(cls) {
+    if ( class(cls)!="clustering" )
+        stop("function requires class 'clustering', as returned by clusterTimeseries2")
+    for ( i in 1:length(cls$sorting) ) {
+        k <- names(cls$sorting)[i]
+        srt <- 1:length(cls$sorting[[i]])
+        names(srt) <- cls$sorting[[i]]
+
+        ## re-order and re-name matrices
+        cls$centers[[k]] <- cls$centers[[k]][names(srt),]
+        rownames(cls$centers[[k]]) <- srt
+        ## TODO: upstream - provide colnames for Pci!!!
+        cls$Pci[[k]] <- cls$Pci[[k]][,as.numeric(names(srt))]
+        colnames(cls$Pci[[k]]) <- srt
+        cls$Ccc[[k]] <- cls$Ccc[[k]][names(srt),names(srt)]
+        rownames(cls$Ccc[[k]]) <- colnames(cls$Ccc[[k]]) <- srt
+
+        ## add 0-cluster and re-write clusters, sorting and colors
+        if ( 0 %in% srt )
+            srt <- c(srt,"0"=0)
+
+        cls$clusters[,k] <- srt[as.character(cls$clusters[,k])]
+
+        cls$sorting[[k]] <- srt[cls$sorting[[k]]]
+        names(cls$colors[[k]]) <- srt[names(cls$colors[[k]])]
+    }
+    cls
+}
+
 ### PLOT CLUSTERED TIME-SERIES
 
 #' plot polar coordinates
