@@ -863,7 +863,8 @@ for ( type in sgtypes ) {
         }
     }
     mtext(paste(testid,"recovery by segments"),3,0,cex=1.5)
-    legend("bottomright",leg,col=tcols[leg],lty=1,lwd=2,bty="n")
+    if ( !is.null(leg) )
+        legend("bottomright",leg,col=tcols[leg],lty=1,lwd=2,bty="n")
     legend("topleft",paste(type))
     dev.off()
 
