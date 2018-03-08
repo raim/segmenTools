@@ -1121,7 +1121,7 @@ relabelClusters <- function(cls) {
 
         cls$clusters[,k] <- srt[as.character(cls$clusters[,k])]
 
-        cls$sorting[[k]] <- srt[cls$sorting[[k]]]
+        cls$sorting[[k]] <- as.character(srt[cls$sorting[[k]]])
         names(cls$colors[[k]]) <- srt[names(cls$colors[[k]])]
     }
     cls
