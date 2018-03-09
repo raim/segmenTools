@@ -390,7 +390,8 @@ clusterAnnotation <- function(cls, data, p=1,
         ## cumulative hypergeometric distribution
         ## TODO: take sum of bonferroni correction factors
         ## correct below in bin.filter
-        tmp <- clusterCluster(bins, cls, alternative=c("greater"))
+        tmp <- clusterCluster(bins, cls,
+                              alternative=c("greater"),cl2.srt=cls.srt)
        
         # get overlap and p.values in original bin order
         if ( !is.null(tmp) ) {
