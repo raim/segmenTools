@@ -257,12 +257,14 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),decreasing=FALSE)]
     new.srt <- c(sig.srt[!duplicated(sig.srt)], rest.srt)
 
-    ## resort all matrices in overlap structure
+    ## resort all matrices in overlap structure (overlap, pvalue, jaccard, ...)
     ## TODO: do this nicer
+    n <- nrow(pvl)
+    m <- ncol(pvl)
     for ( i in 1:length(ovl) )
-        if ( class(ovl[[i]])=="matrix" )
-            if ( nrow(ovl[[i]]) == length(new.srt) )
-                ovl[[i]] <- ovl[[i]][new.srt,]
+      if ( class(ovl[[i]])=="matrix" ) ## check if matrix is of same dim
+        if ( nrow(ovl[[i]])==n & ncol(ovl[[i]])==m )
+          ovl[[i]] <- ovl[[i]][new.srt,]
 
     ## transpose back
     if ( axis==1 )
@@ -394,6 +396,7 @@ clusterAnnotation <- function(cls, data, p=1,
         if ( !is.null(tmp) ) {
             ovl <- tmp$overlap # contingency table
             pvl <- tmp$p.value
+            rownames(ovl) <- rownames(pvl) <- paste0(name,"_",rownames(pvl))
             overlap <- rbind(overlap, ovl)
             pvalues <- rbind(pvalues, pvl)
             # copy name in same size to allow easy cbind below
@@ -520,8 +523,19 @@ clusterAnnotation <- function(cls, data, p=1,
     if ( !is.null(terms) ) # not required for other columns (no keys)
         sig <- lapply(sig, function(x)
             cbind.data.frame(description=terms[x[,"category"]],x))
+
+    ##cat(paste("USED FILTER p<", p, "\n"))
+
+    ## process full tables
+    ## remove filtered (usually bin.filter==FALSE for a T/F table input)
+    rm.pat <- paste0("_",bin.filter,"$")
+    pvalues <- pvalues[grep(rm.pat, rownames(pvalues), invert=TRUE),]
+    ## remove all where p-value is below threshold
+    rm.pvl <- apply(pvalues,1,function(x) !any(x<=p))
+    pvalues <- pvalues[!rm.pvl,]
+    overlap <- overlap[rownames(pvalues),]
     
-    return(list(tables=sig, psig=psig))
+    return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap))
            
 }
 
