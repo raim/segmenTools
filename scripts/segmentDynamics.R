@@ -488,11 +488,11 @@ for ( type in sgtypes ) {
 
     ## FILTER: no single significant read-count (< pval.thresh.sig)
     unsig <- pvs[,"p.signif"] == 0 
-
+    pcdf <- ecdf(pvs[,"p.signif"])
     file.name <- file.path(out.path,paste0(fname,"_filter_signifraction"))
     plotdev(file.name,width=4,height=4,type=fig.type,res=300)
-    plot(ecdf(pvs[,"p.signif"]),xlab="fraction of significant reads")
-    points(.01,tcdf(.01))
+    plot(pcdf,xlab="fraction of significant reads")
+    points(.01,pcdf(.01))
     dev.off()
     
     ## FILTER: total expresssion vs. rain
