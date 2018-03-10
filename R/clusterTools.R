@@ -693,7 +693,7 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
                                parameters=c(iter.max=100000, nstart=100,
                                             B=500, tol=1e-5, lambda=1,
                                             nu=4, nu.est=0, trans=1,
-                                            merge=FALSE),
+                                            merge=FALSE, randomStart=0),
                                nui.thresh=-Inf, verb=1, ...) {
 
     if ( method=="flowClust" ) {
@@ -791,11 +791,12 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
             nu <- parameters["nu"]
             nu.est <- parameters["nu.est"]
             trans <- parameters["trans"]
+            randomStart <- parameters["randomStart"]
 
             #cat(paste("lambda", lambda, "\n"))
 
             fc <- flowClust::flowClust(dat[!rm.vals,], K=Kused, B=B, tol=tol,
-                                         lambda=lambda,
+                                         lambda=lambda, randomStart=randomStart,
                                          nu=nu, nu.est=nu.est, trans=trans,...)
 
 
@@ -1357,8 +1358,6 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     icl <- cls$icl
     K <- as.numeric(names(bic))
     krng <- range(K)
-    max.bic <- max(bic, na.rm=TRUE) # max BIC
-    max.icl <- max(icl, na.rm=TRUE) # max ICL
     max.clb <- K[which(cls$K==cls$max.clb)]
     max.cli <- K[which(cls$K==cls$max.cli)]
     sel.bic <- bic[which(cls$K==cls$selected)]
@@ -1373,9 +1372,9 @@ plotBIC <- function(cls, norm=FALSE, ...) {
         bic <- bic/N/M
         icl <- icl/N/M
         sel.bic <- sel.bic/N/M
-        max.bic <- bic[as.character(max.clb)]
-        max.icl <- icl[as.character(max.cli)]
     }
+    max.bic <- max(bic, na.rm=TRUE) # max BIC
+    max.icl <- max(icl, na.rm=TRUE) # max ICL
 
     ## legend
     leg <- c("BIC","ICL","failed","max. BIC","max. ICL", "selected")
@@ -1387,8 +1386,9 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     ## flowMerge clusters present?
     if ( !is.null(cls$merged.K) ) {
         mrg.cl <- cls$merged.K
+        mrg.origK <- sub("K:","",names(cls$merged.origK))
         mrg.orig <- cls$merged.origK
-        mrg.bic <- bic[as.character(mrg.orig)]
+        mrg.bic <- bic[which(cls$K==mrg.origK)]
         krng <- range(c(krng,mrg.orig,mrg.cl))
     }
     
