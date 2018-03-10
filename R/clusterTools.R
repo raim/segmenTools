@@ -182,6 +182,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' low numbers in Jaccard index
 #' @param round number of digits to round overlap numbers to (useful
 #' for Jaccard index)
+#' @param axis integer vector, sets whether x-axis (1,3) and/or
+#' y-axis (2,4) are drawn; the column and row names of \code{dat} will
+#' be used as tick labels
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: sort by significance?
