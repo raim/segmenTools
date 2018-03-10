@@ -17,8 +17,8 @@ which will be plotted on the image}
 
 \item{text.cex}{relative font size for text fields}
 
-\item{axis}{integer vector, sets whether bottom (1) and/or left
-(2) axis are draw; the column and row names of \code{dat} will
+\item{axis}{integer vector, sets whether x-axis (1,3) and/or
+y-axis (2,4) are drawn; the column and row names of \code{dat} will
 be used as tick labels}
 
 \item{axis1.col}{invididual colors for x-axis tick labels, length must

@@ -5,7 +5,7 @@
 \title{plot cluster-cluster or segment-segment overlaps}
 \usage{
 plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, short = TRUE,
-  scale = 1, round, ...)
+  scale = 1, round, axis = 1:2, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -28,6 +28,10 @@ low numbers in Jaccard index}
 
 \item{round}{number of digits to round overlap numbers to (useful
 for Jaccard index)}
+
+\item{axis}{integer vector, sets whether x-axis (1,3) and/or
+y-axis (2,4) are drawn; the column and row names of \code{dat} will
+be used as tick labels}
 
 \item{...}{arguments to \code{\link{image_matrix}}}
 }
