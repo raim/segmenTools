@@ -187,7 +187,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 ## TODO: sort by significance?
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=1, round, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=1, round, axis=1:2, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
@@ -221,7 +221,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=
         txt[hg]  <- paste(txt[hg],"k",sep="")
     }
 
-    image_matrix(pval, breaks=breaks, col=colors, axis=1:2,
+    image_matrix(pval, breaks=breaks, col=colors, axis=axis,
                  text=txt, text.col=txt.col, ...)
 }
 
@@ -553,8 +553,8 @@ clusterAnnotation <- function(cls, data, p=1,
 #' which will be plotted on the image
 #' @param text.col individual colors for text fields
 #' @param text.cex relative font size for text fields
-#' @param axis integer vector, sets whether bottom (1) and/or left
-#' (2) axis are draw; the column and row names of \code{dat} will
+#' @param axis integer vector, sets whether x-axis (1,3) and/or
+#' y-axis (2,4) are drawn; the column and row names of \code{dat} will
 #' be used as tick labels
 #' @param axis1.col invididual colors for x-axis tick labels, length must
 #' equal the number of columns of \code{dat}
