@@ -106,6 +106,8 @@ option_list <- list(
   make_option("--trans", type="integer", default=1, 
               help="A numeric indicating whether the Box-Cox transformation
           parameter is estimated from the data; 0: no, 1: non-specific, 2: cluster-specific estim. of lambda"), ## TODO: try 2
+  make_option("--randomStart", type="integer", default=1, 
+              help="number of kmeans initializations"), 
   make_option(c("--merge"), action="store_true", default=FALSE,
               help="use flowMerge to merge best BIC clustering"),
   make_option(c("--recluster"), action="store_true", default=FALSE,
