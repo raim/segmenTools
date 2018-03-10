@@ -516,9 +516,11 @@ clusterAnnotation <- function(cls, data, p=1,
         sig <- lapply(hyp.tables, function(x) {
             x <- x[x[,"p-value"] <= p,] #smaller then passed p-value threshold?
             x[order(x[,"p-value"]),]})
+
     ## filter by bins
+    rm.pat <- paste0("_",bin.filter,"$")
     if ( !missing(bin.filter) )
-        sig <- lapply(sig, function(x) x[!x[,"bin"]%in%bin.filter,] )
+        sig <- lapply(sig, function(x) x[grep(rm.pat,x[,"bin"], invert=TRUE),] )
         
     ## add description of terms
     if ( !is.null(terms) ) # not required for other columns (no keys)
@@ -529,7 +531,6 @@ clusterAnnotation <- function(cls, data, p=1,
 
     ## process full tables
     ## remove filtered (usually bin.filter==FALSE for a T/F table input)
-    rm.pat <- paste0("_",bin.filter,"$")
     pvalues <- pvalues[grep(rm.pat, rownames(pvalues), invert=TRUE),]
     ## remove all where p-value is below threshold
     rm.pvl <- apply(pvalues,1,function(x) !any(x<=p))
