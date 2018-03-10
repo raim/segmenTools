@@ -594,6 +594,14 @@ image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, a
                          las=axis1.las, cex.axis=axis.cex, lwd=2)
             else
                 axis(1, at=1:ncol(dat), labels=colnames(dat), las=axis1.las)
+        if ( 3 %in% axis ) 
+            if ( !missing(axis1.col) ) # colored ticks
+                for ( i in 1:ncol(dat) )
+                    axis(3, at=i,colnames(dat)[i],
+                         col.axis=axis1.col[i], col=axis1.col[i],
+                         las=axis1.las, cex.axis=axis.cex, lwd=2)
+            else
+                axis(3, at=1:ncol(dat), labels=colnames(dat), las=axis1.las)
         if ( 2 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
                 for ( i in 1:nrow(dat) )
@@ -602,6 +610,14 @@ image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, a
                              las=axis2.las, cex.axis=axis.cex, lwd=2)
             else
                 axis(2, at=nrow(dat):1, rownames(dat),las=axis2.las)        
+        if ( 4 %in% axis )
+            if ( !missing(axis2.col) ) # colored ticks
+                for ( i in 1:nrow(dat) )
+                        axis(4, at=nrow(dat)-i+1, rownames(dat)[i],
+                             col.axis=axis2.col[i], col=axis2.col[i],
+                             las=axis2.las, cex.axis=axis.cex, lwd=2)
+            else
+                axis(4, at=nrow(dat):1, rownames(dat),las=axis2.las)        
     }
 } 
 
