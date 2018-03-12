@@ -1604,13 +1604,14 @@ splitsegs <- function(segs, chrS, idcol, verb=0) {
         stop("splitsegs requires ordered start<end coordinates")
 
     ## remember all columns
-    ## split IDs will be indicated!
     col.srt <- colnames(segs)
+
+    ## copy IDs, split IDs will receive a suffix
     if ( missing(idcol) ) idcol <- NULL
     if ( !is.null(idcol) ) ids <- as.character(segs[,idcol])
     else ids <- as.character(1:nrow(segs))
 
-    # is2388_2 vs. is2513_2
+    ## copy all other columns
     othercols <- col.srt[!col.srt%in%c("start","end",idcol)]
     if ( length(othercols)==0 ) othercols <- NULL
         
@@ -1628,13 +1629,16 @@ splitsegs <- function(segs, chrS, idcol, verb=0) {
     if ( !is.null(othercols) )
         old.data <- segs[-splt,othercols,drop=FALSE]
     
+    ## construct split coordinates
     str <- idx2str(start[splt],chrS)
-    str.end <- idx2str(end[splt],chrS)
     ## (str==-1)*max(chrS) adds minus strand to end
     new<-rbind(cbind(start[splt],chrS[schr[splt]+1] + (str==-1)*max(chrS)),
                cbind(chrS[schr[splt]+1]+1 + (str==-1)*max(chrS) ,end[splt]))
+    ## add suffix to ID
     new.ids <- paste0(rep(ids[splt],2),rep(c("","_2"),each=length(splt)))
-    if ( !is.null(othercols) ) { ## copy all other columns
+
+    ## copy all other columns
+    if ( !is.null(othercols) ) { 
         new.data <- rbind(segs[splt,othercols,drop=FALSE],
                           segs[splt,othercols,drop=FALSE])
     }
@@ -1654,6 +1658,7 @@ splitsegs <- function(segs, chrS, idcol, verb=0) {
     start <- start[srt]
     if ( !is.null(othercols) ) data <- data[srt,]
 
+    ## collate results and reproduce input data structure
     res <- data.frame(start=start, end=end,ID=ids, stringsAsFactors=FALSE)
     if ( !is.null(othercols) )
         res <- cbind(res, data)
