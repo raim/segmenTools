@@ -83,18 +83,12 @@ for ( i in 2:length(chrS) ) {
 ## and seg.path to write files with data for all segments
 if ( verb>0 )
     cat(paste("Calculating pre-segmentation\t",time(),"\n",sep=""))
-if ( plot.borders ) {
+if ( plot.borders ) 
     if ( verb>0 ) cat(paste("... and plotting border scans.\n"))
-    primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
-                          avg=avg, favg=favg,
-                          minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
-                          fig.path=outdir, verb=verb)
-} else {
-    primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
-                          avg=avg, favg=favg,
-                          minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
-                          verb=verb)
-}
+primseg <- presegment(ts=ts, chrS=chrS, map2chrom=FALSE,
+                      avg=avg, favg=favg,,
+                      minrd=minrd, minds=minds, minsg=minsg, rmlen=rmlen,
+                      fig.path=outdir, plot.borders=plot.borders, verb=verb)
 
 ## column chr will be filled by index2coor
 primseg <- data.frame(ID=paste("sg",str_pad(1:nrow(primseg),4,pad="0"),sep=""),
@@ -112,10 +106,13 @@ emptyseg <- data.frame(ID=paste("is",str_pad(1:(nrow(primseg)+1),4,pad="0"),
                          sep=""),
                        chr=rep(NA,nrow(primseg)+1),
                        start=c(1,primseg[1:nrow(primseg),"end"]+1),
-                       end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)))
+                       end=c(primseg[1:nrow(primseg),"start"]-1,nrow(ts)),
+                       stringsAsFactors=FALSE)
 emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
 emptyseg <- emptyseg[emlen>0,] # rm 0-length
-## TODO: remove >max(chrS)
+emptyseg <- splitsegs(emptyseg,chrS,idcol="ID",verb=verb)
+
+## TODO: remove >max(chrS) and split at chromosome ends!
 
 ## write out inter-segments!
 if ( write.segments ) {

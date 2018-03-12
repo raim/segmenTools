@@ -1337,23 +1337,32 @@ segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
 #' and forward and reverse strand values, but can be omitted.
 #' @param map2chrom if true, argument \code{chrS} is required to map
 #' the segment coordinates to chromosomal coordinates
-#' @param fig.path a directory path for plots of the segment end scanning;
-#' no figures will be plotted if \code{fig.path} is not provided.
-#' @param fig.type image type, "png" or "pdf"
 #' @param seg.path a directory path where individual segments' data will
 #' be written to as tab-delimited .csv files; no files will be written if
 #' \code{seg.path} is not provided.
+#' @param plot.borders logical indicating whether plots of the scanned
+#' borders should be generate (in directory at \code{fig.path})
+#' @param fig.path a directory path for plots of the segment end scanning;
+#' no figures will be plotted if \code{fig.path} is not provided.
+#' @param fig.type image type, "png" or "pdf"
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
 presegment <- function(ts, avg=1000, minrd=8,
                        favg=100, border=c("expand","trim"),
                        minds=250, rmlen=250, minsg=5e3,
                        chrS, map2chrom=FALSE,
-                       seg.path, fig.path, fig.type="png",
+                       seg.path, plot.borders=FALSE, fig.path, fig.type="png",
                        verb=1) {
 
     if ( verb> 0 )
         cat(paste("Calculating total read-counts and moving averages...\n"))
+
+    ## plot borders fig path
+    if ( missing(fig.path) )
+        fig.path <- getwd() # plot to working directory
+
+    ## cut at chromosome ends depends on presence of chrS index
+    cutChromosomes <- !missing(chrS)
     
     ## total time series
     numts <- rowSums(ts > 0) ## number timepoints with reads
@@ -1368,15 +1377,19 @@ presegment <- function(ts, avg=1000, minrd=8,
     ## TODO: should be >= for "minimal"
     segs <- avgts > minrd # smoothed total read number is larger then threshold
     ## set chromosome ends to FALSE as well
-    if ( !missing(chrS) )
-        segs[c(chrS[2:length(chrS)],chrS+1)] <- FALSE
-
+    if ( cutChromosomes ) {
+        chrends <- sort(c(chrS[2:length(chrS)],(chrS+1)[2:length(chrS)-1]))
+        if ( idx2str(length(segs),chrS)==-1 ) # add reverse strand splits
+            chrends <- c(chrends, chrends + max(chrS))
+        segs[chrends] <- FALSE
+    }
+    
     ## areas below expression threshold
     empty <- which(!segs) 
 
     ## distance between empty areas
     emptycoor <- empty
-    if ( !missing(chrS) ) # accounts for chromosome ends - TODO: could be faster
+    if ( cutChromosomes ) # accounts for chromosome ends - TODO: could be faster
         emptycoor <- idx2coor(empty, chrS)[,"coor"]
     distn <- diff(emptycoor) 
 
@@ -1385,6 +1398,8 @@ presegment <- function(ts, avg=1000, minrd=8,
     end <- start + distn[which(distn>1)]-2
 
     ## fuse close segments, < minds
+    ## NOTE: this will fuse chromosome ends again
+    ## so perhaps the effort above is not required
     close <- start[2:length(end)] - end[2:length(end)-1] < minds
 
     if ( verb>0 )
@@ -1406,7 +1421,7 @@ presegment <- function(ts, avg=1000, minrd=8,
     ## (2) expand ends in both directions until mov.avg. (n=10) of signal is 0
     ## TODO: analyze gradients and minima, and add to appropriate segments
     ## TODO: border expand | trim
-    if ( border=="expand" ) {
+    if ( border[1]=="expand" ) {
         if ( verb>0 )
             cat(paste("Scanning borders ...\n"))
         fused <- 0
@@ -1434,7 +1449,7 @@ presegment <- function(ts, avg=1000, minrd=8,
                 fused <- fused +1
             }
             
-            if ( missing(fig.path) ) next
+            if ( !plot.borders ) next
     
             ## plot borders
             bord <- range(rng)
@@ -1528,31 +1543,13 @@ presegment <- function(ts, avg=1000, minrd=8,
     ## (5) split chromosome ends!
     ## TODO: why is multiple chromosome end handling required?
     ## TODO: attach small telomeric segments to next?
-    ## TODO: doesnt work at chrXVI
+    ## TODO: doesnt work at chrXVI ??
     ## get chromosomes of starts and ends via chrS
-    if ( !missing(chrS) ) {
-        
-        schr <- idx2chr(start,chrS) # forward strand
-        echr <- idx2chr(end,chrS) # reverse strand
-        splt <- which(echr!=schr) # which are spanning chromosome ends?
-        
-        if ( verb>0 )
-          cat(paste("Splitting chromosome ends",length(splt),"\n"))
-        
-        ## split chromosome-spanning segments, and fuse with rest
-        old <- cbind(start[-splt], end[-splt])
-        
-        str <- idx2str(start,chrS)[splt]
-        ## (str==-1)*max(chrS) adds minus strand to end
-        new<-rbind(cbind(start[splt],chrS[schr[splt]+1] + (str==-1)*max(chrS)),
-                   cbind(chrS[schr[splt]+1]+1 + (str==-1)*max(chrS) ,end[splt]))
-        seg <- rbind(old,new)
-        start <- seg[,1] # re-assign start/end of segments
-        end <- seg[,2]
-        
-        ## re-order
-        end <- end[order(start)]
-        start <- sort(start)
+    if ( cutChromosomes ) {
+
+        seg <- splitsegs(cbind(start,end),chrS,verb=verb)
+        start <- seg[,"start"]
+        end <- seg[,"end"]
 
         ## remove too small segments again
         small <- end-start < rmlen
@@ -1569,7 +1566,7 @@ presegment <- function(ts, avg=1000, minrd=8,
     primseg <- cbind(start,end)  ## DONE - PRIMARY SEGMENT v4
 
     ## map back to original chromosome coordinates
-    if ( !missing(chrS) & map2chrom ) {
+    if ( cutChromosomes & map2chrom ) {
         #primseg <-cbind(start=primseg[,1], end=primseg[,2])
         primseg <- index2coor(primseg,chrS)
     }
@@ -1581,6 +1578,90 @@ presegment <- function(ts, avg=1000, minrd=8,
     }
     primseg
 }
+
+#' splits segments that span chromosome ends
+#'
+#' Finds segments that span chromosomes ends and splits those
+#' in two segments on each covered chromosome. The input must
+#' contain columns "start" and "end"; these will be modified for
+#' chromosome-spanning segments. All other entries in the matrix
+#' will be copied, unless an "idcol" is specified, which will receive the
+#' suffix "_2" for one of two copies.
+#' @param segs a matrix of segment start and end coordinates given
+#' in columns named "start" and "end"
+#' @param chrS a chromosome index, indicating at wich positions
+#' chromosomes start; this is required for handling chromosome ends
+#' and forward and reverse strand values, but can be omitted
+#' @param idcol
+#' @param verb integer level of verbosity, 0: no messages, 1: show messages
+#' @export
+splitsegs <- function(segs, chrS, idcol, verb=0) {
+
+    start <- segs[,"start"]
+    end <- segs[,"end"]
+
+    if ( any(end<start) )
+        stop("splitsegs requires ordered start<end coordinates")
+
+    ## remember all columns
+    ## split IDs will be indicated!
+    col.srt <- colnames(segs)
+    if ( missing(idcol) ) idcol <- NULL
+    if ( !is.null(idcol) ) ids <- as.character(segs[,idcol])
+    else ids <- as.character(1:nrow(segs))
+
+    # is2388_2 vs. is2513_2
+    othercols <- col.srt[!col.srt%in%c("start","end",idcol)]
+    if ( length(othercols)==0 ) othercols <- NULL
+        
+    ## get strand
+    schr <- idx2chr(start,chrS) # forward strand
+    echr <- idx2chr(end,chrS) # reverse strand
+    splt <- which(echr!=schr) # which are spanning chromosome ends?
+    
+    if ( verb>0 )
+        cat(paste("Splitting chromosome ends",length(splt),"\n"))
+    
+    ## split chromosome-spanning segments, and fuse with rest
+    old <- cbind(start[-splt], end[-splt])
+    old.ids <- ids[-splt]
+    if ( !is.null(othercols) )
+        old.data <- segs[-splt,othercols,drop=FALSE]
+    
+    str <- idx2str(start[splt],chrS)
+    str.end <- idx2str(end[splt],chrS)
+    ## (str==-1)*max(chrS) adds minus strand to end
+    new<-rbind(cbind(start[splt],chrS[schr[splt]+1] + (str==-1)*max(chrS)),
+               cbind(chrS[schr[splt]+1]+1 + (str==-1)*max(chrS) ,end[splt]))
+    new.ids <- paste0(rep(ids[splt],2),rep(c("","_2"),each=length(splt)))
+    if ( !is.null(othercols) ) { ## copy all other columns
+        new.data <- rbind(segs[splt,othercols,drop=FALSE],
+                          segs[splt,othercols,drop=FALSE])
+    }
+        
+    ## bind
+    seg <- rbind(old,new)
+    ids <- c(old.ids,new.ids)
+    if ( !is.null(othercols) ) data <- rbind(old.data, new.data)
+
+    start <- seg[,1] # re-assign start/end of segments
+    end <- seg[,2]
+    
+    ## re-order
+    srt <- order(start)
+    ids <- ids[srt]
+    end <- end[srt]
+    start <- start[srt]
+    if ( !is.null(othercols) ) data <- data[srt,]
+
+    res <- data.frame(start=start, end=end,ID=ids, stringsAsFactors=FALSE)
+    if ( !is.null(othercols) )
+        res <- cbind(res, data)
+    colnames(res) <- c("start","end", idcol, othercols)
+    res <- res[,col.srt] # re-sort as original
+    res
+}
+
 
 #' write out segment data to individual files
 #' 
