@@ -6,7 +6,8 @@
 \usage{
 presegment(ts, avg = 1000, minrd = 8, favg = 100, border = c("expand",
   "trim"), minds = 250, rmlen = 250, minsg = 5000, chrS,
-  map2chrom = FALSE, seg.path, fig.path, fig.type = "png", verb = 1)
+  map2chrom = FALSE, seg.path, plot.borders = FALSE, fig.path,
+  fig.type = "png", verb = 1)
 }
 \arguments{
 \item{ts}{the time-series of readcounts for the complete chromosome,
@@ -45,6 +46,9 @@ the segment coordinates to chromosomal coordinates}
 \item{seg.path}{a directory path where individual segments' data will
 be written to as tab-delimited .csv files; no files will be written if
 \code{seg.path} is not provided.}
+
+\item{plot.borders}{logical indicating whether plots of the scanned
+borders should be generate (in directory at \code{fig.path})}
 
 \item{fig.path}{a directory path for plots of the segment end scanning;
 no figures will be plotted if \code{fig.path} is not provided.}
