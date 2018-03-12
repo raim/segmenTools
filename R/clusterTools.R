@@ -1113,12 +1113,49 @@ mergeCluster <- function(tset, cset, selected) {
 ## takes a time-series and a clustering object,
 ## calculates phases for each cluster and sorts clusters
 ## by phase
-phasesortClusters <- function(x, cls) {
-    cls.srt <- unique(cls)
-    names(cls.srt) <- cls.srt
-    phase <- calculatePhase(x)
-    phase <- sapply(cls.srt, function(x) phaseDist(phase[cls==x,]))
-    names(sort(phase[grep("mean",rownames(phase)),]))
+phasesortClusters <- function(ts, cls, phase, cycles) {
+
+    
+    orig <- NULL
+    if ( class(ts)=="timeseries" )
+        ts <- ts$ts
+    if ( is.vector(cls) )
+        cls <- matrix(cls,ncol=1)
+    if ( class(cls)=="clustering" ) {
+        ## store if cls is a clustering set
+        orig <- cls
+        cls <- cls$clusters
+    }
+
+    ## calculate segment phase
+    if ( missing(phase) )
+        phase <- calculatePhase(ts, cycles=cycles)
+
+    for ( k in 1:ncol(cls) {
+        cl <- cls[,k]
+        
+        cl.srt <- unique(cl)
+        names(cl.srt) <- cl.srt
+        
+        phase <- sapply(cl.srt, function(x) phaseDist(phase[cl==x,]))
+        #names(sort(phase[grep("mean",rownames(phase)),]))
+        colnames(phase) <- cl.srt
+        cl.srt <- cl.srt[order(phase[1,])]
+        
+    }
+    
+    ## sort by phase!
+    phases <- calculatePhase(tset$ts, cycles=3)
+    nset <- cset
+    for ( i in 1:length(cset$sorting) ) {
+        cls <- as.character(cset$clusters[,i])
+        cls.srt <- cset$sorting[[i]]
+        phs <- sapply(cls.srt, function(x) phaseDist(phases[cls==x]))
+        colnames(phs) <- cls.srt
+        nset$sorting[[i]] <- cls.srt[order(phs[1,])]
+    }
+    nset <- relabelClusters(nset) # re-label by sorting
+    cset <- nset
 }
 
 #' relabels cluster labels by their sorting
