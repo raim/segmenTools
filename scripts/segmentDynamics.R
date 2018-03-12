@@ -617,6 +617,17 @@ for ( type in sgtypes ) {
     write.table(sgcls,file=paste(file.name,".csv",sep=""),quote=FALSE,
                 sep="\t",col.names=TRUE,row.names=FALSE)
 
+
+    ## RESORT CLUSTERING
+    ## TODO: sort by phase and re-cluster; use vector phs
+    ## of average segment phases!
+    ## cls.phase <- sapply(cls.srt, function(x)
+    ##   phaseDist(phase[cls==x],w=1-rp[cls==x,"pVal"]))
+    ## cset$sorting[[bestKcol]] <- cls.srt
+    ## ## re-color
+    ## cset <- colorClusters(cset)
+
+    
     ## save all as RData
     if ( save.rdata ) 
       save(sgs, rds, phs, pvs, dft, tset, fcset, sgcls, fname,
@@ -648,14 +659,6 @@ for ( type in sgtypes ) {
         mai=c(.5,.5,0.1,0),mgp=c(1.5,.5,0),tcl=-.3)
     plotDFT(tset, fcset, cycles=dft.range, pch=1, cex=.5)
     dev.off()
-    ## RESORT CLUSTERING
-    ## TODO: sort by phase and re-cluster; use vector phs
-    ## of average segment phases!
-    ## cls.phase <- sapply(cls.srt, function(x)
-    ##   phaseDist(phase[cls==x],w=1-rp[cls==x,"pVal"]))
-    ## cset$sorting[[bestKcol]] <- cls.srt
-    ## ## re-color
-    ## cset <- colorClusters(cset)
 
     ## plot best BIC
     file.name <- file.path(out.path,paste0(fname,"_osc_",selected))
