@@ -1592,7 +1592,8 @@ presegment <- function(ts, avg=1000, minrd=8,
 #' @param chrS a chromosome index, indicating at wich positions
 #' chromosomes start; this is required for handling chromosome ends
 #' and forward and reverse strand values, but can be omitted
-#' @param idcol
+#' @param idcol column holding segment IDs; IDs of split segments will
+#' receive the suffix "_2" for once copy#' 
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
 splitsegs <- function(segs, chrS, idcol, verb=0) {
