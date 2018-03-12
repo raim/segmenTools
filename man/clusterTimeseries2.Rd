@@ -6,8 +6,8 @@
 \usage{
 clusterTimeseries2(tset, K = 16, method = "flowClust", selected,
   parameters = c(iter.max = 1e+05, nstart = 100, B = 500, tol = 1e-05, lambda
-  = 1, nu = 4, nu.est = 0, trans = 1, merge = FALSE), nui.thresh = -Inf,
-  verb = 1, ...)
+  = 1, nu = 4, nu.est = 0, trans = 1, merge = FALSE, randomStart = 0),
+  nui.thresh = -Inf, verb = 1, ...)
 }
 \arguments{
 \item{tset}{a timeseries processed by \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
