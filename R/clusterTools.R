@@ -1131,7 +1131,7 @@ phasesortClusters <- function(ts, cls, phase, cycles) {
     if ( missing(phase) )
         phase <- calculatePhase(ts, cycles=cycles)
 
-    for ( k in 1:ncol(cls) {
+    for ( k in 1:ncol(cls) ) {
         cl <- cls[,k]
         
         cl.srt <- unique(cl)
