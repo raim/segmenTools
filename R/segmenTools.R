@@ -324,7 +324,9 @@ annotateQuery <- function(query, target, col) {
 #' annotate target segments by overlapping query segments
 #' 
 #' wrapper around \code{\link{segmentOverlap}}, used to 
-#' annotate the target set by a column in the query set
+#' annotate the target set by a column in the query set. Note that
+#' coordinates must already be `indexed', see \code{?\link{segmentOverlap}}
+#' and \code{?\link{coor2index}}.
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
 #' @param qcol column names to copy from target to it's best match in query,
@@ -509,8 +511,19 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' see \code{bedtools} \code{intersects}, the Binary Interval
 #' Search (BITS) algorithm, and the \code{NClist} algorithm (implemented
 #' in packages IRanges and GenomicRanges) for similar tools.
-#' It loops over targets and collects all queries that match;
-#' optionally adds NA lines for non-matched targets
+#' It loops over targets and collects all queries that match, and
+#' optionally adds NA lines for non-matched targets.
+#'
+#' If \code{details==TRUE}, a column \code{qpos} will indicate the
+#' relative position of the query to the target (e.g. `inside' means
+#' that the query is `inside' the target, `left' means at lower
+#' coordinates then the target). The positions `right' and `left'
+#' can later can be converted to `upstream/downstream/etc.' by
+#' \code{\link{index2coor}} which re-introduces strand information.
+#' To analyze relative positions between features on distinct
+#' strands, the target or query has to be mapped to the opposite
+#' strand by \code{\link{switchStrands}} before passing it to
+#' \code{segmentOverlaps}.
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
 #' @param details add details on the relative positions of the query
@@ -573,7 +586,13 @@ segmentOverlap <- function(query, target, details=FALSE, add.na=FALSE, untie=FAL
             ## 6: query starts left of target start (INSIDE, COVERS or LEFT)
             ##    ~ !LhLt, but incl. start
             LlLt <- query[,"start"] <= target[k,"start"]
+            ## 7: TODO 20180320
+            ##    divergent/convergent/tandem neighbors
+            ##    -> "neighbors", can later (in index2coor) be classified into
+            ##    convergent/divergent (different strand in --antisense search,
+            ##    and tandem (same strand, in --sense search)
             
+            ## RULES
             ## combinations:
             overlp <- LlRt & RhLt # general overlap: should contain all below
             inside <- LhLt & RlRt # is inside target
