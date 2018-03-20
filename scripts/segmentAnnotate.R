@@ -121,11 +121,6 @@ if ( verb>0 )
 if ( verb>0 )
     msg(paste("LOADING DATA FILES\t",time(),"\n",sep=""))
 
-## load chromosome index - DOESNT WORK WITHOUT
-if ( verb>0 )
-    msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
-cf <- read.table(chrfile,sep="\t",header=FALSE)
-chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 ) msg(paste("Loading query:", query, "\t\n"))
@@ -152,6 +147,16 @@ if ( verb>0 )
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
+## load chromosome index - DOESNT WORK WITHOUT
+if ( verb>0 )
+    msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
+cf <- read.table(chrfile,sep="\t",header=FALSE)
+chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+
+
+## TODO: segmenTools wrapper starting from un-indexed chromosome
+## searching for specific rules (tandem; convergent/antisense/divergent)
+## with self or target
 ## TODO: convert to function in R/segmenTools from here:
 
 ## converting both to continuous index
@@ -193,6 +198,9 @@ tmp <- cbind(target[tidx,],
              result[,-which(colnames(result)==trgCol),drop=FALSE]) 
 
 ## TODO: handle strands better here! Expecting +/- factors
+## TODO - 20180320: smarter handling of antisense option?
+##                  currently assumes same strand
+##                  also: handle convergent/divergent, tandem neighbors
 if ( details ) {
     relCol <- ifelse(prefix=="", "qpos",
                      paste(paste(prefix,"qpos",sep="_")))
