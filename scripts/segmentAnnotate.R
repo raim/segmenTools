@@ -49,7 +49,7 @@ option_list <- list(
 #              help="overlap statistics to copy to best matching target if details is set to TRUE"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
-  make_option(c("--qrange"), type="character", default="", 
+  make_option(c("--qrange"), type="character", default="",  # TODO: implement!
               help="instead of start:end coordinates, use a range around either start (start;-1000:100) or end (end;-1000:100) coordinates"),
   ## divergent can be done with a range on target
 #  make_option(c("--divergent"), type="integer", default=0,
