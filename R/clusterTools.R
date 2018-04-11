@@ -1145,17 +1145,17 @@ phasesortClusters <- function(ts, cls, phase, cycles) {
     }
     
     ## sort by phase!
-    phases <- calculatePhase(tset$ts, cycles=3)
-    nset <- cset
-    for ( i in 1:length(cset$sorting) ) {
-        cls <- as.character(cset$clusters[,i])
-        cls.srt <- cset$sorting[[i]]
+    phases <- calculatePhase(ts$ts, cycles=3)
+    nset <- cls
+    for ( i in 1:length(cls$sorting) ) {
+        cls <- as.character(cls$clusters[,i])
+        cls.srt <- cls$sorting[[i]]
         phs <- sapply(cls.srt, function(x) phaseDist(phases[cls==x]))
         colnames(phs) <- cls.srt
         nset$sorting[[i]] <- cls.srt[order(phs[1,])]
     }
     nset <- relabelClusters(nset) # re-label by sorting
-    cset <- nset
+    cls <- nset
 }
 
 #' relabels cluster labels by their sorting

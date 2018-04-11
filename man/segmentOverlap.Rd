@@ -4,7 +4,7 @@
 \alias{segmentOverlap}
 \title{Overlaps between two sets of chromosome segments}
 \usage{
-segmentOverlap(query, target, details = FALSE, add.na = FALSE,
+segmentOverlap(query, target, details = FALSE, distance, add.na = FALSE,
   untie = FALSE, collapse = FALSE, sort = FALSE, msgfile = stdout())
 }
 \arguments{
@@ -41,6 +41,18 @@ with strand information implied in the continuous index position.
 see \code{bedtools} \code{intersects}, the Binary Interval
 Search (BITS) algorithm, and the \code{NClist} algorithm (implemented
 in packages IRanges and GenomicRanges) for similar tools.
-It loops over targets and collects all queries that match;
-optionally adds NA lines for non-matched targets
+It loops over targets and collects all queries that match, and
+optionally adds NA lines for non-matched targets.
+}
+\details{
+If \code{details==TRUE}, a column \code{qpos} will indicate the
+relative position of the query to the target (e.g. `inside' means
+that the query is `inside' the target, `left' means at lower
+coordinates then the target). The positions `right' and `left'
+can later can be converted to `upstream/downstream/etc.' by
+\code{\link{index2coor}} which re-introduces strand information.
+To analyze relative positions between features on distinct
+strands, the target or query has to be mapped to the opposite
+strand by \code{\link{switchStrands}} before passing it to
+\code{segmentOverlaps}.
 }

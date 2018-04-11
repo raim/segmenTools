@@ -331,7 +331,7 @@ annotateQuery <- function(query, target, col) {
 ## 4) classify into left, covers/equals, right
 ## 5) strands: translate to upstream, downstream, overlaps/antisense 
 ## 6) report characteristic distances (and jaccard for overlaps?)
-orientation <- function(q, t, coors, frw.id=c(1,"+"))) {
+orientation <- function(q, t, coors, frw.id=c(1,"+")) {
     chr <- coors[q,"chr"]
     if ( chr != coors[t,"chr"] ) return(NA)
     frw <- coors[q,"strand"] %in% frw.id
@@ -361,7 +361,7 @@ orientation <- function(q, t, coors, frw.id=c(1,"+"))) {
 ## \code{\link{annotateTarget}} allowing for high-level
 ## inferences on relative positions of genome segments
 ## to each other
-segmentPairs <- function(query, qcol <- "ID", chrS, distance, verb=1,
+segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
                          rules=c("divergent","convergent","antisense"),
                          strands=list(frw=c("1","+"),rev=c("-1","-"))) {
 

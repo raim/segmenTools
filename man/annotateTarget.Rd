@@ -39,5 +39,7 @@ stdout, useful when using in context of command line pipes}
 }
 \description{
 wrapper around \code{\link{segmentOverlap}}, used to 
-annotate the target set by a column in the query set
+annotate the target set by a column in the query set. Note that
+coordinates must already be `indexed', see \code{?\link{segmentOverlap}}
+and \code{?\link{coor2index}}.
 }
