@@ -575,7 +575,7 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' \code{\link{index2coor}} which re-introduces strand information.
 #' To analyze relative positions between features on distinct
 #' strands, the target or query has to be mapped to the opposite
-#' strand by \code{\link{switchStrands}} before passing it to
+#' strand by \code{\link{switchStrand}} before passing it to
 #' \code{segmentOverlaps}.
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)

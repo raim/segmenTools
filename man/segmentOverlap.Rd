@@ -55,6 +55,6 @@ can later can be converted to `upstream/downstream/etc.' by
 \code{\link{index2coor}} which re-introduces strand information.
 To analyze relative positions between features on distinct
 strands, the target or query has to be mapped to the opposite
-strand by \code{\link{switchStrands}} before passing it to
+strand by \code{\link{switchStrand}} before passing it to
 \code{segmentOverlaps}.
 }
