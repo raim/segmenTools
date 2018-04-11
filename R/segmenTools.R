@@ -395,7 +395,7 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
     rl <- "antisense"
     rule <- rules[[rl]]
     
-    if ( rule[[strand]]=="!=" ) {
+    if ( rule[["strand"]]=="!=" ) {
 
         ## forward strands as queries
         que <- query[,frw.idx]
@@ -404,7 +404,7 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
 
         ## get overlapping pairs and their Jaccard index
         ## get jaccard index of overlapping pairs
-        ovl <- segmentOverlap(query=que, target=target,
+        ovl <- segmentOverlap(query=que, target=tar,
                               details=TRUE, untie=FALSE, collapse=FALSE,
                               add.na=FALSE, sort=TRUE,  
                               msgfile=msgfile)
@@ -478,6 +478,7 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
     result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
     
     ## remove empty targets (no hit)
+    each.target <- FALSE
     if ( !each.target & details ) {
         qCol <- ifelse(prefix=="", "qlen",
                        paste(paste(prefix,"qlen",sep="_")))
@@ -703,6 +704,7 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' wrt the target (covers,left,inside,right); note, that  keywords 'left'
 #' and 'right' will be converted to 'upstream' or 'downstream' by
 #' index2coor, accounting for strand info.
+#' @param distance not yet implemented: maximal distance for neighbor count
 #' @param add.na add an empty overlap line for targets without overlaps
 #' @param untie if several queries have equal top rank of 1, the rank
 #' can be  replaced by simple order, such that only the first query

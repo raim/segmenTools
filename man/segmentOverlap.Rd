@@ -17,6 +17,8 @@ wrt the target (covers,left,inside,right); note, that  keywords 'left'
 and 'right' will be converted to 'upstream' or 'downstream' by
 index2coor, accounting for strand info.}
 
+\item{distance}{not yet implemented: maximal distance for neighbor count}
+
 \item{add.na}{add an empty overlap line for targets without overlaps}
 
 \item{untie}{if several queries have equal top rank of 1, the rank
