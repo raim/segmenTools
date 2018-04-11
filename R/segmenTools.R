@@ -356,6 +356,13 @@ orientation <- function(q, t, coors, frw.id=c(1,"+")) {
 }
 
 ## TODO: pairwise genome segment annotation
+## TODO: convert query to target according to rules
+## TODO: 20180402
+## functions upstream/downstream/overlaps
+## bandSparse(nque, ntar, ...?) matrices ss, ee, es, se, Jaccard
+## -> rules to calculate bandSparse matrices:
+## upstream, downstream, divergent, convergent, each with characteristic
+## distance
 ##
 ## pairwise segment anntation, a wrapper around
 ## \code{\link{annotateTarget}} allowing for high-level
@@ -365,135 +372,7 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
                          rules=c("divergent","convergent","antisense"),
                          strands=list(frw=c("1","+"),rev=c("-1","-"))) {
 
-    ## nicer timestamp
-    time <- function() format(Sys.time(), "%Y%m%d %H:%M:%S")
-    ## messages
-    msg <- function(x) cat(x, file=msgfile)
-    msgfile <- stdout()
-
-    ## TODO: use coor2index/segmentOverlap or do directly?
-    
-    if ( verb>0 )
-        msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
-
-    ## recording strand
-    frw.idx <- query[,"strand"] %in% strands$frw
-    rev.idx <- query[,"strand"] %in% strands$rev
-    ## converting continuous index, including all start<end
-    query <- coor2index(query, chrS, circular=FALSE)
-
-    
-    ## TODO: convert query to target according to rules
-    ## TODO: 20180402
-    ## functions upstream/downstream/overlaps
-    ## bandSparse(nque, ntar, ...?) matrices ss, ee, es, se, Jaccard
-    ## -> rules to calculate bandSparse matrices:
-    ## upstream, downstream, divergent, convergent, each with characteristic
-    ## distance
-    
-    ## search on other strand
-    rl <- "antisense"
-    rule <- rules[[rl]]
-    
-    if ( rule[["strand"]]=="!=" ) {
-
-        ## forward strands as queries
-        que <- query[,frw.idx]
-        ## reverse strands as targets
-        tar <- switchStrand(query[,rev.idx], chrS)
-
-        ## get overlapping pairs and their Jaccard index
-        ## get jaccard index of overlapping pairs
-        ovl <- segmentOverlap(query=que, target=tar,
-                              details=TRUE, untie=FALSE, collapse=FALSE,
-                              add.na=FALSE, sort=TRUE,  
-                              msgfile=msgfile)
-        ## add divergent neighbor pairs 
-        div <- apply(que, 1, function(x) {
-            dff <- x["start"] - tar[,"end"]
-            which(dff <= distance )})
-    } else {
-        ## shift coordinates for convergent
-        cnv <- apply(query, 1, function(x) {
-            which(query[,"start"]-x["end"] <= distance)})
-    }
-    ## get overlapping pairs
-    
-
-    
-    ## distance cutoffs
-    #tstart <- target[,"end"]
-    #tend <- target[,"start"]
-    #qstart <- query[,"start"]
-    #qend <- query[,"end"]
-    #startd <- tstart - qstart
-    #endd <- tend - qend
-    
-   
-    
-    
-    if ( verb>0 )
-        msg(paste("TRANSLATE COORDINATES\t",time(),"\n",sep=""))
-    
-    ## TRANSLATE LEFT/RIGHT TO UPSTREAM/DOWNSTREAM
-    ## convert back to chromosome coordinates
-
-    ## bind coordinates and results to map coordinates and overlaps
-    resCol <- colnames(result) # store requested query/result columns
-    trgCol <-  ifelse(prefix=="", "target", paste(paste(prefix,"target",sep="_")))
-    resCol <- resCol[resCol!=trgCol]
-    tidx <- as.numeric(result[,trgCol])
-    
-    ## TODO: only required if details
-    ## TODO: reduce tmp to coordinate columns and add these to options
-    tmp <- cbind(target[tidx,],
-                 result[,-which(colnames(result)==trgCol),drop=FALSE]) 
-    
-    ## TODO: handle strands better here! Expecting +/- factors
-    ## TODO - 20180320: smarter handling of antisense option?
-    ##                  currently assumes same strand
-    ##                  also: handle convergent/divergent, tandem neighbors
-    if ( details ) {
-        relCol <- ifelse(prefix=="", "qpos",
-                         paste(paste(prefix,"qpos",sep="_")))
-        tmp <- index2coor(tmp, chrS, strands=c("+","-"), relCol=relCol) 
-        ## TRANSLATE RELATIVE POSITION TO TARGET POSITION
-        orig <- strsplit(as.character(tmp[,relCol]),";")
-        new <- unlist(lapply(orig, function(x) {
-            new <- x
-            new[x=="inside"] <- "covers"
-            new[x=="covers"] <- "inside"
-            new[x=="upstream"] <- "downstream"
-            new[x=="downstream"] <- "upstream"
-            paste(new,collapse=";")}))
-        new[new=="NA"] <- NA
-        tmp[,relCol] <- new
-    } 
-    
-    ## FINAL RESULT TABLE
-    ## select target columns
-    if ( length(tcol)==0 )
-        tcol <- colnames(target)
-    ## and bind selected target and selected query/result columns
-    result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
-    
-    ## remove empty targets (no hit)
-    each.target <- FALSE
-    if ( !each.target & details ) {
-        qCol <- ifelse(prefix=="", "qlen",
-                       paste(paste(prefix,"qlen",sep="_")))
-        result <- result[as.character(result[,qCol])!="0",] # char allows collapse
-    }
-
-    ## final coordinate mapping
-    ## NOTE: without relCol !!
-    ## TODO: allow coorCols as option!
-    coorCols <- c("start", "end", "coor", chrCol = "chr", strandCol = "strand")
-    if ( any(colnames(result)%in%coorCols) )
-        result <- index2coor(result, chrS, strands=c("+","-"))
-
-    result
-}
+ }
 
 #' annotate target segments by overlapping query segments
 #' 
