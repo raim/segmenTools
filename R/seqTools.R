@@ -9,6 +9,7 @@
 #' same order.
 #' @param sq a, RNA or DNA string
 #' @param type "RNA" or "DNA"
+#' @param na string to use for non-recognized nucleotides
 #' @param reverse revert to sequence
 #'@export
 revcomp <- function(sq, type="DNA", na="N", reverse=TRUE) {
@@ -21,13 +22,17 @@ revcomp <- function(sq, type="DNA", na="N", reverse=TRUE) {
   paste(rv,collapse="")
 }
 
-#' calculates letter frequences in strings
+#' calculates letter frequences in ranges of strings
 #'
-#' @param seq a sequence object as returned by \code{\link{readFasta}}
-#' calculates letter frequences in strings, e.g.,
+#' calculates letter frequences in ranges of strings, e.g.,
 #' nucleotide sequences. The input is a sequence object
-#' as returned by \code{\link{readFasta}}
-range2nt <- function(seq, ranges, coors=c("chr","start","end") ) {
+#' as returned by (genomeBrowser's version of) \code{readFasta}.
+#' TODO: move readFasta here and document!
+#' @param seq a sequence object as returned by \code{readFasta}
+#' @param ranges a table provided ranges in each string 
+#' @param coors coordinate names in ranges table
+#' @export
+range2nt <- function(seq, ranges, coors=c(chr="chr",start="start",end="end") ) {
 
     ranges <- ranges[,coors]
     nt <- list(rep(NA), nrow(ranges))
@@ -36,7 +41,7 @@ range2nt <- function(seq, ranges, coors=c("chr","start","end") ) {
     ## count all letters in each 
     t(apply(ranges, 1, function(x) {
         x <- unlist(x)
-        sq <- sqs[[x["chr"]]][x["start"]:x["end"]]
+        sq <- sqs[[x[coors["chr"]]]][x[coors["start"]]:x[coors["end"]]]
         table(sq)/length(sq)
     }))
  }
@@ -45,7 +50,8 @@ range2nt <- function(seq, ranges, coors=c("chr","start","end") ) {
 #'
 #' calculate local nucleotide content in moving windows
 #' and returns genomeData matrix
-#' @param seq a sequence object as returned by \code{\link{readFasta}}
+#' TODO: move readFasta here and document!
+#' @param seq a sequence object as returned by \code{readFasta}
 #' @param window width of the moving window
 #' @param step step size
 #' @param abc sequence letters for which averages are calculated
