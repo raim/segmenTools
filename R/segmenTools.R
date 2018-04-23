@@ -435,6 +435,10 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
                   ifelse(collapse,"collapse","split"), "\n"),file=msgfile)
     dups <- rdups <- which(duplicated(best[,"target"]))
     if ( collapse ) {
+        ## de-factor before pasting!! (20180423)
+        for ( k in 1:ncol(best) )
+            if ( is.factor(best[,k]) )
+                best[,k] <- as.character(best[,k])
         while ( length(rdups)>0 ) {
             d <- rdups[1]
             id <- best[d,"target"]
