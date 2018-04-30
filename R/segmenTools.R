@@ -1144,6 +1144,14 @@ randomSegments <- function(query, qclass, total) {
     rquery
 }
 
+## FILL UP GENOME ADD MISSING SEGMENTS 
+fillGenome <- function(seg, chrS, coor2index=TRUE) {
+    ## TODO: find empty segments and rbind!
+    ## generate segs.range, vector of present coordinates
+    rng <- unique(unlist(apply(seg, 1, function(x) x["start"]:x["end"] )))
+    dff <- setdiff(rng, 1:2*max(chrS))
+    miss <- which(diff(dff)>1) # collapse adjacent to segments
+}
 
 ### SEGMENT READ STATISTICS
 
