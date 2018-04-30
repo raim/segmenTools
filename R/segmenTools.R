@@ -1144,13 +1144,56 @@ randomSegments <- function(query, qclass, total) {
     rquery
 }
 
-## FILL UP GENOME ADD MISSING SEGMENTS 
-fillGenome <- function(seg, chrS, coor2index=TRUE) {
-    ## TODO: find empty segments and rbind!
-    ## generate segs.range, vector of present coordinates
+## FILL UP GENOME ADD MISSING SEGMENTS
+#' Get inter-segments
+#'
+#' finds all ranges not present in the input segments, e.g. non-coding
+#' regions in a list of coding regions
+#' @param seg input segments with indexed coordinates (see
+#' \code{\link{coor2index}})
+#' @param chrS a chromosome index, indicating at wich positions
+#' chromosomes start; this is required for handling chromosome ends
+#' and forward and reverse strand values
+#' @param indexed boolean value indicating whether the coordinates
+#' in argument \code{seg} have already been indexed; if not
+#' \code{\link{coor2index}}) will be applied and the returned inter-segments
+#' will be mapped back to chromosome coordinates by \code{\link{index2coor}}
+#' @param expand if \code{TRUE} the returned inter-segments will contain
+#' the same columns as the input; otherwise only coordinates are returned
+#'@export
+fillGenome <- function(seg, chrS, indexed=TRUE, expand=TRUE) {
+
+    ## find all non-covered segments
+
+    ## apply coor2index
+    if ( !indexed )
+      seg <- coor2index(seg,chrS)
+    ## expand segments to full range
     rng <- unique(unlist(apply(seg, 1, function(x) x["start"]:x["end"] )))
-    dff <- setdiff(rng, 1:2*max(chrS))
-    miss <- which(diff(dff)>1) # collapse adjacent to segments
+    ## find all not present
+    all <- 1:(2*max(chrS))
+    mss <- all[!all%in%rng]
+    ## collapse adjacent to segments
+    dff <- which(diff(mss)>1) 
+    starts <- c(mss[1],mss[dff+1])
+    ends <- c(mss[dff],mss[length(mss)])
+    iseg <- cbind(start=starts,end=ends)
+    ## cut at chromosome ends
+    iseg <- splitsegs(iseg,chrS)
+
+    ## map back to chromosome coordinates
+    if ( !indexed )
+      iseg <- index2coor(iseg,chrS)
+    else iseg <- cbind(chr=1,iseg,strand=idx2str(iseg,chrS)[,1])
+    
+    ## expand to same matrix as input
+    if ( expand ) {
+        imat <- as.data.frame(matrix(NA, ncol=ncol(seg), nrow=nrow(iseg)))
+        colnames(imat) <- colnames(seg)
+        imat[,colnames(iseg)] <- iseg
+        iseg <- imat
+    }
+    iseg
 }
 
 ### SEGMENT READ STATISTICS
@@ -1690,7 +1733,7 @@ presegment <- function(ts, avg=1000, minrd=8,
 #' in columns named "start" and "end"
 #' @param chrS a chromosome index, indicating at wich positions
 #' chromosomes start; this is required for handling chromosome ends
-#' and forward and reverse strand values, but can be omitted
+#' and forward and reverse strand values
 #' @param idcol column holding segment IDs; IDs of split segments will
 #' receive the suffix "_2" for once copy#' 
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages

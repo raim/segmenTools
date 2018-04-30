@@ -233,7 +233,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=
     #    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
 
     image_matrix(pval, breaks=breaks, col=colors, axis=axis,
-                 text=txt, text.col=txt.col, main=main, ...)
+                 text=txt, text.col=txt.col, ...)
 }
 
 

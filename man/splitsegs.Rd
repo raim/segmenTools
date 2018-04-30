@@ -12,7 +12,7 @@ in columns named "start" and "end"}
 
 \item{chrS}{a chromosome index, indicating at wich positions
 chromosomes start; this is required for handling chromosome ends
-and forward and reverse strand values, but can be omitted}
+and forward and reverse strand values}
 
 \item{idcol}{column holding segment IDs; IDs of split segments will
 receive the suffix "_2" for once copy#'}
