@@ -195,7 +195,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=
     ## set up p-value and colors
     pval <- x$p.value
     pval[pval<=p.min] <- p.min
-    pval <- -log2(pval)
+    pval <- -log2(pval) # TODO: argument for log-type!
     breaks <- seq(0,-log2(p.min),length.out=n+1)
     colors <- grDevices::gray(seq(1,0,length.out=n))
     ## set up text (overlap numbers) and text colors
@@ -224,9 +224,18 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=
         txt[hg]  <- paste(txt[hg],"k",sep="")
     }
 
+    ## TODO: allow the following, but "main" needs to be
+    ## removed from ... !?
+    #args <- list(...)
+    #if ( "main" %in% names(args) )
+    #    main <- args[["main"]]
+    #else
+    #    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
+
     image_matrix(pval, breaks=breaks, col=colors, axis=axis,
-                 text=txt, text.col=txt.col, ...)
+                 text=txt, text.col=txt.col, main=main, ...)
 }
+
 
 #' sorts cluster overlap structure by p-values
 #' 
