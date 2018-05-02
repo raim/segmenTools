@@ -580,7 +580,7 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' To analyze relative positions between features on distinct
 #' strands, the target or query has to be mapped to the opposite
 #' strand by \code{\link{switchStrand}} before passing it to
-#' \code{segmentOverlaps}.
+#' \code{segmentOverlap}.
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
 #' @param details add details on the relative positions of the query
