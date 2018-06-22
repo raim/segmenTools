@@ -160,6 +160,33 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::jpeg(file.name, width=width, height=height, units="in", res=res)
 }
 
+##
+
+#' 2D density heatmap plot
+#'
+#' copied from Josh O'Brien posted at
+#' https://stackoverflow.com/questions/17093935/r-scatter-plot-symbol-color-represents-number-of-overlapping-points/17096661#17096661
+#' @param x x-coordinates
+#' @param y y-coordinates
+#' @param ... arguments to plot
+#' @export
+dense2d <- function(x, y,...) {
+  df <- data.frame(x, y)
+  
+  ## Use densCols() output to get density at each point
+  xcol <- densCols(x,y, colramp=colorRampPalette(c("black", "white")))
+  df$dens <- col2rgb(xcol)[1,] + 1L
+  
+  ## Map densities to colors
+  cols <-  colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", 
+                              "#FCFF00", "#FF9400", "#FF3100"))(256)
+  df$col <- cols[df$dens]
+  
+  ## Plot it, reordering rows so that densest points are plotted on top
+  plot(y~x, data=df[order(df$dens),], pch=20, col=col, cex=1,...)
+}
+
+
 #' plot multiple cumulative distribution functions
 #' 
 #' plot multiple cumulative distribution functions of overlap statistics, as
