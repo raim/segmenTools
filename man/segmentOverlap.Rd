@@ -56,5 +56,5 @@ can later can be converted to `upstream/downstream/etc.' by
 To analyze relative positions between features on distinct
 strands, the target or query has to be mapped to the opposite
 strand by \code{\link{switchStrand}} before passing it to
-\code{segmentOverlaps}.
+\code{segmentOverlap}.
 }

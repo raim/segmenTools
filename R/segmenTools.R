@@ -5,7 +5,7 @@
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
-#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb 
+#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans
 ##@importFrom segmenTier clusterCor_c 
 NULL # this just ends the global package documentation
@@ -168,22 +168,23 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
 #' https://stackoverflow.com/questions/17093935/r-scatter-plot-symbol-color-represents-number-of-overlapping-points/17096661#17096661
 #' @param x x-coordinates
 #' @param y y-coordinates
-#' @param ... arguments to plot
+#' @param pch \code{pch} argument to plot
+#' @param ... arguments to plot (hint:cex can be useful)
 #' @export
-dense2d <- function(x, y,...) {
+dense2d <- function(x, y, pch=20, ...) {
   df <- data.frame(x, y)
   
   ## Use densCols() output to get density at each point
-  xcol <- densCols(x,y, colramp=colorRampPalette(c("black", "white")))
+  xcol <- grDevices::densCols(x,y, colramp=grDevices::colorRampPalette(c("black", "white")))
   df$dens <- col2rgb(xcol)[1,] + 1L
   
   ## Map densities to colors
-  cols <-  colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", 
+  cols <-  grDevices::colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", 
                               "#FCFF00", "#FF9400", "#FF3100"))(256)
   df$col <- cols[df$dens]
   
   ## Plot it, reordering rows so that densest points are plotted on top
-  plot(y~x, data=df[order(df$dens),], pch=20, col=col, cex=1,...)
+  plot(y~x, data=df[order(df$dens),], col=col, ...)
 }
 
 
