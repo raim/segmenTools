@@ -5,8 +5,8 @@
 \title{plots cluster averages}
 \usage{
 plotClusters(x, cls, k, each = TRUE, type = "rng", time, time.at,
-  avg = "median", q = 0.9, norm, cls.col, cls.srt, ylab,
-  ylim = ifelse(each, "avg", "rng"), ylim.scale = 0.1, xlab,
+  avg = "median", q = 0.9, norm, cls.col, cls.srt, xlab, xlim, ylab,
+  ylim = ifelse(each, "avg", "rng"), ylim.scale = 0.1,
   avg.col = "#000000", avg.lwd = 3, avg.cex = 1, avg.pch = 1,
   lwd = 0.5, use.lty = FALSE, alpha = 0.2, embed = FALSE,
   plot.legend = FALSE, leg.xy = "topleft", leg.ids, vline = "",
@@ -60,6 +60,10 @@ is taken from there}
 subsets of clusters; if cls is of class 'clustering' it is taken
 from there}
 
+\item{xlab}{x-axis label (auto-selected if missing)}
+
+\item{xlim}{\code{xlim} parameter for plot}
+
 \item{ylab}{y-axis label (only used if \code{each==FALSE})}
 
 \item{ylim}{either conventional range of the y-axis, or a string
@@ -70,8 +74,6 @@ depends on argument \code{q}}
 
 \item{ylim.scale}{if \code{ylim=="avg"}, the calculated ylim will be
 extended by this fraction of the total range on both sides}
-
-\item{xlab}{x-axis label (auto-selected if missing)}
 
 \item{avg.col}{color for average line; used only if \code{type="all"}}
 

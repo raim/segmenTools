@@ -1595,6 +1595,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' the clusters (as.caracter(cls)); if cls is of class 'clustering' it
 #' is taken from there
 #' @param xlab x-axis label (auto-selected if missing)
+#' @param xlim \code{xlim} parameter for plot
 #' @param ylab y-axis label (only used if \code{each==FALSE})
 #' @param ylim either conventional range of the y-axis, or a string
 #' specifying whether ylim should be calculated from the average
@@ -1642,8 +1643,9 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
+                         xlab, xlim,
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
-                         xlab, avg.col="#000000",avg.lwd=3,avg.cex=1,avg.pch=1,
+                         avg.col="#000000",avg.lwd=3,avg.cex=1,avg.pch=1,
                          lwd=.5, use.lty=FALSE, alpha=.2,
                          embed=FALSE,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, 
@@ -1721,6 +1723,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
         if ( missing(xlab) )
             xlab <- "index"
     } 
+    if ( missing(xlim) )
+        xlim <- range(time)
     if ( missing(xlab) )
         xlab <- "time"
     if ( missing(time.at) )
@@ -1765,16 +1769,16 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             par(mfcol=c(length(cls.srt),1),mai=newmai)
      } else {
         if ( !missing(ref.xy) ) {
-            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=range(time))
+            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=xlim)
             polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                     y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                     col=ref.col,border=NA)
-            axis(4,at=round(range(ref.xy[,2])))
+            axis(4,at=round(range(ref.xy[,2])),las=2)
             mtext(ref.ylab, 4, .35)
             par(new=TRUE)
         }
         plot(1,col=NA,axes=FALSE,
-             xlab=xlab,xlim=range(time),
+             xlab=xlab,xlim=xlim,
              ylab=ylab,ylim=ylim, ...)
         axis(1, at=time.at);axis(2)
         axis(3, at=time, labels=FALSE)
@@ -1786,15 +1790,15 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     for ( cl in cls.srt ) {
         if ( each ) {
             if ( !missing(ref.xy) ) {
-                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=range(time))
+                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=xlim)
                 polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                         y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                         col=ref.col,border=NA)
-                axis(4,at=round(range(ref.xy[,2])))
+                axis(4,at=round(range(ref.xy[,2])),las=2)
                 mtext(ref.ylab, 4, .35)
                 par(new=TRUE)
             }
-            plot(1,col=NA,axes=FALSE, xlab=NA, xlim=range(time),
+            plot(1,col=NA,axes=FALSE, xlab=NA, xlim=xlim,
                  ylab=paste(cl," (",cls.sze[cl],")",sep=""),ylim=ylim, ...)
             axis(1, at=time.at);axis(2)
         }
