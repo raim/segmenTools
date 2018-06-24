@@ -184,7 +184,7 @@ dense2d <- function(x, y, pch=20, ...) {
   df$col <- cols[df$dens]
   
   ## Plot it, reordering rows so that densest points are plotted on top
-  plot(y~x, data=df[order(df$dens),], col=col, ...)
+  plot(y~x, data=df[order(df$dens),], pch=pch, col=col, ...)
 }
 
 
