@@ -41,6 +41,34 @@ complex2degree <- function(x) {
     ph
 }
 
+#' circular density
+#'
+#' wrapper around the \code{\link[circular:density.circular]{density.circular}}
+#' function from package \code{circular}, that maps back to numeric
+#' types, to avoid automatic handling of the S3 class circular data
+#' (eg. polar plots) and allows to scale densities by the absolute number;
+#' see argument \code{freq}
+#' @param x phases in degree and of class numeric, NA will be removed
+#' @param bw bandwith parameter of
+#' \code{\link[circular:density.circular]{density.circular}}
+#' @param freq if TRUE densities \code{y} will be scaled by the total
+#' number of measurement \code{N} as \code{N * y/sum(y)}; the resulting
+#' density function will integrate to \code{N}
+#' @param ... further arguments to
+#' \code{\link[circular:density.circular]{density.circular}}
+#'@export
+circ.dens <- function(x, bw=18, freq=FALSE, ...) {
+    x <- x[!is.na(x)]
+    #x <- 2*pi * x/360 # in radian # TODO allow radian?
+    ph <- circular::circular(x, units="degrees")
+    cd <- circular::density.circular(ph, bw=bw,...)
+    xx <- as.numeric(cd$x)
+    if ( freq ) # normalize to total density 1 and multiply with N
+        cd$y <- length(x) * cd$y/sum(cd$y) #/mean(diff(xx))
+    cd <- data.frame(x=xx,y= cd$y)
+    cd
+}
+
 #' calculate peak phase
 #' 
 #' calculate phases via a Discrete Fourier Transformation, but starting
