@@ -222,7 +222,8 @@ if ( phase.weight ) wght <-  1-pval
 
 if ( verb>0 )
     cat(paste("Loading segments\t",time(),"\n"))
-segs <- read.table(infile,sep="\t",header=TRUE, comment.char="")
+segs <- read.table(infile,sep="\t",header=TRUE, comment.char="",
+                   stringsAsFactors=FALSE)
 
 ## reduce to requested segment types
 if ( stypes[1]=="" )  
@@ -439,7 +440,7 @@ for ( type in sgtypes ) {
     unsigr <- rep(FALSE, nrow(avg))
     if ( with.rain!="" ) {
         sgrain <- read.delim(file.path(with.rain,paste0(fname,"_rain.csv")),
-                           row.names=1)[as.character(sgs[,idcol]),]
+                             row.names=1,stringsAsFactors=FALSE)[as.character(sgs[,idcol]),]
 
         ## FILTER
         unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
@@ -462,7 +463,7 @@ for ( type in sgtypes ) {
     if ( with.permutation!="" ) {
         sgdft <- read.delim(file.path(with.permutation,
                                       paste0(fname,"_fourier.csv")),
-                            row.names=1)[as.character(sgs[,idcol]),]
+                            row.names=1,stringsAsFactors=FALSE)[as.character(sgs[,idcol]),]
         ## FILTER
         sgdft[is.na(sgdft[,"X2_p"]),"X2_p"] <- 1
         unsigp <- sgdft[,"X2_p"] >= pval.thresh.sig
