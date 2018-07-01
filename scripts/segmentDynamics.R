@@ -229,7 +229,7 @@ segs <- read.table(infile,sep="\t",header=TRUE, comment.char="",
 ## add type ALL column,
 ## allows to pass ALL to cmdline option --stypes to avoid typesplitting
 if ( stypes[1]=="ALL" & !"ALL"%in%colnames(segs) ) {
-    segs <- cbind.data.frame(segs, all=all)
+    segs <- cbind.data.frame(segs, all="all")
     stypes <- "all"
     typecol <- "all"
 }
