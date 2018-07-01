@@ -41,8 +41,12 @@ option_list <- list(
   ## SEGMENT SETTINGS
   make_option(c("--fuse.segs"), action="store_true", default=FALSE,
               help="use FUSE tag from clusterSegments to fuse adjacent segments"),
+  make_option(c("--typecol"), type="character", default="type", 
+              help="name of the column with segment types"),
   make_option(c("--stypes"), type="character", default="", 
-              help="sub-set of segments in column 'type'"),
+              help="sub-set of segments in column 'type', option --typecol"),
+  make_option(c("--idcol"), type="character", default="ID", 
+              help="name of the column with unique segment names"),
   ## OSCILLATION SETTINGS
   make_option("--pval.thresh", default=1,
               help="phases above this thresh will be set to NA [default %default]"),
@@ -222,15 +226,15 @@ segs <- read.table(infile,sep="\t",header=TRUE, comment.char="")
 
 ## reduce to requested segment types
 if ( stypes[1]=="" )  
-    stypes <- sort(unique(as.character(segs[,"type"])))
-segs <- segs[as.character(segs[,"type"])%in%stypes,]
+    stypes <- sort(unique(as.character(segs[,typecol])))
+segs <- segs[as.character(segs[,typecol])%in%stypes,]
 
 
 
 if ( fuse.segs ) {
     fuse <- segs[2:nrow(segs),"fuse"]==1
     cat(paste("NOTE: FUSING", sum(fuse), "SEGMENTS, from segment types:\n",
-              paste(unique(segs[fuse,"type"]),collapse="; "),"\n"))
+              paste(unique(segs[fuse,typecol]),collapse="; "),"\n"))
     fsegs <- segs[c(TRUE,!fuse),]
     
     fsegs[,"end"] <- segs[c(!fuse,TRUE),"end"]
@@ -291,8 +295,8 @@ for ( type in sgtypes ) {
         ## from D:dft1-7.dcash.snr_T:raw_K:12_S:icor_E:3_M:75_nui:3
         test.circ.test <- FALSE
         if (test.circ.test) {
-            idx1 <- grep("sg0002_raw_ash_icor_463",sgs[,"ID"],value=F)
-            idx2 <- grep("sg0002_raw_ash_icor_464",sgs[,"ID"],value=F)
+            idx1 <- grep("sg0002_raw_ash_icor_463",sgs[,idcol],value=F)
+            idx2 <- grep("sg0002_raw_ash_icor_464",sgs[,idcol],value=F)
             x1 <- circular(phase[sgs[idx1,"start"]:sgs[idx1,"end"]],
                            type="angles",units="degrees")
             x2 <- circular(phase[sgs[idx2,"start"]:sgs[idx2,"end"]],
@@ -313,7 +317,7 @@ for ( type in sgtypes ) {
         
         ## write out phase, pval and read-count distributions
         ## convert back to chromosome coordinates
-        sgdst <- data.frame(ID=sgs[,"ID"],rds,phs,pvs)
+        sgdst <- data.frame(ID=sgs[,idcol],rds,phs,pvs)
         file.name <- file.path(out.path,paste(fname,"_dynamics",sep=""))
         write.table(sgdst,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
@@ -351,7 +355,7 @@ for ( type in sgtypes ) {
     
     ## write out average timeseries
     if ( "timeseries" %in% jobs ) {
-        sgts <- data.frame(ID=sgs[,"ID"], avg)
+        sgts <- data.frame(ID=sgs[,idcol], avg)
         file.name <- file.path(out.path,paste(fname,"_timeseries",sep=""))
         write.table(sgts,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
@@ -383,7 +387,7 @@ for ( type in sgtypes ) {
             colnames(pvl) <- paste(colnames(pvl),"p",sep="_")
             dft <- data.frame(dft,pvl)
         }
-        sgdft <- data.frame(ID=sgs[,"ID"], dft)
+        sgdft <- data.frame(ID=sgs[,idcol], dft)
         file.name <- file.path(out.path,paste(fname,"_fourier",sep=""))
         write.table(sgdft,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
@@ -397,7 +401,7 @@ for ( type in sgtypes ) {
         if ( verb>0 )
           cat(paste("rain osci stastistics\t",time(),"\n"))
         rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
-        sgrain <- data.frame(ID=sgs[,"ID"], rn)
+        sgrain <- data.frame(ID=sgs[,idcol], rn)
         file.name <- file.path(out.path,paste(fname,"_rain",sep=""))
         write.table(sgrain,file=paste(file.name,".csv",sep=""),quote=FALSE,
                     sep="\t",col.names=TRUE,row.names=FALSE)
@@ -435,7 +439,7 @@ for ( type in sgtypes ) {
     unsigr <- rep(FALSE, nrow(avg))
     if ( with.rain!="" ) {
         sgrain <- read.delim(file.path(with.rain,paste0(fname,"_rain.csv")),
-                           row.names=1)[as.character(sgs[,"ID"]),]
+                           row.names=1)[as.character(sgs[,idcol]),]
 
         ## FILTER
         unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
@@ -458,7 +462,7 @@ for ( type in sgtypes ) {
     if ( with.permutation!="" ) {
         sgdft <- read.delim(file.path(with.permutation,
                                       paste0(fname,"_fourier.csv")),
-                            row.names=1)[as.character(sgs[,"ID"]),]
+                            row.names=1)[as.character(sgs[,idcol]),]
         ## FILTER
         sgdft[is.na(sgdft[,"X2_p"]),"X2_p"] <- 1
         unsigp <- sgdft[,"X2_p"] >= pval.thresh.sig
@@ -590,7 +594,7 @@ for ( type in sgtypes ) {
 
     ## and add selected global clustering to segment table
     ## write out clusters
-    sgcls <- data.frame(ID=sgs[,"ID"],sgCL=cls)
+    sgcls <- data.frame(ID=sgs[,idcol],sgCL=cls)
 
 
     ## flowMerge 
