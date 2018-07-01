@@ -44,7 +44,8 @@ option_list <- list(
   make_option(c("--typecol"), type="character", default="type", 
               help="name of the column with segment types"),
   make_option(c("--stypes"), type="character", default="", 
-              help="sub-set of segments in column 'type', option --typecol"),
+              help="sub-set of segments in column 'type', option --typecol,
+use --typecol ALL and --stypes ALL to avoid splitting into types (unless `ALL' is an actual colum name)"),
   make_option(c("--idcol"), type="character", default="ID", 
               help="name of the column with unique segment names"),
   ## OSCILLATION SETTINGS
@@ -225,6 +226,14 @@ if ( verb>0 )
 segs <- read.table(infile,sep="\t",header=TRUE, comment.char="",
                    stringsAsFactors=FALSE)
 
+## add type ALL column,
+## allows to pass ALL to cmdline option --stypes to avoid typesplitting
+if ( stypes[1]=="ALL" & !"ALL"%in%colnames(segs) ) {
+    segs <- cbind.data.frame(segs, all=all)
+    stypes <- "all"
+    typecol <- "all"
+}
+
 ## reduce to requested segment types
 if ( stypes[1]=="" )  
     stypes <- sort(unique(as.character(segs[,typecol])))
@@ -247,7 +256,7 @@ if ( fuse.segs ) {
 segs <- coor2index(segs,chrS)
 
 ## split by type
-lst <- split(segs,segs$type)
+lst <- split(segs,segs[,typecol])
 if ( length(stypes)>0 ) 
     lst <- lst[names(lst)%in%stypes]
 sgtypes <- names(lst)
