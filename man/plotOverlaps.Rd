@@ -4,8 +4,8 @@
 \alias{plotOverlaps}
 \title{plot cluster-cluster or segment-segment overlaps}
 \usage{
-plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, short = TRUE,
-  scale = 1, round, axis = 1:2, ...)
+plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, col,
+  short = TRUE, scale = 1, round, axis = 1:2, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -17,8 +17,11 @@ this cutoff will appear black; TODO: plot legend}
 \item{p.txt}{p-value cutoff for showing overlap numbers as white instead
 of black text}
 
-\item{n}{number of gray shades between \code{p=1} (white)
+\item{n}{number of color shades between \code{p=1} (white)
 and \code{p >= p.min} (black)}
+
+\item{col}{color ramp, default are grey values, length of
+this vector overrules parameter \code{n}}
 
 \item{short}{logical, indicating whether to cut higher overlap
 numbers; currently: division by 1000 and replacement by \code{k}}

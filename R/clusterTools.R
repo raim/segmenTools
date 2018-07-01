@@ -174,8 +174,10 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' this cutoff will appear black; TODO: plot legend
 #' @param p.txt p-value cutoff for showing overlap numbers as white instead
 #' of black text
-#' @param n number of gray shades between \code{p=1} (white)
+#' @param n number of color shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
+#' @param col color ramp, default are grey values, length of
+#' this vector overrules parameter \code{n}
 #' @param short logical, indicating whether to cut higher overlap
 #' numbers; currently: division by 1000 and replacement by \code{k}
 #' @param scale factor to divide overlap numbers with, useful for
@@ -190,14 +192,17 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 ## TODO: sort by significance?
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=1, round, axis=1:2, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, scale=1, round, axis=1:2, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
     pval[pval<=p.min] <- p.min
     pval <- -log2(pval) # TODO: argument for log-type!
+    if ( !missing(col) )
+        n <- length(col)
+    else
+        col <- grDevices::gray(seq(1,0,length.out=n))
     breaks <- seq(0,-log2(p.min),length.out=n+1)
-    colors <- grDevices::gray(seq(1,0,length.out=n))
     ## set up text (overlap numbers) and text colors
     type <- "" # TODO, add info to input results on the name of the statistics
     if ( "overlap"%in%names(x) ) {
@@ -232,7 +237,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, short=TRUE, scale=
     #else
     #    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
 
-    image_matrix(pval, breaks=breaks, col=colors, axis=axis,
+    image_matrix(pval, breaks=breaks, col=col, axis=axis,
                  text=txt, text.col=txt.col, ...)
 }
 
