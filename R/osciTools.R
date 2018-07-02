@@ -55,7 +55,7 @@ complex2degree <- function(x) {
 #' due to high memory usage of
 #' \code{\link[circular:density.circular]{density.circular}}.
 #' NOTE: results are equivalent only for the scaled version freq=TRUE;
-#' TODO: find out why densities differ by a factor of 100 between the 2
+#' TODO: find out why densities differ by a factor of ~100 between the 2
 #' @param x phases in degrees and of class numeric
 #' @param bw the smoothing bandwith parameter
 #' @param n the number of equally spaced points at which density
@@ -63,6 +63,7 @@ complex2degree <- function(x) {
 #' @param freq if TRUE densities \code{y} will be scaled by the total
 #' number of measurement \code{N} as \code{N * y/sum(y)}; the resulting
 #' density function will integrate to \code{N}
+#' @param units phase angle units, 'degrees' or 'radians'
 #' @param high.mem use \code{\link[stats:density]{density}} to calculate
 #' kernel densities, based on copying data from -360 to 0 and 360 to
 #' 720 degrees
@@ -73,27 +74,32 @@ complex2degree <- function(x) {
 #' @seealso \code{\link[circular:density.circular]{density.circular}},
 #' \code{\link[stats:density]{density}} 
 #'@export
-circ.dens <- function(x, bw=18, n=512, freq=FALSE, high.mem=FALSE, na.rm=TRUE, ...) {
+circ.dens <- function(x, bw=18, n=512, freq=FALSE, units="degrees", high.mem=FALSE, na.rm=TRUE, ...) {
 
     if ( na.rm ) x <- x[!is.na(x)]
-    ##x <- 2*pi * x/360 # in radian # TODO allow radian?
 
+    ##x <- 2*pi * x/360 # in radian # TODO allow/use radian?
+    if ( units=="degrees" )
+        maxc <- 360
+    else if ( units=="radians" )
+        maxc <- 2*pi
+    
     if ( high.mem ) { # use stats:density
-        x <- c(x-360, x, x+360)
-        ## note: n*3
-        cd <- stats::density(x, bw=bw, n=n, from=0, to=360, ...)
+        x <- c(x-maxc, x, x+maxc)
+        cd <- stats::density(x, bw=bw, n=n, from=0, to=maxc, ...)
     } else { # use circular:density
-        ph <- circular::circular(x, units="degrees")
+        ph <- circular::circular(x, units=units)
         cd <- circular::density.circular(ph, bw=bw, n=n, ...)
     }
     ## results
     xx <- as.numeric(cd$x)
 
+    ## normalize to total density 1 and multiply with N
     ## NOTE: after normalization results are comparable!
-    if ( freq ) # normalize to total density 1 and multiply with N
-        cd$y <- length(x) * cd$y/sum(cd$y) #/mean(diff(xx))
-    cd <- data.frame(x=xx, y=cd$y)
-    attr(cd, "bw") <- cd$bw # TODO: how to do this correctly?
+    if ( freq ) 
+        cd$y <- length(x) * cd$y/sum(cd$y)
+    
+    cd <- list(x=xx, y=cd$y, bw=bw)
     cd
 }
 

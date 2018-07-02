@@ -4,8 +4,8 @@
 \alias{circ.dens}
 \title{circular density}
 \usage{
-circ.dens(x, bw = 18, n = 512, freq = FALSE, high.mem = FALSE,
-  na.rm = TRUE, ...)
+circ.dens(x, bw = 18, n = 512, freq = FALSE, units = "degrees",
+  high.mem = FALSE, na.rm = TRUE, ...)
 }
 \arguments{
 \item{x}{phases in degrees and of class numeric}
@@ -18,6 +18,8 @@ will be estimated}
 \item{freq}{if TRUE densities \code{y} will be scaled by the total
 number of measurement \code{N} as \code{N * y/sum(y)}; the resulting
 density function will integrate to \code{N}}
+
+\item{units}{phase angle units, 'degrees' or 'radians'}
 
 \item{high.mem}{use \code{\link[stats:density]{density}} to calculate
 kernel densities, based on copying data from -360 to 0 and 360 to
@@ -42,7 +44,7 @@ types to avoid automatic handling of the S3 class circular data
 due to high memory usage of
 \code{\link[circular:density.circular]{density.circular}}.
 NOTE: results are equivalent only for the scaled version freq=TRUE;
-TODO: find out why densities differ by a factor of 100 between the 2
+TODO: find out why densities differ by a factor of ~100 between the 2
 }
 \seealso{
 \code{\link[circular:density.circular]{density.circular}},
