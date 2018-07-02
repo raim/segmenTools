@@ -43,31 +43,60 @@ complex2degree <- function(x) {
 
 #' circular density
 #'
-#' wrapper around the \code{\link[circular:density.circular]{density.circular}}
-#' function from package \code{circular}, that maps back to numeric
-#' types, to avoid automatic handling of the S3 class circular data
-#' (eg. polar plots) and allows to scale densities by the absolute number;
-#' see argument \code{freq}
-#' @param x phases in degree and of class numeric, NA will be removed
-#' @param bw bandwith parameter of
+#' calculates kernel density estimates for circular data (`phase angles').
+#' It is a convenience wrapper around the
 #' \code{\link[circular:density.circular]{density.circular}}
+#' function from package \code{circular} that (a) coerces results to numeric
+#' types to avoid automatic handling of the S3 class circular data
+#' (eg. polar plots), (b) allows to scale densities by the absolute number
+#' (argument \code{freq}), and (c) can alternatively invoke
+#' \code{\link[stats:density]{density}} from the \code{stats} package
+#' (see option \code{high.mem}) for long phase vectors (`genome-wide')
+#' due to high memory usage of
+#' \code{\link[circular:density.circular]{density.circular}}.
+#' NOTE: results are equivalent only for the scaled version freq=TRUE;
+#' TODO: find out why densities differ by a factor of 100 between the 2
+#' @param x phases in degrees and of class numeric
+#' @param bw the smoothing bandwith parameter
+#' @param n the number of equally spaced points at which density
+#' will be estimated
 #' @param freq if TRUE densities \code{y} will be scaled by the total
 #' number of measurement \code{N} as \code{N * y/sum(y)}; the resulting
 #' density function will integrate to \code{N}
+#' @param high.mem use \code{\link[stats:density]{density}} to calculate
+#' kernel densities, based on copying data from -360 to 0 and 360 to
+#' 720 degrees
+#' @param na.rm remove NA values before calculation
 #' @param ... further arguments to
 #' \code{\link[circular:density.circular]{density.circular}}
+#' or \code{\link[stats:density]{density}} 
+#' @seealso \code{\link[circular:density.circular]{density.circular}},
+#' \code{\link[stats:density]{density}} 
 #'@export
-circ.dens <- function(x, bw=18, freq=FALSE, ...) {
-    x <- x[!is.na(x)]
-    #x <- 2*pi * x/360 # in radian # TODO allow radian?
-    ph <- circular::circular(x, units="degrees")
-    cd <- circular::density.circular(ph, bw=bw,...)
+circ.dens <- function(x, bw=18, n=512, freq=FALSE, high.mem=FALSE, na.rm=TRUE, ...) {
+
+    if ( na.rm ) x <- x[!is.na(x)]
+    ##x <- 2*pi * x/360 # in radian # TODO allow radian?
+
+    if ( high.mem ) { # use stats:density
+        x <- c(x-360, x, x+360)
+        ## note: n*3
+        cd <- stats::density(x, bw=bw, n=n, from=0, to=360, ...)
+    } else { # use circular:density
+        ph <- circular::circular(x, units="degrees")
+        cd <- circular::density.circular(ph, bw=bw, n=n, ...)
+    }
+    ## results
     xx <- as.numeric(cd$x)
+
+    ## NOTE: after normalization results are comparable!
     if ( freq ) # normalize to total density 1 and multiply with N
         cd$y <- length(x) * cd$y/sum(cd$y) #/mean(diff(xx))
-    cd <- data.frame(x=xx,y= cd$y)
+    cd <- data.frame(x=xx, y=cd$y)
+    attr(cd, "bw") <- cd$bw # TODO: how to do this correctly?
     cd
 }
+
 
 #' calculate peak phase
 #' 

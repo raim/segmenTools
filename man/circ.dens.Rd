@@ -4,25 +4,47 @@
 \alias{circ.dens}
 \title{circular density}
 \usage{
-circ.dens(x, bw = 18, freq = FALSE, ...)
+circ.dens(x, bw = 18, n = 512, freq = FALSE, high.mem = FALSE,
+  na.rm = TRUE, ...)
 }
 \arguments{
-\item{x}{phases in degree and of class numeric, NA will be removed}
+\item{x}{phases in degrees and of class numeric}
 
-\item{bw}{bandwith parameter of
-\code{\link[circular:density.circular]{density.circular}}}
+\item{bw}{the smoothing bandwith parameter}
+
+\item{n}{the number of equally spaced points at which density
+will be estimated}
 
 \item{freq}{if TRUE densities \code{y} will be scaled by the total
 number of measurement \code{N} as \code{N * y/sum(y)}; the resulting
 density function will integrate to \code{N}}
 
+\item{high.mem}{use \code{\link[stats:density]{density}} to calculate
+kernel densities, based on copying data from -360 to 0 and 360 to
+720 degrees}
+
+\item{na.rm}{remove NA values before calculation}
+
 \item{...}{further arguments to
-\code{\link[circular:density.circular]{density.circular}}}
+\code{\link[circular:density.circular]{density.circular}}
+or \code{\link[stats:density]{density}}}
 }
 \description{
-wrapper around the \code{\link[circular:density.circular]{density.circular}}
-function from package \code{circular}, that maps back to numeric
-types, to avoid automatic handling of the S3 class circular data
-(eg. polar plots) and allows to scale densities by the absolute number;
-see argument \code{freq}
+calculates kernel density estimates for circular data (`phase angles').
+It is a convenience wrapper around the
+\code{\link[circular:density.circular]{density.circular}}
+function from package \code{circular} that (a) coerces results to numeric
+types to avoid automatic handling of the S3 class circular data
+(eg. polar plots), (b) allows to scale densities by the absolute number
+(argument \code{freq}), and (c) can alternatively invoke
+\code{\link[stats:density]{density}} from the \code{stats} package
+(see option \code{high.mem}) for long phase vectors (`genome-wide')
+due to high memory usage of
+\code{\link[circular:density.circular]{density.circular}}.
+NOTE: results are equivalent only for the scaled version freq=TRUE;
+TODO: find out why densities differ by a factor of 100 between the 2
+}
+\seealso{
+\code{\link[circular:density.circular]{density.circular}},
+\code{\link[stats:density]{density}}
 }
