@@ -4,7 +4,7 @@
 \alias{dense2d}
 \title{2D density heatmap plot}
 \usage{
-dense2d(x, y, pch = 20, ...)
+dense2d(x, y, pch = 20, nbin = c(128, 128), ...)
 }
 \arguments{
 \item{x}{x-coordinates}
@@ -13,7 +13,14 @@ dense2d(x, y, pch = 20, ...)
 
 \item{pch}{\code{pch} argument to plot}
 
+\item{nbin}{number of bins in each dimension, see argument \code{nbins}
+\code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
+to \code{\link[KernSmooth:bkde2D]{bkde2D}}}
+
 \item{...}{arguments to plot (hint:cex can be useful)}
+}
+\value{
+the plotted data.frame, including local densities
 }
 \description{
 copied from Josh O'Brien posted at

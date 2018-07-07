@@ -169,13 +169,24 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
 #' @param x x-coordinates
 #' @param y y-coordinates
 #' @param pch \code{pch} argument to plot
+#' @param nbin number of bins in each dimension, see argument \code{nbins}
+#' \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
+#' to \code{\link[KernSmooth:bkde2D]{bkde2D}} 
 #' @param ... arguments to plot (hint:cex can be useful)
+#' @return the plotted data.frame, including local densities
 #' @export
-dense2d <- function(x, y, pch=20, ...) {
+dense2d <- function(x, y, pch=20, nbin=c(128,128), ...) {
+    
   df <- data.frame(x, y)
-  
+
+  ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
+  ## KernSmooth::bkde2D(cbind(x, y), bandwidth=c(20,20), gridsize=c(128,128))
   ## Use densCols() output to get density at each point
-  xcol <- grDevices::densCols(x,y, colramp=grDevices::colorRampPalette(c("black", "white")))
+  xcol <- grDevices::densCols(x,y, nbin=nbin,
+                              colramp=grDevices::colorRampPalette(c("black",
+                                                                    "white")))
+    ## black - white, rgb components equal
+    ## each corresponds to density, convert to number between 1 and 256
   df$dens <- col2rgb(xcol)[1,] + 1L
   
   ## Map densities to colors
@@ -185,6 +196,11 @@ dense2d <- function(x, y, pch=20, ...) {
   
   ## Plot it, reordering rows so that densest points are plotted on top
   plot(y~x, data=df[order(df$dens),], pch=pch, col=col, ...)
+
+  ## normalize to 1, for legend?
+  df$dens <- df$dens/256
+
+  invisible(df)
 }
 
 
