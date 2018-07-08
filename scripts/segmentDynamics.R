@@ -57,6 +57,10 @@ use --typecol ALL and --stypes ALL to avoid splitting into types (unless `ALL' i
               help="pvals above will be counted as non-significant; optionally used in segment averaging (option --filter.reads), and segment filtering before clustering (options --with.rain or --with.permutation, and --cl.filter) [default %default]"),
   make_option("--read.rng", type="character", default="",
               help="range of time-points for total read-count, Fourier and rain calculations (but not used for clustering!), comma-separated list of integers"),
+  make_option("--period", default=24,
+              help="period for `rain' oscillation stats [default %default]"),
+  make_option("--deltat", default=2,
+              help="sampling interval for `rain' oscillation stats [default %default]"),
   ## SEGMENT AVERAGING
   make_option(c("--endcut"), type="integer", default=0, 
               help="fraction at segment ends that will not be considered for average time series"),
@@ -410,7 +414,7 @@ for ( type in sgtypes ) {
     if ( any(c("rain") %in% jobs) ) {
         if ( verb>0 )
           cat(paste("rain osci stastistics\t",time(),"\n"))
-        rn <- rain(t(avg[,read.rng]),period=0.65,deltat=4/60)
+        rn <- rain(t(avg[,read.rng]), period=period, deltat=deltat)
         sgrain <- data.frame(ID=sgs[,idcol], rn)
         file.name <- file.path(out.path,paste(fname,"_rain",sep=""))
         write.table(sgrain,file=paste(file.name,".csv",sep=""),quote=FALSE,
