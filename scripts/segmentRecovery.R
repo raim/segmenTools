@@ -96,7 +96,7 @@ if ( verb>0 )
 if ( verb>0 )
     cat(paste("Loading chromosome index file:", chrfile, "\n"))
 cf <- read.table(chrfile,sep="\t",header=FALSE)
-chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
 
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 )

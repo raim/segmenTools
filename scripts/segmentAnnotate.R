@@ -148,10 +148,13 @@ if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
 ## load chromosome index - DOESNT WORK WITHOUT
+## NOTE: file with sorted chromosomes and their lengths
+## in the last column; segment query and target files
+## refer to these chromosomes in column "chr"
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
 cf <- read.table(chrfile,sep="\t",header=FALSE)
-chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
 
 
 ## TODO: segmenTools wrapper starting from un-indexed chromosome
@@ -160,6 +163,8 @@ chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
 ## TODO: convert to function in R/segmenTools from here:
 
 ## converting both to continuous index
+## TODO: use chrMap if chromosome columns are names and don't use
+## the index
 query <- coor2index(query, chrS)
 target <- coor2index(target, chrS)
 

@@ -197,7 +197,7 @@ if ( ncpu>1 ) # load parallel for flowClust
 
 ## load chromosome index
 cf <- read.table(chrfile,sep="\t",header=FALSE)
-chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
 
 ## load time-series and oscillation data: coor, ts, osc
 if ( verb>0 )

@@ -180,7 +180,7 @@ cat(paste("LOADING SEQUENCING DATA\t", time(), "\n",sep=""))
 if ( chrfile != "" ) {
     cat(paste("Using chromosome index file:",chrfile, "\n"))
     cf <- read.table(chrfile, sep="\t",header=FALSE)
-    chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+    chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
 } else {
     ##datafile <- file.path("/data/yeast/RNAseq/results/genomeData/Sacchromyces.cerevisiae.clean.S288C_oscillation.RData")
     cat(paste("Using full data file:", datafile, "\n"))

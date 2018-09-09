@@ -90,9 +90,9 @@ if ( verb>0 )
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
 cf <- read.table(chrfile,sep="\t",header=FALSE,stringsAsFactors=FALSE)
-chrMap <- cf[,2]
-chrL <- cf[,3]
-chrS <- c(0,cumsum(cf[,3])) ## index of chr/pos = chrS[chr] + pos
+#chrMap <- cf[,2]
+chrL <- cf[,ncol(cf)]
+chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
 total <- 2*sum(chrL) # both strands!
 
 ## READ SEGMENTS TO BE TESTED 
