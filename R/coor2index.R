@@ -48,15 +48,20 @@ insertRows <- function(existingDF, newrows, r ) {
     new
 }
 
-#' Splits genome features crossing ends of circular chromosomes.
-#' Splits genome features that cover start/end coordinates of circular
+#' Splits genome features spanning annotated ends of circular chromosomes.
+#' 
+#' Splits genome features that span start/end coordinates of circular
 #' chromosomes, and adds the downstream half with optional modification
-#' of ID, and type values. Note that only the upstream half retains
+#' of ID, and type values. Circular features are recognized here by
+#' start > end, in left->right direction of genome annotation.
+#' Strand information must NOT be encoded in start/end coordinate direction,
+#' but explicitly provided via a strand column!
+#' Note that only the upstream half retains
 #' all column information (exceptions: see argument \code{copyCols}),
 #' the downstream half will only carry information on coordinates, and
 #' optionally updated feature type and ID.
 #' The update will only happen if the passed table contains type and ID
-#' information (see argument \code{idCools}. The split can be reversed
+#' information (see argument \code{idCols}. The split can be reversed
 #' by function \code{removeCircularFeatures}.
 #' @param features a list of genomic features with coordinates
 #' @param chrL obligatory list of chromosome lengths, in order used
@@ -229,6 +234,8 @@ coor2index <- function(features, chrS, chrMap,
         names(chrIdx) <- chrMap
         chr <- chrIdx[as.character(chr)]
     }
+    if ( any(!is.numeric(chr)) )
+        stop("chromosomes must be a numeric index; use chromosome name map with argument `chrMap'!")
     ## convert to index
     for ( col in cols ) {
         features[,col] <- features[,col]+chrS[chr]
@@ -299,6 +306,9 @@ idx2str <- function(idx,chrS)
 #' @param chrS the chromosome index, indicating the start position
 #' of each chromosome in the continuous index, derived from chromosome length
 #' information
+#' @param chrMap a vector of chromosome names, in the same order as
+#' \code{chrS}; if provided chromosome index will be mapped back to
+#' chromosome name
 #' @param cols names of the columns giving coordinates that will be mapped
 #' to continuous index
 #' @param chrCol name of the column that gives the chromosome number
@@ -308,7 +318,7 @@ idx2str <- function(idx,chrS)
 #' information
 #' @param strands forward/reverse strand indicators
 #' @export
-index2coor <- function(features, chrS,
+index2coor <- function(features, chrS, chrMap,
                        cols=c("start","end","coor"),
                        chrCol="chr", strandCol="strand", relCol,
                        strands=c(1,-1)) {
@@ -370,8 +380,16 @@ index2coor <- function(features, chrS,
             features[current,relCol] <- tmpcol
         }
     }
+    ## positions as factor
     if ( rel2factor)
-         features[,relCol] <- factor(features[,relCol])
+        features[,relCol] <- factor(features[,relCol])
+
+    ## return to chromosome names
+    if ( !missing(chrMap) ) {
+        chrIdx <- 1:length(chrMap)
+        names(chrIdx) <- chrMap
+        features[,chrCol] <- chrMap[features[,chrCol]]
+    }
     features
 }
 
