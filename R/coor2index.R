@@ -223,6 +223,7 @@ coor2index <- function(features, chrS, chrMap,
     ## chromosome of each feature
     chr <- features[,chrCol]
     ## map chromosomes to index
+    ## TODO: automate, if chromosomes are not numeric!?
     if ( !missing(chrMap) ) {
         chrIdx <- 1:length(chrMap)
         names(chrIdx) <- chrMap
