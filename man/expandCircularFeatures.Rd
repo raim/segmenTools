@@ -2,7 +2,7 @@
 % Please edit documentation in R/coor2index.R
 \name{expandCircularFeatures}
 \alias{expandCircularFeatures}
-\title{Splits genome features crossing ends of circular chromosomes.}
+\title{Splits genome features spanning annotated ends of circular chromosomes.}
 \usage{
 expandCircularFeatures(features, chrL, coorCols = c("chr", "start", "end",
   "strand"), reverse = c("-", -1), idTag = "-circ2", idCols = c(ID = "ID",
@@ -33,9 +33,13 @@ all other information}
 \code{TRUE} to copy all columns, or a vector of column indices or names}
 }
 \description{
-Splits genome features that cross start/end coordinates of circular
+Splits genome features that span start/end coordinates of circular
 chromosomes, and adds the downstream half with optional modification
-of ID, and type values. Note that only the upstream half retains
+of ID, and type values. Circular features are recognized here by
+start > end, in left->right direction of genome annotation.
+Strand information must NOT be encoded in start/end coordinate direction,
+but explicitly provided via a strand column!
+Note that only the upstream half retains
 all column information (exceptions: see argument \code{copyCols}),
 the downstream half will only carry information on coordinates, and
 optionally updated feature type and ID.
