@@ -5,8 +5,8 @@
 \title{convert continuous index to chromosome coordinates (reverse of
 \code{\link{coor2index}})}
 \usage{
-index2coor(features, chrS, cols = c("start", "end", "coor"), chrCol = "chr",
-  strandCol = "strand", relCol, strands = c(1, -1))
+index2coor(features, chrS, chrMap, cols = c("start", "end", "coor"),
+  chrCol = "chr", strandCol = "strand", relCol, strands = c(1, -1))
 }
 \arguments{
 \item{features}{a table of chromosome features that must contain
@@ -17,6 +17,10 @@ positions (option \code{cols}) and strand information (column
 \item{chrS}{the chromosome index, indicating the start position
 of each chromosome in the continuous index, derived from chromosome length
 information}
+
+\item{chrMap}{a vector of chromosome names, in the same order as
+\code{chrS}; if provided chromosome index will be mapped back to
+chromosome name}
 
 \item{cols}{names of the columns giving coordinates that will be mapped
 to continuous index}

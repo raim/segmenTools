@@ -2,16 +2,7 @@
 % Please edit documentation in R/coor2index.R
 \name{expandCircularFeatures}
 \alias{expandCircularFeatures}
-\title{Splits genome features crossing ends of circular chromosomes.
-Splits genome features that cover start/end coordinates of circular
-chromosomes, and adds the downstream half with optional modification
-of ID, and type values. Note that only the upstream half retains
-all column information (exceptions: see argument \code{copyCols}),
-the downstream half will only carry information on coordinates, and
-optionally updated feature type and ID.
-The update will only happen if the passed table contains type and ID
-information (see argument \code{idCools}. The split can be reversed
-by function \code{removeCircularFeatures}.}
+\title{Splits genome features crossing ends of circular chromosomes.}
 \usage{
 expandCircularFeatures(features, chrL, coorCols = c("chr", "start", "end",
   "strand"), reverse = c("-", -1), idTag = "-circ2", idCols = c(ID = "ID",
@@ -42,15 +33,14 @@ all other information}
 \code{TRUE} to copy all columns, or a vector of column indices or names}
 }
 \description{
-Splits genome features crossing ends of circular chromosomes.
-Splits genome features that cover start/end coordinates of circular
+Splits genome features that cross start/end coordinates of circular
 chromosomes, and adds the downstream half with optional modification
 of ID, and type values. Note that only the upstream half retains
 all column information (exceptions: see argument \code{copyCols}),
 the downstream half will only carry information on coordinates, and
 optionally updated feature type and ID.
 The update will only happen if the passed table contains type and ID
-information (see argument \code{idCools}. The split can be reversed
+information (see argument \code{idCols}. The split can be reversed
 by function \code{removeCircularFeatures}.
 }
 \seealso{
