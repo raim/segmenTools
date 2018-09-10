@@ -31,6 +31,8 @@ suppressPackageStartupMessages(library(optparse))
 option_list <- list(
   make_option(c("--chrfile"), type="character", default="",
               help="chromosome index file, providing a sorted list of chromosomes and their lengths in column 3 [default %default]"),
+  make_option(c("--chrmap"), action="store_true", default=FALSE,
+              help="chromosome are names, and will be mapped to index using the first column of the chromosome index file (--chrfile)"),
   ## QUERY OPTIONS
   make_option(c("-q", "--query"), type="character", default="", 
               help="query set of chromosomal segments"),    
@@ -69,6 +71,9 @@ option_list <- list(
               help="columns in targets to write to result table"),
   make_option(c("--each.target"), action="store_true", default=FALSE,
               help="include targets without query hits from result table; if TRUE and each.query is FALSE, the result table will have matching rows with the target table"),
+  ## diverse parsing/handling options
+  make_option(c("--cchar"), type="character", default="", 
+              help="comment character in input files"),  
   ## OUTPUT
   make_option(c("-o", "--outfile"), type="character", default="", 
               help="file name to write annotated target list"),
@@ -124,7 +129,8 @@ if ( verb>0 )
 
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 ) msg(paste("Loading query:", query, "\t\n"))
-query <- read.table(query,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char="")
+query <- read.table(query, sep="\t", header=TRUE, stringsAsFactors=FALSE,
+                    comment.char=cchar)
 
 if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 
@@ -132,7 +138,8 @@ if ( target=="" ) {
     target <- file("stdin")
 }
 
-target <- read.table(target,sep="\t",header=TRUE, stringsAsFactors=FALSE, comment.char="")
+target <- read.table(target, sep="\t", header=TRUE, stringsAsFactors=FALSE,
+                     comment.char=cchar)
 
 ## filter by type
 if ( length(qtypes)>0 )
@@ -153,9 +160,11 @@ if ( nrow(query)==0 | nrow(target)==0 )
 ## refer to these chromosomes in column "chr"
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
-cf <- read.table(chrfile,sep="\t",header=FALSE)
-chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
+cf <- read.table(chrfile,sep="\t",header=FALSE, stringsAsFactors=FALSE)
+chrS <- c(0,cumsum(as.numeric(cf[,ncol(cf)]))) ## index of chr/pos = chrS[chr] + pos
 
+## name information in first column
+chrMap <- cf[,1]
 
 ## TODO: segmenTools wrapper starting from un-indexed chromosome
 ## searching for specific rules (tandem; convergent/antisense/divergent)
@@ -165,8 +174,13 @@ chrS <- c(0,cumsum(cf[,ncol(cf)])) ## index of chr/pos = chrS[chr] + pos
 ## converting both to continuous index
 ## TODO: use chrMap if chromosome columns are names and don't use
 ## the index
-query <- coor2index(query, chrS)
-target <- coor2index(target, chrS)
+if ( chrmap ) {
+    query <- coor2index(query, chrS, chrMap=cf[,1])
+    target <- coor2index(target, chrS, chrMap=cf[,1])
+} else {
+    query <- coor2index(query, chrS)
+    target <- coor2index(target, chrS)
+}
 
 ## search on other strand 
 if ( antisense ) 
@@ -231,18 +245,31 @@ if ( length(tcol)==0 )
 result <- cbind(target[tidx,tcol,drop=FALSE], tmp[,resCol,drop=FALSE])
 
 ## remove empty targets (no hit)
-if ( !each.target & details ) {
-    qCol <- ifelse(prefix=="", "qlen",
+## TODO: only works well if details==TRUE, since query length field can be used
+##       implement this smarter for details==FALSE !
+if ( !each.target )
+    if (  details ) {
+        qCol <- ifelse(prefix=="", "qlen",
                    paste(paste(prefix,"qlen",sep="_")))
-    result <- result[as.character(result[,qCol])!="0",] # char allows collapse
-}
+        result <- result[as.character(result[,qCol])!="0",] # char allows collapse
+    } else{
+        #qCol <- ifelse(prefix=="", qcol[1],
+        #           paste(paste(prefix,qcol[1],sep="_")))
+        #result <- result[as.character(result[,qCol])!="",] # char allows collapse
+    }
+
 
 ## final coordinate mapping
 ## NOTE: without relCol !!
 ## TODO: allow coorCols as option!
 coorCols <- c("start", "end", "coor", chrCol = "chr", strandCol = "strand")
 if ( any(colnames(result)%in%coorCols) )
-    result <- index2coor(result, chrS, strands=c("+","-"))
+    if ( chrmap ) {
+        result <- index2coor(result, chrS,
+                             strands=c("+","-"), chrMap=chrMap)
+    } else {
+        result <- index2coor(result, chrS, strands=c("+","-"))
+    }
 
 if ( verb>0 )
     msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
