@@ -41,6 +41,8 @@ option_list <- list(
     make_option(c("--only.split"), action="store_true", default=FALSE,
                 help="the input has already fixed coordinates, with start > end
 indicating not the strand, but features spanning the end; only option --split will be used to split features in upstream/downstream halves at the start/end"),
+    make_option(c("--fix.neg"), action="store_false", default=TRUE,
+                help="subtract chromosome length from features with negative start coordinates"),
     ## OUTPUT OPTIONS
     make_option(c("--split"), action="store_true", default=FALSE,
                 help="splits features spanning start/end in two and adds a postfix `-circ2' and a parent column entry to the downstream end "),
@@ -77,7 +79,7 @@ if ( interactive() & debug ) {
 ## get chromosome index and extension
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
-cf <- read.table(chrfile,sep="\t",header=FALSE, stringsAsFactors=FALSE)
+cf <- read.table(chrfile,sep="\t",header=FALSE, stringsAsFactors=FALSE, quote="")
 chrL <- as.numeric(cf[,ncol(cf)]) ## length
 chrS <- c(0,cumsum(chrL)) ## index of chr/pos = chrS[chr] +
 ## name information in first column
@@ -90,7 +92,7 @@ chrRL <- chrL - ext
 
 ## load segments
 if ( verb>0 ) msg(paste("Loading infile:", infile, "\t\n"))
-input <- read.table(infile, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+input <- read.table(infile, sep="\t", header=TRUE, stringsAsFactors=FALSE, quote="")
 
 if ( !only.split ) {
     
@@ -121,8 +123,13 @@ if ( !only.split ) {
     ## 2a) detect partial hits that are covered by the span hits
     ## simple heuristic: same end?
     ## TODO: make this saver
-    covered <- ( input[,"chr"]==input[span,"chr"] &
-                 input[,"end"]==input[span,"end"] )
+    dupls <- c()
+    for ( sp in which(span) )
+        dupls <- c(dupls, which( input[,"chr"]==input[sp,"chr"] &
+                                 input[,"end"]==input[sp,"end"] ))
+    covered <- rep(FALSE, length(span))
+    covered[dupls] <- TRUE
+    
 
     if ( verb )
         msg(paste("fixing", sum(span), "hit(s) spanning start/end\n"))
@@ -132,11 +139,21 @@ if ( !only.split ) {
     
     result <- input[-which(covered & !span),]
 } else {
+    ## assumes that features are already ordered with start<end
+    ## and start>end implying features spanning circular ends
     result <- input
     span <- input[,"start"]>input[,"end"]
 }
 
-## 3) split hits
+## 3) detect and correct negative values
+if ( fix.neg ) {
+    negs <- result[,"start"] < 0
+    if ( verb )
+        msg(paste("fixing", sum(negs), "hit(s) with negative start coordinate\n"))
+    result[negs,"start"] <- chrRL[result[negs,"chr"]] +  result[negs,"start"]
+}
+
+## 4) split hits
 if ( split | only.split ) {
     if ( verb )
         msg(paste("splitting", sum(span), "hit(s) spanning start/end\n"))
