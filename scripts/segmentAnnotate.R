@@ -130,7 +130,7 @@ if ( verb>0 )
 ## READ SEGMENTS TO BE TESTED 
 if ( verb>0 ) msg(paste("Loading query:", query, "\t\n"))
 query <- read.table(query, sep="\t", header=TRUE, stringsAsFactors=FALSE,
-                    comment.char=cchar)
+                    comment.char=cchar, quote="")
 
 if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 
@@ -139,7 +139,7 @@ if ( target=="" ) {
 }
 
 target <- read.table(target, sep="\t", header=TRUE, stringsAsFactors=FALSE,
-                     comment.char=cchar)
+                     comment.char=cchar, quote="")
 
 ## filter by type
 if ( length(qtypes)>0 )
@@ -160,7 +160,7 @@ if ( nrow(query)==0 | nrow(target)==0 )
 ## refer to these chromosomes in column "chr"
 if ( verb>0 )
     msg(paste("Loading chromosome index file:", chrfile, "\t\n"))
-cf <- read.table(chrfile,sep="\t",header=FALSE, stringsAsFactors=FALSE)
+cf <- read.table(chrfile,sep="\t",header=FALSE, stringsAsFactors=FALSE, quote="")
 chrS <- c(0,cumsum(as.numeric(cf[,ncol(cf)]))) ## index of chr/pos = chrS[chr] + pos
 
 ## name information in first column
@@ -223,7 +223,10 @@ tmp <- cbind(target[tidx,],
 if ( details ) {
     relCol <- ifelse(prefix=="", "qpos",
                      paste(paste(prefix,"qpos",sep="_")))
-    tmp <- index2coor(tmp, chrS, strands=c("+","-"), relCol=relCol) 
+    if ( chrmap ) 
+        tmp <- index2coor(tmp, chrS, strands=c("+","-"), relCol=relCol, chrMap=chrMap)
+    else
+        tmp <- index2coor(tmp, chrS, strands=c("+","-"), relCol=relCol) 
     ## TRANSLATE RELATIVE POSITION TO TARGET POSITION
     orig <- strsplit(as.character(tmp[,relCol]),";")
     new <- unlist(lapply(orig, function(x) {
