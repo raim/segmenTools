@@ -54,7 +54,7 @@ insertRows <- function(existingDF, newrows, r ) {
 #' chromosomes, and adds the downstream half with optional modification
 #' of ID, and type values. Circular features are recognized here by
 #' start > end, in left->right direction of genome annotation.
-#' Strand information must NOT be encoded in start/end coordinate direction,
+#' Strand information MUST NOT BE ENCODED IN start/end coordinate direction,
 #' but explicitly provided via a strand column!
 #' Note that only the upstream half retains
 #' all column information (exceptions: see argument \code{copyCols}),
@@ -79,13 +79,18 @@ insertRows <- function(existingDF, newrows, r ) {
 #' all other information
 #' @param copyCols copy values to circular feature copy; either logical
 #' \code{TRUE} to copy all columns, or a vector of column indices or names
+#' @param insertRows insert the circular features below their parent,
+#' if set to \code{FALSE} circular features will just be appended; this
+#' saves a lot of time for large datasets
 #' @seealso \code{removeCircularFeatures}
 #' @export
 expandCircularFeatures <- function(features, chrL, 
                                    coorCols=c("chr","start","end","strand"),
                                    reverse=c("-",-1),
                                    idTag="-circ2", idCols=c(ID="ID",type="type",
-                                          parent="parent"),copyCols=FALSE) {
+                                                            parent="parent"),
+                                   copyCols=FALSE,
+                                   insertRows=TRUE) {
 
     ## chromosome index - revert from chrL
     
@@ -149,7 +154,13 @@ expandCircularFeatures <- function(features, chrL,
     features[circ&!rev,coorCols[3]] <- chrL[features[circ&!rev,coorCols[1]]]
 
     ## insert below original & return
-    insertRows(features,cfeat,cidx+1)
+    ## TODO: find faster version via ID mapping!
+    ## TODO: without insertRows table seems to have an empty first line!?
+    if ( insertRows ) 
+        res <- insertRows(features,cfeat,cidx+1)
+    else
+        res <- rbind(features,cfeat)
+    res
 }
 
 #' NOT WORKING - Undo \code{expandCircularFeatures}
