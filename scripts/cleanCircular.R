@@ -1,5 +1,8 @@
 #!/usr/bin/env Rscript
 
+## TODO - bugs
+## NULL at begnning when just redirecting to stdout
+
 ## This script
 ## processes circular features that have been calculated for 
 ## artificially extended circular chromosomes;
@@ -38,6 +41,8 @@ option_list <- list(
     ## QUERY OPTIONS
     make_option(c("-i", "--infile"), type="character", default="", 
                 help="infile: set of chromosomal segments"),
+    make_option(c("--id"), type="character", default="ID", 
+                help="ID column name; ignored if missing!"),
     make_option(c("--only.split"), action="store_true", default=FALSE,
                 help="the input has already fixed coordinates, with start > end
 indicating not the strand, but features spanning the end; only option --split will be used to split features in upstream/downstream halves at the start/end"),
@@ -46,6 +51,8 @@ indicating not the strand, but features spanning the end; only option --split wi
     ## OUTPUT OPTIONS
     make_option(c("--split"), action="store_true", default=FALSE,
                 help="splits features spanning start/end in two and adds a postfix `-circ2' and a parent column entry to the downstream end "),
+    make_option(c("--sort.rows"), action="store_true", default=FALSE,
+                help="3' half of split circular children will be inserted below their 5' parent; can be slow, use --sort.rows to activate"),
     make_option(c("-o", "--outfile"), type="character", default="", 
                 help="file name to write circularized version of infile"),
     make_option(c("-v", "--verb"), type="integer", default=1, 
@@ -94,6 +101,26 @@ chrRL <- chrL - ext
 if ( verb>0 ) msg(paste("Loading infile:", infile, "\t\n"))
 input <- read.table(infile, sep="\t", header=TRUE, stringsAsFactors=FALSE, quote="")
 
+## ONLY HANDLE SEGMENTS WITH GENOME INFO!!
+missing <- which(!input$chr%in%names(chrL))
+if ( length(missing)>0 ) {
+    ## TODO: allow storing them, but operations not requiring chrL
+    msg(paste("WARNING:", length(missing), " features with chromosomes not listed in chromosome index file; these will be lost!\n"))
+    #missdat <- input[missing,]
+    input <- input[-missing,]
+}
+
+## test numeric character of start/end
+if ( !is.integer(input$start) ) {
+    idx <- which(is.na(as.integer(input$start)))
+    stop("non-integer start columns in lines ", paste(idx,collapse=";"))
+}
+if ( !is.integer(input$end) ) {
+    #which(is.na(as.numeric(input$end)))
+    stop("non-integer end column")
+}
+
+
 if ( !only.split ) {
     
     ## order start and end
@@ -109,7 +136,7 @@ if ( !only.split ) {
     rm <- ( input[,"end"]>chrRL[input[,"chr"]] &
             input[,"start"]>chrRL[input[,"chr"]] )
     
-    if ( verb )
+    if ( verb>0 )
         msg(paste("removing", sum(rm), "hit(s) within extension",ext,"\n"))
     input <- input[-which(rm),]
     
@@ -131,9 +158,9 @@ if ( !only.split ) {
     covered[dupls] <- TRUE
     
 
-    if ( verb )
+    if ( verb>0 )
         msg(paste("fixing", sum(span), "hit(s) spanning start/end\n"))
-    if ( verb )
+    if ( verb>0 )
         msg(paste("removing", sum(covered &!span),
                   "hit(s) covered by end hit\n"))
     
@@ -148,17 +175,22 @@ if ( !only.split ) {
 ## 3) detect and correct negative values
 if ( fix.neg ) {
     negs <- result[,"start"] < 0
-    if ( verb )
+    if ( verb>0 )
         msg(paste("fixing", sum(negs), "hit(s) with negative start coordinate\n"))
-    result[negs,"start"] <- chrRL[result[negs,"chr"]] +  result[negs,"start"]
+    if ( sum(negs)>0 )
+        result[negs,"start"] <- chrRL[result[negs,"chr"]] +  result[negs,"start"]
 }
 
 ## 4) split hits
 if ( split | only.split ) {
-    if ( verb )
+    if ( verb>0 )
         msg(paste("splitting", sum(span), "hit(s) spanning start/end\n"))
-    result <- expandCircularFeatures(result, chrL=chrRL)
+    result <- expandCircularFeatures(result, chrL=chrRL, insertRows=sort.rows, copyCols=TRUE, idCols=c(ID=id,type="type",parent="parent"))
 }
+
+## TODO: allow adding unknown chromosomes back?
+#if ( length(missing)>0 ) {
+#}
 
 if ( verb>0 )
     msg(paste("DONE. WRITING RESULTS\t",time(),"\n",sep=""))
