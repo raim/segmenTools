@@ -6,7 +6,7 @@
 \usage{
 expandCircularFeatures(features, chrL, coorCols = c("chr", "start", "end",
   "strand"), reverse = c("-", -1), idTag = "-circ2", idCols = c(ID = "ID",
-  type = "type", parent = "parent"), copyCols = FALSE)
+  type = "type", parent = "parent"), copyCols = FALSE, insertRows = TRUE)
 }
 \arguments{
 \item{features}{a list of genomic features with coordinates}
@@ -31,13 +31,17 @@ all other information}
 
 \item{copyCols}{copy values to circular feature copy; either logical
 \code{TRUE} to copy all columns, or a vector of column indices or names}
+
+\item{insertRows}{insert the circular features below their parent,
+if set to \code{FALSE} circular features will just be appended; this
+saves a lot of time for large datasets}
 }
 \description{
 Splits genome features that span start/end coordinates of circular
 chromosomes, and adds the downstream half with optional modification
 of ID, and type values. Circular features are recognized here by
 start > end, in left->right direction of genome annotation.
-Strand information must NOT be encoded in start/end coordinate direction,
+Strand information MUST NOT BE ENCODED IN start/end coordinate direction,
 but explicitly provided via a strand column!
 Note that only the upstream half retains
 all column information (exceptions: see argument \code{copyCols}),
