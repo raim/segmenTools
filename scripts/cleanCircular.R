@@ -105,7 +105,10 @@ input <- read.table(infile, sep="\t", header=TRUE, stringsAsFactors=FALSE, quote
 missing <- which(!input$chr%in%names(chrL))
 if ( length(missing)>0 ) {
     ## TODO: allow storing them, but operations not requiring chrL
-    msg(paste("WARNING:", length(missing), " features with chromosomes not listed in chromosome index file; these will be lost!\n"))
+    msg(paste("WARNING:", length(missing),
+              "features with chromosomes not listed in chromosome index file",
+              "these will be lost!",
+              paste(unique(input$chr[missing]),collapse=";"), "\n"))
     #missdat <- input[missing,]
     input <- input[-missing,]
 }
@@ -113,11 +116,15 @@ if ( length(missing)>0 ) {
 ## test numeric character of start/end
 if ( !is.integer(input$start) ) {
     idx <- which(is.na(as.integer(input$start)))
-    stop("non-integer start columns in lines ", paste(idx,collapse=";"))
+    if ( length(idx) )
+        stop("non-integer start columns in lines ", paste(idx,collapse=";"))
+    else input$start <- as.numeric(input$start)
 }
 if ( !is.integer(input$end) ) {
-    #which(is.na(as.numeric(input$end)))
-    stop("non-integer end column")
+    idx <- which(is.na(as.numeric(input$end)))
+    if ( length(idx) )
+        stop("non-integer end columns in lines ", paste(idx,collapse=";"))
+    else input$end <- as.numeric(input$end)
 }
 
 
