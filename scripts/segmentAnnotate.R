@@ -189,6 +189,16 @@ if ( antisense )
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 
+## check if requested columns are present
+## TODO: check this early in annotateTarget as well
+if ( any(!qcol%in%colnames(query)) ) {
+    warning(paste(qcol[!qcol%in%colnames(query)],collapse=";"),
+            " not in query columns (argument --qcol)! Skipped!\n")
+    qcol <- qcol[qcol%in%colnames(query)]
+    if ( length(qcol)==0 )
+        stop("no query columns (argument --qcol) found.")
+}
+
 ## TODO: allow upstream/downstream ranges
 ## TODO: allow collapse as argument / requires to add row number
 ## of target and use merge
