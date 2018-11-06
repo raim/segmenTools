@@ -559,13 +559,16 @@ clusterAnnotation <- function(cls, data, p=1,
 }
 
 ### PLOT cluster-cluster overlaps
-#' data.matrix `as-is' wrapper for \code{\link[graphics]{image}}
+#' wrapper for \code{\link[graphics]{image}} plotting a data matrix
+#' in the orientation of text display
 #' 
 #' Wrapper around \code{\link[graphics]{image}} to plot a matrix as
 #' it is displayed in R console, i.e. the field \code{dat[1,1]}
 #' is at the top left corner. It further allows to plot text
 #' into individual fields and have colored axis tick labels.
-#' @param dat the numeric data matrix to be plotted
+#' @param z the numeric data matrix to be plotted
+#' @param x optional x coordinates, corresponding to columns of z
+#' @param y optional y coordinates, corresponding to rows of z
 #' @param text a matrix of characters corresponding to \code{dat}
 #' which will be plotted on the image
 #' @param text.col individual colors for text fields
@@ -583,20 +586,24 @@ clusterAnnotation <- function(cls, data, p=1,
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, axis1.las=2, axis2.col, axis2.las=2, axis.cex=1.5, ...) {
+image_matrix <- function(z, x, y, text, text.col, text.cex=1, axis=1:2, axis1.col, axis1.las=2, axis2.col, axis2.las=2, axis.cex=1.5, ...) {
 
     ## reverse columns and transpose
-    if ( nrow(dat)>1 )
-        imgdat <- t(apply(dat, 2, rev))
+    if ( nrow(z)>1 )
+        imgdat <- t(apply(z, 2, rev))
     else
-        imgdat <- t(dat)
-    image(x=1:ncol(dat), y=1:nrow(dat), z=imgdat, axes=FALSE, ...)
+        imgdat <- t(z)
+    axis1.numeric <- !missing(x)
+    axis2.numeric <- !missing(y)
+    if ( missing(x) ) x <- 1:ncol(z)
+    if ( missing(y) ) y <- 1:nrow(z)
+    image(x=x, y=y, z=imgdat, axes=FALSE, ...)
 
     ## add text
     if ( !missing(text) ) {
         if ( missing(text.col) )
             text.col <- rep(1, length(c(text)))
-        text(x=rep(1:ncol(dat),nrow(dat)), y=rep(nrow(dat):1,each=ncol(dat)),
+        text(x=rep(1:ncol(z),nrow(z)), y=rep(nrow(z):1,each=ncol(z)),
              paste(t(text)),col=t(text.col),cex=text.cex)
     }
     
@@ -605,36 +612,40 @@ image_matrix <- function(dat, text, text.col, text.cex=1, axis=1:2, axis1.col, a
     if ( !missing(axis) ) {
         if ( 1 %in% axis ) 
             if ( !missing(axis1.col) ) # colored ticks
-                for ( i in 1:ncol(dat) )
-                    axis(1, at=i,colnames(dat)[i],
+                for ( i in 1:ncol(z) )
+                    axis(1, at=i,colnames(z)[i],
                          col.axis=axis1.col[i], col=axis1.col[i],
                          las=axis1.las, cex.axis=axis.cex, lwd=2)
-            else
-                axis(1, at=1:ncol(dat), labels=colnames(dat), las=axis1.las)
+            else if ( !axis1.numeric )
+                axis(1, at=1:ncol(z), labels=colnames(z), las=axis1.las)
+            else axis(1)               
         if ( 3 %in% axis ) 
             if ( !missing(axis1.col) ) # colored ticks
-                for ( i in 1:ncol(dat) )
-                    axis(3, at=i,colnames(dat)[i],
+                for ( i in 1:ncol(z) )
+                    axis(3, at=i,colnames(z)[i],
                          col.axis=axis1.col[i], col=axis1.col[i],
                          las=axis1.las, cex.axis=axis.cex, lwd=2)
-            else
-                axis(3, at=1:ncol(dat), labels=colnames(dat), las=axis1.las)
+            else if ( !axis1.numeric )
+                axis(3, at=1:ncol(z), labels=colnames(z), las=axis1.las)
+            else axis(3)               
         if ( 2 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
-                for ( i in 1:nrow(dat) )
-                        axis(2, at=nrow(dat)-i+1, rownames(dat)[i],
+                for ( i in 1:nrow(z) )
+                        axis(2, at=nrow(z)-i+1, rownames(z)[i],
                              col.axis=axis2.col[i], col=axis2.col[i],
                              las=axis2.las, cex.axis=axis.cex, lwd=2)
-            else
-                axis(2, at=nrow(dat):1, rownames(dat),las=axis2.las)        
+            else if ( !axis2.numeric )
+                axis(2, at=nrow(z):1, rownames(z),las=axis2.las)        
+            else axis(2)               
         if ( 4 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
-                for ( i in 1:nrow(dat) )
-                        axis(4, at=nrow(dat)-i+1, rownames(dat)[i],
+                for ( i in 1:nrow(z) )
+                        axis(4, at=nrow(z)-i+1, rownames(z)[i],
                              col.axis=axis2.col[i], col=axis2.col[i],
                              las=axis2.las, cex.axis=axis.cex, lwd=2)
-            else
-                axis(4, at=nrow(dat):1, rownames(dat),las=axis2.las)        
+            else if ( !axis2.numeric )
+                axis(4, at=nrow(z):1, rownames(z),las=axis2.las)
+            else axis(4)
     }
 } 
 

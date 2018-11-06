@@ -2,13 +2,18 @@
 % Please edit documentation in R/clusterTools.R
 \name{image_matrix}
 \alias{image_matrix}
-\title{data.matrix `as-is' wrapper for \code{\link[graphics]{image}}}
+\title{wrapper for \code{\link[graphics]{image}} plotting a data matrix
+in the orientation of text display}
 \usage{
-image_matrix(dat, text, text.col, text.cex = 1, axis = 1:2, axis1.col,
+image_matrix(z, x, y, text, text.col, text.cex = 1, axis = 1:2, axis1.col,
   axis1.las = 2, axis2.col, axis2.las = 2, axis.cex = 1.5, ...)
 }
 \arguments{
-\item{dat}{the numeric data matrix to be plotted}
+\item{z}{the numeric data matrix to be plotted}
+
+\item{x}{optional x coordinates, corresponding to columns of z}
+
+\item{y}{optional y coordinates, corresponding to rows of z}
 
 \item{text}{a matrix of characters corresponding to \code{dat}
 which will be plotted on the image}
