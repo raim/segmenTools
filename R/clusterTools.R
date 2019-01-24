@@ -52,11 +52,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
     }
    
   ## check cluster length
-  if ( length(cl1) != length(cl2) ) {
-      print(paste("ERROR cluster vectors of different size:",
-                  length(cl1),length(cl2)))
-      return(NULL)
-  }
+  if ( length(cl1) != length(cl2) ) 
+      stop("ERROR cluster vectors of different size:", length(cl1),length(cl2))
   
   ## add NA cluster
   if ( sum(is.na(cl1)) )
