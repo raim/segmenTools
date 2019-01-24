@@ -485,8 +485,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     if ( !missing(minJaccard) ) {
         rmJ <- which(best[,"intersect"]/best[,"union"] < minJaccard)
         best[rmJ,2:ncol(best)] <- NA
-        ## TODO 20190124: why not drop rmJ? avoids NA;NA in results!
-        best <- best[-rmJ,,drop=FALSE]
+        ## TODO 20190124: avoids NA;NA in results!
     }
     
     ## collapse or remove duplicated with qrank==1
