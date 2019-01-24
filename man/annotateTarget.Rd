@@ -39,7 +39,24 @@ stdout, useful when using in context of command line pipes}
 }
 \description{
 wrapper around \code{\link{segmentOverlap}}, used to 
+annotate the target set by a column in the query set. See
+Details for required input formats.
+}
+\details{
+Wrapper around  \code{\link{segmentOverlap}}, used to 
 annotate the target set by a column in the query set. Note that
 coordinates must already be `indexed', see \code{?\link{segmentOverlap}}
-and \code{?\link{coor2index}}.
+and \code{?\link{coor2index}}. The default options (\code{only.best=TRUE},
+\code{collapse=TRUE} yield a result matrix with 1 row for each
+\code{target} (\code{nrow(results)==nrow(target)}, annotated by
+only the best ranking overlapping \code{query} segment(s), ie. the
+the \code{query} segment(s) with the highest Jaccard index. If multiple
+\code{query} segments have the same Jaccard index, they are collapsed
+into ;-separated lists. If \code{collapse=FALSE}, each overlapping
+\code{query} segment will have its own row, and the result matrix
+is longer (\code{nrow(results)>=nrow(target)}). If \code{only.best=FALSE},
+all overlapping \code{query} segments will be reported.
+Additionaly a minimal Jaccard filter can be applied
+(option \code{minJaccard}), and only \code{query} segments with a
+higher Jaccard index are reported.
 }

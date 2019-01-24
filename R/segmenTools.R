@@ -421,9 +421,25 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
 #' annotate target segments by overlapping query segments
 #' 
 #' wrapper around \code{\link{segmentOverlap}}, used to 
+#' annotate the target set by a column in the query set. See
+#' Details for required input formats.
+#'
+#' Wrapper around  \code{\link{segmentOverlap}}, used to 
 #' annotate the target set by a column in the query set. Note that
 #' coordinates must already be `indexed', see \code{?\link{segmentOverlap}}
-#' and \code{?\link{coor2index}}.
+#' and \code{?\link{coor2index}}. The default options (\code{only.best=TRUE},
+#' \code{collapse=TRUE} yield a result matrix with 1 row for each
+#' \code{target} (\code{nrow(results)==nrow(target)}, annotated by
+#' only the best ranking overlapping \code{query} segment(s), ie. the
+#' the \code{query} segment(s) with the highest Jaccard index. If multiple
+#' \code{query} segments have the same Jaccard index, they are collapsed
+#' into ;-separated lists. If \code{collapse=FALSE}, each overlapping
+#' \code{query} segment will have its own row, and the result matrix
+#' is longer (\code{nrow(results)>=nrow(target)}). If \code{only.best=FALSE},
+#' all overlapping \code{query} segments will be reported.
+#' Additionaly a minimal Jaccard filter can be applied
+#' (option \code{minJaccard}), and only \code{query} segments with a
+#' higher Jaccard index are reported.
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
 #' @param qcol column names to copy from target to it's best match in query,
@@ -465,10 +481,12 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     best <- cltr
     if ( only.best )
       best <- cltr[cltr[,"qrank"]==1,,drop=FALSE]
-    ## apply threshold
+    ## APPLY THRESHOLD
     if ( !missing(minJaccard) ) {
         rmJ <- which(best[,"intersect"]/best[,"union"] < minJaccard)
         best[rmJ,2:ncol(best)] <- NA
+        ## TODO 20190124: why not drop rmJ? avoids NA;NA in results!
+        best <- best[-rmJ,,drop=FALSE]
     }
     
     ## collapse or remove duplicated with qrank==1
