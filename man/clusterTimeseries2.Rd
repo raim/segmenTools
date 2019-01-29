@@ -15,7 +15,8 @@ clusterTimeseries2(tset, K = 16, method = "flowClust", selected,
 \item{K}{selected cluster numbers, the argument \code{centers}
 of \code{\link[stats:kmeans]{kmeans}}}
 
-\item{method}{string specifying the clustering algorithm to use}
+\item{method}{string specifying the clustering algorithm to use, currently
+"kmeans" and "flowClust" are implemented}
 
 \item{selected}{a pre-selected cluster number  which is then
 used as a start clustering for \code{flowMerge} (if option

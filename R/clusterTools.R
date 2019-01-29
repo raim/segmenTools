@@ -720,7 +720,8 @@ clusterColors <- function(cset, expand=TRUE, ...) {
 #' @param tset a timeseries processed by \code{\link[segmenTier:processTimeseries]{processTimeseries}}
 #' @param K selected cluster numbers, the argument \code{centers}
 #' of \code{\link[stats:kmeans]{kmeans}}
-#' @param method string specifying the clustering algorithm to use
+#' @param method string specifying the clustering algorithm to use, currently
+#' "kmeans" and "flowClust" are implemented
 #' @param parameters named vector of parameters for clustering algorithms,
 #' currently ALL required parameters MUST be specified
 #' @param selected a pre-selected cluster number  which is then
@@ -838,8 +839,8 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
             #cat(paste("lambda", lambda, "\n"))
 
             fc <- flowClust::flowClust(dat[!rm.vals,], K=Kused, B=B, tol=tol,
-                                         lambda=lambda, randomStart=randomStart,
-                                         nu=nu, nu.est=nu.est, trans=trans,...)
+                                       lambda=lambda, randomStart=randomStart,
+                                       nu=nu, nu.est=nu.est, trans=trans,...)
 
 
             ## prepare cluster sequence
