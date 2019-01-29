@@ -573,13 +573,13 @@ for ( type in sgtypes ) {
     testnew <- TRUE ## ALLOWS MULTIPLE EQUAL K!
     if ( testnew ) {
         fcset <- clusterTimeseries2(tset, K=K, method="flowClust",
-                                   parameters=c(B=B,tol=tol,lambda=lambda,
-                                                nu=nu,nu.est=nu.est,
-                                                trans=trans))
+                                    parameters=c(B=B,tol=tol,lambda=lambda,
+                                                 nu=nu,nu.est=nu.est,
+                                                 trans=trans, randomStart=0))
     } else {
         fcset <- flowclusterTimeseries(tset, ncpu=ncpu, K=K, selected=fixedK,
-                                   B=B, tol=tol, lambda=lambda, merge=merge,
-                                   nu=nu, nu.est=nu.est, trans=trans)
+                                       B=B, tol=tol, lambda=lambda, merge=merge,
+                                       nu=nu, nu.est=nu.est, trans=trans)
     }
     
     ## save all as RData
