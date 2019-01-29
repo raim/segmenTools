@@ -117,12 +117,14 @@ sgcltab <- getSegmentClassTable(sgtypes,sep="_") ## TODO: use
 sgclasses <- getSegmentClasses(sgtypes,sep="_")
 
 ## short names
-short.name <- colnames(sgcltab)
-paste(short.name[1], sgcltab[,short.name[1]],sep=":")
-tmp <- lapply(1:ncol(sgcltab),
-              function(x) paste(short.name[x],sgcltab[,short.name[x]],sep=":"))
-mat <- matrix(unlist(tmp), ncol = length(tmp), byrow = FALSE)
-sgnames <- apply(mat, 1, paste, collapse="_")
+if ( ncol(sgcltab)>0 ) {
+    short.name <- colnames(sgcltab)
+    paste(short.name[1], sgcltab[,short.name[1]],sep=":")
+    tmp <- lapply(1:ncol(sgcltab),
+                  function(x) paste(short.name[x],sgcltab[,short.name[x]],sep=":"))
+    mat <- matrix(unlist(tmp), ncol = length(tmp), byrow = FALSE)
+    sgnames <- apply(mat, 1, paste, collapse="_")
+}  else sgnames <- sgtypes
 names(sgnames) <- sgtypes
 
 ## col, pch and lty for classes
@@ -233,7 +235,7 @@ for ( type in sgtypes ) {
 ## calculate average length dist for segment classes
 x <- sglen[[1]]$mids
 
-for ( i in 1:ncol(sgcltab) ) {
+for ( i in seq_len(ncol(sgcltab)) ) {
 
     scl <- colnames(sgcltab)[i]
     if ( verb>0 )
@@ -326,75 +328,77 @@ write.table(result,file=file.name, sep="\t",col.names=TRUE,row.names=FALSE,quote
 ## cluster & plot a vs. mu of all segmentations
 ## TODO: two heatmaps with parameters E vs. nui as axes
 ## and segment number and gamma-mu as color
-nuipch <- 15:17
-ecol <- rainbow(3)
-K <- 9
-pmcol <- rainbow(K)
-library(cluster) # for pam clustering
-sgnum <- result[,"segnum"]
-sga <- result[,"a"]
-dat <- cbind((sgnum-min(sgnum))/(max(sgnum)-min(sgnum)),
-             (sga-min(sga))/(max(sga)-min(sga)))
-pm <- pam(dat,K)
-## TODO: sort clustering by increasing height!
-pmsrt <- split(dat[,2],pm$clustering)
-pmmn <- unlist(lapply(pmsrt, mean))
+if ( FALSE ) {
+    nuipch <- 15:17
+    ecol <- rainbow(3)
+    K <- 9
+    pmcol <- rainbow(K)
+    library(cluster) # for pam clustering
+    sgnum <- result[,"segnum"]
+    sga <- result[,"a"]
+    dat <- cbind((sgnum-min(sgnum))/(max(sgnum)-min(sgnum)),
+    (sga-min(sga))/(max(sga)-min(sga)))
+    pm <- pam(dat,K)
+    ## TODO: sort clustering by increasing height!
+    pmsrt <- split(dat[,2],pm$clustering)
+    pmmn <- unlist(lapply(pmsrt, mean))
+    
+    pmsrt <- order(as.numeric(names(pmmn)[order(pmmn)]))
+    ## sorted clustering
+    pmcls <- pmsrt[pm$clustering]
+    
+                                        #pmcls <- pm$clustering # TODO: sort?
+    
+    cllst <- apply(sgcltab,2, unique)
+    ## strange bug: 75 in list of 75,100,150 gets a leading space
+    ## trim all:
+    cllst <- lapply(cllst,trimws)
+    ## sor numeric! K, S, E, M, nui
+    cllst <- lapply(cllst, function(x) {
+        if ( suppressWarnings(all(!is.na(as.numeric(x)))) )
+            x <- as.character(sort(as.numeric(x)))
+        x})
+    allcl <- unlist(sapply(1:length(cllst),
+                           function(x) paste(names(cllst)[x],
+                                             cllst[[x]],sep=".")))
 
-pmsrt <- order(as.numeric(names(pmmn)[order(pmmn)]))
-## sorted clustering
-pmcls <- pmsrt[pm$clustering]
+    enum <- matrix(NA, nrow=K, ncol=length(allcl))
+    colnames(enum) <- allcl
+    rownames(enum) <- 1:K
+    pval <- enum
+    ## get cumulative hypergeometric distribution of clustering vs. segments
+    for ( i in 1:K ) 
+        for ( j in 1:ncol(sgcltab) ) {
+            clcl <-  clusterCluster(pmcls==i,sgcltab[,j])
+            cln <- colnames(sgcltab)[j]
+            cln <- paste(cln,colnames(clcl$overlap),sep=".")
+            if ( "TRUE" %in% rownames(clcl$overlap) ) {
+                enum[i,cln] <- clcl$overlap["TRUE",]
+                pval[i,cln] <- clcl$p.value["TRUE",]
+            }
+        }
 
-#pmcls <- pm$clustering # TODO: sort?
-
-cllst <- apply(sgcltab,2, unique)
-## strange bug: 75 in list of 75,100,150 gets a leading space
-## trim all:
-cllst <- lapply(cllst,trimws)
-## sor numeric! K, S, E, M, nui
-cllst <- lapply(cllst, function(x) {
-    if ( suppressWarnings(all(!is.na(as.numeric(x)))) )
-      x <- as.character(sort(as.numeric(x)))
-    x})
-allcl <- unlist(sapply(1:length(cllst),
-                       function(x) paste(names(cllst)[x],
-                                         cllst[[x]],sep=".")))
-
-enum <- matrix(NA, nrow=K, ncol=length(allcl))
-colnames(enum) <- allcl
-rownames(enum) <- 1:K
-pval <- enum
-## get cumulative hypergeometric distribution of clustering vs. segments
-for ( i in 1:K ) 
-  for ( j in 1:ncol(sgcltab) ) {
-      clcl <-  clusterCluster(pmcls==i,sgcltab[,j])
-      cln <- colnames(sgcltab)[j]
-                cln <- paste(cln,colnames(clcl$overlap),sep=".")
-      if ( "TRUE" %in% rownames(clcl$overlap) ) {
-          enum[i,cln] <- clcl$overlap["TRUE",]
-          pval[i,cln] <- clcl$p.value["TRUE",]
-      }
-  }
-
-file.name <- file.path(out.path,paste("segmentLength_clusters",sep=""))
-plotdev(file.name,width=4.5,height=4.5,type=fig.type)
-par(mai=c(.7,.5,.1,.1),mgp=c(1.75,.5,0))
-image_matrix(-log2(pval) ,text=enum, axis=1:2,
-             col=c("#FFFFFF",rev(grey.colors(20))),
-             axis2.col=pmcol[1:nrow(pval)],
-             xlab=NA,ylab=NA)
-abline(v=cumsum(unlist(lapply(cllst, length)))+.5)
-axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
-dev.off()
+    file.name <- file.path(out.path,paste("segmentLength_clusters",sep=""))
+    plotdev(file.name,width=4.5,height=4.5,type=fig.type)
+    par(mai=c(.7,.5,.1,.1),mgp=c(1.75,.5,0))
+    image_matrix(-log2(pval) ,text=enum, axis=1:2,
+                 col=c("#FFFFFF",rev(grey.colors(20))),
+                 axis2.col=pmcol[1:nrow(pval)],
+                 xlab=NA,ylab=NA)
+    abline(v=cumsum(unlist(lapply(cllst, length)))+.5)
+    axis(1, at=cumsum(unlist(lapply(cllst, length)))+.5, tck=-1,labels=NA) 
+    dev.off()
 
 
 
-file.name <- file.path(out.path,paste("segmentLength_summary",sep=""))
-plotdev(file.name,width=3.5,height=3.5, type=fig.type)
-par(mfcol=c(1,1), mai=c(.65,.65,.1,.1),mgp=c(1.75,.5,0))
-plot(result[,"segnum"],result[,"a"],xlab="number of segments",ylab=expression("shape parameter "~alpha),pch=nuipch[sgcltab[,"nui"]],col=pmcol[pm$clustering]) #ecol[sgcltab[,"E"]] ) #pmcol[pm$clustering]) #
-legend("topright",legend=c(paste("nui",1:3)), col=c(rep(1,3)), pch=c(nuipch)) #
+    file.name <- file.path(out.path,paste("segmentLength_summary",sep=""))
+    plotdev(file.name,width=3.5,height=3.5, type=fig.type)
+    par(mfcol=c(1,1), mai=c(.65,.65,.1,.1),mgp=c(1.75,.5,0))
+    plot(result[,"segnum"],result[,"a"],xlab="number of segments",ylab=expression("shape parameter "~alpha),pch=nuipch[sgcltab[,"nui"]],col=pmcol[pm$clustering]) #ecol[sgcltab[,"E"]] ) #pmcol[pm$clustering]) #
+    legend("topright",legend=c(paste("nui",1:3)), col=c(rep(1,3)), pch=c(nuipch)) #
 #legend("right",legend=c(paste("E",1:3)), col=c(ecol), pch=16) #
-dev.off()
+    dev.off()
+}
 
 ## TODO: more analyses of segment number vs. classes
 ## TODO: segment length vs. dynamics - load result
