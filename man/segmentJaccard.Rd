@@ -4,7 +4,8 @@
 \alias{segmentJaccard}
 \title{Jaccard-Index overlap test for classes of segments (genomic intervals)}
 \usage{
-segmentJaccard(query, target, qclass, tclass, total, perm = 0, verb = 1)
+segmentJaccard(query, target, qclass, tclass, total, perm = 0,
+  verb = 1)
 }
 \arguments{
 \item{query}{query set of segments}

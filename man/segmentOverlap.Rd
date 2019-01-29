@@ -4,8 +4,9 @@
 \alias{segmentOverlap}
 \title{Overlaps between two sets of chromosome segments}
 \usage{
-segmentOverlap(query, target, details = FALSE, distance, add.na = FALSE,
-  untie = FALSE, collapse = FALSE, sort = FALSE, msgfile = stdout())
+segmentOverlap(query, target, details = FALSE, distance,
+  add.na = FALSE, untie = FALSE, collapse = FALSE, sort = FALSE,
+  msgfile = stdout())
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}

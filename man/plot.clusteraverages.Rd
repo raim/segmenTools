@@ -5,8 +5,8 @@
 \title{plots cluster averages}
 \usage{
 \method{plot}{clusteraverages}(x, cls.srt, cls.col, each = FALSE,
-  polygon = TRUE, xlab, time, ylab = "average", ylim = ifelse(each, "avg",
-  "rng"), ylim.scale = 0.1, ...)
+  polygon = TRUE, xlab, time, ylab = "average", ylim = ifelse(each,
+  "avg", "rng"), ylim.scale = 0.1, ...)
 }
 \arguments{
 \item{x}{cluster time series average object as calculated by

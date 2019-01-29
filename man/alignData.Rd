@@ -4,8 +4,8 @@
 \alias{alignData}
 \title{align genome data at specified coordinates (e.g. TSS)}
 \usage{
-alignData(coors, data, dst = 500, chrS, coorCols = c(chr = "chr", position =
-  "coor", strand = "strand"), reverse = c("-", -1))
+alignData(coors, data, dst = 500, chrS, coorCols = c(chr = "chr",
+  position = "coor", strand = "strand"), reverse = c("-", -1))
 }
 \arguments{
 \item{coors}{genome positions (position, chromosome, strand)

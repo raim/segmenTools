@@ -5,8 +5,9 @@
 \title{wrapper for \code{\link[graphics]{image}} plotting a data matrix
 in the orientation of text display}
 \usage{
-image_matrix(z, x, y, text, text.col, text.cex = 1, axis = 1:2, axis1.col,
-  axis1.las = 2, axis2.col, axis2.las = 2, axis.cex = 1.5, ...)
+image_matrix(z, x, y, text, text.col, text.cex = 1, axis = 1:2,
+  axis1.col, axis1.las = 2, axis2.col, axis2.las = 2, axis.cex = 1.5,
+  ...)
 }
 \arguments{
 \item{z}{the numeric data matrix to be plotted}

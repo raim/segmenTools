@@ -5,7 +5,8 @@
 \title{summarize GEOSoft probes}
 \usage{
 summarizeGEOSoft(data, id = "ORF", avg = "mean", farms = FALSE,
-  keep.empty = FALSE, replicate = FALSE, repsep = ";", verb = TRUE, ...)
+  keep.empty = FALSE, replicate = FALSE, repsep = ";", verb = TRUE,
+  ...)
 }
 \arguments{
 \item{data}{a list as returned by function \code{\link{parseGEOSoft}}}

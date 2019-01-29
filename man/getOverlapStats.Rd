@@ -4,8 +4,8 @@
 \alias{getOverlapStats}
 \title{Statistics of overlaps between two segment sets.}
 \usage{
-getOverlapStats(ovl, ovlth = 0.8, minj = 0.8, minf = 0.2, hrng = c(0.8,
-  1.2), tnum = NA, qnum = NA, qid = NA, tid = NA)
+getOverlapStats(ovl, ovlth = 0.8, minj = 0.8, minf = 0.2,
+  hrng = c(0.8, 1.2), tnum = NA, qnum = NA, qid = NA, tid = NA)
 }
 \arguments{
 \item{ovl}{overlap table from \code{\link{segmentOverlap}}}

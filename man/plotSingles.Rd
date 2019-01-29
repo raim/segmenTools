@@ -4,8 +4,9 @@
 \alias{plotSingles}
 \title{plot indivividual time series in cluster context}
 \usage{
-plotSingles(x, cls, goi, grep = FALSE, each = TRUE, plot.legend = each,
-  lwd = 2, leg.xy = "topleft", y.intersp = 1, ...)
+plotSingles(x, cls, goi, grep = FALSE, each = TRUE,
+  plot.legend = each, lwd = 2, leg.xy = "topleft", y.intersp = 1,
+  ...)
 }
 \arguments{
 \item{x}{either a simple data matrix with time points (x-axis) in columns,
