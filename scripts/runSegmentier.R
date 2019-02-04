@@ -222,7 +222,7 @@ alltests <- unique(unlist(tests)) # new primseg3 20161115
 ### SELECT SEGMENTS
 if ( length(segs)==0 ) {
     ## smallest segments first
-    sets <- order(prdf) # rev(order(prdf)) ) 
+    sets <- rev(order(prdf))  # order(prdf) # 
     if ( do.test ) {
         cat(paste("DEVEL OPTION: CALCULATING TESTSETS\n"))
         sets <- alltests
