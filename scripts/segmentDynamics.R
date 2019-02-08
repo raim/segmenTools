@@ -389,7 +389,9 @@ for ( type in sgtypes ) {
         if ( perm>0 & verb>0 )
           cat(paste("permutations\t", perm,"\n",sep=""))
         
-        tset <- processTimeseries(avg[,read.rng],smooth.time=smooth.time,
+        tset <- processTimeseries(avg[,read.rng],na2zero=TRUE,
+                                  use.fft=TRUE,
+                                  smooth.time=smooth.time,
                                   trafo=trafo, perm=perm,
                                   dft.range=dft.range, dc.trafo=dc.trafo,
                                   use.snr=TRUE,low.thresh=-Inf, verb=verb)
@@ -564,7 +566,8 @@ for ( type in sgtypes ) {
         cat(paste("noise segments\t",sum(rmvals),"\n"))
     }
 
-    tset <- processTimeseries(dat,smooth.time=smooth.time, trafo=trafo,
+    tset <- processTimeseries(dat,na2zero=TRUE,use.fft=TRUE,
+                              smooth.time=smooth.time, trafo=trafo,
                               perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
                               use.snr=TRUE,low.thresh=-Inf)
 
@@ -658,7 +661,8 @@ for ( type in sgtypes ) {
 
     ## re-do tset without removing unsignificant!
     ## "plot-tset"
-    pset <- processTimeseries(avg,smooth.time=smooth.time, trafo=trafo,
+    pset <- processTimeseries(avg,na2zero=TRUE,use.fft=TRUE,
+                              smooth.time=smooth.time, trafo=trafo,
                               perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
                               use.snr=TRUE,low.thresh=-Inf)
 
