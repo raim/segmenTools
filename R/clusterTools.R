@@ -268,7 +268,8 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     }
     ## second, sort rest by increasing pval
     rest.srt <- which(!(1:nrow(pvl)) %in% sig.srt)
-    rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),decreasing=FALSE)]
+    rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),
+                               decreasing=FALSE)]
     new.srt <- c(sig.srt[!duplicated(sig.srt)], rest.srt)
 
     ## resort all matrices in overlap structure (overlap, pvalue, jaccard, ...)
@@ -845,7 +846,7 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
 
             ## prepare cluster sequence
             seq <- rep(0, N) ## init. to nuissance cluster 0
-            seq[!rm.vals] <- flowClust::Map(fc,rm.outliers=F)
+            seq[!rm.vals] <- flowClust::Map(fc,rm.outliers=FALSE)
             
             ## store which K was used, the clustering and cluster centers
             usedk[k] <- fc@K
@@ -1076,7 +1077,7 @@ mergeCluster <- function(tset, cset, selected) {
         if ( class(mrg)!="try-error" ) {
             mrg.cl <- flowMerge::fitPiecewiseLinreg(mrg)
             obj <- mrg[[mrg.cl]]
-            mcls[!rm.vals] <- flowClust::Map(obj, rm.outliers=F)
+            mcls[!rm.vals] <- flowClust::Map(obj, rm.outliers=FALSE)
             mrg.id <- paste0(selected,"m",mrg.cl) # merged K, column name
 
             ## NOTE/TODO: rownames of obj@mu contain merge info
@@ -1402,15 +1403,16 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
     
     for ( cl in cls.srt ) {
         ## average and deviation
-        clavg[cl,] <- apply(ts[cls==cl,,drop=F],2, function(x) avg(x,na.rm=T))
+        clavg[cl,] <- apply(ts[cls==cl,,drop=FALSE],2,
+                            function(x) avg(x,na.rm=T))
         if ( is.numeric(q) ) {
             ## upper/lower quantiles
-            cllow[cl,]<- apply(ts[cls==cl,,drop=F],2,
+            cllow[cl,]<- apply(ts[cls==cl,,drop=FALSE],2,
                                function(x) quantile(x,  qf,na.rm=T))
-            clhig[cl,]<- apply(ts[cls==cl,,drop=F],2,
+            clhig[cl,]<- apply(ts[cls==cl,,drop=FALSE],2,
                                function(x) quantile(x,1-qf,na.rm=T))
         } else  {
-            df <- apply(ts[cls==cl,,drop=F],2, function(x) qf(x,na.rm=T))
+            df <- apply(ts[cls==cl,,drop=FALSE],2, function(x) qf(x,na.rm=T))
             cllow[cl,] <- clavg[cl,] - df
             clhig[cl,] <- clavg[cl,] + df
         }
@@ -1473,7 +1475,7 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     }
     
     plot(K, bic, ylim=range(c(bic,icl),na.rm=T),xlab="K",xlim=krng,
-         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"), axes=F, ...)
+         ylab=paste0(ifelse(norm,"norm. ",""),"BIC/ICL"), axes=FALSE, ...)
     axis(2)
     axis(1,at=1:max(krng))
     lines(K,bic)
@@ -1783,7 +1785,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             par(mfcol=c(length(cls.srt),1),mai=newmai)
      } else {
         if ( !missing(ref.xy) ) {
-            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=xlim)
+            plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",
+                 axes=FALSE,xlab=NA,ylab=NA,
+                 ylim=round(range(ref.xy[,2])),xlim=xlim)
             polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                     y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                     col=ref.col,border=NA)
@@ -1804,7 +1808,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     for ( cl in cls.srt ) {
         if ( each ) {
             if ( !missing(ref.xy) ) {
-                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",axes=F,xlab=NA,ylab=NA,ylim=round(range(ref.xy[,2])),xlim=xlim)
+                plot(ref.xy,type="l",lty=1,lwd=2,col="#C0C0C080",
+                     axes=FALSE,xlab=NA,ylab=NA,
+                     ylim=round(range(ref.xy[,2])),xlim=xlim)
                 polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                         y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                         col=ref.col,border=NA)
@@ -1824,7 +1830,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             if ( use.lty )
                 lty <- rep(1:6, len=sum(idx,na.rm=TRUE))
             else  lty <- rep(1, sum(idx,na.rm=TRUE)) #lty <- all.lty[idx]
-            matplot(time, t(ts[idx,,drop=F]), add=TRUE,
+            matplot(time, t(ts[idx,,drop=FALSE]), add=TRUE,
                     type="l", lty=lty, col=all.col[idx], lwd=lwd)
             
             ## store for external legend (eg. plotSingles with each=FALSE)
