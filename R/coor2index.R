@@ -22,7 +22,7 @@ tagDuplicates <- function(names) {
 getChrSum <- function(chrL) c(0,cumsum(chrL))
 
 ## util to insert rows, by user Ari B. Friedman at
-## https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appended
+## \url{https://stackoverflow.com/a/11562428}
 insertRow <- function(existingDF, newrow, r) {
     existingDF <- as.data.frame(existingDF,stringsAsFactors=FALSE)
     existingDF[seq(r+1,nrow(existingDF)+1),] <-
