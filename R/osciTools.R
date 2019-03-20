@@ -19,6 +19,10 @@ get_fft <- function(x) {
     fft
 }
 
+## TODO: simple routine for windowed FFT, see yeastSeq2016 DO analysis
+fft_window <- function(x, win, Tmax, Tmin, res=1) {
+}
+
 #' convert complex numbers to degrees
 #'
 #' convert complex number representation of polar coordinates
