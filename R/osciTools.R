@@ -21,6 +21,34 @@ get_fft <- function(x) {
 
 ## TODO: simple routine for windowed FFT, see yeastSeq2016 DO analysis
 fft_window <- function(x, win, Tmax, Tmin, res=1) {
+
+    ## calculate window size <-> Tmax (one is required)
+    if ( missing(win) & !missing(Tmax) )
+        win <- Tmax/res
+    else if ( missing(Tmax) & !missing(win) )
+        Tmax <- win*res
+
+    ## call fourier in windows, via apply
+    last <- length(x)-win+1
+    dft <- sapply(1:last, function(i) fft(x[i:(i+win-1)]))
+    dft <- dft[1:(floor(win/2) +1),] # rm mirror
+    dft <- dft/win # scale amplitudes
+    dc <- abs(dft[1,]) # DC component
+    dft <- dft[2:nrow(dft),] # rm DC component
+    Tosc <- win/(1:(nrow(dft))) # period in index time unit
+    Tcenter <- 1:last + win/2 # center of fourier window in index time unit
+
+    ## convert by resolution info
+    Tosc <- Tosc*res # period in hours
+    Tcenter <- Tcenter*res  # center of window in hours
+    
+    ## cut to minimal period
+    rmp <- Tosc<Tmin
+    dft <- dft[!rmp,]
+    Tosc <- Tosc[!rmp]
+
+    ## TODO: clarify, Tcenter?
+    list(time=Tcenter, period=Tosc, DC=dc, DFT=dft)
 }
 
 #' convert complex numbers to degrees

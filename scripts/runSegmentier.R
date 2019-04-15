@@ -323,9 +323,9 @@ for ( i in do.sets ) {
     ## process time series, get DFT etc.
     ## TODO: add processing info to tset
     ##       allow multiple processing, and take over IDs in cluster
-    tset <- processTimeseries(ts=tsd, na2zero=TRUE,
+    tset <- processTimeseries(ts=tsd, na2zero=TRUE, use.fft=use.fft,
                               trafo=trafo, dc.trafo=dc.trafo,
-                              use.fft=use.fft, dft.range=dft.range,
+                              dft.range=dft.range,
                               use.snr=use.snr, low.thresh=low.thresh)
     ## cluster time series
     ## TODO: use global clustering and calculate icor locally
