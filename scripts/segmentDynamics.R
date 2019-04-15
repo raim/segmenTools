@@ -44,8 +44,7 @@ option_list <- list(
   make_option(c("--typecol"), type="character", default="type", 
               help="name of the column with segment types"),
   make_option(c("--stypes"), type="character", default="", 
-              help="sub-set of segments in column 'type', option --typecol,
-use --typecol ALL and --stypes ALL to avoid splitting into types (unless `ALL' is an actual colum name)"),
+              help="sub-set of segments in column 'type', option --typecol, use --typecol ALL and --stypes ALL to avoid splitting into types (unless `ALL' is an actual colum name)"),
   make_option(c("--idcol"), type="character", default="ID", 
               help="name of the column with unique segment names"),
   ## OSCILLATION SETTINGS
@@ -73,6 +72,8 @@ use --typecol ALL and --stypes ALL to avoid splitting into types (unless `ALL' i
   ## SEGMENT TIME-SERIES PROCESSING 
   make_option(c("--trafo"), type="character", default="raw",
               help="time-series transformation function, R base functions like 'log', and 'ash' for asinh is available [default %default]"),
+  make_option(c("--use.snr"), action="store_true", default=FALSE,
+              help="do SNR scaling of amplitudes [default %default]"),
   make_option(c("--dc.trafo"), type="character", default="raw", 
               help="DC component transformation function, see --trafo [default %default]"),
   make_option("--perm", type="integer", default=0,
@@ -394,7 +395,7 @@ for ( type in sgtypes ) {
                                   smooth.time=smooth.time,
                                   trafo=trafo, perm=perm,
                                   dft.range=dft.range, dc.trafo=dc.trafo,
-                                  use.snr=TRUE,low.thresh=-Inf, verb=verb)
+                                  use.snr=use.snr,low.thresh=-Inf, verb=verb)
         
         ## write out phase, pval and DFT from segment averages
         dft <- tset$dft
@@ -569,7 +570,7 @@ for ( type in sgtypes ) {
     tset <- processTimeseries(dat,na2zero=TRUE,use.fft=TRUE,
                               smooth.time=smooth.time, trafo=trafo,
                               perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
-                              use.snr=TRUE,low.thresh=-Inf)
+                              use.snr=use.snr,low.thresh=-Inf)
 
 
     ## cluster by flowClust
@@ -664,7 +665,7 @@ for ( type in sgtypes ) {
     pset <- processTimeseries(avg,na2zero=TRUE,use.fft=TRUE,
                               smooth.time=smooth.time, trafo=trafo,
                               perm=0, dft.range=dft.range, dc.trafo=dc.trafo,
-                              use.snr=TRUE,low.thresh=-Inf)
+                              use.snr=use.snr,low.thresh=-Inf)
 
     ## plot BIC
     file.name <- file.path(out.path,paste(fname,"_BIC",sep=""))
