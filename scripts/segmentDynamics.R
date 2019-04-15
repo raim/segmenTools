@@ -395,6 +395,10 @@ for ( type in sgtypes ) {
                                   trafo=trafo, perm=perm,
                                   dft.range=dft.range, dc.trafo=dc.trafo,
                                   use.snr=use.snr,low.thresh=-Inf, verb=verb)
+
+        ## TODO: FIX AMPLITUDE IF SNR WAS NOT USED
+        if ( !use.snr & dc.trafo=="raw" )
+            tset$dft <- tset$dft/length(read.rng)
         
         ## write out phase, pval and DFT from segment averages
         dft <- tset$dft
