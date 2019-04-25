@@ -522,8 +522,8 @@ for ( type in sgtypes ) {
     dev.off()
     
     ## FILTER: total expresssion vs. rain
-    minexp <- .05
-    tot <-ash(rds[,"r.mean"])
+    minexp <- -.5
+    tot <- log(rds[,"r.mean"])
     lowex <- tot<minexp
 
     ## plot total
@@ -551,6 +551,11 @@ for ( type in sgtypes ) {
 
     ## filter combination
     noise <- lowex | short | fewpoints
+    ## 20190425 - align with segmentStatistics.R
+    ##noise <- pvs >= noisep & low
+    ## unsigr <- sgrain[,"pVal"] >= pval.thresh.sig
+
+    noise <- unsigr & lowex
 
     ## SELECT FILTER
     filters <- cbind(lowex=lowex, fewpoints=fewpoints, short=short, 
