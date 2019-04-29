@@ -1610,6 +1610,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param cls.col optional named cluster color vector, where names indicate
 #' the clusters (as.caracter(cls)); if cls is of class 'clustering' it
 #' is taken from there
+#' @param axes add axes (bottom and left)
 #' @param xlab x-axis label (auto-selected if missing)
 #' @param xlim \code{xlim} parameter for plot
 #' @param ylab y-axis label (only used if \code{each==FALSE})
@@ -1659,7 +1660,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
-                         xlab, xlim,
+                         axes=TRUE, xlab, xlim,
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
                          avg.col="#000000",avg.lwd=3,avg.cex=1,avg.pch=1,
                          lwd=.5, use.lty=FALSE, alpha=.2,
@@ -1791,16 +1792,20 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                     y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                     col=ref.col,border=NA)
-            axis(4,at=round(range(ref.xy[,2])),las=2)
-            mtext(ref.ylab, 4, .35)
+            if ( axes ) {
+                axis(4,at=round(range(ref.xy[,2])),las=2)
+                mtext(ref.ylab, 4, .35)
+            }
             par(new=TRUE)
         }
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=xlim,
              ylab=ylab,ylim=ylim, ...)
-        axis(1, at=time.at);axis(2)
-        axis(3, at=time, labels=FALSE)
-        mtext("samples", 3, 1.2)
+        if ( axes ) {
+            axis(1, at=time.at);axis(2)
+            axis(3, at=time, labels=FALSE)
+            mtext("samples", 3, 1.2)
+        }
     }
     ## plot each cluster in cls.srt
     used.pars <- rep(list(NA), length(cls.srt))
@@ -1814,13 +1819,19 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                 polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                         y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                         col=ref.col,border=NA)
-                axis(4,at=round(range(ref.xy[,2])),las=2)
-                mtext(ref.ylab, 4, .35)
+                if ( axes ) {
+                    axis(4,at=round(range(ref.xy[,2])),las=2)
+                    mtext(ref.ylab, 4, .35)
+                }
                 par(new=TRUE)
             }
+            if ( missing(ylab) )
+                ylab <- paste(cl," (",cls.sze[cl],")",sep="")
             plot(1,col=NA,axes=FALSE, xlab=NA, xlim=xlim,
-                 ylab=paste(cl," (",cls.sze[cl],")",sep=""),ylim=ylim, ...)
-            axis(1, at=time.at);axis(2)
+                 ylab=ylab,ylim=ylim, ...)
+            if ( axes ) {
+                axis(1, at=time.at);axis(2)
+            }
         }
         if ( "rng"%in%type ) ## polygon
             polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
