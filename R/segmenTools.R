@@ -33,7 +33,7 @@ log_1 <- function(x) log(x+1)
 
 #' mean-0 normalization
 #' @param x data to be transformed
-#' @return log2(x/apply(x,1,mean))
+#' @return t(apply(x,1,scale))
 #' @export
 meanzero <- function(x) t(apply(x,1,scale))
 
