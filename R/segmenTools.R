@@ -1162,6 +1162,7 @@ randomSegments <- function(query, qclass, total) {
     sgcls <- as.factor(query[,qclass])
     
     ## inter-segment lengths
+    ## TODO: handle nrow==1
     qnum <- nrow(query)
     islen <- apply(cbind(query[1:(qnum-1),"end"],
                          query[2:qnum,"start"]), 1, diff)
