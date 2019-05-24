@@ -223,79 +223,124 @@ testPhase <- function(n=5, cyc=4, T=24, res=6, xlim=c(-T/res,T+T/res)) {
 }
 
 ## time-series processing
-# function taken from FLUSH.LVS.bundle/R/normalize_LVS.R and via tataProject.R
-# http://www.meb.ki.se/~yudpaw/
-# http://www.ncbi.nlm.nih.gov/pubmed/18318917
-##normalize.los <- function(x,los.id,norm.ref=c("median","mean"),norm.type=c("loess","smooth","scale"), add.maximum=FALSE, reset.extrema=FALSE, extend.max=FALSE) {
-##  require("matrixStats") ## TODO: replace by apply
-##  if(missing(los.id))
-##    stop("must provide index (logical or numerical) for LOS genes")
-##  
-##  if(!is.logical(los.id) && !is.numeric(los.id))
-##    stop("los.id must be a vector either logical or numeric")
-##  
-##  ## generate reference data: mean/median for each reference probe
-##  norm.ref <- match.arg(norm.ref)
-##  ref.data <- switch(norm.ref,"median"=rowMedians(x),rowMeans(x))
-##  
-##  out <- matrix(NA, ncol=ncol(x), nrow=nrow(x))
-##
-##  ## SIMPLE SCALING
-##  if ( norm.type=="scale" ) {
-##    out <- t(t(x) * rowMeans(t(ref.data[los]/x[los,])))
-##    colnames(out) <- colnames(x)
-##    rownames(out) <- rownames(x)
-##    return(out)       
-##  }
-##    
-##  for ( i in 1:ncol(x) ) {
-##    los <- los.id
-##    ## add all individual array maxima to extend fitting curve
-##    if ( add.maximum ) {
-##      if ( is.logical(los)) los[x[,i]>=max(x[los,i])]<-TRUE
-##      if ( is.numeric(los)) los<-c(los,which(x[,i]>=max(x[los,i])))
-##    }
-##    if ( norm.type=="loess" ) {
-##      ## fit polynomial of degree 2 for reference data points
-##      sm <- loess(x[los,i]~ref.data[los], degree = 2)
-##
-##      ## sm$x IS ref.data[los] , i.e. time-series medians/means
-##      ## sm$fitted IS x[los,i] curve??
-##            
-##      ## linearly interpolate fitted curve at raw data points,
-##      ## rule=2: extrapolate at maxima to last value (rule=1:
-##      ## extrapolate as NA)
-##      a <- approx(x=sm$fitted, y=sm$x, xout=x[,i], rule = 2)$y
-##    } else if ( norm.type=="smooth") {
-##      ## generate a smoothed spline for reference data points
-##      sm <- smooth.spline(y=x[los,i] , x= ref.data[los])
-##      ## as above
-##      a <- approx(x=sm$y, y=sm$x, xout=x[,i], rule = 2)$y
-##    }
-##    
-##    ## HANDLE DATA BEYONG APPROX RANGE, x>=max(los)
-##    if ( reset.extrema ) {
-##      
-##      ## TODO: instead use simple scaling with highest LOS value
-##      ##max.los <- which(los & x[,i] == max(x[los,i]))
-##      ##a[x[,i]>=max(x[los,i])] <- x[x[,i]>=max(x[los,i]),i] * a[max.los]/x[max.los,i]))
-##      
-##      ## TODO: was >= and <= correct(er) ??
-##      a[x[,i] > max(x[los,i])] <- x[x[,i] > max(x[los,i]),i]
-##      a[x[,i] < min(x[los,i])] <- x[x[,i] < min(x[los,i]),i]  
-##    } else if ( extend.max ) {
-##      ## use simple scaling with highest LOS value
-##      max.los <- which(los & x[,i] == max(x[los,i]))
-##      a[  x[,i] > max(x[los,i]) ] <-
-##        x[x[,i] > max(x[los,i]),i] * a[max.los]/x[max.los,i]
-##      ## TODO: x[,i]<=min(x[los,i]) !!??
-##      
-##    }
-##    out[,i] <- a
-##  }
-##    
-##  colnames(out) <- colnames(x)
-##  rownames(out) <- rownames(x)
-##  
-##  return(out)
-##}
+## function taken from FLUSH.LVS.bundle/R/normalize_LVS.R and via tataProject.R
+## http://www.meb.ki.se/~yudpaw/
+## http://www.ncbi.nlm.nih.gov/pubmed/18318917
+#' LVS/LOS normalization
+#'
+#' This function normalizes the columns of a matrix by a set of
+#' invariant data rows (\code{LOS}, a "least-oscillating set") to be
+#' defined by the user (option \code{los.id}). For each column a LOESS
+#' fit, local fitting of a 2nd order polynomial with default
+#' parameters of the R \code{stats} function
+#' \code{\link[stats:loess]{loess}} is calculated between the values
+#' of the reference set (\code{LOS}) and their median or median
+#' (option \code{norm.ref} over all columns.  This is a modified
+#' version of the function `normalize_LVS` from package
+#' \code{FLUSH.LVS} (Calza et al. 2008), as used for normalization by
+#' a "least-oscillating" set of "microarray" probes from a
+#' transcriptome time-series of "yeast respiratory oscillations" by
+#' Machne & Murray, 2012. Alternatively to LOESS but un-tested, the 
+#' data can also be normalized by smoothing or simple min/max scaling.
+#' Also un-tested and highly experimental: to avoid cutting data at
+#' highest values of the \code{LOS} set, one can \code{add.maxima} of each
+#' column to the LOESS fits, or after the fit and normalization reset
+#' (\code{reset.extrema}) or re-scale (\code{extend.max}) maximal values.
+#' @param x a data matrix to be normalized
+#' @param los.id a numerical or logical vector, providing the indices
+#' or a TRUE/FALSE vector for a set of "least-oscillating" or "least-variant"
+#' data rows
+#' @param norm.ref take the "median" or the "mean" of the reference
+#' data set (\code{los.id}) for normalization
+#' @param norm.type use "loess", "smooth" or "scale" normalization; see Details
+#' @param add.maximum untested, see Details
+#' @param reset.extrema untested, see Details
+#' @param extend.max untested, see Details
+#' @references
+#' Calza S, Valentini D, Pawitan Y (2008)
+#' Normalization of oligonucleotide arrays based on the least-variant
+#' set of genes. BMC Bioinformatics 9:140.
+#'
+#' Machne R, Murray DB (2012)
+#' The yin and yang of yeast transcription: elements of a global feedback
+#' system between metabolism and chromatin. PLoS One 7(6):e37906
+#' 
+#' @export
+normalize.los <- function(x, los.id,norm.ref=c("median","mean"),
+                          norm.type=c("loess","smooth","scale"),
+                          add.maximum=FALSE, reset.extrema=FALSE,
+                          extend.max=FALSE) {
+    
+    if(missing(los.id))
+        stop("must provide index (logical or numerical) for LOS genes")
+    
+    if(!is.logical(los.id) && !is.numeric(los.id))
+        stop("los.id must be a vector either logical or numeric")
+    
+    ## generate reference data: mean/median for each reference probe
+    norm.ref <- match.arg(norm.ref)
+    ref.data <- switch(norm.ref,
+                       "median"=apply(x,1,median),
+                       "mean"=apply(x,1,mean))
+    
+    out <- matrix(NA, ncol=ncol(x), nrow=nrow(x))
+
+  ## SIMPLE SCALING
+  if ( norm.type[1]=="scale" ) {
+    out <- t(t(x) * apply(t(ref.data[los]/x[los,]),1,mean))
+    colnames(out) <- colnames(x)
+    rownames(out) <- rownames(x)
+    return(out)       
+  }
+    
+  for ( i in 1:ncol(x) ) {
+    los <- los.id
+    ## add all individual array maxima to extend fitting curve
+    if ( add.maximum ) {
+      if ( is.logical(los)) los[x[,i]>=max(x[los,i])]<-TRUE
+      if ( is.numeric(los)) los<-c(los,which(x[,i]>=max(x[los,i])))
+    }
+    if ( norm.type[1]=="loess" ) {
+      ## fit polynomial of degree 2 for reference data points
+      sm <- loess(x[los,i]~ref.data[los], degree = 2)
+
+      ## sm$x IS ref.data[los] , i.e. time-series medians/means
+      ## sm$fitted IS x[los,i] curve??
+            
+      ## linearly interpolate fitted curve at raw data points,
+      ## rule=2: extrapolate at maxima to last value (rule=1:
+      ## extrapolate as NA)
+      a <- approx(x=sm$fitted, y=sm$x, xout=x[,i], rule = 2)$y
+    } else if ( norm.type[1]=="smooth") {
+      ## generate a smoothed spline for reference data points
+      sm <- smooth.spline(y=x[los,i] , x= ref.data[los])
+      ## as above
+      a <- approx(x=sm$y, y=sm$x, xout=x[,i], rule = 2)$y
+    }
+    
+    ## HANDLE DATA BEYONG APPROX RANGE, x>=max(los)
+    if ( reset.extrema ) {
+      
+      ## TODO: instead use simple scaling with highest LOS value
+      ##max.los <- which(los & x[,i] == max(x[los,i]))
+      ##a[x[,i]>=max(x[los,i])] <- x[x[,i]>=max(x[los,i]),i] * a[max.los]/x[max.los,i]))
+      
+      ## TODO: was >= and <= correct(er) ??
+      a[x[,i] > max(x[los,i])] <- x[x[,i] > max(x[los,i]),i]
+      a[x[,i] < min(x[los,i])] <- x[x[,i] < min(x[los,i]),i]  
+    } else if ( extend.max ) {
+      ## use simple scaling with highest LOS value
+      max.los <- which(los & x[,i] == max(x[los,i]))
+      a[  x[,i] > max(x[los,i]) ] <-
+        x[x[,i] > max(x[los,i]),i] * a[max.los]/x[max.los,i]
+      ## TODO: x[,i]<=min(x[los,i]) !!??
+      
+    }
+    out[,i] <- a
+  }
+    
+  colnames(out) <- colnames(x)
+  rownames(out) <- rownames(x)
+  
+  return(out)
+}
