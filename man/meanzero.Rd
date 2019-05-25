@@ -10,7 +10,7 @@ meanzero(x)
 \item{x}{data to be transformed}
 }
 \value{
-log2(x/apply(x,1,mean))
+t(apply(x,1,scale))
 }
 \description{
 mean-0 normalization
