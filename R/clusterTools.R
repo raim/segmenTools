@@ -1803,7 +1803,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
              ylab=ylab,ylim=ylim, ...)
         if ( axes ) {
             axis(1, at=time.at);axis(2)
-            axis(3, at=time, labels=FALSE)
+            axis(3, at=time, labels=FALSE, tcl=-par("tcl"))
             mtext("samples", 3, 1.2)
         }
     }
@@ -1964,7 +1964,7 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
              xlab=xlab,xlim=range(time),
              ylab=ylab,ylim=ylim, ...)
         axis(1);axis(2)
-        axis(3, at=time, labels=FALSE)
+        axis(3, at=time, labels=FALSE, tcl=-par("tcl"))
         mtext("samples", 3, 1.2)
     }
     ## plot each cluster in cls.srt
