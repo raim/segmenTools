@@ -80,6 +80,10 @@ option_list <- list(
               help="number of permutations used to calculate p-values for all DFT components"),
   make_option("--smooth.time", type="integer", default=1, # best for clustering was 3
               help="span of the moving average for smoothing of individual read time-series"),
+  make_option(c("--dePCR"), action="store_true", default=FALSE,
+              help="simple PCR amplification model to calculate back from read-cont to original molecule number, assuming minimal signal ~ 1 molecule"),
+  make_option(c("--countfile"), type="character", default="raw",
+              help="file providing the total read-count per time point which had been used to normalize read-counts to RKPM"),
   ## SEGMENT CLUSTERING
   make_option(c("--missing"), action="store_true", default=FALSE,
               help="only calculate missing clusterings; useful if SGE jobs were not successful, to only calculate the missing"),
@@ -365,9 +369,25 @@ for ( type in sgtypes ) {
         
         avg
     }
+
+    ## assume PCR amplfication and get original number
+   
     avg <- t(apply(sgs,1,sgavg))
     
-    
+    if ( dePCR ) {
+        ## multiply by the total 
+        cnt <- read.delim(countfile,
+                          header=FALSE, sep=" ")
+        tot <- t(t(avg)*cnt[,2])
+        ## x(n) = x(0) * 2^n
+        ## n = log2(x(n)/x(0))
+        ## assuming minimal signal is from x(0)=1 molecule
+        n <- log2(min(c(tot[tot>0])))
+        ## TODO: this is negative; likely requires re-scaling of RPKM
+        ## x(0) = x(n) * 2^-n
+        avg <- tot*2^-n
+    }
+     
     ## write out average timeseries
     if ( "timeseries" %in% jobs ) {
         sgts <- data.frame(ID=sgs[,idcol], avg)
