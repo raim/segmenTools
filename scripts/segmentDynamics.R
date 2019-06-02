@@ -373,13 +373,16 @@ for ( type in sgtypes ) {
     ## assume PCR amplfication and get original number
    
     avg <- t(apply(sgs,1,sgavg))
-    
+
+    ## re-scale data by assumping a simple PCR model
+    ## x(n) = x(0) * 2^n, with n PCR amplification cycles
     if ( dePCR ) {
-        ## multiply by the total 
+        ## multiply by the total read-count, assuming data
+        ## was divided by this factor
         cnt <- read.delim(countfile,
                           header=FALSE, sep=" ")
         tot <- t(t(avg)*cnt[,2])
-        ## x(n) = x(0) * 2^n
+        ## estimate number of PCR cycles n
         ## n = log2(x(n)/x(0))
         ## assuming minimal signal is from x(0)=1 molecule
         n <- log2(min(c(tot[tot>0])))
