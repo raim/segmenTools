@@ -184,12 +184,14 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param axis integer vector, sets whether x-axis (1,3) and/or
 #' y-axis (2,4) are drawn; the column and row names of \code{dat} will
 #' be used as tick labels
+#' @param show.sig only for overlap lists sorted by \code{\link{sortClusters}}:
+#' draws a red line where unsorted non-significant hits start
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: sort by significance?
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, scale=1, round, axis=1:2, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, scale=1, round, axis=1:2, show.sig=TRUE, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
@@ -236,6 +238,14 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, s
 
     image_matrix(pval, breaks=breaks, col=col, axis=axis,
                  text=txt, text.col=txt.col, ...)
+
+    ## overlaps sorted by sortClusters indicate where
+    ## unsorted non-significant hits start - draw a line: 
+    if ( show.sig & "nsig"%in%names(x) )
+        if ( nrow(pval)>x$nsig )
+            abline(h=nrow(pval)-x$nsig+.5, col=2, lwd=2)
+
+    
 }
 
 
@@ -272,6 +282,9 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
                                decreasing=FALSE)]
     new.srt <- c(sig.srt[!duplicated(sig.srt)], rest.srt)
 
+    ## remember row split between sig and non-sig
+    nsig <- sum(!duplicated(sig.srt))
+    
     ## resort all matrices in overlap structure (overlap, pvalue, jaccard, ...)
     ## TODO: do this nicer
     n <- nrow(pvl)
@@ -284,6 +297,9 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     ## transpose back
     if ( axis==1 )
         ovl <- lapply(ovl, t)
+
+    ## add number of sorted sig
+    ovl$nsig <- nsig
 
     ovl
 }
