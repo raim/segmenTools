@@ -193,6 +193,21 @@ target <- coor2index(target, chrS)
 if ( antisense ) 
     target <- switchStrand(target, chrS)
 
+## upstream bug yeast - missing 2 micron plasmid - catch here
+if ( any(is.na(query[,"start"])) ) {
+    rm <- which(is.na(query[,"start"]))
+    warning("removing ", length(rm), " queries due to missing coordinates",
+            "(in yeast: upstream error, missing chr column for 2-micron genes)")
+    query <- query[-rm,]
+}
+if ( any(is.na(target[,"start"])) ) {
+    rm <- which(is.na(target[,"start"]))
+    warning("removing ", length(rm), " queries due to missing coordinates",
+            "(in yeast: upstream error, missing chr column for 2-micron genes)")
+    target <- target[-rm,]
+}
+    
+
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 

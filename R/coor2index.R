@@ -245,8 +245,13 @@ coor2index <- function(features, chrS, chrMap,
         names(chrIdx) <- chrMap
         chr <- chrIdx[as.character(chr)]
     }
+
     if ( any(!is.numeric(chr)) )
         stop("chromosomes must be a numeric index; use chromosome name map with argument `chrMap'!")
+
+    if ( any(is.na(chr)) | any(!chr%in%names(chrS)) )
+        warning("some chromosomes are not available (NA)")
+    
     ## convert to index
     for ( col in cols ) {
         features[,col] <- features[,col]+chrS[chr]
