@@ -249,8 +249,14 @@ coor2index <- function(features, chrS, chrMap,
     if ( any(!is.numeric(chr)) )
         stop("chromosomes must be a numeric index; use chromosome name map with argument `chrMap'!")
 
-    if ( any(is.na(chr)) | any(!chr%in%names(chrS)) )
+    ## check for missing chromosome info and issue warning
+    ## remember and also set chr to NA below
+    ## TODO: check for missing info in other functions as well
+    nachr <- numeric()
+    if ( any(is.na(chr)) | any(!chr%in%names(chrS)) ) {
+        nachr <- which(is.na(chr) | !chr%in%names(chrS))
         warning("some chromosomes are not available (NA)")
+    }
     
     ## convert to index
     for ( col in cols ) {
@@ -259,6 +265,8 @@ coor2index <- function(features, chrS, chrMap,
         features[minus,col] <- features[minus,col]+max(chrS)
     }
     features[,chrCol] <- 1
+    if ( length(nachr)>0 )
+        features[nachr,chrCol] <- NA
     ## TODO: map so that start < end??
     
     features 
