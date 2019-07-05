@@ -434,6 +434,12 @@ for ( set in sets ) {
 ### PLOT BY TEST TYPES
 for ( test.type in test.types ) {
 
+
+    if ( !test.type%in%names(stats) ) {
+        warning(test.type, " not found in stats object for set: ", set)
+        next
+    }
+    
     cstats <- collectOvlStats(stats, type=test.type)
 
     CDF <- cstats$CDF

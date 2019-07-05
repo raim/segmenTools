@@ -229,8 +229,7 @@ coor2index <- function(features, chrS, chrMap,
     }
     ## re-order start>end; only for non-circular chromosomes
     ## TODO: add circular info to chrS
-    if ( sum(c("start","end")%in%colnames(features))==2 &
-         !circular ) {
+    if ( sum(c("start","end")%in%colnames(features))==2 & !circular ) {
         rev <- features[,"start"]>features[,"end"]
         ends <- features[rev,"start"]
         features[rev,"start"] <- features[rev,"end"]
@@ -253,8 +252,8 @@ coor2index <- function(features, chrS, chrMap,
     ## remember and also set chr to NA below
     ## TODO: check for missing info in other functions as well
     nachr <- numeric()
-    if ( any(is.na(chr)) | any(!chr%in%names(chrS)) ) {
-        nachr <- which(is.na(chr) | !chr%in%names(chrS))
+    if ( any(is.na(chr)) ) {
+        nachr <- which(is.na(chr) )
         warning("some chromosomes are not available (NA)")
     }
     
