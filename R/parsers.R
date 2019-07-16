@@ -20,7 +20,7 @@ parseGEOSoft <- function(file, idcol, only.data=TRUE, valcol="VALUE", title=TRUE
 
     ## working with IDs, set this to false!
     old <- unlist(options("stringsAsFactors"))
-    op <- options(stringsAsFactors=F)
+    op <- options(stringsAsFactors=FALSE)
     
     ## parse all lines
     cnx <- gzfile(file)
@@ -79,6 +79,13 @@ parseGEOSoft <- function(file, idcol, only.data=TRUE, valcol="VALUE", title=TRUE
         for ( i in 1:length(idx) ) {
             tmp <- read.delim(gzfile(file),
                               skip=sidx[i], nrow=eidx[i]-sidx[i]-1,row.names=1)
+            ## filter rows which are not in ids!
+            miss <- which(!rownames(tmp)%in%rownames(dat))
+            if ( length(miss)>0 ) {
+                warning("data set ", i, ": ",
+                        length(miss), " data rows not in IDs")
+                tmp <- tmp[-miss,]
+            }
             dat[rownames(tmp),i] <- tmp[,valcol]
         }
         
@@ -167,7 +174,8 @@ summarizeGEOSoft <- function(data, id="ORF", avg="mean", farms=FALSE,
     names(idx) <- dids
     for ( i in idx ) {
         if ( farms ) ## USING FARMS
-            dat[i[1],] <- 2^farms::generateExprVal.method.farms(dat[i,],...)$exprs
+            dat[i[1],] <- 2^farms::generateExprVal.method.farms(dat[i,],
+                                                                ...)$exprs
         else ## or a simple averaging function
             dat[i[1],] <- apply(dat[i,],2,avgf,...)
     }
