@@ -8,7 +8,7 @@ alignData(coors, data, dst = 500, chrS, coorCols = c(chr = "chr",
   position = "coor", strand = "strand"), reverse = c("-", -1))
 }
 \arguments{
-\item{coors}{genome positions (position, chromosome, strand)
+\item{coors}{genome positions (chromosome, coordinate, strand)
 at which data will be aligned}
 
 \item{data}{genome data to be aligned; NOTE, that currently this

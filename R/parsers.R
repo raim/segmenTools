@@ -360,3 +360,70 @@ gff2tab <- function(file, attrsep=";", fieldsep="=") {
                      stringsAsFactors=FALSE)
 }
 
+
+## from library("Biostrings")
+#' fasta sequence file parser stolen from (an older version of)
+#' \code{Biostrings}
+#' @param file file with sequence(s) in fasta format
+#' @param checkComments remove information after a semi-colon ; in fasta
+#' header
+#' @param strip.descs split header at a pattern in argument \code{split.desc}
+#' and store in returned structure as \code{details}
+#' @param split.desc pattern to split header into description and details
+#' with argument \code{strip.descs}
+#' @export
+readFASTA <- function (file, checkComments=TRUE, strip.descs=TRUE,
+                       split.desc="") 
+{    
+    if (is.character(file)) {
+        if ( length(grep("\\.gz$",file)) )
+          file <- gzfile(file)
+        else
+          file <- file(file, "r")
+        on.exit(close(file))
+    }
+    else {
+        if (!inherits(file, "connection")) 
+            stop("'file' must be a character string or connection")
+        if (!isOpen(file)) {
+            open(file, "r")
+            on.exit(close(file))
+        }
+    }
+    s1 <- scan(file = file, what = "", sep = "\n", quote = "", 
+        allowEscapes = FALSE, quiet = TRUE)
+    if (checkComments) {
+        comments <- grep("^;", s1)
+        if (length(comments) > 0) 
+            s1 <- s1[-comments]
+    }
+    descriptions <- which(substr(s1, 1L, 1L) == ">")
+    numF <- length(descriptions)
+    if (numF == 0) 
+        stop("no FASTA sequences found")
+    dp <- descriptions + 1L
+    dm <- descriptions - 1L
+    end <- c(dm[-1], length(s1))
+    lapply(seq_len(numF), function(i) {
+        desc <- s1[descriptions[i]]
+        if (strip.descs) 
+            desc <- substr(desc, 2L, nchar(desc))
+        details <- NULL
+        if ( split.desc != "" ) {
+          desc <- unlist(strsplit(desc,split.desc))
+          if ( length(desc)>2 ) stop("seq id not compatible with split.desc")
+          details <- desc[2]
+          desc <- desc[1]
+        }
+        if (end[i] >= dp[i]) {
+            seq <- paste(s1[dp[i]:end[i]], collapse = "")
+        }
+        else {
+            warning("record \"", desc, "\" contains no sequence")
+            seq <- ""
+        }
+        ## replace trailing // in sequence
+        seq <- gsub("/","",seq)
+        list(desc = desc, details=details, seq = seq)
+    })
+}

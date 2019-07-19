@@ -442,7 +442,7 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
 
 
 #' align genome data at specified coordinates (e.g. TSS)
-#' @param coors genome positions (position, chromosome, strand)
+#' @param coors genome positions (chromosome, coordinate, strand)
 #' at which data will be aligned
 #' @param data genome data to be aligned; NOTE, that currently this
 #' is required to be fully expanded matrix covering each position
