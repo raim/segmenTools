@@ -9,7 +9,8 @@ alignData(coors, data, dst = 500, chrS, coorCols = c(chr = "chr",
 }
 \arguments{
 \item{coors}{genome positions (position, chromosome, strand)
-at which data will be aligned}
+at which data will be aligned
+(TODO: allow start/end coors and set NA if beyond)}
 
 \item{data}{genome data to be aligned; NOTE, that currently this
 is required to be fully expanded matrix covering each position
