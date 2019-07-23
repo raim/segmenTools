@@ -5,7 +5,8 @@
 \title{plot cluster-cluster or segment-segment overlaps}
 \usage{
 plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, col,
-  short = TRUE, scale = 1, round, axis = 1:2, show.sig = TRUE, ...)
+  txt.col = c("black", "white"), short = TRUE, scale = 1, round,
+  axis = 1:2, show.sig = TRUE, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -23,6 +24,10 @@ and \code{p >= p.min} (black)}
 \item{col}{color ramp, default are grey values, length of
 this vector overrules parameter \code{n}}
 
+\item{txt.col}{two colors used for the plot text, ie., the
+overlap counts; the second is used if `p<p.txt` as a discrete
+signficance cutoff}
+
 \item{short}{logical, indicating whether to cut higher overlap
 numbers; currently: division by 1000 and replacement by \code{k}}
 
@@ -36,7 +41,9 @@ for Jaccard index)}
 y-axis (2,4) are drawn; the column and row names of \code{dat} will
 be used as tick labels}
 
-\item{show.sig}{only for overlap lists sorted by \code{\link{sortClusters}}:
+\item{show.sig}{only for overlap lists sorted by
+\code{\link[segmenTier:sortClusters]{sortClusters}} from package
+\code{segmenTier}:
 draws a red line where unsorted non-significant hits start}
 
 \item{...}{arguments to \code{\link{image_matrix}}}

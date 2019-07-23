@@ -175,6 +175,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' and \code{p >= p.min} (black)
 #' @param col color ramp, default are grey values, length of
 #' this vector overrules parameter \code{n}
+#' @param txt.col two colors used for the plot text, ie., the
+#' overlap counts; the second is used if `p<p.txt` as a discrete
+#' signficance cutoff
 #' @param short logical, indicating whether to cut higher overlap
 #' numbers; currently: division by 1000 and replacement by \code{k}
 #' @param scale factor to divide overlap numbers with, useful for
@@ -184,14 +187,19 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param axis integer vector, sets whether x-axis (1,3) and/or
 #' y-axis (2,4) are drawn; the column and row names of \code{dat} will
 #' be used as tick labels
-#' @param show.sig only for overlap lists sorted by \code{\link{sortClusters}}:
+#' @param show.sig only for overlap lists sorted by
+#' \code{\link[segmenTier:sortClusters]{sortClusters}} from package
+#' \code{segmenTier}:
 #' draws a red line where unsorted non-significant hits start
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: sort by significance?
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, scale=1, round, axis=1:2, show.sig=TRUE, ...) {
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
+                         txt.col = c("black","white"),
+                         short=TRUE, scale=1, round, axis=1:2,
+                         show.sig=TRUE, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
@@ -216,9 +224,9 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, s
     if ( scale>1 ) txt <- txt*scale
     if ( !missing(round) ) txt <- round(txt,digits=round)
     txt[txt=="0"] <- ""
-    txt.col <- txt
-    txt.col[] <- "black"
-    txt.col[pval >= -log2(p.txt)] <- "white"
+    tcol <- txt
+    tcol[] <- txt.col[1]
+    tcol[pval >= -log2(p.txt)] <- txt.col[2]
     ## cut text (high overlap numbers)
     if ( short ) {
         txt <- x[[type]]
@@ -237,7 +245,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col, short=TRUE, s
     #    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
 
     image_matrix(pval, breaks=breaks, col=col, axis=axis,
-                 text=txt, text.col=txt.col, ...)
+                 text=txt, text.col=tcol, ...)
 
     ## overlaps sorted by sortClusters indicate where
     ## unsorted non-significant hits start - draw a line: 
@@ -600,7 +608,10 @@ clusterAnnotation <- function(cls, data, p=1,
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
-image_matrix <- function(z, x, y, text, text.col, text.cex=1, axis=1:2, axis1.col, axis1.las=2, axis2.col, axis2.las=2, axis.cex=1.5, ...) {
+image_matrix <- function(z, x, y, text, text.col, text.cex=1,
+                         axis=1:2, axis.cex=1.5,
+                         axis1.col, axis1.las=2,
+                         axis2.col, axis2.las=2, ...) {
 
     ## reverse columns and transpose
     if ( nrow(z)>1 )

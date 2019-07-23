@@ -5,7 +5,7 @@
 \title{Switch between plot devices}
 \usage{
 plotdev(file.name = "test", type = "png", width = 5, height = 5,
-  res = 100)
+  res = 100, bg = "white")
 }
 \arguments{
 \item{file.name}{file name without suffix (.png, etc)}
@@ -17,6 +17,8 @@ plotdev(file.name = "test", type = "png", width = 5, height = 5,
 \item{height}{figure height in inches}
 
 \item{res}{resolution in ppi (pixels per inch), only for 'png' and 'tiff'}
+
+\item{bg}{background color}
 }
 \description{
 Switch between plot devices

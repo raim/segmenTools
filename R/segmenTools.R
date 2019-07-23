@@ -143,8 +143,10 @@ ci95 <- function(x,na.rm=FALSE) {
 #' @param width figure width in inches
 #' @param height figure height in inches
 #' @param res resolution in ppi (pixels per inch), only for 'png' and 'tiff'
+#' @param bg background color
 #' @export
-plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
+plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
+                    bg="white") {
   file.name <- paste(file.name, type, sep=".")
   if ( type == "png" )
     grDevices::png(file.name, width=width, height=height, units="in", res=res)
@@ -152,7 +154,7 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100) {
     grDevices::postscript(file.name, width=height, height=width,paper="special",
                           horizontal = FALSE, onefile = FALSE)
   if ( type == "pdf" )
-    grDevices::pdf(file.name, width=width, height=height)
+    grDevices::pdf(file.name, width=width, height=height, bg=bg)
   if ( type == "tiff" )
     grDevices::tiff(file.name, width=width, height=height, units="in", res=res)
   if ( type == "svg" )

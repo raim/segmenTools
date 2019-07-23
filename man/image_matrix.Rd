@@ -6,7 +6,7 @@
 in the orientation of text display}
 \usage{
 image_matrix(z, x, y, text, text.col, text.cex = 1, axis = 1:2,
-  axis1.col, axis1.las = 2, axis2.col, axis2.las = 2, axis.cex = 1.5,
+  axis.cex = 1.5, axis1.col, axis1.las = 2, axis2.col, axis2.las = 2,
   ...)
 }
 \arguments{
@@ -27,6 +27,8 @@ which will be plotted on the image}
 y-axis (2,4) are drawn; the column and row names of \code{dat} will
 be used as tick labels}
 
+\item{axis.cex}{if axis[1|2].col is provided, this sets the tick label size}
+
 \item{axis1.col}{invididual colors for x-axis tick labels, length must
 equal the number of columns of \code{dat}}
 
@@ -36,8 +38,6 @@ equal the number of columns of \code{dat}}
 equal the number of rows of \code{dat}}
 
 \item{axis2.las}{parameter \code{las} (tick label orientation) for y axis}
-
-\item{axis.cex}{if axis[1|2].col is provided, this sets the tick label size}
 
 \item{...}{further arguments to \code{\link[graphics]{image}}, e.g., col
 to select colors}
