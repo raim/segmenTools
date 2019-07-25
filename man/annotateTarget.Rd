@@ -5,8 +5,8 @@
 \title{annotate target segments by overlapping query segments}
 \usage{
 annotateTarget(query, target, qcol = colnames(query), tcol, prefix,
-  details = FALSE, only.best = TRUE, minJaccard, collapse = TRUE,
-  msgfile = stdout())
+  details = FALSE, only.best = TRUE, sort = TRUE, minJaccard,
+  collapse = TRUE, msgfile = stdout())
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}
@@ -26,6 +26,8 @@ match, i.e., union and intersect, and relative position of the query
 to the matching targets}
 
 \item{only.best}{only consider the top-ranking query hit}
+
+\item{sort}{sort hits by rank}
 
 \item{minJaccard}{minimal Jaccard index (intersect/union) threshold;
 overlaps below this value will NOT be reported; NOTE that this will
@@ -55,7 +57,8 @@ the \code{query} segment(s) with the highest Jaccard index. If multiple
 into ;-separated lists. If \code{collapse=FALSE}, each overlapping
 \code{query} segment will have its own row, and the result matrix
 is longer (\code{nrow(results)>=nrow(target)}). If \code{only.best=FALSE},
-all overlapping \code{query} segments will be reported.
+all overlapping \code{query} segments will be reported, and optionally
+sorted by rank (\code{sort}).
 Additionaly a minimal Jaccard filter can be applied
 (option \code{minJaccard}), and only \code{query} segments with a
 higher Jaccard index are reported.

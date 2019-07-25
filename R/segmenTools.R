@@ -439,7 +439,8 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
 #' into ;-separated lists. If \code{collapse=FALSE}, each overlapping
 #' \code{query} segment will have its own row, and the result matrix
 #' is longer (\code{nrow(results)>=nrow(target)}). If \code{only.best=FALSE},
-#' all overlapping \code{query} segments will be reported.
+#' all overlapping \code{query} segments will be reported, and optionally
+#' sorted by rank (\code{sort}).
 #' Additionaly a minimal Jaccard filter can be applied
 #' (option \code{minJaccard}), and only \code{query} segments with a
 #' higher Jaccard index are reported.
@@ -454,6 +455,7 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
 #' match, i.e., union and intersect, and relative position of the query
 #' to the matching targets
 #' @param only.best only consider the top-ranking query hit
+#' @param sort sort hits by rank
 #' @param minJaccard minimal Jaccard index (intersect/union) threshold;
 #' overlaps below this value will NOT be reported; NOTE that this will
 #' set argument \code{details} to \code{TRUE}
@@ -463,18 +465,21 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
 #' stdout, useful when using in context of command line pipes
 #' @export
 annotateTarget <- function(query, target, qcol=colnames(query), tcol,
-                           prefix, details=FALSE, only.best=TRUE, minJaccard,
-                           collapse=TRUE, msgfile=stdout()) {
+                           prefix, details=FALSE, only.best=TRUE, sort=TRUE,
+                           minJaccard, collapse=TRUE, msgfile=stdout()) {
 
     ## activate "details" for jaccard filter
     if ( !missing(minJaccard) )
         details <- TRUE
+
+    ## force sorting with only.best option!
+    if ( only.best ) sort <- TRUE
     
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
     cltr <- segmentOverlap(query=query, target=target,
                            collapse=FALSE,
-                           add.na=TRUE, sort=TRUE,untie=FALSE,
+                           add.na=TRUE, sort=sort, untie=FALSE,
                            details=details, msgfile=msgfile)
 
     ## bind query column to overlap table
@@ -665,7 +670,9 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' @param msgfile file pointer for progress messages and warnings, defaults to
 #' stdout, useful when using in context of command line pipes
 #' @export
-segmentOverlap <- function(query, target, details=FALSE, distance, add.na=FALSE, untie=FALSE, collapse=FALSE, sort=FALSE, msgfile=stdout()) {
+segmentOverlap <- function(query, target, details=FALSE, distance,
+                           add.na=FALSE, untie=FALSE, collapse=FALSE,
+                           sort=FALSE, msgfile=stdout()) {
 
     ## get target and query ID - only required for messages
     if ( "ID" %in% colnames(target) ) {
