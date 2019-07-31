@@ -4,8 +4,8 @@
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table read.delim read.table
-#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext
-#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols
+#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout
+#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median
 ##@bibliography /home/raim/ref/tata.bib
 ##@importFrom segmenTier clusterCor_c 
@@ -206,6 +206,77 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128), ...) {
   invisible(df)
 }
 
+#' Map a distribution to a color scheme
+#'
+#' Returns a list containing colors and breaks, to
+#' be used in \code{image} plots, and the cut data and colors
+#' for each datum. Note that the function is specifically used
+#' for color scheme selection in the \code{genomeBrowser} project.
+#' @param x data vector
+#' @param mn minimal value to cut data at, if missing
+#' \code{\link[stats:quantile]{quantile}} will
+#' be used with parameter \code{q} or \code{q[1]}
+#' @param mx maximal value to cut data at, if missing the quantile
+#' \code{q[2]} or, if only one {q} is provided, \code{1-q[1]} will be used
+#' @param q parameter \code{probs} for quantile selection of
+#' mn/mx data cuts, here a single value or two values; see \code{mn}
+#' and \code{mx} arguments
+#' @param colf color map function used to create a color gradient,
+#' eg. \code{\link[grDevices:gray.colors]{gray.colors}} or
+#' \code{viridis}
+#' @param n number of colors, first argument to \code{colf}
+#' @param plot plot a legend, ie. a histogram of the full data and an
+#' \code{image} of the color scheme below
+#' @param xlab x-axis label to use in legend plot
+#' @param heights relative heights of histogram and image plots
+#' @param mai \code{par("mai")} plot parameter for plot margins
+#' @param ... further arguments to \code{colf}, e.g. \code{start} and
+#' \code{end} in \code{\link[grDevices:gray.colors]{gray.colors}} 
+#' @export
+selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
+                         plot=TRUE, xlab="score", heights=c(.75,.25),
+                         mai=c(.75,.75,.1,.1), ...) {
+
+    ## full data range
+    rng <- range(x, na.rm=TRUE)
+    brk <- seq(rng[1], rng[2], length.out=n+1)
+
+    ## cut data
+    if ( length(q)==1) q <- c(q, 1-q)
+    if ( missing(mx) ) mx <- quantile(x, q=q[2], na.rm=TRUE) 
+    if ( missing(mn) ) mn <- quantile(x, q=q[1], na.rm=TRUE) 
+    x.cut <- x
+    x.cut[x.cut>mx] <- mx
+    x.cut[x.cut<mn] <- mn
+
+    ## colors & breaks for cut data
+    cols <- colf(n, ...)
+    x.cols <- cols[n*x.cut/max(x.cut)]
+    cbrk <- seq(mn, mx, length.out=n+1)
+
+    ## plot legend
+    if ( plot ) {
+
+        lbrk <- seq(min(brk),max(brk),length.out=length(cols)+1)
+        cdat <- lbrk
+        cdat[cdat>mx] <- mx
+        cdat[cdat<mn] <- mn
+        
+        layout(t(t(1:2)), heights=heights, widths=1)
+        mai[1] <- mai[1]/5
+        par(xaxs="i", yaxs="i", mai=mai)
+        hist(x.cut,breaks=brk, border=2, col=2, axes=FALSE, main=NA)
+        hist(x,breaks=brk, add=TRUE)
+        abline(v=c(mn,mx), col=2, lty=2)
+        axis(2)
+        axis(1, labels=NA)
+        mai[1] <- mai[1]*5
+        par(xaxs="i", mai=mai)
+        image_matrix(x=lbrk, z=t(cdat), breaks=cbrk,
+                     col=cols, axis=1, ylab="color", xlab=xlab)
+    }
+    list(breaks=cbrk, col=cols, x.cut=x.cut, x.col=x.cols)
+}
 
 #' plot multiple cumulative distribution functions
 #' 
