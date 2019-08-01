@@ -3,6 +3,8 @@
 ## SEGMENT CLASSES OVERLAP STATISTIC
 ## by permutation test analysis
 
+## TODO: implement downstream scan
+
 library(segmenTools)
 
 ## nicer timestamp
@@ -33,6 +35,8 @@ option_list <- list(
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
   make_option(c("--upstream"), type="integer", default=0,
               help="search range upstream of target (in nt.)"),
+##  make_option(c("--downstream"), type="integer", default=0,
+##              help="search range downstream of target (in nt.)"),
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   ## OUTPUT
