@@ -243,15 +243,15 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
 
     ## cut data
     if ( length(q)==1) q <- c(q, 1-q)
-    if ( missing(mx) ) mx <- quantile(x, q=q[2], na.rm=TRUE) 
     if ( missing(mn) ) mn <- quantile(x, q=q[1], na.rm=TRUE) 
+    if ( missing(mx) ) mx <- quantile(x, q=q[2], na.rm=TRUE) 
     x.cut <- x
-    x.cut[x.cut>mx] <- mx
-    x.cut[x.cut<mn] <- mn
+    x.cut[which(x.cut>mx)] <- mx
+    x.cut[which(x.cut<mn)] <- mn
 
     ## colors & breaks for cut data
     cols <- colf(n, ...)
-    x.cols <- cols[n*x.cut/max(x.cut)]
+    x.cols <- cols[n*(x.cut-min(x.cut))/(max(x.cut)-min(x.cut))]
     cbrk <- seq(mn, mx, length.out=n+1)
 
     ## plot legend
