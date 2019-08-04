@@ -697,6 +697,61 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
    if ( !missing(file.name) ) dev.off()   
 }
 
+## TODO: arguments
+#' @param ... arguments to \code{\link{dense2d}} or \code{\link{points}}
+#' @export
+jrplot <- function(jaccard,ratio,j.thresh=0.5, did="", tot, 
+                   rlim=c(0,max(ratio,na.rm=TRUE)), jlim=c(0,1.05),
+                   nbin=512, ...) {
+
+    ## legend text
+    leg.txt <- ifelse(did=="","",paste0(did,":\n"))
+    leg.txt <- paste0(leg.txt, sum(!is.na(jaccard)))
+    if (!missing(tot) )
+        if ( !is.na(tot) )
+            leg.txt <- paste0(leg.txt,"/",tot)
+    
+    plot(jaccard,ratio, ylim=rlim, xlim=jlim, col=NA,
+         xlab=expression("Jaccard Index,"~J*"="*I/U),
+         ylab=expression("Length Ratio,"~R*"="*Q/T))
+    j <- seq(0,2,.01)
+    lines(j,1/j, col="black", lwd=1, lty=2)
+    abline(a=0,b=1, col="black", lwd=1, lty=2)
+    ##abline(v=1, col="black", lwd=1, lty=1)
+    abline(v=j.thresh, col=2, lwd=2, lty=2)
+    abline(h=1, col="red", lwd=2, lty=2)
+    df <- NULL
+    if ( length(na.omit(jaccard))<100 )
+        points(jaccard,ratio, pch=20, col="#00000077", ...)
+    else {
+        par(new=TRUE)
+        df <- dense2d(jaccard,ratio, ylim=rlim, xlim=jlim, nbin=nbin,
+                      xlab=NA, ylab=NA, axes=FALSE, ...)
+    }    
+    legend("topright",leg.txt,
+           bg="#FFFFFFAA",box.col=NA, cex=1.5)
+
+    good <- ratio>=1 & jaccard>j.thresh
+    bad <- ratio< 1 & jaccard>j.thresh
+    
+    text(0.82, 2, bquote(Q>T*":"~.(sum(good,na.rm=TRUE))))
+    text(0.82, 0.25, bquote(Q<T*":"~.(sum(bad,na.rm=TRUE))))
+    
+    long <-  ratio>=1 & jaccard<=j.thresh
+    short <- ratio< 1 & jaccard<=j.thresh
+    shorts <- sum(short,na.rm=TRUE)
+    longs <- sum(long,na.rm=TRUE)
+    
+    text(j.thresh/2, rlim[2]*.9, bquote(Q>T*":"~.(longs)))
+    text(j.thresh/2, rlim[1]/2,  bquote(Q<T*":"~.(shorts)))
+    if ( any(ratio>rlim[2],na.rm=TRUE) )
+        text(1/rlim[2],rlim[2],paste0(sum(ratio>rlim[2],na.rm=TRUE),
+                                      ": R>", rlim[2]),
+             pos=4, cex=.7)
+    ## return dense2d return for potential legend
+    df
+}
+
 ### MAIN ALGORITHM - FINDS OVERLAPS BETWEEN TWO SETS
 ### CHROMOSOMAL SEGMENTS
 
