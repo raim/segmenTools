@@ -6,7 +6,7 @@
 #'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors
-#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median
+#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit
 ##@bibliography /home/raim/ref/tata.bib
 ##@importFrom segmenTier clusterCor_c 
 NULL # this just ends the global package documentation
@@ -698,9 +698,26 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 }
 
 ## TODO: arguments
-#' @param ... arguments to \code{\link{dense2d}} or \code{\link{points}}
+#' Jaccard vs. Ratio Segment Overlap Plots
+#'
+#' Generates a plot of Jaccard Indices vs. query/target overlap ratios,
+#' decorated with threshold lines and counts.
+#' @param jaccard Jaccard Indices
+#' @param ratio query/target length ratio
+#' @param j.thresh Jaccard threshold, line will be drawn at this point,
+#' and counts reported for values below and above
+#' @param minn minimal number of available points to use \code{\link{dense2d}},
+#' a conventional scatter plot (\code{\link{points}}) will be used if less
+#' than \code{minn} data are available
+#' @param did optional data ID to be used in the plot legend
+#' @param tot optional total number of targets to indicate non-overlapping
+#' targets in the plot legend
+#' @param rlim ratio (y-)axis limis
+#' @param jlim Jaccard (x-)axis limits
+#' @param nbin \code{nbin} parameter for \code{\link{dense2d}}
+#' @param ... further arguments to \code{\link{dense2d}} or \code{\link{points}}
 #' @export
-jrplot <- function(jaccard,ratio,j.thresh=0.5, did="", tot, 
+jrplot <- function(jaccard,ratio,j.thresh=0.5, minn=100, did="", tot, 
                    rlim=c(0,max(ratio,na.rm=TRUE)), jlim=c(0,1.05),
                    nbin=512, ...) {
 
@@ -718,10 +735,10 @@ jrplot <- function(jaccard,ratio,j.thresh=0.5, did="", tot,
     lines(j,1/j, col="black", lwd=1, lty=2)
     abline(a=0,b=1, col="black", lwd=1, lty=2)
     ##abline(v=1, col="black", lwd=1, lty=1)
-    abline(v=j.thresh, col=2, lwd=2, lty=2)
+    abline(v=j.thresh, col="red", lwd=2, lty=2)
     abline(h=1, col="red", lwd=2, lty=2)
     df <- NULL
-    if ( length(na.omit(jaccard))<100 )
+    if ( length(na.omit(jaccard))<minn )
         points(jaccard,ratio, pch=20, col="#00000077", ...)
     else {
         par(new=TRUE)
