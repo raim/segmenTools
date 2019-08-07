@@ -4,9 +4,9 @@
 \alias{jrplot}
 \title{Jaccard vs. Ratio Segment Overlap Plots}
 \usage{
-jrplot(jaccard, ratio, symm = TRUE, j.thresh = 0.5, minn = 100,
-  did = "", tot, rlim = c(0, 2), jlim = c(0, 1.05), nbin = 512,
-  ...)
+jrplot(jaccard, ratio, symm = TRUE, nbin = 512, minn = 10,
+  rlim = c(0, 2), jlim = c(0, 1.05), decorate = TRUE,
+  j.thresh = 0.5, yd = 0.1, did = "", tot, ...)
 }
 \arguments{
 \item{jaccard}{Jaccard Indices}
@@ -16,23 +16,29 @@ jrplot(jaccard, ratio, symm = TRUE, j.thresh = 0.5, minn = 100,
 \item{symm}{plot symmetric version, ie. for ratio>1 plot 1/ratio with
 inverted y-axis}
 
-\item{j.thresh}{Jaccard threshold, line will be drawn at this point,
-and counts reported for values below and above}
+\item{nbin}{\code{nbin} parameter for \code{\link{dense2d}}}
 
 \item{minn}{minimal number of available points to use \code{\link{dense2d}},
 a conventional scatter plot (\code{\link{points}}) will be used if less
 than \code{minn} data are available}
 
-\item{did}{optional data ID to be used in the plot legend}
-
-\item{tot}{optional total number of targets to indicate non-overlapping
-targets in the plot legend}
-
 \item{rlim}{ratio (y-)axis limis}
 
 \item{jlim}{Jaccard (x-)axis limits}
 
-\item{nbin}{\code{nbin} parameter for \code{\link{dense2d}}}
+\item{decorate}{decorate the plot with Jaccard threshold and quartal
+numbers}
+
+\item{j.thresh}{Jaccard threshold, line will be drawn at this point,
+and counts reported for values below and above}
+
+\item{yd}{fraction of plot height to use for quartal number plot
+decoration}
+
+\item{did}{optional data ID to be used in the plot legend}
+
+\item{tot}{optional total number of targets to indicate non-overlapping
+targets in the plot legend}
 
 \item{...}{further arguments to \code{\link{dense2d}} or \code{\link{points}}}
 }
