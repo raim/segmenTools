@@ -167,43 +167,55 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
 
 #' 2D density heatmap plot
 #'
-#' copied from Josh O'Brien posted at
+#' Uses base R's \code{\link[grDevices:densCols]{densCols}} to
+#' calculate local densities at each point in a scatterplot, and then
+#' replaces them by a colored scheme, copied from Josh O'Brien posted
+#' at
 #' https://stackoverflow.com/questions/17093935/r-scatter-plot-symbol-color-represents-number-of-overlapping-points/17096661#17096661
 #' @param x x-coordinates
 #' @param y y-coordinates
 #' @param pch \code{pch} argument to plot
-#' @param nbin number of bins in each dimension, see argument \code{nbins}
-#' \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
-#' to \code{\link[KernSmooth:bkde2D]{bkde2D}} 
+#' @param nbin number of bins for both dimensions, can be a single
+#'     number for both dimensions, or separate numbers, see argument
+#'     \code{nbins} to function
+#'     \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
+#'     to \code{\link[KernSmooth:bkde2D]{bkde2D}}
+#' @param colf color map function used to create a color gradient,
+#'     eg. \code{\link[grDevices:colorRampPalette]{colorRampPalette}}
+#'     or \code{viridis}
 #' @param ... arguments to plot (hint:cex can be useful)
 #' @return the plotted data.frame, including local densities
 #' @export
-dense2d <- function(x, y, pch=20, nbin=c(128,128), ...) {
+dense2d <- function(x, y, pch=20, nbin=c(128,128), 
+                    colf=grDevices::colorRampPalette(c("#000099","#00FEFF",
+                                                      "#45FE4F", "#FCFF00",
+                                                      "#FF9400", "#FF3100")),
+                    ...) {
     
-  df <- data.frame(x, y)
-
-  ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
-  ## KernSmooth::bkde2D(cbind(x, y), bandwidth=c(20,20), gridsize=c(128,128))
-  ## Use densCols() output to get density at each point
-  xcol <- grDevices::densCols(x,y, nbin=nbin,
-                              colramp=grDevices::colorRampPalette(c("black",
-                                                                    "white")))
+    df <- data.frame(x, y)
+    
+    ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
+    ## KernSmooth::bkde2D(cbind(x, y), bandwidth=c(20,20), gridsize=c(128,128))
+    ## Use densCols() output to get density at each point
+    xcol <- grDevices::densCols(x, y, nbin=nbin,
+                                colramp=grDevices::colorRampPalette(c("black",
+                                                                      "white")))
     ## black - white, rgb components equal
     ## each corresponds to density, convert to number between 1 and 256
-  df$dens <- col2rgb(xcol)[1,] + 1L
+    df$dens <- col2rgb(xcol)[1,] + 1L
   
-  ## Map densities to colors
-  cols <-  grDevices::colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", 
-                              "#FCFF00", "#FF9400", "#FF3100"))(256)
-  df$col <- cols[df$dens]
-  
-  ## Plot it, reordering rows so that densest points are plotted on top
-  plot(y~x, data=df[order(df$dens),], pch=pch, col=col, ...)
-
-  ## normalize to 1, for legend?
-  df$dens <- df$dens/256
-
-  invisible(df)
+    ## Map densities to colors
+    ncol <- 256 # TODO: fixed due to RGB range? 
+    cols <- colf(ncol)
+    df$col <- cols[df$dens]
+    
+    ## Plot it, reordering rows so that densest points are plotted on top
+    plot(y~x, data=df[order(df$dens),], pch=pch, col=col, ...)
+    
+    ## normalize to 1, for legend?
+    df$dens <- df$dens/ncol
+    
+    invisible(df)
 }
 
 #' Map a distribution to a color scheme
@@ -697,6 +709,24 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
    if ( !missing(file.name) ) dev.off()   
 }
 
+## utils for jrplot below
+highx <- function(frac=10) {
+    hx <- par("usr")[2] - (par("usr")[2]-par("usr")[1])/frac
+    ifelse(par("xlog"), 10^hx, hx)
+}
+lowx <- function(frac=10) {
+    hx <- par("usr")[1] + (par("usr")[2]-par("usr")[1])/frac
+    ifelse(par("xlog"), 10^hx, hx)
+}
+highy <- function(frac=10) {
+    hy <- par("usr")[4] - (par("usr")[4]-par("usr")[3])/frac
+    ifelse(par("ylog"), 10^hy, hy)
+}
+lowy <- function(frac=10) {
+    hy <- par("usr")[3] + (par("usr")[4]-par("usr")[3])/frac
+    ifelse(par("ylog"), 10^hy, hy)
+}
+
 ## TODO: arguments
 #' Jaccard vs. Ratio Segment Overlap Plots
 #'
@@ -704,22 +734,28 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' decorated with threshold lines and counts.
 #' @param jaccard Jaccard Indices
 #' @param ratio query/target length ratio
-#' @param j.thresh Jaccard threshold, line will be drawn at this point,
-#' and counts reported for values below and above
+#' @param symm plot symmetric version, ie. for ratio>1 plot 1/ratio with
+#' inverted y-axis
+#' @param nbin \code{nbin} parameter for \code{\link{dense2d}}
 #' @param minn minimal number of available points to use \code{\link{dense2d}},
 #' a conventional scatter plot (\code{\link{points}}) will be used if less
 #' than \code{minn} data are available
+#' @param rlim ratio (y-)axis limis
+#' @param jlim Jaccard (x-)axis limits
+#' @param decorate decorate the plot with Jaccard threshold and quartal
+#' numbers
+#' @param j.thresh Jaccard threshold, line will be drawn at this point,
+#' and counts reported for values below and above
+#' @param yd fraction of plot height to use for quartal number plot
+#' decoration
 #' @param did optional data ID to be used in the plot legend
 #' @param tot optional total number of targets to indicate non-overlapping
 #' targets in the plot legend
-#' @param rlim ratio (y-)axis limis
-#' @param jlim Jaccard (x-)axis limits
-#' @param nbin \code{nbin} parameter for \code{\link{dense2d}}
 #' @param ... further arguments to \code{\link{dense2d}} or \code{\link{points}}
 #' @export
-jrplot <- function(jaccard,ratio,j.thresh=0.5, minn=100, did="", tot, 
-                   rlim=c(0,max(ratio,na.rm=TRUE)), jlim=c(0,1.05),
-                   nbin=512, ...) {
+jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10, 
+                   rlim=c(0,2), jlim=c(0,1.05), decorate=TRUE,
+                   j.thresh=0.5, yd=.1,did="", tot, ...) {
 
     ## legend text
     leg.txt <- ifelse(did=="","",paste0(did,":\n"))
@@ -727,16 +763,52 @@ jrplot <- function(jaccard,ratio,j.thresh=0.5, minn=100, did="", tot,
     if (!missing(tot) )
         if ( !is.na(tot) )
             leg.txt <- paste0(leg.txt,"/",tot)
+
+    ## scale to symmetric plot!
+    if ( symm )
+        ratio[which(ratio>1)] <- 2 - 1/ratio[which(ratio>1)]
     
     plot(jaccard,ratio, ylim=rlim, xlim=jlim, col=NA,
          xlab=expression("Jaccard Index,"~J*"="*I/U),
-         ylab=expression("Length Ratio,"~R*"="*Q/T))
-    j <- seq(0,2,.01)
-    lines(j,1/j, col="black", lwd=1, lty=2)
+         ylab=NA, axes=FALSE)
+
+
+    ## draw min/max lines and threshold for J vs. R
+    if ( symm )
+        abline(a=2, b=-1, col="black", lwd=1, lty=2)
+    else {
+        j <- seq(0,2,.01)
+        lines(j,1/j, col="black", lwd=1, lty=2)
+    }
     abline(a=0,b=1, col="black", lwd=1, lty=2)
-    ##abline(v=1, col="black", lwd=1, lty=1)
     abline(v=j.thresh, col="red", lwd=2, lty=2)
-    abline(h=1, col="red", lwd=2, lty=2)
+
+    ## axes
+    ##abline(v=1, col="red", lwd=2, lty=2)
+    abline(h=1)
+    axis(1)
+    ## construct axes for symmetric plot
+    if ( symm ) {
+        axis(2, labels=NA, col.ticks=NA) # empty line
+        ## long tick at symmetry axis 1
+        mgp <- par("mgp")
+        mgp1 <- mgp
+        mgp1[2] <- mgp1[2]*2
+        axis(2, at=1, labels=1, cex=1.1, tcl=2*par("tcl"), mgp=mgp1)
+        ## axis for Q/T
+        qt <- pretty(seq(0,1,.1))
+        axis(2, at=qt[-length(qt)])
+        ## axis for T/Q
+        xt <- pretty(seq(1,2,.1))
+        xt <- xt[-1]
+        axis(2, at=xt, labels=2-xt)
+        mtext(expression(R*"="*Q/T), 2, mgp[1], adj=.25)
+        mtext(expression(R*"="*T/Q), 2, mgp[1], adj=.75)
+    } else {
+        axis(2)
+        mtext(expression("Length Ratio,"~R*"="*Q/T), 2, mgp[1])
+    }
+    #box()
     df <- NULL
     if ( length(na.omit(jaccard))<minn )
         points(jaccard,ratio, pch=20, col="#00000077", ...)
@@ -744,29 +816,51 @@ jrplot <- function(jaccard,ratio,j.thresh=0.5, minn=100, did="", tot,
         par(new=TRUE)
         df <- dense2d(jaccard,ratio, ylim=rlim, xlim=jlim, nbin=nbin,
                       xlab=NA, ylab=NA, axes=FALSE, ...)
-    }    
-    legend("topright",leg.txt,
-           bg="#FFFFFFAA",box.col=NA, cex=1.5)
+    }
 
-    good <- ratio>=1 & jaccard>j.thresh
-    bad <- ratio< 1 & jaccard>j.thresh
+    ## plot decoration
+    if ( decorate ) {
+
+        ## total number legend
+        if ( FALSE ) # TODO: make optional or do externally?
+            legend("top",leg.txt, bg="#FFFFFFAA",box.col=NA, cex=1.5)
+        else
+            mtext(sub("\\n"," ", leg.txt), 3, mgp[1]/2, cex=1.5)
+        
+        ## quartal numbers
+        
+        ## above Jaccard threshold
+        good <- ratio >= 1 & jaccard>j.thresh
+        bad <-  ratio <  1 & jaccard>j.thresh
+        
+        ylim <- par("usr")[3:4]
+        ydff  <- yd*diff(ylim)
+        ylow  <- ylim[1]+ydff
+        yhigh <- ylim[2]-ydff
+        
+        text(j.thresh, yhigh-ydff,
+             bquote(Q>T*":"~.(sum(good,na.rm=TRUE))),pos=4)
+        text(j.thresh, ylow +ydff,
+             bquote(Q<T*":"~.(sum(bad, na.rm=TRUE))),pos=4)
+        
+        ## below jaccard threshold
+        long  <- ratio>=1 & jaccard<=j.thresh
+        short <- ratio< 1 & jaccard<=j.thresh
+        shorts <- sum(short, na.rm=TRUE)
+        longs  <- sum(long,  na.rm=TRUE)
+        
+        text(j.thresh, yhigh, bquote(Q>T*":"~.(longs)),pos=2)
+        text(j.thresh, ylow,  bquote(Q<T*":"~.(shorts)),pos=2)
+        
+        ## this was only useful for !symm
+        ##if ( any(ratio>rlim[2],na.rm=TRUE) )
+        ##    text(1/rlim[2],rlim[2],paste0(sum(ratio>rlim[2],na.rm=TRUE),
+        ##                                  ": R>", rlim[2]),
+        ##         pos=4, cex=.7)
+    }
     
-    text(0.82, 2, bquote(Q>T*":"~.(sum(good,na.rm=TRUE))))
-    text(0.82, 0.25, bquote(Q<T*":"~.(sum(bad,na.rm=TRUE))))
-    
-    long <-  ratio>=1 & jaccard<=j.thresh
-    short <- ratio< 1 & jaccard<=j.thresh
-    shorts <- sum(short,na.rm=TRUE)
-    longs <- sum(long,na.rm=TRUE)
-    
-    text(j.thresh/2, rlim[2]*.9, bquote(Q>T*":"~.(longs)))
-    text(j.thresh/2, rlim[1]/2,  bquote(Q<T*":"~.(shorts)))
-    if ( any(ratio>rlim[2],na.rm=TRUE) )
-        text(1/rlim[2],rlim[2],paste0(sum(ratio>rlim[2],na.rm=TRUE),
-                                      ": R>", rlim[2]),
-             pos=4, cex=.7)
-    ## return dense2d return for potential legend
-    df
+    ## pass on dense2d return for potential density legend
+    invisible(df)
 }
 
 ### MAIN ALGORITHM - FINDS OVERLAPS BETWEEN TWO SETS

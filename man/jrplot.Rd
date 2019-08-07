@@ -4,14 +4,17 @@
 \alias{jrplot}
 \title{Jaccard vs. Ratio Segment Overlap Plots}
 \usage{
-jrplot(jaccard, ratio, j.thresh = 0.5, minn = 100, did = "", tot,
-  rlim = c(0, max(ratio, na.rm = TRUE)), jlim = c(0, 1.05),
-  nbin = 512, ...)
+jrplot(jaccard, ratio, symm = TRUE, j.thresh = 0.5, minn = 100,
+  did = "", tot, rlim = c(0, 2), jlim = c(0, 1.05), nbin = 512,
+  ...)
 }
 \arguments{
 \item{jaccard}{Jaccard Indices}
 
 \item{ratio}{query/target length ratio}
+
+\item{symm}{plot symmetric version, ie. for ratio>1 plot 1/ratio with
+inverted y-axis}
 
 \item{j.thresh}{Jaccard threshold, line will be drawn at this point,
 and counts reported for values below and above}

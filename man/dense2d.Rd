@@ -4,7 +4,9 @@
 \alias{dense2d}
 \title{2D density heatmap plot}
 \usage{
-dense2d(x, y, pch = 20, nbin = c(128, 128), ...)
+dense2d(x, y, pch = 20, nbin = c(128, 128),
+  colf = grDevices::colorRampPalette(c("#000099", "#00FEFF", "#45FE4F",
+  "#FCFF00", "#FF9400", "#FF3100")), ...)
 }
 \arguments{
 \item{x}{x-coordinates}
@@ -13,9 +15,15 @@ dense2d(x, y, pch = 20, nbin = c(128, 128), ...)
 
 \item{pch}{\code{pch} argument to plot}
 
-\item{nbin}{number of bins in each dimension, see argument \code{nbins}
+\item{nbin}{number of bins for both dimensions, can be a single
+number for both dimensions, or separate numbers, see argument
+\code{nbins} to function
 \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
 to \code{\link[KernSmooth:bkde2D]{bkde2D}}}
+
+\item{colf}{color map function used to create a color gradient,
+eg. \code{\link[grDevices:colorRampPalette]{colorRampPalette}}
+or \code{viridis}}
 
 \item{...}{arguments to plot (hint:cex can be useful)}
 }
@@ -23,6 +31,9 @@ to \code{\link[KernSmooth:bkde2D]{bkde2D}}}
 the plotted data.frame, including local densities
 }
 \description{
-copied from Josh O'Brien posted at
+Uses base R's \code{\link[grDevices:densCols]{densCols}} to
+calculate local densities at each point in a scatterplot, and then
+replaces them by a colored scheme, copied from Josh O'Brien posted
+at
 https://stackoverflow.com/questions/17093935/r-scatter-plot-symbol-color-represents-number-of-overlapping-points/17096661#17096661
 }
