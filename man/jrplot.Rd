@@ -43,6 +43,6 @@ targets in the plot legend}
 \item{...}{further arguments to \code{\link{dense2d}} or \code{\link{points}}}
 }
 \description{
-Generates a plot of Jaccard Indices vs. query/target overlap ratios,
-decorated with threshold lines and counts.
+Generates a plot of Jaccard indices vs. query/target overlap Ratios,
+optionally decorated with threshold lines and counts.
 }

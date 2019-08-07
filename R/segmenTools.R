@@ -709,29 +709,11 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
    if ( !missing(file.name) ) dev.off()   
 }
 
-## utils for jrplot below
-highx <- function(frac=10) {
-    hx <- par("usr")[2] - (par("usr")[2]-par("usr")[1])/frac
-    ifelse(par("xlog"), 10^hx, hx)
-}
-lowx <- function(frac=10) {
-    hx <- par("usr")[1] + (par("usr")[2]-par("usr")[1])/frac
-    ifelse(par("xlog"), 10^hx, hx)
-}
-highy <- function(frac=10) {
-    hy <- par("usr")[4] - (par("usr")[4]-par("usr")[3])/frac
-    ifelse(par("ylog"), 10^hy, hy)
-}
-lowy <- function(frac=10) {
-    hy <- par("usr")[3] + (par("usr")[4]-par("usr")[3])/frac
-    ifelse(par("ylog"), 10^hy, hy)
-}
 
-## TODO: arguments
 #' Jaccard vs. Ratio Segment Overlap Plots
 #'
-#' Generates a plot of Jaccard Indices vs. query/target overlap ratios,
-#' decorated with threshold lines and counts.
+#' Generates a plot of Jaccard indices vs. query/target overlap Ratios,
+#' optionally decorated with threshold lines and counts.
 #' @param jaccard Jaccard Indices
 #' @param ratio query/target length ratio
 #' @param symm plot symmetric version, ie. for ratio>1 plot 1/ratio with
@@ -803,7 +785,7 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
         xt <- xt[-1]
         axis(2, at=xt, labels=2-xt)
         mtext(expression(R*"="*Q/T), 2, mgp[1], adj=.25)
-        mtext(expression(R*"="*T/Q), 2, mgp[1], adj=.75)
+        mtext(expression(1/R*"="*T/Q), 2, mgp[1], adj=.75)
     } else {
         axis(2)
         mtext(expression("Length Ratio,"~R*"="*Q/T), 2, mgp[1])
