@@ -548,29 +548,36 @@ clusterAnnotation <- function(cls, data, p=1,
     only.clusters <- rownames(psig)!="total" 
     psig["avg",] <- rowMeans(t( psig[only.clusters, ] ),na.rm=T)
 
+    if ( !missing(bin.filter) ) 
+        rm.pat <- paste0("_",bin.filter,"$")
+
     ## FILTER BY P-VALUE, BINS and add DESCRIPTIONS
     ## TODO: add GO classes (MF,CC,BP)
     ## filter significant and order by p-value
-    if ( p<1 )
+    sig <- NULL
+    if ( p<1 ) {
         sig <- lapply(hyp.tables, function(x) {
             x <- x[x[,"p-value"] <= p,] #smaller then passed p-value threshold?
             x[order(x[,"p-value"]),]})
 
-    ## filter by bins
-    rm.pat <- paste0("_",bin.filter,"$")
-    if ( !missing(bin.filter) )
-        sig <- lapply(sig, function(x) x[grep(rm.pat,x[,"bin"], invert=TRUE),] )
+        ## filter by bins
+        if ( !missing(bin.filter) ) 
+            sig <- lapply(sig, function(x)
+                x[grep(rm.pat,x[,"bin"], invert=TRUE),] )
         
-    ## add description of terms
-    if ( !is.null(terms) ) # not required for other columns (no keys)
-        sig <- lapply(sig, function(x)
-            cbind.data.frame(description=terms[x[,"category"]],x))
-
+    
+        ## add description of terms
+        if ( !is.null(terms) ) # not required for other columns (no keys)
+            sig <- lapply(sig, function(x)
+                cbind.data.frame(description=terms[x[,"category"]],x))
+    }
+        
     ##cat(paste("USED FILTER p<", p, "\n"))
 
     ## process full tables
     ## remove filtered (usually bin.filter==FALSE for a T/F table input)
-    pvalues <- pvalues[grep(rm.pat, rownames(pvalues), invert=TRUE),]
+    if ( !missing(bin.filter) ) 
+        pvalues <- pvalues[grep(rm.pat, rownames(pvalues), invert=TRUE),]
     ## remove all where p-value is below threshold
     rm.pvl <- apply(pvalues,1,function(x) !any(x<=p))
     pvalues <- pvalues[!rm.pvl,]
