@@ -415,32 +415,45 @@ clusterAnnotation <- function(cls, data, p=1,
     overlap <- NULL ## CONTIGENCY TABLE!
     pvalues <- NULL ## hypergeometric distribution test p.value
     hyp.names <- NULL
-    ## TODO : parallelize this
+
+    ## is it a TRUE/FALSE table?
+    logic <- typeof(data)=="logical"
+    if ( logic ) { # for TRUE/FALSE table, rm FALSE and rm TRUE from names
+        rm.pat <- "_FALSE"
+        rp.pat <- "_TRUE"
+    }
+     
     if (verbose) cat(paste("HYPERGEOMETRIC STATISTICS FOR:\n",
                            ncol(data), "categories\t:\n"))
+    ## TODO : parallelize this
     for ( j in 1:ncol(data) ) {
+
         bins <- data[,j]
         name <- colnames(data)[j]
         expected <- unique(bins)
-
 
         if (verbose) cat(paste(j, "-",name, ", ", sep=""))
         
         ## cumulative hypergeometric distribution
         ## TODO: take sum of bonferroni correction factors
         ## correct below in bin.filter
-        tmp <- clusterCluster(bins, cls,
-                              alternative=c("greater"),cl2.srt=cls.srt)
-       
+        if ( logic )
+            tmp <- clusterCluster(bins, cls, cl1.srt=c("TRUE"),
+                                  alternative=c("greater"),cl2.srt=cls.srt)
+        else 
+            tmp <- clusterCluster(bins, cls,
+                                  alternative=c("greater"),cl2.srt=cls.srt)
+        
         # get overlap and p.values in original bin order
         if ( !is.null(tmp) ) {
             ovl <- tmp$overlap # contingency table
             pvl <- tmp$p.value
-            rownames(ovl) <- rownames(pvl) <- paste0(name,"_",rownames(pvl))
+            rownames(ovl) <- rownames(pvl) <-
+                paste0(name,ifelse(logic,"",paste0("_",rownames(pvl))))
             overlap <- rbind(overlap, ovl)
             pvalues <- rbind(pvalues, pvl)
             # copy name in same size to allow easy cbind below
-            hyp.names<-c(hyp.names, rep(name, nrow(ovl)))
+            hyp.names <- c(hyp.names, rep(name, nrow(ovl)))
           } else {
               warning(paste("WARNING: hypergeo test failed for bin:", name))
           }
@@ -550,7 +563,8 @@ clusterAnnotation <- function(cls, data, p=1,
 
     if ( !missing(bin.filter) ) 
         rm.pat <- paste0("_",bin.filter,"$")
-
+    
+   
     ## FILTER BY P-VALUE, BINS and add DESCRIPTIONS
     ## TODO: add GO classes (MF,CC,BP)
     ## filter significant and order by p-value
