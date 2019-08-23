@@ -7,7 +7,7 @@ BugReports: https://github.com/raim/segmenTools/issues
 Maintainer: Rainer Machne <raim@tbi.univie.ac.at>
 Description: tools and scripts for analysis of gene clusters and genome segmentations by segmenTier.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.0.0)
 Suggests:
     segmenTier, 
     circular,
