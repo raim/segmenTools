@@ -263,7 +263,7 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
 
     ## colors & breaks for cut data
     cols <- colf(n, ...)
-    x.cols <- cols[n*(x.cut-min(x.cut))/(max(x.cut)-min(x.cut))]
+    x.cols <- cols[1+(n-1)*(x.cut-min(x.cut))/(max(x.cut)-min(x.cut))]
     cbrk <- seq(mn, mx, length.out=n+1)
 
     ## plot legend
