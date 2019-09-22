@@ -31,6 +31,8 @@ option_list <- list(
               help="sub-sets of testset to use for testing"),
   make_option(c("--ttypcol"), type="character", default="type", 
               help="name of column with sub-set annotation"),
+  make_option(c("--nostrand"), action="store_true", default=FALSE,
+              help="ignore strand information in query and target"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
   make_option(c("--upstream"), type="integer", default=0,
@@ -87,6 +89,15 @@ for ( i in 1:length(opt) ) {
 if ( verb>0 )
     msg(paste("\n"))
 
+## catch incompatible options
+if ( antisense & upstream!=0 )
+    stop("options --antisense and --upstream are incompatible!")
+if ( nostrand & antisense )
+    stop("options --nostrand and --antisense are incompatible")
+if ( nostrand & upstream!=0 )
+    stop("options --nostrand and --upstream are incompatible")
+
+
 if ( verb>0 )
     msg(paste("LOADING DATA FILES\t",time(),"\n",sep=""))
 
@@ -142,8 +153,6 @@ if ( target=="" & (antisense|upstream!=0) ) {
 ## scan for range around targets
 if ( upstream!=0 ) {
 
-    if ( antisense )
-        stop("Options `--antisense' and `--upstream' are not compatible!")
 
     ## make sure start < end for both strands
     ## (only valid for non-circular DNA!!)
@@ -188,6 +197,13 @@ if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
 ## TODO: convert to function in R/segmenTools from here:
+
+## consider only one strand
+if ( nostrand ) {
+    total <- total/2
+    query$strand <- "+"
+    target$strand <- "+"
+}
 
 ## converting both to continuous index
 query <- coor2index(query, chrS)

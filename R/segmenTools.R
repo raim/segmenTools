@@ -1305,11 +1305,15 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     J.real <- matrix(NA, nrow=qN, ncol=tN)
     colnames(J.real) <- tcls.srt
     rownames(J.real) <- qcls.srt
+    ## additional data
+    I.target <- I.query <- J.real # intersect/target
     for ( i in 1:qN ) {
         for ( j in 1:tN ) { 
             is <- length(intersect(qcls.rng[[i]],tcls.rng[[j]]))
             un <- length(union(qcls.rng[[i]],tcls.rng[[j]]))
             J.real[i,j] <- is/un
+            I.target[i,j] <- is/length(tcls.rng[[j]]) 
+            I.query[i,j] <- is/length(qcls.rng[[i]]) 
         }
     }
     #J.real
@@ -1346,6 +1350,8 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     ## results
     ovl <- list()
     ovl$jaccard <- J.real
+    ovl$intersect.target <- I.target
+    ovl$intersect.query <- I.query
     if ( perm>0 ) 
         ovl$p.value <- J.pval
     
