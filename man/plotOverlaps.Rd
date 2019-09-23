@@ -6,8 +6,8 @@
 \usage{
 plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, col,
   values = c("overlap", "jaccard", "intersect.target"),
-  txt.col = c("black", "white"), short = TRUE, scale = 1, round,
-  axis = 1:2, show.sig = TRUE, ...)
+  txt.col = c("black", "white"), rmz = TRUE, short = TRUE,
+  scale = 1, round, axis = 1:2, show.sig = TRUE, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -31,6 +31,8 @@ on available data in \code{x}, see "Description"}
 \item{txt.col}{two colors used for the plot text, ie., the
 overlap counts; the second is used if `p<p.txt` as a discrete
 signficance cutoff}
+
+\item{rmz}{remove 0 from text values}
 
 \item{short}{logical, indicating whether to cut higher overlap
 numbers; currently: division by 1000 and replacement by \code{k}}

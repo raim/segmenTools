@@ -187,6 +187,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param txt.col two colors used for the plot text, ie., the
 #' overlap counts; the second is used if `p<p.txt` as a discrete
 #' signficance cutoff
+#' @param rmz remove 0 from text values
 #' @param short logical, indicating whether to cut higher overlap
 #' numbers; currently: division by 1000 and replacement by \code{k}
 #' @param scale factor to divide overlap numbers with, useful for
@@ -207,7 +208,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @export
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
                          values=c("overlap","jaccard","intersect.target"),
-                         txt.col = c("black","white"),
+                         txt.col = c("black","white"), rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, ...) {
 
@@ -246,7 +247,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     if ( type=="intersect.query" ) txt <- txt*100
     if ( !missing(round) ) txt <- round(txt,digits=round)
     ## select color based on p.txt
-    txt[txt=="0"] <- ""
+    if ( rmz) txt[txt=="0"] <- ""
     tcol <- txt
     tcol[] <- txt.col[1]
     tcol[pval >= -log2(p.txt)] <- txt.col[2]
@@ -255,7 +256,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         txt <- x[[type]]
         hg <-txt>1e3
         txt[hg] <- signif(txt[hg]/1e3,2)
-        txt[txt=="0"] <- ""
+        if ( rmz) txt[txt=="0"] <- ""
         txt[hg]  <- paste(txt[hg],"k",sep="")
     }
 
