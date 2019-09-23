@@ -5,6 +5,7 @@
 \title{plot cluster-cluster or segment-segment overlaps}
 \usage{
 plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, col,
+  values = c("overlap", "jaccard", "intersect.target"),
   txt.col = c("black", "white"), short = TRUE, scale = 1, round,
   axis = 1:2, show.sig = TRUE, ...)
 }
@@ -23,6 +24,9 @@ and \code{p >= p.min} (black)}
 
 \item{col}{color ramp, default are grey values, length of
 this vector overrules parameter \code{n}}
+
+\item{values}{selection of text (numeric values) to plot, depends
+on available data in \code{x}, see "Description"}
 
 \item{txt.col}{two colors used for the plot text, ie., the
 overlap counts; the second is used if `p<p.txt` as a discrete
@@ -52,9 +56,16 @@ draws a red line where unsorted non-significant hits start}
 Plots the significance distribution of cluster-cluster or segment-segment
 overlap statistics provided by \code{\link{clusterCluster}} or
 \code{\link{segmentJaccard}}, where the a white-black gradient is
-calculated from \code{-log(p)}, and the text shows the overlap statistics,
-i.e., the number of overlapping features for \code{\link{clusterCluster}},
-or the Jaccard index for \code{\link{segmentJaccard}}. Note that two
+calculated from \code{-log(p)}, and the text shows the overlap numbers,
+e.g., the number of overlapping features for \code{\link{clusterCluster}},
+or the Jaccard index or relative intersect values for
+\code{\link{segmentJaccard}}. Option \code{text} allows to select
+which values to plot as text. Only "overlap" is available for a
+\code{\link{clusterCluster}} results, while for \code{\link{segmentJaccard}}
+the Jaccard index ("jaccard"), or the relative intersect size can
+be shown: "intersect.target" and "intersect.query" are the intersect
+divided by total target or query length, respectively.
+Note that two
 distinct p-value cutoffs can be visualyized: p-values \code{<=p.min}
 are shown in black, and p-values \code{p.txt} are shown in white instead
 of black text (thus becoming visible on the black of significant

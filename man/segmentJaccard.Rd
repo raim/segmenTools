@@ -34,7 +34,10 @@ Note, that this ignores chromosome borders!
 }
 \details{
 Reports the Jaccard index (\code{J=intersect/union)}) between
-two distinct sets of segments (genomic intervals).
+two distinct sets of segments (matrix "jaccard" in the results object),
+and the relative intersect lengths, i.e., intersect divided by
+the total target length (matrix "intersect.target") or the total
+query length (matrix "intersect.query").
 If argument \code{perm>0}, a simple permutation is performed,
 sampling randomly from
 all inter-segment distances and segment lengths, and ignoring optional
@@ -44,5 +47,6 @@ both strands, if both are used) can be passed in argument \code{total},
 and if missing the start of the first segment is also used as the distance
 of the final segment to the query range end.
 The results of the permutation test (argument \code{perm>0}) can be
-plotted directly with \code{\link{plotOverlaps}}.
+plotted directly with \code{\link{plotOverlaps}}, where option \code{text}
+allows to plot either the jaccard index or the relative intersect sizes.
 }

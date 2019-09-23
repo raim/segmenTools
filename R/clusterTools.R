@@ -158,9 +158,16 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' Plots the significance distribution of cluster-cluster or segment-segment
 #' overlap statistics provided by \code{\link{clusterCluster}} or
 #' \code{\link{segmentJaccard}}, where the a white-black gradient is
-#' calculated from \code{-log(p)}, and the text shows the overlap statistics,
-#' i.e., the number of overlapping features for \code{\link{clusterCluster}},
-#' or the Jaccard index for \code{\link{segmentJaccard}}. Note that two
+#' calculated from \code{-log(p)}, and the text shows the overlap numbers,
+#' e.g., the number of overlapping features for \code{\link{clusterCluster}},
+#' or the Jaccard index or relative intersect values for
+#' \code{\link{segmentJaccard}}. Option \code{text} allows to select
+#' which values to plot as text. Only "overlap" is available for a
+#' \code{\link{clusterCluster}} results, while for \code{\link{segmentJaccard}}
+#' the Jaccard index ("jaccard"), or the relative intersect size can
+#' be shown: "intersect.target" and "intersect.query" are the intersect
+#' divided by total target or query length, respectively.
+#' Note that two
 #' distinct p-value cutoffs can be visualyized: p-values \code{<=p.min}
 #' are shown in black, and p-values \code{p.txt} are shown in white instead
 #' of black text (thus becoming visible on the black of significant
@@ -175,6 +182,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' and \code{p >= p.min} (black)
 #' @param col color ramp, default are grey values, length of
 #' this vector overrules parameter \code{n}
+#' @param values selection of text (numeric values) to plot, depends
+#' on available data in \code{x}, see "Description"
 #' @param txt.col two colors used for the plot text, ie., the
 #' overlap counts; the second is used if `p<p.txt` as a discrete
 #' signficance cutoff
@@ -197,6 +206,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
+                         values=c("overlap","jaccard","intersect.target"),
                          txt.col = c("black","white"),
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, ...) {
@@ -212,17 +222,30 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     breaks <- seq(0,-log2(p.min),length.out=n+1)
     ## set up text (overlap numbers) and text colors
     type <- "" # TODO, add info to input results on the name of the statistics
-    if ( "overlap"%in%names(x) ) {
-        type <- "overlap"
-    } else if ( "jaccard"%in%names(x) ) {
-        type <- "jaccard"
-        short <- FALSE
-        ## TODO: handle jaccard vs. hypergeo better
-        ## and align scale/round/short options
+    for ( i in 1:length(values) ) {
+        ## take first available
+        if ( values[i]%in%names(x) ) {
+            type <- values[i]
+            break
+        } 
     }
+    cat(paste("text values:", type, "\n"))
+
+    ## TODO: handle jaccard vs. hypergeo better
+    ## and align scale/round/short options
+
+    ## shorten large overlap numbers?
+    if ( type!="overlap" )
+        short <- FALSE
+
+    ## parse and process text values
     txt <- x[[type]]
     if ( scale>1 ) txt <- txt*scale
+    ## % of relative intersect
+    if ( type=="intersect.target" ) txt <- txt*100
+    if ( type=="intersect.query" ) txt <- txt*100
     if ( !missing(round) ) txt <- round(txt,digits=round)
+    ## select color based on p.txt
     txt[txt=="0"] <- ""
     tcol <- txt
     tcol[] <- txt.col[1]
@@ -253,7 +276,8 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         if ( nrow(pval)>x$nsig )
             abline(h=nrow(pval)-x$nsig+.5, col=2, lwd=2)
 
-    
+    ## return plot settings silently
+    invisible(list(type=type, short=short, round=round, scale=scale, text=txt))
 }
 
 
