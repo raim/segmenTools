@@ -230,47 +230,56 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
             break
         } 
     }
-    cat(paste("text values:", type, "\n"))
 
-    ## TODO: handle jaccard vs. hypergeo better
-    ## and align scale/round/short options
 
-    ## shorten large overlap numbers?
-    if ( type!="overlap" )
-        short <- FALSE
-
-    ## parse and process text values
-    txt <- x[[type]]
-    if ( scale>1 ) txt <- txt*scale
-    ## % of relative intersect
-    if ( type=="intersect.target" ) txt <- txt*100
-    if ( type=="intersect.query" ) txt <- txt*100
-    if ( !missing(round) ) txt <- round(txt,digits=round)
-    ## select color based on p.txt
-    if ( rmz) txt[txt=="0"] <- ""
-    tcol <- txt
-    tcol[] <- txt.col[1]
-    tcol[pval >= -log2(p.txt)] <- txt.col[2]
-    ## cut text (high overlap numbers)
-    if ( short ) {
+    ## NO TEXT:
+    if ( type=="" ) {
+        txt <- NA
+        image_matrix(pval, breaks=breaks, col=col, axis=axis, ...)
+    } else {
+        
+        cat(paste("text values:", type, "\n"))
+        
+        ## TODO: handle jaccard vs. hypergeo better
+        ## and align scale/round/short options
+        
+        ## shorten large overlap numbers?
+        if ( type!="overlap" )
+            short <- FALSE
+        
+        ## parse and process text values
         txt <- x[[type]]
-        hg <-txt>1e3
-        txt[hg] <- signif(txt[hg]/1e3,2)
+        if ( scale>1 ) txt <- txt*scale
+        ## % of relative intersect
+        if ( type=="intersect.target" ) txt <- txt*100
+        if ( type=="intersect.query" ) txt <- txt*100
+        if ( !missing(round) ) txt <- round(txt,digits=round)
+        ## select color based on p.txt
         if ( rmz) txt[txt=="0"] <- ""
-        txt[hg]  <- paste(txt[hg],"k",sep="")
+        tcol <- txt
+        tcol[] <- txt.col[1]
+        tcol[pval >= -log2(p.txt)] <- txt.col[2]
+        ## cut text (high overlap numbers)
+        if ( short ) {
+            txt <- x[[type]]
+            hg <-txt>1e3
+            txt[hg] <- signif(txt[hg]/1e3,2)
+            if ( rmz) txt[txt=="0"] <- ""
+            txt[hg]  <- paste(txt[hg],"k",sep="")
+        }
+        
+        ## TODO: allow the following, but "main" needs to be
+        ## removed from ... !?
+        ##args <- list(...)
+        ##if ( "main" %in% names(args) )
+        ##    main <- args[["main"]]
+        ##else
+        ##    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
+        
+        image_matrix(pval, breaks=breaks, col=col, axis=axis,
+                     text=txt, text.col=tcol, ...)
     }
-
-    ## TODO: allow the following, but "main" needs to be
-    ## removed from ... !?
-    #args <- list(...)
-    #if ( "main" %in% names(args) )
-    #    main <- args[["main"]]
-    #else
-    #    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
-
-    image_matrix(pval, breaks=breaks, col=col, axis=axis,
-                 text=txt, text.col=tcol, ...)
-
+    
     ## overlaps sorted by sortClusters indicate where
     ## unsorted non-significant hits start - draw a line: 
     if ( show.sig & "nsig"%in%names(x) )

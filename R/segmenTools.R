@@ -1421,8 +1421,9 @@ randomSegments <- function(query, qclass, total) {
     ## TODO: allow this check, but requires chrL to be known!
     if ( sum(islen)+sum(sglen) != total )
         stop()
-    if ( any(islen<0) )
-        cat(paste("NOTE: overlapping segments in randomized query set!\n"))
+    if ( FALSE )
+        if ( any(islen<0) )
+            cat(paste("NOTE: overlapping segments in randomized query set!\n"))
     
     ## RANDOMIZATION
     ## sample segment lengths
