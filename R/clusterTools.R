@@ -238,7 +238,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         image_matrix(pval, breaks=breaks, col=col, axis=axis, ...)
     } else {
         
-        cat(paste("text values:", type, "\n"))
+        ## cat(paste("text values:", type, "\n"))
         
         ## TODO: handle jaccard vs. hypergeo better
         ## and align scale/round/short options
