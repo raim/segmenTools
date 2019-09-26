@@ -304,8 +304,9 @@ idx2coor <- function(pos, chrS, strands=c(1,-1)) {
 #' @export
 idx2chr <- function(idx,chrS) {
     chr <- sapply(idx,function(x) which(chrS>=x)[1]-1)
-    chr[is.na(chr)] <- sapply(idx[is.na(chr)],function(x) # reverse strand
-        which((chrS+max(chrS))>=x)[1]-1)
+    if ( any(is.na(chr)) )
+        chr[is.na(chr)] <- sapply(idx[is.na(chr)],function(x) # reverse strand
+            which((chrS+max(chrS))>=x)[1]-1)
     chr
 }
 #' get the strand from continuous index
