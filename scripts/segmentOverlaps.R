@@ -22,6 +22,8 @@ option_list <- list(
               help="query set of chromosomal segments"),    
   make_option(c("--qclass"), type="character", default="", 
               help="query classes to test"),
+  make_option(c("--intersegment"), type="character", default="", 
+              help="use this value as additional 'qclass' for inter-segment stretches"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
@@ -231,6 +233,33 @@ if ( any(is.na(target[,"start"])) ) {
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 
+## add inter-segments here
+if ( intersegment!="" ) {
+
+    ## convert to numeric, if qclass is numeric
+    
+    if ( is.numeric(query[,qclass]) )
+        intersegment <- as.numeric(intersegment)
+
+    maxL <- ifelse(nostrand, max(chrS), 2*max(chrS))
+ 
+    emptyseg <- data.frame(ID=paste("is",sprintf("%04d",1:(nrow(query)+1)),
+                                    sep=""),
+                           chr=rep(1,nrow(query)+1),
+                           start=c(1,query[1:nrow(query),"end"]+1),
+                           end=c(query[1:nrow(query),"start"]-1,maxL),
+                           stringsAsFactors=FALSE)
+    emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
+    emptyseg <- emptyseg[emlen>0,] # rm 0-length and negative overlaps
+    emptyseg <- splitsegs(emptyseg,chrS,idcol="ID",verb=verb)
+
+    emq <- as.data.frame(matrix(NA, ncol=ncol(query), nrow=nrow(emptyseg)))
+    colnames(emq) <- colnames(query)
+    emq[,colnames(emptyseg)] <- emptyseg
+    if ( qclass%in%colnames(emq) )
+        emq[,qclass] <- intersegment ## add intersegment cluster
+    query <- rbind(query, emq)
+}
 ## calculate Jaccard Index and permutation test
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
