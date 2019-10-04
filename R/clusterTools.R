@@ -254,6 +254,8 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         if ( type=="intersect.target" ) txt <- txt*100
         if ( type=="intersect.query" ) txt <- txt*100
         if ( !missing(round) ) txt <- round(txt,digits=round)
+        else round <- NA
+        
         ## select color based on p.txt
         if ( rmz) txt[txt=="0"] <- ""
         tcol <- txt
@@ -812,6 +814,10 @@ clusterColors <- function(cset, expand=TRUE, ...) {
 #' \code{merge==TRUE})
 #' @param nui.thresh threshold correlation of a data point to a cluster
 #' center; if below the data point will be added to nuissance cluster 0
+#' @param ncpu number of cores available for parallel mode of
+#' \pkg{flowClust}. NOTE: parallel mode of
+#' \code{\link[flowClust:flowClust]{flowClust}} is often non-functional.
+#' Alternatively, you can set \code{options(mc.cores=ncpu)} directly.
 #' @param verb level of verbosity, 0: no output, 1: progress messages
 #' @param ... further parameters to \code{flowClust} or \code{\link[stats:kmeans]{kmeans}}
 #'@export
@@ -820,11 +826,11 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
                                             B=500, tol=1e-5, lambda=1,
                                             nu=4, nu.est=0, trans=1,
                                             merge=FALSE, randomStart=0),
-                               nui.thresh=-Inf, verb=1, ...) {
+                               nui.thresh=-Inf,  ncpu=1, verb=1,...) {
 
     if ( method=="flowClust" ) {
-        ## suppress parallel mode!
-        ncpu=1
+        #dont ## suppress parallel mode!
+        #ncpu=1
         oldcpu <- unlist(options("cores"))
         oldcpu2 <- unlist(options("mc.cores"))
         options(cores=ncpu)
@@ -989,10 +995,14 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
     ## max BIC and ICL
     max.bic <- max(bic, na.rm=T)
     max.clb <- K[which(bic==max.bic)[1]]
-    max.aic <- max(aic, na.rm=T)
+    if ( any(!is.na(aic)) )
+        max.aic <- max(aic, na.rm=T)
+    else max.aic <- NA
     max.cla <- K[which(aic==max.aic)[1]]
-    max.icl <- max(icl, na.rm=T)
-    max.cli <- K[which(icl==max.icl)[1]]
+    if ( any(!is.na(icl)) ) {
+        max.icl <- max(icl, na.rm=T)
+        max.cli <- K[which(icl==max.icl)[1]]
+    } else max.icl <- max.cli <- NA
     ## best K selection
     ## use K with max BIC
     selected <- max.clb

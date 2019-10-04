@@ -7,7 +7,7 @@
 clusterTimeseries2(tset, K = 16, method = "flowClust", selected,
   parameters = c(iter.max = 1e+05, nstart = 100, B = 500, tol = 1e-05,
   lambda = 1, nu = 4, nu.est = 0, trans = 1, merge = FALSE, randomStart =
-  0), nui.thresh = -Inf, verb = 1, ...)
+  0), nui.thresh = -Inf, ncpu = 1, verb = 1, ...)
 }
 \arguments{
 \item{tset}{a timeseries processed by \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
@@ -27,6 +27,11 @@ currently ALL required parameters MUST be specified}
 
 \item{nui.thresh}{threshold correlation of a data point to a cluster
 center; if below the data point will be added to nuissance cluster 0}
+
+\item{ncpu}{number of cores available for parallel mode of
+\pkg{flowClust}. NOTE: parallel mode of
+\code{\link[flowClust:flowClust]{flowClust}} is often non-functional.
+Alternatively, you can set \code{options(mc.cores=ncpu)} directly.}
 
 \item{verb}{level of verbosity, 0: no output, 1: progress messages}
 
