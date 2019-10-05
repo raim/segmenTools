@@ -829,8 +829,8 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
                                nui.thresh=-Inf,  ncpu=1, verb=1,...) {
 
     if ( method=="flowClust" ) {
-        #dont ## suppress parallel mode!
-        #ncpu=1
+        # dont ## suppress parallel mode!
+        # ncpu=1
         oldcpu <- unlist(options("cores"))
         oldcpu2 <- unlist(options("mc.cores"))
         options(cores=ncpu)
@@ -871,6 +871,25 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
         cat(paste("Timeseries N\t",N,"\n",sep=""))
         cat(paste("Used datapoints\t",sum(!rm.vals),"\n",sep=""))
     }
+
+    ## run flowClust over all K (multithreaded)
+    if ( method=="flowClust" ) {
+        ## TODO: defaults if missing
+        B <- parameters["B"]
+        tol <- parameters["tol"]
+        lambda <- parameters["lambda"]
+        nu <- parameters["nu"]
+        nu.est <- parameters["nu.est"]
+        trans <- parameters["trans"]
+        randomStart <- parameters["randomStart"]
+        
+        fcls <- flowClust::flowClust(dat[!rm.vals,], K=K, B=B, tol=tol,
+                                    lambda=lambda, randomStart=randomStart,
+                                    nu=nu, nu.est=nu.est, trans=trans,...)
+    }
+
+    ## loop over K: run k-means or retrieve values from
+    ## pre-calculated flowClust
     
     usedk <- K
     for ( k in 1:length(K) ) {
@@ -916,21 +935,10 @@ clusterTimeseries2 <- function(tset, K=16, method="flowClust", selected,
 
         } else if ( method=="flowClust" ) {
 
-            ## TODO: defaults if missing
-            B <- parameters["B"]
-            tol <- parameters["tol"]
-            lambda <- parameters["lambda"]
-            nu <- parameters["nu"]
-            nu.est <- parameters["nu.est"]
-            trans <- parameters["trans"]
-            randomStart <- parameters["randomStart"]
-
-            #cat(paste("lambda", lambda, "\n"))
-
-            fc <- flowClust::flowClust(dat[!rm.vals,], K=Kused, B=B, tol=tol,
-                                       lambda=lambda, randomStart=randomStart,
-                                       nu=nu, nu.est=nu.est, trans=trans,...)
-
+            ## get flowClust object
+            if ( length(fcls) > 1 ) fc <- fcls[[k]]
+            else fc <- fcls
+      
 
             ## prepare cluster sequence
             seq <- rep(0, N) ## init. to nuissance cluster 0
@@ -1574,8 +1582,10 @@ plotBIC <- function(cls, norm=FALSE, ...) {
     points(K[is.na(bic)], rep(min(bic,na.rm=T),sum(is.na(bic))), pch=4, col=2)
     points(max.clb, max.bic,lty=2,pch=4,cex=1.5)
     abline(v=max.clb,lty=2)
-    points(K, icl, col=4,cex=.5)
-    points(max.cli, max.icl,lty=2,pch=4,cex=1,col=4)
+    if ( any(!is.na(icl)) ) {
+        points(K, icl, col=4,cex=.5)
+        points(max.cli, max.icl,lty=2,pch=4,cex=1,col=4)
+    }
     points(sel, sel.bic, col=2, pch=19, cex=1.5)
     legend("right",legend=leg,pch=lpch,lty=llty,col=lcol,pt.cex=lcex)
     if ( !is.null(cls$merged.K) ) {
