@@ -107,7 +107,8 @@ used in the \code{\link{plotSingles}} wrapper}
 
 \item{leg.ids}{a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}}
 
-\item{vline}{adds a vertical line at position x[i]}
+\item{vline}{x coordinates for vertical lines, useful e.g. to
+mark replicates}
 
 \item{vl_col}{color for vertical line (default to cluster colour)}
 
