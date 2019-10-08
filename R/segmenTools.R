@@ -241,12 +241,13 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128),
 #' \code{image} of the color scheme below
 #' @param xlab x-axis label to use in legend plot
 #' @param heights relative heights of histogram and image plots
+#' @param xlim optional limits to x-axis
 #' @param mai \code{par("mai")} plot parameter for plot margins
 #' @param ... further arguments to \code{colf}, e.g. \code{start} and
 #' \code{end} in \code{\link[grDevices:gray.colors]{gray.colors}} 
 #' @export
 selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
-                         plot=TRUE, xlab="score", heights=c(.75,.25),
+                         plot=TRUE, xlab="score", xlim, heights=c(.75,.25),
                          mai=c(.75,.75,.1,.1), ...) {
 
     ## full data range
@@ -266,6 +267,9 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
     x.cols <- cols[1+(n-1)*(x.cut-min(x.cut))/(max(x.cut)-min(x.cut))]
     cbrk <- seq(mn, mx, length.out=n+1)
 
+    if ( missing(xlim) )
+        xlim <- rng
+    
     ## plot legend
     if ( plot ) {
 
@@ -277,7 +281,7 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
         layout(t(t(1:2)), heights=heights, widths=1)
         mai[1] <- mai[1]/5
         par(xaxs="i", yaxs="i", mai=mai)
-        hist(x.cut,breaks=brk, border=2, col=2, axes=FALSE, main=NA)
+        hist(x.cut,breaks=brk, border=2, col=2, xlim=xlim, axes=FALSE, main=NA)
         hist(x,breaks=brk, add=TRUE)
         abline(v=c(mn,mx), col=2, lty=2)
         axis(2)
@@ -285,9 +289,9 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
         mai[1] <- mai[1]*5
         par(xaxs="i", mai=mai)
         image_matrix(x=lbrk, z=t(cdat), breaks=cbrk,
-                     col=cols, axis=1, ylab="color", xlab=xlab)
+                     col=cols, axis=1, ylab="color", xlab=xlab, xlim=xlim)
     }
-    list(breaks=cbrk, col=cols, x.cut=x.cut, x.col=x.cols)
+    list(breaks=cbrk, col=cols, x.cut=x.cut, x.col=x.cols, xlim=xlim)
 }
 
 #' plot multiple cumulative distribution functions

@@ -1741,7 +1741,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' or \code{par(mfcol/mfrow)} setups
 #' @param leg.xy position of the legend, see
 #' \code{\link[graphics:legend]{legend}}
-#' @param vline adds a vertical line at position x[i]
+#' @param vline x coordinates for vertical lines, useful e.g. to
+#' mark replicates
 #' @param vl_col color for vertical line (default to cluster colour)
 #' @param vl_lty vertical line type 
 #' @param vl_lwd vertical line width
