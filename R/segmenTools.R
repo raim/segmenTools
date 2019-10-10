@@ -243,13 +243,17 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128),
 #' @param heights relative heights of histogram and image plots
 #' @param xlim optional limits to x-axis
 #' @param mai \code{par("mai")} plot parameter for plot margins
+#' @param ylim y-axis limits for histogram
 #' @param ... further arguments to \code{colf}, e.g. \code{start} and
 #' \code{end} in \code{\link[grDevices:gray.colors]{gray.colors}} 
 #' @export
 selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
                          plot=TRUE, xlab="score", xlim, heights=c(.75,.25),
-                         mai=c(.75,.75,.1,.1), ...) {
+                         mai=c(.75,.75,.1,.1), ylim, ...) {
 
+    ## TODO: allow to pass pre-selected colors and breaks
+    ## and just use to plot legend
+    
     ## full data range
     rng <- range(x, na.rm=TRUE)
     brk <- seq(rng[1], rng[2], length.out=n+1)
@@ -281,7 +285,15 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
         layout(t(t(1:2)), heights=heights, widths=1)
         mai[1] <- mai[1]/5
         par(xaxs="i", yaxs="i", mai=mai)
-        hist(x.cut,breaks=brk, border=2, col=2, xlim=xlim, axes=FALSE, main=NA)
+        if ( missing(ylim) )
+            hist(x.cut,breaks=brk, border=2, col=2,
+                 xlim=xlim, axes=FALSE, main=NA)
+        else {
+            x.cut2 <- x.cut
+            x.cut2[x.cut2>ylim[2]] <- ylim[2]
+            hist(x.cut2,breaks=brk, border=2, col=2,
+                 xlim=xlim, ylim=ylim, axes=FALSE, main=NA)
+        }
         hist(x,breaks=brk, add=TRUE)
         abline(v=c(mn,mx), col=2, lty=2)
         axis(2)
