@@ -120,9 +120,9 @@ collection of attributes into data columns
 ## TODO
 
 segmenTools:
+* coor2bed and bed2coor conversion from/to bed format, see genomeBrowser script
 * clusterCluster: add fields for statistical corrections
-* plotClusters: allow reference data (L/D or DOT)
 
 segmenTier:
-* processTimeseries: handle 0-valued rows or 0-var rows better
 * clusterTimeseries: re-cluster cset by kmeans with centers initialized by flowclust cluster centers 
+* change indexing to allow segments of length 1, see dpseg
