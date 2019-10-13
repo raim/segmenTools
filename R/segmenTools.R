@@ -1464,6 +1464,43 @@ randomSegments <- function(query, qclass, total) {
     rquery
 }
 
+#' collapse adjacent genome positions into segments
+#' @param x ordered chromosome coordinates, a matrix or data.frame
+#' with columns "chr" and "coor"
+#' @param dist maximal distance between loci to be collapsed
+#' @export
+collapsePositions <- function(x, dist=1) {
+
+    ## TODO: ensure sorting
+
+    ## convert to dataframe
+    ## TODO: avoid
+    if ( class(x)=="matrix" )
+    x <- data.frame(x)
+    
+    ## get rows with distance > dist and avoid chromosome ends by <0
+    idx  <- which(diff(x$coor)>dist | diff(x$coor)<0)
+
+
+    ## get start and end sites
+    sidx <- c(1,idx+1)
+    eidx <- c(idx,nrow(x))
+    starts <- x$coor[sidx] 
+    ends <- x$coor[eidx]
+
+    ## bind
+    CIL <- cbind(chr=x$chr[sidx], chr2=x$chr[eidx],
+                 start=x$coor[sidx], end=x$coor[eidx])
+    
+    ## check equal chromosomes
+    if ( any(which(CIL[,1]!=CIL[,2])) ) {
+        stop("bug: wrong chromosomes; please notify developers!")
+    } else {
+        CIL[,-2]
+    }
+
+}
+
 ## FILL UP GENOME ADD MISSING SEGMENTS
 #' Get inter-segments
 #'
