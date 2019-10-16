@@ -251,6 +251,7 @@ if ( intersegment!="" ) {
                            stringsAsFactors=FALSE)
     emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
     emptyseg <- emptyseg[emlen>0,] # rm 0-length and negative overlaps
+    ## split chromosome end segments
     emptyseg <- splitsegs(emptyseg,chrS,idcol="ID",verb=verb)
 
     emq <- as.data.frame(matrix(NA, ncol=ncol(query), nrow=nrow(emptyseg)))

@@ -1419,8 +1419,7 @@ randomSegments <- function(query, qclass, total) {
     ## inter-segment lengths
     ## TODO: handle nrow==1
     qnum <- nrow(query)
-    islen <- apply(cbind(query[1:(qnum-1),"end"],
-                         query[2:qnum,"start"]), 1, diff)
+    islen <- apply(cbind(query[2:qnum-1,"end"],query[2:qnum,"start"]), 1, diff)
     ## NOTE: the start of the first real query segment
     ## is also used as the distance of the final segment
     ## unless a total length is explicitly provided as argument
@@ -1458,9 +1457,14 @@ randomSegments <- function(query, qclass, total) {
     cumlen[seq(2,tot,2)] <- rsglen
     cumlen <- cumsum(cumlen)
     
-    rquery <- data.frame(start=cumlen[seq(1,tot-1,2)],
+    rquery <- data.frame(start=cumlen[seq(1,tot-1,2)] +1,
                          end=cumlen[seq(2,tot-1,2)],
                          type=rcls)
+
+    ## TEST random segment length
+    if ( sum(rquery[,"end"]-rquery[,"start"]+1) !=
+         sum(sglen) )
+        stop("BUG: wrong total segment length, pls contact developers")
     rquery
 }
 
