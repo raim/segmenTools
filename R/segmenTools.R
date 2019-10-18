@@ -244,12 +244,14 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128),
 #' @param xlim optional limits to x-axis
 #' @param mai \code{par("mai")} plot parameter for plot margins
 #' @param ylim y-axis limits for histogram
+#' @param legendf legend plot function, called after the upper distribution
+#' plot, can be used to add a legend
 #' @param ... further arguments to \code{colf}, e.g. \code{start} and
 #' \code{end} in \code{\link[grDevices:gray.colors]{gray.colors}} 
 #' @export
 selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
                          plot=TRUE, xlab="score", xlim, heights=c(.75,.25),
-                         mai=c(.75,.75,.1,.1), ylim, ...) {
+                         mai=c(.75,.75,.1,.1), ylim, legendf, ...) {
 
     ## TODO: allow to pass pre-selected colors and breaks
     ## and just use to plot legend
@@ -298,6 +300,8 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
         abline(v=c(mn,mx), col=2, lty=2)
         axis(2)
         axis(1, labels=NA)
+        if ( !missing(legendf) ) legendf()
+        ## image plot
         mai[1] <- mai[1]*5
         par(xaxs="i", mai=mai)
         image_matrix(x=lbrk, z=t(cdat), breaks=cbrk,

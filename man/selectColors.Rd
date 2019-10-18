@@ -6,7 +6,7 @@
 \usage{
 selectColors(x, mn, mx, q = 0.1, colf = grDevices::gray.colors,
   n = 100, plot = TRUE, xlab = "score", xlim, heights = c(0.75,
-  0.25), mai = c(0.75, 0.75, 0.1, 0.1), ylim, ...)
+  0.25), mai = c(0.75, 0.75, 0.1, 0.1), ylim, legendf, ...)
 }
 \arguments{
 \item{x}{data vector}
@@ -40,6 +40,9 @@ eg. \code{\link[grDevices:gray.colors]{gray.colors}} or
 \item{mai}{\code{par("mai")} plot parameter for plot margins}
 
 \item{ylim}{y-axis limits for histogram}
+
+\item{legendf}{legend plot function, called after the upper distribution
+plot, can be used to add a legend}
 
 \item{...}{further arguments to \code{colf}, e.g. \code{start} and
 \code{end} in \code{\link[grDevices:gray.colors]{gray.colors}}}
