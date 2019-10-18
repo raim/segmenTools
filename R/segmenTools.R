@@ -1376,8 +1376,11 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     ovl$jaccard <- J.real
     ovl$intersect.target <- I.target
     ovl$intersect.query <- I.query
-    ovl$total.target <- unlist(lapply(tcls.rng, length))
-    ovl$total.query <- unlist(lapply(qcls.rng, length))
+    ## as matrix to allow auto-sorting via lapply(ovl, function(x), x[cls.srt])
+    ovl$total.target <- matrix(unlist(lapply(tcls.rng, length)),nrow=1)
+    colnames(ovl$total.target) <- colnames(ovl$jaccard)
+    ovl$total.query <- matrix(unlist(lapply(qcls.rng, length)),ncol=1)
+    rownames(ovl$total.query) <- rownames(ovl$jaccard)
     if ( perm>0 ) 
         ovl$p.value <- J.pval
     
@@ -1506,7 +1509,7 @@ collapsePositions <- function(x, dist=1) {
     if ( any(which(CIL[,1]!=CIL[,2])) ) {
         stop("bug: wrong chromosomes; please notify developers!")
     } else {
-        CIL[,-2]
+        CIL[,-2,drop=FALSE]
     }
 
 }
