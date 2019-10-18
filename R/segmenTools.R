@@ -1306,7 +1306,7 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
         rng <- apply(as.matrix(query[idx,c("start","end")]), 1,
                      function(x) x["start"]:x["end"])
         names(rng) <- NULL
-        qcls.rng[[cl]] <- unlist(rng)
+        qcls.rng[[cl]] <- unique(unlist(rng)) # note: merging overlaps
     }
     
     ## get full ranges for all target classes
@@ -1318,7 +1318,7 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
         rng <- apply(as.matrix(target[idx,c("start","end")]), 1,
                      function(x) x["start"]:x["end"])
         names(rng) <- NULL
-        tcls.rng[[cl]] <- unlist(rng)
+        tcls.rng[[cl]] <- unique(unlist(rng)) # note: merging overlaps
     }
 
     ## get intersect/union of all query:target class pairs
@@ -1372,6 +1372,8 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     ovl$jaccard <- J.real
     ovl$intersect.target <- I.target
     ovl$intersect.query <- I.query
+    ovl$total.target <- unlist(lapply(tcls.rng, length))
+    ovl$total.query <- unlist(lapply(qcls.rng, length))
     if ( perm>0 ) 
         ovl$p.value <- J.pval
     
