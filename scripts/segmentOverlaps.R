@@ -256,9 +256,11 @@ if ( intersegment!="" ) {
 
     emq <- as.data.frame(matrix(NA, ncol=ncol(query), nrow=nrow(emptyseg)))
     colnames(emq) <- colnames(query)
+    emptyseg <- emptyseg[,colnames(emptyseg)%in%colnames(emq)]
     emq[,colnames(emptyseg)] <- emptyseg
     if ( qclass%in%colnames(emq) )
         emq[,qclass] <- intersegment ## add intersegment cluster
+    if ("ID"%in%colnames(query) )
     query <- rbind(query, emq)
 }
 ## calculate Jaccard Index and permutation test
