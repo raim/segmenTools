@@ -236,6 +236,7 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128),
 #' @param colf color map function used to create a color gradient,
 #' eg. \code{\link[grDevices:gray.colors]{gray.colors}} or
 #' \code{viridis}
+#' @param reverse revert color order
 #' @param n number of colors, first argument to \code{colf}
 #' @param plot plot a legend, ie. a histogram of the full data and an
 #' \code{image} of the color scheme below
@@ -249,7 +250,8 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128),
 #' @param ... further arguments to \code{colf}, e.g. \code{start} and
 #' \code{end} in \code{\link[grDevices:gray.colors]{gray.colors}} 
 #' @export
-selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
+selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,
+                         reverse=FALSE, n=100,
                          plot=TRUE, xlab="score", xlim, heights=c(.75,.25),
                          mai=c(.75,.75,.1,.1), ylim, legendf, ...) {
 
@@ -262,14 +264,15 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,  n=100,
 
     ## cut data
     if ( length(q)==1) q <- c(q, 1-q)
-    if ( missing(mn) ) mn <- quantile(x, q=q[1], na.rm=TRUE) 
-    if ( missing(mx) ) mx <- quantile(x, q=q[2], na.rm=TRUE) 
+    if ( missing(mn) ) mn <- quantile(x, probs=q[1], na.rm=TRUE) 
+    if ( missing(mx) ) mx <- quantile(x, probs=q[2], na.rm=TRUE) 
     x.cut <- x
     x.cut[which(x.cut>mx)] <- mx
     x.cut[which(x.cut<mn)] <- mn
 
     ## colors & breaks for cut data
     cols <- colf(n, ...)
+    if ( reverse ) cols <- rev(cols)
     x.cols <- cols[1+(n-1)*(x.cut-min(x.cut))/(max(x.cut)-min(x.cut))]
     cbrk <- seq(mn, mx, length.out=n+1)
 

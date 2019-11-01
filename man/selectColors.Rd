@@ -5,8 +5,9 @@
 \title{Map a distribution to a color scheme}
 \usage{
 selectColors(x, mn, mx, q = 0.1, colf = grDevices::gray.colors,
-  n = 100, plot = TRUE, xlab = "score", xlim, heights = c(0.75,
-  0.25), mai = c(0.75, 0.75, 0.1, 0.1), ylim, legendf, ...)
+  reverse = FALSE, n = 100, plot = TRUE, xlab = "score", xlim,
+  heights = c(0.75, 0.25), mai = c(0.75, 0.75, 0.1, 0.1), ylim,
+  legendf, ...)
 }
 \arguments{
 \item{x}{data vector}
@@ -25,6 +26,8 @@ and \code{mx} arguments}
 \item{colf}{color map function used to create a color gradient,
 eg. \code{\link[grDevices:gray.colors]{gray.colors}} or
 \code{viridis}}
+
+\item{reverse}{revert color order}
 
 \item{n}{number of colors, first argument to \code{colf}}
 
