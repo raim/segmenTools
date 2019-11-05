@@ -160,11 +160,10 @@ if ( nrow(query)==0 | nrow(target)==0 )
 
 ## adding strand if missing
 if ( add.qstrand!="" )
-    if ( !"strand"%in%colnames(query) )
-        query$strand <- add.qstrand
+    query$strand <- add.qstrand
 if ( add.tstrand!="" )
-    if ( !"strand"%in%colnames(query) )
-        target$strand <- add.tstrand
+    target$strand <- add.tstrand
+
 
 ## load chromosome index - DOESNT WORK WITHOUT
 ## NOTE: file with sorted chromosomes and their lengths
