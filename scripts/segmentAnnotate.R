@@ -49,6 +49,10 @@ option_list <- list(
 #  make_option(c("--dcol"), type="character",
 #              default=c("query,intersect,qlen,qpos"), 
 #              help="overlap statistics to copy to best matching target if details is set to TRUE"),
+  make_option(c("--add.qstrand"), type="character", default="", 
+              help="use this character as strand information in queries"),
+  make_option(c("--add.tstrand"), type="character", default="", 
+              help="use this character as strand information in targets"),
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search matches on reverse strand"),
   make_option(c("--qrange"), type="character", default="",  # TODO: implement!
@@ -153,6 +157,14 @@ if ( verb>0 )
 
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
+
+## adding strand if missing
+if ( add.qstrand!="" )
+    if ( !"strand"%in%colnames(query) )
+        query$strand <- add.qstrand
+if ( add.tstrand!="" )
+    if ( !"strand"%in%colnames(query) )
+        target$strand <- add.tstrand
 
 ## load chromosome index - DOESNT WORK WITHOUT
 ## NOTE: file with sorted chromosomes and their lengths
