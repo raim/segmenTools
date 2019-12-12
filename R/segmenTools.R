@@ -4,13 +4,12 @@
 #'@name segmenTools
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table read.delim read.table
-#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout
-#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors
+#'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout grconvertX grconvertY
+#'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors dev.size
 #'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit
 ##@bibliography /home/raim/ref/tata.bib
 ##@importFrom segmenTier clusterCor_c 
 NULL # this just ends the global package documentation
-
 
 ### GENOME SEGMENT UTILS & ANALYSIS
 
@@ -136,32 +135,6 @@ ci95 <- function(x,na.rm=FALSE) {
 
 
 
-### PLOT UTILS
-#' Switch between plot devices
-#' @param file.name file name without suffix (.png, etc)
-#' @param type plot type: png, jpeg, eps, pdf, tiff or svg
-#' @param width figure width in inches
-#' @param height figure height in inches
-#' @param res resolution in ppi (pixels per inch), only for 'png' and 'tiff'
-#' @param bg background color
-#' @export
-plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
-                    bg="white") {
-  file.name <- paste(file.name, type, sep=".")
-  if ( type == "png" )
-    grDevices::png(file.name, width=width, height=height, units="in", res=res)
-  if ( type == "eps" )
-    grDevices::postscript(file.name, width=height, height=width,paper="special",
-                          horizontal = FALSE, onefile = FALSE)
-  if ( type == "pdf" )
-    grDevices::pdf(file.name, width=width, height=height, bg=bg)
-  if ( type == "tiff" )
-    grDevices::tiff(file.name, width=width, height=height, units="in", res=res)
-  if ( type == "svg" )
-    grDevices::svg(file.name, width=width, height=height)
-  if ( type == "jpeg" )
-    grDevices::jpeg(file.name, width=width, height=height, units="in", res=res)
-}
 
 ##
 
