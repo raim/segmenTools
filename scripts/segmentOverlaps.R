@@ -43,6 +43,8 @@ option_list <- list(
 ##              help="search range downstream of target (in nt.)"),
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
+  make_option(c("--count"),  action="store_true", default=FALSE,
+              help="count individual overlaps"),
   ## OUTPUT
   make_option(c("--fig.type"), type="character", default="png",
               help="figure type (png, pdf, eps) [default %default]"),
@@ -267,6 +269,17 @@ if ( intersegment!="" ) {
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
                       verb=1)
+
+## ADD COUNTS
+if ( count ) {
+    ann <- annotateTarget(query=query, target=target,
+                          collapse=FALSE,  details=FALSE, only.best=FALSE,
+                          qcol=qclass, tcol=tclass)
+    ## count table
+    ovl$count <- table(ann[,qclass], ann[,tclass])
+
+}
+
 
 if ( verb>0 )
   msg(paste0("DONE\t",time(),"\n"))

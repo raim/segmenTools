@@ -1359,6 +1359,9 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     rownames(ovl$total.query) <- rownames(ovl$jaccard)
     if ( perm>0 ) 
         ovl$p.value <- J.pval
+
+    ovl$columns <- ifelse(tclass!="",tclass,"target")
+    ovl$rows <- ifelse(qclass!="",qclass,"query")
     
     return(ovl)
 }
