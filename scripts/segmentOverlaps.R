@@ -286,7 +286,10 @@ if ( count ) {
         qcol <- "qclass"
     }
     ## count table
-    ovl$count <- as.matrix(table(ann[,qcol], ann[,tcol]))
+    ovl$count <- ovl$p.value
+    ovl$count[] <- 0
+    tab <- as.matrix(table(ann[,qcol], ann[,tcol]))
+    ovl$count[rownames(tab),colnames(tab)] <- tab
 
 }
 
