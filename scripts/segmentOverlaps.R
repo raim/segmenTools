@@ -289,7 +289,22 @@ if ( count ) {
     ovl$count <- ovl$p.value
     ovl$count[] <- 0
     tab <- as.matrix(table(ann[,qcol], ann[,tcol]))
+
+    ## empty dim names
+    rstr <- paste(sample(c(letters, LETTERS),12, replace=TRUE),
+                  collapse="")
+    colnames(tab)[colnames(tab)==""] <- rstr
+    colnames(ovl$count)[colnames(ovl$count)==""] <- rstr
+    rownames(tab)[rownames(tab)==""] <- rstr
+    rownames(ovl$count)[rownames(ovl$count)==""] <- rstr
+
+    ## copy overlap count
     ovl$count[rownames(tab),colnames(tab)] <- tab
+
+    ## reset empty dim names
+    colnames(count)[colnames(count)==rstr] <- ""
+    rownames(count)[rownames(count)==rstr] <- ""
+
 
 }
 
