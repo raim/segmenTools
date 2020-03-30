@@ -624,10 +624,13 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
             colnames(addcol) <- paste(prefix,"_",colnames(addcol),sep="")
 
     ## filter target columns
-    if ( !missing(tcol) & tcol!="" ) {
-        target <- target[best[,"target"],tcol,drop=FALSE]
-        colnames(target) <- tcol
-        addcol <- cbind(target, addcol)
+    if ( !missing(tcol) ) {
+        tcol <- tcol[tcol!=""]
+        if ( length(tcol)>0 ) {
+            target <- target[best[,"target"],tcol,drop=FALSE]
+            colnames(target) <- tcol
+            addcol <- cbind(target, addcol)
+        }
     }
     addcol
     ## add index to column ID if already present

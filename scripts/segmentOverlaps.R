@@ -263,32 +263,44 @@ if ( intersegment!="" ) {
     if ( qclass%in%colnames(emq) )
         emq[,qclass] <- intersegment ## add intersegment cluster
     if ("ID"%in%colnames(query) )
-    query <- rbind(query, emq)
+        query <- rbind(query, emq)
 }
 ## calculate Jaccard Index and permutation test
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
                       verb=1)
 
+
 ## ADD COUNTS
 if ( count ) {
     tcol <- tclass
     qcol <- qclass
+    if ( "ID"%in%colnames(query) )
+        qcol <- c("ID",qcol)
+    if ( "ID"%in%colnames(target) ) {
+        tcol <- c("ID",tcol)
+        tcol <- tcol[tcol!=""]
+    }
     ann <- annotateTarget(query=query, target=target,
                           collapse=FALSE,  details=FALSE, only.best=FALSE,
-                          qcol=qcol, tcol=tcol)
-    if ( tcol=="" ) {
+                          qcol=qcol, tcol=tcol, prefix="query")
+    
+    if ( tclass=="" ) {
         ann <- cbind(ann, tclass="target")
-        tcol <- "tclass"
+        tcol <- tclass <- "tclass"
     }
-    if ( qcol=="" ) {
+    if ( qclass=="" ) {
         ann <- cbind(ann, qclass="query")
-        qcol <- "qclass"
+        qcol <- qclass <- "qclass"
     }
+
+    ## FILTER EMPTY
+    ann <- ann[!is.na(ann[,paste0("query_",qclass)]),]
+    
     ## count table
     ovl$count <- ovl$p.value
     ovl$count[] <- 0
-    tab <- as.matrix(table(ann[,qcol], ann[,tcol]))
+    tab <- as.matrix(table(ann[,paste0("query_",qclass)], ann[,tclass]))
 
     ## empty dim names
     rstr <- paste(sample(c(letters, LETTERS),12, replace=TRUE),
@@ -302,9 +314,12 @@ if ( count ) {
     ovl$count[rownames(tab),colnames(tab)] <- tab
 
     ## reset empty dim names
-    colnames(count)[colnames(count)==rstr] <- ""
-    rownames(count)[rownames(count)==rstr] <- ""
+    colnames(ovl$count)[colnames(ovl$count)==rstr] <- ""
+    rownames(ovl$count)[rownames(ovl$count)==rstr] <- ""
 
+    ## ADD TO RESULT STRUCTURE
+    ovl$annotation <- ann
+    
 
 }
 
@@ -318,13 +333,18 @@ if ( verb>0 )
 if ( tclass=="" ) tclass <- "all"
 if ( qclass=="" ) qclass <- "all"
 
+## store data
+##OUTFILE NAME
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
-## store data
-if ( !interactive() ) 
-  save(ovl, file=paste0(file.name,".RData"))
-
+if ( !interactive() ) {
+    save(ovl, file=paste0(file.name,".RData"))
+    if ( "annotation" %in% names(ovl) )
+        write.table(ann, file=paste0(file.name,"_annotation.tsv"),
+                    sep="\t", row.names=FALSE, quote=FALSE)
+}
+  
 ## plot
 if ( perm>0 ) {
     plotdev(paste0(file.name),type=fig.type)
