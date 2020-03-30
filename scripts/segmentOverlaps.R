@@ -272,11 +272,21 @@ ovl <- segmentJaccard(query=query, target=target,
 
 ## ADD COUNTS
 if ( count ) {
+    tcol <- tclass
+    qcol <- qclass
     ann <- annotateTarget(query=query, target=target,
                           collapse=FALSE,  details=FALSE, only.best=FALSE,
-                          qcol=qclass, tcol=tclass)
+                          qcol=qcol, tcol=tcol)
+    if ( tcol=="" ) {
+        ann <- cbind(ann, tclass="target")
+        tcol <- "tclass"
+    }
+    if ( qcol=="" ) {
+        ann <- cbind(ann, qclass="query")
+        qcol <- "qclass"
+    }
     ## count table
-    ovl$count <- table(ann[,qclass], ann[,tclass])
+    ovl$count <- as.matrix(table(ann[,qcol], ann[,tcol]))
 
 }
 

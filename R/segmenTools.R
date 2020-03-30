@@ -611,6 +611,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ## e.g., details = c("qpos", "intersect", "union")
     if ( details )
         qcol <- c(qcol, "qpos", "qrank", "qlen", "intersect", "union")
+    qcol <- qcol[qcol!=""]
     
     ## get and optionally rename requested columns
     ## TODO: why was match used? use dplyr::join !
@@ -623,7 +624,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
             colnames(addcol) <- paste(prefix,"_",colnames(addcol),sep="")
 
     ## filter target columns
-    if ( !missing(tcol) ) {
+    if ( !missing(tcol) & tcol!="" ) {
         target <- target[best[,"target"],tcol,drop=FALSE]
         colnames(target) <- tcol
         addcol <- cbind(target, addcol)
