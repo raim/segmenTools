@@ -275,12 +275,16 @@ ovl <- segmentJaccard(query=query, target=target,
 if ( count ) {
     tcol <- tclass
     qcol <- qclass
-    if ( "ID"%in%colnames(query) )
-        qcol <- c("ID",qcol)
-    if ( "ID"%in%colnames(target) ) {
-        tcol <- c("ID",tcol)
-        tcol <- tcol[tcol!=""]
-    }
+    if ( !"ID"%in%colnames(query) )
+        query <- cbind(query, ID=1:nrow(query))
+    qcol <- c("ID",qcol)
+    qcol <- qcol[qcol!=""]
+    
+    if ( !"ID"%in%colnames(target) ) 
+        target <- cbind(target, ID=1:nrow(target))
+    tcol <- c("ID",tcol)
+    tcol <- tcol[tcol!=""]
+    
     ann <- annotateTarget(query=query, target=target,
                           collapse=FALSE,  details=FALSE, only.best=FALSE,
                           qcol=qcol, tcol=tcol, prefix="query")
@@ -288,14 +292,15 @@ if ( count ) {
     if ( tclass=="" ) {
         ann <- cbind(ann, tclass="target")
         tcol <- tclass <- "tclass"
+        ann <- cbind(ann, tclass="all")
     }
     if ( qclass=="" ) {
-        ann <- cbind(ann, qclass="query")
         qcol <- qclass <- "qclass"
+        ann <- cbind(ann, query_qclass="query")
     }
 
     ## FILTER EMPTY
-    ann <- ann[!is.na(ann[,paste0("query_",qclass)]),]
+    ann <- ann[!is.na(ann[,paste0("query_ID")]),]
     
     ## count table
     ovl$count <- ovl$p.value
