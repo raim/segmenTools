@@ -7,7 +7,8 @@
 plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, col,
   values = c("overlap", "jaccard", "intersect.target"),
   txt.col = c("black", "white"), rmz = TRUE, short = TRUE,
-  scale = 1, round, axis = 1:2, show.sig = TRUE, ...)
+  scale = 1, round, axis = 1:2, show.sig = TRUE,
+  show.total = FALSE, ...)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by
@@ -51,6 +52,9 @@ be used as tick labels}
 \code{\link[segmenTier:sortClusters]{sortClusters}} from package
 \code{segmenTier}:
 draws a red line where unsorted non-significant hits start}
+
+\item{show.total}{show total numbers (counts) of overlapping features
+on top and right axes}
 
 \item{...}{arguments to \code{\link{image_matrix}}}
 }
