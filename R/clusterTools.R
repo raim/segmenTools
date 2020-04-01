@@ -145,10 +145,14 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
       for ( pcol in 1:ncol(prich) )
         p.value[prow,pcol] <- min(prich[prow,pcol],ppoor[prow,pcol])
 
-    ## TODO: add test number for later bonferroni correction
   result <- append(result, list(p.value=p.value))
     result$alternative <- alternative
     result$varnames=c(vn1,vn2)
+
+    ## TODO: add test number for later bonferroni correction
+    ## TODO: add total numbers as result$num.query/total
+    ## TODO: align with nomenclature in segmentJaccard and plotOverlaps
+    
   class(result) <- "clusterOverlaps"
   return(result)
 }
@@ -201,6 +205,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' \code{\link[segmenTier:sortClusters]{sortClusters}} from package
 #' \code{segmenTier}:
 #' draws a red line where unsorted non-significant hits start
+#' @param show.total show total numbers (counts) of overlapping features
+#' on top and right axes
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: sort by significance?
@@ -210,7 +216,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
                          values=c("overlap","jaccard","intersect.target"),
                          txt.col = c("black","white"), rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
-                         show.sig=TRUE, ...) {
+                         show.sig=TRUE, show.total=FALSE, ...) {
 
     ## set up p-value and colors
     pval <- x$p.value
@@ -287,6 +293,16 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     if ( show.sig & "nsig"%in%names(x) )
         if ( nrow(pval)>x$nsig )
             abline(h=nrow(pval)-x$nsig+.5, col=2, lwd=2)
+
+    if ( show.total ) {
+        if ( "num.query"%in%names(x) )
+            axis(4, at=length(x$num.query):1, labels=x$num.query,
+                 las=2, lwd=0, lwd.ticks=1)
+        if ( "num.target"%in%names(x) )
+            axis(3, at=1:length(x$num.target), labels=x$num.target,
+                 las=2, lwd=0, lwd.ticks=1)            
+        figlabel("total", region="figure", pos="topright",cex=1.5)
+    }
 
     ## return plot settings silently
     invisible(list(type=type, short=short, round=round, scale=scale, text=txt))
