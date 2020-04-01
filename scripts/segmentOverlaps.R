@@ -291,9 +291,8 @@ if ( count ) {
                           qcol=qcol, tcol=tcol, prefix="query")
     
     if ( tclass=="" ) {
-        ann <- cbind(ann, tclass="target")
         tcol <- tclass <- "tclass"
-        ann <- cbind(ann, tclass="all")
+        ann <- cbind(ann, tclass="target")
     }
     if ( qclass=="" ) {
         qcol <- qclass <- "qclass"
@@ -336,8 +335,8 @@ if ( verb>0 )
   msg(paste0("writing results\n"))
 
 ## write out results
-if ( tclass=="" ) tclass <- "all"
-if ( qclass=="" ) qclass <- "all"
+if ( tclass%in%c("","tclass") ) tclass <- "all"
+if ( qclass%in%c("","qclass") ) qclass <- "all"
 
 ## store data
 ##OUTFILE NAME
