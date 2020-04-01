@@ -1360,10 +1360,14 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     ovl$total.target <- matrix(unlist(lapply(tcls.rng, length)),nrow=1)
     colnames(ovl$total.target) <- colnames(ovl$jaccard)
     ovl$total.query <- matrix(unlist(lapply(qcls.rng, length)),ncol=1)
+    
     rownames(ovl$total.query) <- rownames(ovl$jaccard)
     if ( perm>0 ) 
         ovl$p.value <- J.pval
 
+    ovl$num.target <- t(as.matrix(table(tcls)))
+    ovl$num.query <- as.matrix(table(qcls))
+    
     ovl$columns <- ifelse(tclass!="",tclass,"target")
     ovl$rows <- ifelse(qclass!="",qclass,"query")
 

@@ -265,6 +265,7 @@ if ( intersegment!="" ) {
     if ("ID"%in%colnames(query) )
         query <- rbind(query, emq)
 }
+
 ## calculate Jaccard Index and permutation test
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
