@@ -301,7 +301,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         if ( "num.target"%in%names(x) )
             axis(3, at=1:length(x$num.target), labels=x$num.target,
                  las=2, lwd=0, lwd.ticks=1)            
-        figlabel("total", region="figure", pos="topright",cex=1.5)
+        figlabel("total", region="figure", pos="topright",cex=par("cex"))
     }
 
     ## return plot settings silently
@@ -1967,7 +1967,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             
             ## store for external legend (eg. plotSingles with each=FALSE)
             used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
-                                          lty=lty,col=all.col[idx],
+                                          lty=lty[idx],col=all.col[idx],
                                           stringsAsFactors=FALSE)
             if ( plot.legend ) {
                 nms <- rownames(ts)[idx]
