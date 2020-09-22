@@ -1850,8 +1850,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
     else norm <- "raw"
 
     ## y-axis
-    if ( missing(ylab) )
-      ylab <- norm
+    ##if ( missing(ylab) )
+    ##  ylab <- norm
     
     ## x-axis
     if ( missing(time) ) {
@@ -1918,6 +1918,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
             }
             par(new=TRUE)
         }
+        ## use normalization is ylab
+        if ( missing(ylab) ) ylab <- norm
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=xlim,
              ylab=ylab,ylim=ylim, ...)
@@ -1947,9 +1949,10 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                 par(new=TRUE)
             }
             if ( missing(ylab) )
-                ylab <- paste(cl," (",cls.sze[cl],")",sep="")
+                ylb <- paste(cl," (",cls.sze[cl],")",sep="")
+            else ylb <- ylab
             plot(1,col=NA,axes=FALSE, xlab=NA, xlim=xlim,
-                 ylab=ylab,ylim=ylim, ...)
+                 ylab=ylb,ylim=ylim, ...)
             if ( axes ) {
                 axis(1, at=time.at);axis(2)
             }
