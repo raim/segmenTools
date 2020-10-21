@@ -7,10 +7,10 @@
 plotClusters(x, cls, k, each = TRUE, type = "rng", time, time.at,
   avg = "median", q = 0.9, norm, cls.col, cls.srt, axes = TRUE, xlab,
   xlim, ylab, ylim = ifelse(each, "avg", "rng"), ylim.scale = 0.1,
-  avg.col = "#000000", avg.lwd = 3, avg.cex = 1, avg.pch = 1,
-  lwd = 0.5, use.lty = FALSE, alpha = 0.2, embed = FALSE,
-  plot.legend = FALSE, leg.xy = "topleft", leg.ids, vline = "",
-  vl_col = 0, vl_lwd = 3, vl_lty = 1, ref.xy,
+  avg.col = "#000000", avg.lty = 1, avg.lwd = 3, avg.cex = 1,
+  avg.pch = 1, lwd = 0.5, use.lty = FALSE, alpha = 0.2,
+  embed = FALSE, plot.legend = FALSE, leg.xy = "topleft", leg.ids,
+  vline = "", vl_col = 0, vl_lwd = 3, vl_lty = 1, ref.xy,
   ref.col = "#C0C0C080", ref.ylab = "", ...)
 }
 \arguments{
@@ -79,7 +79,9 @@ extended by this fraction of the total range on both sides}
 
 \item{avg.col}{color for average line; used only if \code{type="all"}}
 
-\item{avg.lwd}{line width for average plots (if \code{type=="all"})}
+\item{avg.lty}{line type for average plots}
+
+\item{avg.lwd}{line width for average plots}
 
 \item{avg.cex}{point size for average plots}
 

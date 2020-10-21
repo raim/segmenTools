@@ -1740,7 +1740,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
 #' extended by this fraction of the total range on both sides
 #' @param avg.col color for average line; used only if \code{type="all"}
-#' @param avg.lwd line width for average plots (if \code{type=="all"})
+#' @param avg.lty line type for average plots 
+#' @param avg.lwd line width for average plots 
 #' @param avg.pch point symbol for average plots
 #' @param avg.cex point size for average plots 
 #' @param lwd line width for indidiual time series plots (if \code{type=="all"})
@@ -1781,7 +1782,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                          cls.col, cls.srt,  
                          axes=TRUE, xlab, xlim,
                          ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
-                         avg.col="#000000",avg.lwd=3,avg.cex=1,avg.pch=1,
+                         avg.col="#000000",avg.lty=1,avg.lwd=3,
+                         avg.cex=1,avg.pch=1,
                          lwd=.5, use.lty=FALSE, alpha=.2,
                          embed=FALSE,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, 
@@ -1982,7 +1984,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                        col=all.col[idx], lty=lty, lwd=lwd)
             }
         }
-        lines(time, avg$avg[cl,], lwd=avg.lwd, col=avg.col[cl]) ## average last
+        ## average last
+        lines(time, avg$avg[cl,], lwd=avg.lwd, lty=avg.lty, col=avg.col[cl])
         points(time, avg$avg[cl,], pch=avg.pch, cex=avg.cex, col=avg.col[cl])
         ## plot decoration
         if ( each ) {
