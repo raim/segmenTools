@@ -3,6 +3,7 @@
 The package provides various tools for cross-correlating genome
 segmentations and annotations. 
 
+
 `segmenTools' were developed specifically for analysis of genome-wide
 time-series data, more specifically time series with periodic properties
 such as circadian data sets. But many functionalities are broadly applicable.
