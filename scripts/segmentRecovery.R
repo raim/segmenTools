@@ -570,6 +570,37 @@ for ( test.type in test.types ) {
     legend("topleft",paste(test.type,"-",tnum))
     dev.off()
 
+    ## CONSSEG FIGURE: consensus segmentation vs. segmenTier input
+    if ( Sys.Date() < as.Date("2021-02-01") ) {
+
+        ccols <- sgcols
+        ccols["consensus"] <- "#000000"
+        ccols[names(ccols)!="consensus"] <- c(2:5)
+        clwd <- rep(1, length(sgcols))
+        names(clwd) <- names(sgcols)
+        clwd["consensus"] <- 2
+        clty <- rep(2, length(sgcols))
+        names(clty) <- names(sgcols)
+        clty["consensus"] <- 1
+                    
+        ## CDF of absolute best hit CDF (rcdf)
+        file.name <- file.path(out.path,testid,
+                               paste(test.type,"_ratioTotal_consseg",
+                                     fname,sep=""))
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
+        par(mai=c(.5,.5,.125,.125),mgp=c(1.3,.4,0),xaxs="i")
+        plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
+                    lwd=clwd,
+                    col=ccols, lty=clty,
+                    h=c(minf,.8), v=c(ovlth,2-ovlth), #c(0.8,1.2),
+                    xlab="ratio: query length/target length")
+        legend("topleft",paste("target:", test.type))#,"-",tnum))
+        nms <- gsub("D:dft1-7.dcash.snr_T:raw_K:12_S:icor_","",names(clwd))
+        legend("right", nms, lwd=clwd, col=ccols, lty=clty,
+               bg="white",box.col=NA,cex=.7)
+        dev.off()
+    }
+
     ## CDF of absolute best hit CDF (rcdf)  - cluster colors
     if ( !is.null(pm) ) {
         file.name <- file.path(out.path,testid,
