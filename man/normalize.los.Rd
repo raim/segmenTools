@@ -4,9 +4,15 @@
 \alias{normalize.los}
 \title{LVS/LOS normalization}
 \usage{
-normalize.los(x, los.id, norm.ref = c("median", "mean"),
-  norm.type = c("loess", "smooth", "scale"), add.maximum = FALSE,
-  reset.extrema = FALSE, extend.max = FALSE)
+normalize.los(
+  x,
+  los.id,
+  norm.ref = c("median", "mean"),
+  norm.type = c("loess", "smooth", "scale"),
+  add.maximum = FALSE,
+  reset.extrema = FALSE,
+  extend.max = FALSE
+)
 }
 \arguments{
 \item{x}{a data matrix to be normalized}

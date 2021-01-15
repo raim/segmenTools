@@ -4,9 +4,19 @@
 \alias{annotateTarget}
 \title{annotate target segments by overlapping query segments}
 \usage{
-annotateTarget(query, target, qcol = colnames(query), tcol, prefix,
-  details = FALSE, only.best = TRUE, sort = TRUE, minJaccard,
-  collapse = TRUE, msgfile = stdout())
+annotateTarget(
+  query,
+  target,
+  qcol = colnames(query),
+  tcol,
+  prefix,
+  details = FALSE,
+  only.best = TRUE,
+  sort = TRUE,
+  minJaccard,
+  collapse = TRUE,
+  msgfile = stdout()
+)
 }
 \arguments{
 \item{query}{the query set of segments (genomic intervals)}

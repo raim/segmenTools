@@ -4,8 +4,15 @@
 \alias{clusterAnnotation}
 \title{clustering enrichment scan}
 \usage{
-clusterAnnotation(cls, data, p = 1, cls.srt, terms = NULL, bin.filter,
-  verbose = TRUE)
+clusterAnnotation(
+  cls,
+  data,
+  p = 1,
+  cls.srt,
+  terms = NULL,
+  bin.filter,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{cls}{a character or numeric vector with the main clustering}

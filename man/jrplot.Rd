@@ -4,9 +4,21 @@
 \alias{jrplot}
 \title{Jaccard vs. Ratio Segment Overlap Plots}
 \usage{
-jrplot(jaccard, ratio, symm = TRUE, nbin = 512, minn = 10,
-  rlim = c(0, 2), jlim = c(0, 1.05), decorate = TRUE,
-  j.thresh = 0.5, yd = 0.1, did = "", tot, ...)
+jrplot(
+  jaccard,
+  ratio,
+  symm = TRUE,
+  nbin = 512,
+  minn = 10,
+  rlim = c(0, 2),
+  jlim = c(0, 1.05),
+  decorate = TRUE,
+  j.thresh = 0.5,
+  yd = 0.1,
+  did = "",
+  tot,
+  ...
+)
 }
 \arguments{
 \item{jaccard}{Jaccard Indices}

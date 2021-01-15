@@ -4,8 +4,16 @@
 \alias{seq2nt}
 \title{calculate local nucleotide content}
 \usage{
-seq2nt(seq, window = 100, step = 1, abc, skew = "", cum = FALSE,
-  circular = FALSE, verb = FALSE)
+seq2nt(
+  seq,
+  window = 100,
+  step = 1,
+  abc,
+  skew = "",
+  cum = FALSE,
+  circular = FALSE,
+  verb = FALSE
+)
 }
 \arguments{
 \item{seq}{a sequence object as returned by \code{readFasta}}

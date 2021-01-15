@@ -4,8 +4,14 @@
 \alias{clusterCluster}
 \title{calculates overlaps between two clusterings}
 \usage{
-clusterCluster(cl1, cl2, na.string = "na", cl1.srt, cl2.srt,
-  alternative = c("greater"))
+clusterCluster(
+  cl1,
+  cl2,
+  na.string = "na",
+  cl1.srt,
+  cl2.srt,
+  alternative = c("greater")
+)
 }
 \arguments{
 \item{cl1}{clustering 1; a vector of cluster associations or an

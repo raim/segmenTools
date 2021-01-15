@@ -4,8 +4,7 @@
 \alias{plotDFT}
 \title{plot polar coordinates}
 \usage{
-plotDFT(dft, col, cycles = 3, radius = 0.9, lambda = 1,
-  bc = "component", ...)
+plotDFT(dft, col, cycles = 3, radius = 0.9, lambda = 1, bc = "component", ...)
 }
 \arguments{
 \item{dft}{the Fourier transform of a time series as returned

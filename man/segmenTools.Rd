@@ -3,11 +3,7 @@
 \docType{package}
 \name{segmenTools}
 \alias{segmenTools}
-\alias{segmenTools-package}
 \title{segmenTools : analysis of genome segmentations by segmenTier}
-\description{
-segmenTools : analysis of genome segmentations by segmenTier
-}
 \section{Dependencies}{
  basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 }

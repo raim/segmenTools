@@ -4,9 +4,15 @@
 \alias{dense2d}
 \title{2D density heatmap plot}
 \usage{
-dense2d(x, y, pch = 20, nbin = c(128, 128),
-  colf = grDevices::colorRampPalette(c("#000099", "#00FEFF", "#45FE4F",
-  "#FCFF00", "#FF9400", "#FF3100")), ...)
+dense2d(
+  x,
+  y,
+  pch = 20,
+  nbin = c(128, 128),
+  colf = grDevices::colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00",
+    "#FF9400", "#FF3100")),
+  ...
+)
 }
 \arguments{
 \item{x}{x-coordinates}

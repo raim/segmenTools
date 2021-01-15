@@ -5,8 +5,7 @@
 \title{fasta sequence file parser stolen from (an older version of)
 \code{Biostrings}}
 \usage{
-readFASTA(file, checkComments = TRUE, strip.descs = TRUE,
-  split.desc = "")
+readFASTA(file, checkComments = TRUE, strip.descs = TRUE, split.desc = "")
 }
 \arguments{
 \item{file}{file with sequence(s) in fasta format}

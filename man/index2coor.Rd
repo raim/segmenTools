@@ -5,8 +5,16 @@
 \title{convert continuous index to chromosome coordinates (reverse of
 \code{\link{coor2index}})}
 \usage{
-index2coor(features, chrS, chrMap, cols = c("start", "end", "coor"),
-  chrCol = "chr", strandCol = "strand", relCol, strands = c(1, -1))
+index2coor(
+  features,
+  chrS,
+  chrMap,
+  cols = c("start", "end", "coor"),
+  chrCol = "chr",
+  strandCol = "strand",
+  relCol,
+  strands = c(1, -1)
+)
 }
 \arguments{
 \item{features}{a table of chromosome features that must contain

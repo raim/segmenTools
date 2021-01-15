@@ -4,10 +4,23 @@
 \alias{presegment}
 \title{Pre-segmentation of the time-series}
 \usage{
-presegment(ts, avg = 1000, minrd = 8, favg = 100,
-  border = c("expand", "trim"), minds = 250, rmlen = 250,
-  minsg = 5000, chrS, map2chrom = FALSE, seg.path,
-  plot.borders = FALSE, fig.path, fig.type = "png", verb = 1)
+presegment(
+  ts,
+  avg = 1000,
+  minrd = 8,
+  favg = 100,
+  border = c("expand", "trim"),
+  minds = 250,
+  rmlen = 250,
+  minsg = 5000,
+  chrS,
+  map2chrom = FALSE,
+  seg.path,
+  plot.borders = FALSE,
+  fig.path,
+  fig.type = "png",
+  verb = 1
+)
 }
 \arguments{
 \item{ts}{the time-series of readcounts for the complete chromosome,

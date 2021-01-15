@@ -4,8 +4,7 @@
 \alias{range2nt}
 \title{calculates letter frequences in ranges of strings}
 \usage{
-range2nt(seq, ranges, coors = c(chr = "chr", start = "start", end =
-  "end"))
+range2nt(seq, ranges, coors = c(chr = "chr", start = "start", end = "end"))
 }
 \arguments{
 \item{seq}{a sequence object as returned by \code{readFasta}}

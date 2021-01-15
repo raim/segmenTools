@@ -4,8 +4,14 @@
 \alias{parseGEOSoft}
 \title{parse GO Soft archives}
 \usage{
-parseGEOSoft(file, idcol, only.data = TRUE, valcol = "VALUE",
-  title = TRUE, desc = TRUE)
+parseGEOSoft(
+  file,
+  idcol,
+  only.data = TRUE,
+  valcol = "VALUE",
+  title = TRUE,
+  desc = TRUE
+)
 }
 \arguments{
 \item{file}{a GEO Soft archive file (eg. GSE18902_family.soft.gz)}

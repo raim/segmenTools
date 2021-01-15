@@ -4,11 +4,23 @@
 \alias{plotOverlaps}
 \title{plot cluster-cluster or segment-segment overlaps}
 \usage{
-plotOverlaps(x, p.min = 0.01, p.txt = p.min * 5, n = 100, col,
+plotOverlaps(
+  x,
+  p.min = 0.01,
+  p.txt = p.min * 5,
+  n = 100,
+  col,
   values = c("overlap", "jaccard", "intersect.target"),
-  txt.col = c("black", "white"), rmz = TRUE, short = TRUE,
-  scale = 1, round, axis = 1:2, show.sig = TRUE,
-  show.total = FALSE, ...)
+  txt.col = c("black", "white"),
+  rmz = TRUE,
+  short = TRUE,
+  scale = 1,
+  round,
+  axis = 1:2,
+  show.sig = TRUE,
+  show.total = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{a `clusterOverlaps' object returned by

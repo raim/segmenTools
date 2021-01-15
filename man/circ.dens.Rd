@@ -4,8 +4,16 @@
 \alias{circ.dens}
 \title{circular density}
 \usage{
-circ.dens(x, bw = 18, n = 512, freq = FALSE, units = "degrees",
-  high.mem = FALSE, na.rm = TRUE, ...)
+circ.dens(
+  x,
+  bw = 18,
+  n = 512,
+  freq = FALSE,
+  units = "degrees",
+  high.mem = FALSE,
+  na.rm = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{phases in degrees and of class numeric}

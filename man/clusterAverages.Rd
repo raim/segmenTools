@@ -4,8 +4,7 @@
 \alias{clusterAverages}
 \title{calculates cluster averages}
 \usage{
-clusterAverages(ts, cls, cls.srt, avg = "median", q = 0.9,
-  rm.inf = TRUE)
+clusterAverages(ts, cls, cls.srt, avg = "median", q = 0.9, rm.inf = TRUE)
 }
 \arguments{
 \item{ts}{a matrix of time series, with time points in columns}

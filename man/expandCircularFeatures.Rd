@@ -4,10 +4,16 @@
 \alias{expandCircularFeatures}
 \title{Splits genome features spanning annotated ends of circular chromosomes.}
 \usage{
-expandCircularFeatures(features, chrL, coorCols = c("chr", "start",
-  "end", "strand"), reverse = c("-", -1), idTag = "-circ2",
+expandCircularFeatures(
+  features,
+  chrL,
+  coorCols = c("chr", "start", "end", "strand"),
+  reverse = c("-", -1),
+  idTag = "-circ2",
   idCols = c(ID = "ID", type = "type", parent = "parent"),
-  copyCols = FALSE, insertRows = TRUE)
+  copyCols = FALSE,
+  insertRows = TRUE
+)
 }
 \arguments{
 \item{features}{a list of genomic features with coordinates}
