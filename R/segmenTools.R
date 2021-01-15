@@ -296,6 +296,7 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,
 #' @param range draw the range of values either as "polygon" or "lines"
 #' @param col lines color vector
 #' @param lty line type vector
+#' @param lwd line lwd vector
 #' @param h horizontal cut-off lines
 #' @param v vertical cut-off lines
 #' @param ylab y-axis label
@@ -303,7 +304,7 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,
 #' @param ... further parameters to plot
 #' @export
 plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", range="polygon",
-                        col, lty, h=c(.2,.8), v=c(0.8,1.2),
+                        col, lty, lwd, h=c(.2,.8), v=c(0.8,1.2), 
                         ylab="cum.dist.func.", ylim=c(0,1), ...) {
 
 
@@ -347,8 +348,11 @@ plot_cdfLst <- function(x=seq(0,2,.05), CDF, type="rcdf", range="polygon",
         abline(v=v,lty=2)
         abline(h=h,lty=2)
         abline(h=0:1, lty=2, col="gray",lwd=.75)
+        if ( missing(lwd) ) lwd <- rep(1, length(CDF))
+        if ( missing(lty) ) lty <- rep(1, length(CDF))
+        if ( missing(col) ) col <- 1:length(CDF)
         for ( i in 1:length(CDF) ) 
-          lines(x,CDF[[i]][[type]](x),col=col[i],lty=lty[i])
+          lines(x,CDF[[i]][[type]](x),col=col[i],lty=lty[i],lwd=lwd[i])
     }
 }
 
