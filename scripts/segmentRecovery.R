@@ -587,7 +587,7 @@ for ( test.type in test.types ) {
         file.name <- file.path(out.path,testid,
                                paste(test.type,"_ratioTotal_consseg",
                                      fname,sep=""))
-        plotdev(file.name,width=3.5,height=3.5,type=fig.type)
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type,res=300)
         par(mai=c(.5,.5,.125,.125),mgp=c(1.3,.4,0),xaxs="i")
         plot_cdfLst(x=seq(0,2,.05), CDF=CDF, type="rcdf",
                     lwd=clwd,
@@ -905,6 +905,42 @@ for ( type in sgtypes ) {
     legend("topleft",paste(type))
     dev.off()
 
+    ## CONSSEG
+    if ( Sys.Date() < as.Date("2021-02-01") ) {
+        ## plot
+        file.name <- file.path(out.path,testid,"segtypes",
+                               paste(type,"_ratioTotal_consseg",fname,sep=""))
+        plotdev(file.name,width=3.5,height=3.5,type=fig.type,res=300)
+        par(mai=c(.5,.5,.125,.125),mgp=c(1.3,.4,0),xaxs="i")
+        leg <- NULL
+        xmax <- 3
+        x <- seq(0,xmax,.05)
+        plot(1,type="l",main=NA,col=NA,lty=1,
+             xlab="ratio: query length/target length",xlim=c(0,xmax),
+             ylab="cum.dist.func.",ylim=c(0,1.05))
+        abline(v=c(ovlth,2-ovlth),lty=2)
+        abline(h=c(minf,.8),lty=2)
+        abline(h=0:1, lty=2, col="gray",lwd=.75)
+        for ( i in 1:length(CDF) ) {
+            if ( length(CDF[[i]])<2 ) next
+            col <- tcols[CDF[[i]]$name] # todo: tid
+            if ( !is.null(CDF[[i]]$rcdf) ) {
+                lines(x,CDF[[i]]$rcdf(x),col=i,lty=1,lwd=2)
+                leg <- c(leg, CDF[[i]]$name) # todo: tid
+            }
+        }
+        #mtext(paste(testid,"recovery by segments"),3,0,cex=1.5)
+        if ( !is.null(leg) ) {
+            leg <- gsub("D:dft1-7.dcash.snr_T:raw_K:12_S:icor_","",leg)
+            legend("bottomright",leg,col=1:length(CDF),cex=.7,lty=1,lwd=2,
+                   bty="o",bg="#FFFFFF",box.col=NA)
+        }
+        legend("topleft",paste("query:",type),seg.len=0,
+              bg="#FFFFFFFF",y.intersp=0.1, x.intersp=0)
+        dev.off()
+    }
+
+    
     file.name <- file.path(out.path,testid,"segtypes",
                            paste(type,"_ratioTotal_rng",fname,sep=""))
     plotdev(file.name,width=2+.2*length(CDF),height=6,type=fig.type)
