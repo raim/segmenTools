@@ -575,7 +575,7 @@ for ( test.type in test.types ) {
 
         ccols <- sgcols
         ccols["consensus"] <- "#000000"
-        ccols[names(ccols)!="consensus"] <- c(2:5)
+        ccols[names(ccols)!="consensus"] <- c(2:6)
         clwd <- rep(1, length(sgcols))
         names(clwd) <- names(sgcols)
         clwd["consensus"] <- 2
