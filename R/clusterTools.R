@@ -1961,7 +1961,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
         }
         if ( "rng"%in%type ) ## polygon
             polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                    col=pol.col[cl],border=NA)
+                    col=pol.col[cl],border=cls.col[cl])
         if ( "all"%in%type ) {
             idx <- cls==cl
             if ( use.lty )
@@ -2103,7 +2103,7 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
         }
         if ( polygon ) ## polygon
           polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                  col=pol.col[cl],border=NA)
+                  col=pol.col[cl],border=cls.col[cl])
         lines(time, avg$avg[cl,], col=avg.col[cl], lwd=3) ## average last
     }
     ## reset plot pars
