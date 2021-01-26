@@ -9,7 +9,8 @@
   cls.srt,
   cls.col,
   each = FALSE,
-  polygon = TRUE,
+  ranges = TRUE,
+  border = 0,
   xlab,
   time,
   ylab = "average",
@@ -32,8 +33,10 @@ can be used for selecting a subset of clusters}
 averages on one panel (\code{FALSE}) or each cluster on a separate panel
 (\code{TRUE})}
 
-\item{polygon}{logical indicating whether to plot the ranges `high' and
+\item{ranges}{logical indicating whether to plot the ranges `high' and
 `low' in the cluster average object \code{avg}}
+
+\item{border}{line width of border line at data ranges}
 
 \item{xlab}{x-axis label}
 

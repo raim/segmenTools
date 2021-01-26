@@ -10,6 +10,7 @@ plotClusters(
   k,
   each = TRUE,
   type = "rng",
+  border = 0,
   time,
   time.at,
   avg = "median",
@@ -66,6 +67,8 @@ averages on one panel (\code{FALSE}) or each cluster on a separate panel
 \item{type}{string specifying the type of plot: "rng" for plotting
 only data ranges (see argument \code{q}) or "all" to plot
 each individual time-course (as thin lines)}
+
+\item{border}{line width of border line at data ranges}
 
 \item{time}{optional numeric vector specifiying x-axis time coordinates}
 

@@ -1707,6 +1707,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param type string specifying the type of plot: "rng" for plotting
 #' only data ranges (see argument \code{q}) or "all" to plot
 #' each individual time-course (as thin lines)
+#' @param border line width of border line at data ranges 
 #' @param each logical value indicating whether to plot all cluster
 #' averages on one panel (\code{FALSE}) or each cluster on a separate panel
 #' (\code{TRUE})
@@ -1777,7 +1778,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 ## make function `timeseriesPlot' or `clusterPlot', that takes
 ## either tset/cset or matrix/vector
 #' @export
-plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
+plotClusters <- function(x, cls, k, each=TRUE, type="rng", border=0,
+                         time, time.at,
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
                          axes=TRUE, xlab, xlim,
@@ -1959,9 +1961,14 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
                 axis(1, at=time.at);axis(2)
             }
         }
-        if ( "rng"%in%type ) ## polygon
+        if ( "rng"%in%type ) {## polygon
             polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                    col=pol.col[cl],border=cls.col[cl])
+                    col=pol.col[cl],border=NA)
+            if ( border>0 ) {
+                lines(time, avg$low[cl,], col=cls.col[cl], lwd=border)
+                lines(time, avg$high[cl,], col=cls.col[cl], lwd=border)
+            }
+        }
         if ( "all"%in%type ) {
             idx <- cls==cl
             if ( use.lty )
@@ -2027,8 +2034,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
 #' @param each logical value indicating whether to plot all cluster
 #' averages on one panel (\code{FALSE}) or each cluster on a separate panel
 #' (\code{TRUE})
-#' @param polygon logical indicating whether to plot the ranges `high' and
+#' @param ranges logical indicating whether to plot the ranges `high' and
 #' `low' in the cluster average object \code{avg}
+#' @param border line width of border line at data ranges 
 #' @param xlab x-axis label
 #' @param time optional time-points of the x-axis
 #' @param ylab y-axis label
@@ -2040,10 +2048,13 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", time, time.at,
 #' @param ... arguments to plot
 #' @export
 plot.clusteraverages <- function(x, cls.srt, cls.col,
-                                each=FALSE, polygon=TRUE,
+                                each=FALSE, ranges=TRUE, border=0,
                                 xlab, time, 
                                 ylab="average", ylim=ifelse(each,"avg","rng"),
                                 ylim.scale=.1,...) {
+
+    ##TODO: this should replace plotClusters?
+    
     avg <- x
     ## x-axis
     if ( missing(time) ) {
@@ -2101,9 +2112,14 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
                  ylab=paste(ylab,cl,sep=" - "),ylim=ylim, ...)
             axis(1);axis(2)
         }
-        if ( polygon ) ## polygon
-          polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                  col=pol.col[cl],border=cls.col[cl])
+        if ( ranges ) { 
+            polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
+                    col=pol.col[cl],border=NA)
+            if ( border>0 ) {
+                lines(time, avg$low[cl,], col=cls.col[cl], lwd=border)
+                lines(time, avg$high[cl,], col=cls.col[cl], lwd=border)
+            }
+        }
         lines(time, avg$avg[cl,], col=avg.col[cl], lwd=3) ## average last
     }
     ## reset plot pars
