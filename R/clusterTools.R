@@ -2155,6 +2155,48 @@ image_cls <- function(cls, col, dir="h", ...) {
 
 ### UTILS
 
+## from lib TeachingDemos; used in plotFeatures
+#' plot borders around text based on text colors
+#' @param x x-coordinates of text labels
+#' @param y y-coordinates of text labels
+#' @param labels vector of text labels
+#' @param col vector of text foreground colors
+#' @param bg vector of text background colors
+#' @param auto.bg auto-select background color black or white based
+#' on a brightness color model
+#' @param bg.thresh brightness threshold to switch from black to white
+#' background color
+#' @param r ratio of stringwidth and stringheight to use for background color
+#' @param ... further arguments to \code{\link{text}} in both foreground
+#' and background calls
+#'@export
+shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
+                       auto.bg=TRUE, bg.thresh=.75, r=0.05, ... ) {
+
+    if ( auto.bg ) {
+        bgn <- rep(bg, length(col))
+        for ( i in 1:length(col) ) {
+            crgb <- col2rgb(col[i])/255
+            L <- 0.2126 * crgb[1,1] + 0.7152 * crgb[2,1] + 0.0722 * crgb[3,1]
+            bgn[i] <- ifelse(L>bg.thresh, "#000000", "#FFFFFF")
+        }
+        bg <- bgn
+    }
+  
+  xy <- xy.coords(x,y)
+  xo <- r*strwidth('A')
+  yo <- r*strheight('A')
+  
+
+    theta <- seq(pi/4, 2*pi, length.out=8)
+    for (i in theta) {
+        text( xy$x + cos(i)*xo, xy$y + sin(i)*yo, labels, col=bg, ... )
+  }
+  text(xy$x, xy$y, labels, col=col, ... )
+}
+
+
+
 #' replace alpha values of an RGB string color vector
 #'
 #' adds (or replaces existing) alpha values (from 0 to 1) to
