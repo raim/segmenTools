@@ -220,13 +220,33 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
 
     ## set up p-value and colors
     pval <- x$p.value
-    pval[pval<=p.min] <- p.min
-    pval <- -log2(pval) # TODO: argument for log-type!
-    if ( !missing(col) )
-        n <- length(col)
-    else
-        col <- grDevices::gray(seq(1,0,length.out=n))
-    breaks <- seq(0,-log2(p.min),length.out=n+1)
+
+    ## "negative" p-values indicate two directions, eg. from t-tests
+    if ( any(pval<0) ) {
+        
+        sgn <- sign(pval[abs(pval)<=p.min])
+        sgn[sgn==0] <- 1
+        pval[abs(pval)<=p.min] <- p.min * sgn
+        pval <- -log2(abs(pval))*sign(pval)
+        
+        if ( !missing(col) ) 
+            n <- length(col)
+        else {
+                col <- grDevices::gray(seq(1,0,length.out=n/2))
+                col <- c(rev(col),col)
+        }
+        breaks <- seq(log2(p.min),-log2(p.min),length.out=n+1)
+    } else { # NO NEGATIVE P-VALS
+
+        pval[pval<=p.min] <- p.min
+        pval <- -log2(pval) # TODO: argument for log-type!
+        if ( !missing(col) )
+            n <- length(col)
+        else
+            col <- grDevices::gray(seq(1,0,length.out=n))
+        breaks <- seq(0,-log2(p.min),length.out=n+1)
+    }
+    
     ## set up text (overlap numbers) and text colors
     type <- "" # TODO, add info to input results on the name of the statistics
     for ( i in 1:length(values) ) {
@@ -328,7 +348,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     if ( axis==1 )
         ovl <- lapply(ovl, t)
 
-    pvl <- ovl$p.value
+    pvl <- abs(ovl$p.value)
     cls.srt <- colnames(pvl)
     sig.srt <- NULL
     ## first, get highly signficant
