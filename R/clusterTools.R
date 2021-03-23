@@ -340,9 +340,10 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
 #' @param ovl a `clusterOverlaps' object returned by
 #' \code{\link{clusterCluster}}
 #' @param p.min significance cutoff during sorting
+#' @param cut remove all overlaps without any \code{p<p.min}
 #' @param axis axis to sort (2 for y-axis/rows, 1 for x-axis/columns)
 #' @export
-sortOverlaps <- function(ovl, p.min=.05, axis=2) {
+sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE) {
 
     ## transpose all, if sorting of x-axis (1) is requested
     if ( axis==1 )
@@ -360,7 +361,8 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     rest.srt <- which(!(1:nrow(pvl)) %in% sig.srt)
     rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),
                                decreasing=FALSE)]
-    new.srt <- c(sig.srt[!duplicated(sig.srt)], rest.srt)
+    new.srt <- sig.srt[!duplicated(sig.srt)]
+    if ( !cut ) new.srt <- c(new.srt, rest.srt)
 
     ## remember row split between sig and non-sig
     nsig <- sum(!duplicated(sig.srt))
@@ -377,6 +379,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2) {
     ## transpose back
     if ( axis==1 )
         ovl <- lapply(ovl, t)
+
 
     ## add number of sorted sig
     ovl$nsig <- nsig
@@ -1967,7 +1970,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", border=0,
                         col=ref.col,border=NA)
                 if ( axes ) {
                     axis(4,at=round(range(ref.xy[,2])),las=2,
-                     col=ref.col, col.ticks=ref.col)
+                         col=ref.col, col.ticks=ref.col)
                     mtext(ref.ylab, 4, .35, col=ref.col, col.axis=ref.col)
                 }
                 par(new=TRUE)

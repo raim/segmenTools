@@ -51,6 +51,21 @@ fft_window <- function(x, win, Tmax, Tmin, res=1) {
     list(time=Tcenter, period=Tosc, DC=dc, DFT=dft)
 }
 
+#' convert phase (degree) to polar coordinates
+#' @param phase phase in degree
+#' @param amplitude amplitude
+#' @param unit "degree" or "rad"
+#' @seealso \code{\link{complex2degree}}
+#' @export
+degree2complex <- function(phase, amplitude=1, unit="degree"){
+    ## to radian
+    if ( unit==degree )
+        phase <- phase*pi/180
+    xy.coords(x=amplitude*cos(phase),
+              y=amplitude*sin(phase))
+}
+
+
 #' convert complex numbers to degrees
 #'
 #' convert complex number representation of polar coordinates

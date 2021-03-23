@@ -4,7 +4,7 @@
 \alias{sortOverlaps}
 \title{sorts cluster overlap structure by p-values}
 \usage{
-sortOverlaps(ovl, p.min = 0.05, axis = 2)
+sortOverlaps(ovl, p.min = 0.05, axis = 2, cut = FALSE)
 }
 \arguments{
 \item{ovl}{a `clusterOverlaps' object returned by
@@ -13,6 +13,8 @@ sortOverlaps(ovl, p.min = 0.05, axis = 2)
 \item{p.min}{significance cutoff during sorting}
 
 \item{axis}{axis to sort (2 for y-axis/rows, 1 for x-axis/columns)}
+
+\item{cut}{remove all overlaps without any \code{p<p.min}}
 }
 \description{
 Sorts one dimension of a cluster overlap structure
