@@ -18,7 +18,7 @@ the start of the first segment is also used as end.}
 \description{
 randomizes the locations of input segments, while maintaining
 the length distributions, optionally different distributions
-of different segment classes. Coordinates have been converted to a
+of different segment classes. Coordinates must be converted to a
 continuous index over all chromosomes with \code{\link{coor2index}}.
 Note, that this ignores chromosome borders!
 TODO: allow to pass chromosome length index chrS to account
