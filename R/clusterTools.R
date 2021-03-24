@@ -10,12 +10,72 @@
 
 ### COMPARE CLUSTERINGS 
 
+#' calculate t-value profiles of clusterings
+#'
+#' Calculate t-tests for each cluster in a clustering against the
+#' total distributions. The resulting tables can be plotted with
+#' \code{\link{plotOverlaps}} and sorted along one axis by signficance
+#' with \code{\link{plotOverlapss}}.
+#' @param x matrix of numeric values where columns are different data
+#'     sets and rows must correspond to the clustering in argument
+#'     \code{cls}
+#' @param cls a clustering of the rows in argument \code{x}
+#' @param test test function to be applied, default is
+#'     \code{\link[stats]{t.test}}. This can be any function that
+#'     takes the cluster subset of \code{x[cls=<cl>,]} as first and
+#'     the total distribution \code{x} as second argument, and returns
+#'     an object with items \code{statistic} and
+#'     \code{p.value}. Negative values in
+#'     \code{statistic} will be differently colored in
+#'     \code{\link{plotOverlapss}} and the sign copied to
+#'     \code{p.value}.
+## TODO: instead of passing function, pass a type and handle numbers
+## betterer, eg. normalized U-statistic for wilcox - OR handle this
+## in plotOverlaps by statistic type!
+#' @export
+clusterProfile <- function(x, cls, test=stats::t.test) {
+
+    if ( class(cls)!="factor")
+        cls <- factor(cls, levels=unique(cls))
+
+    # t-test statistic matrix
+    tt <- matrix(0, ncol=ncol(x), nrow=length(levels(cls))) 
+    colnames(tt) <- colnames(x)
+    rownames(tt) <- levels(cls)
+    
+    tp <- tt
+    tp[] <- 1 # p-value matrix
+
+    for ( i in 1:ncol(x) ) {
+        for ( cl in levels(cls) ){
+            y <- x[which(cls==cl),i]
+            ttmp <- test(y, x[,i])
+            tt[cl,i] <- ttmp$statistic
+            ## set p-values negative for two-sided plot!
+            sgn <- sign(ttmp$statistic)
+            sgn[sgn==0] <- 1
+            tp[cl,i] <- ttmp$p.value * sgn
+        }
+    }
+    ## construct overlap object
+    ova <- list()
+    ova$p.value <- tp
+    ova$statistic <- tt
+
+    ova$num.query <- as.matrix(table(cls)[levels(cls)])
+    ova$num.target <- t(as.matrix(apply(x,2,function(x) sum(!is.na(x)))))
+#t(as.matrix(table(cl2)[cl2.srt]))
+    ova
+}
+
 
 #' calculates overlaps between two clusterings
 #' 
-#' calculates mutual overlaps between two clusterings of the same data set
+#' Calculates mutual overlaps between two clusterings of the same data set
 #' using hypergeometric distribution statistics for significantly
-#' enriched or deprived mutual overlaps;
+#' enriched or deprived mutual overlaps. The resulting tables can
+#' be plotted with \code{\link{plotOverlaps}} and sorted along one
+#' axis by signficance with \code{\link{plotOverlapss}}.
 #' TODO: specify wich cl will be rows/columns and to which
 #' percent refers to
 #' @param cl1 clustering 1; a vector of cluster associations or an
@@ -79,9 +139,10 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   f2 <- levels(as.factor(cl2))
     ## TODO: remember if any was not sorted;
     ## and sort those by sortClusters at the end; sort smaller first
-  if ( !missing(cl1.srt) ) f1 <-  cl1.srt
-  if ( !missing(cl2.srt) ) f2 <-  cl2.srt
-
+    if ( !missing(cl1.srt) ) f1 <-  cl1.srt
+    else cl1.srt <- as.character(f1)
+    if ( !missing(cl2.srt) ) f2 <-  cl2.srt
+    else cl2.srt <- as.character(f2)
       
 
   ## result matrices
@@ -145,7 +206,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
       for ( pcol in 1:ncol(prich) )
         p.value[prow,pcol] <- min(prich[prow,pcol],ppoor[prow,pcol])
 
-  result <- append(result, list(p.value=p.value))
+    result <- append(result, list(p.value=p.value))
     result$alternative <- alternative
     result$varnames=c(vn1,vn2)
 
@@ -153,15 +214,19 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
     ## TODO: add total numbers as result$num.query/total
     ## TODO: align with nomenclature in segmentJaccard and plotOverlaps
     
-  class(result) <- "clusterOverlaps"
+    result$num.target <- t(as.matrix(table(cl2)[cl2.srt]))
+    result$num.query <- as.matrix(table(cl1)[cl1.srt])
+
+    class(result) <- "clusterOverlaps"
   return(result)
 }
 
 #' plot cluster-cluster or segment-segment overlaps
 #'
 #' Plots the significance distribution of cluster-cluster or segment-segment
-#' overlap statistics provided by \code{\link{clusterCluster}} or
-#' \code{\link{segmentJaccard}}, where the a white-black gradient is
+#' overlap statistics provided by \code{\link{clusterCluster}},
+#' \code{\link{clusterProfile}} or \code{\link{segmentJaccard}}, where
+#' a color gradient is
 #' calculated from \code{-log(p)}, and the text shows the overlap numbers,
 #' e.g., the number of overlapping features for \code{\link{clusterCluster}},
 #' or the Jaccard index or relative intersect values for
@@ -213,7 +278,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
-                         values=c("overlap","jaccard","intersect.target"),
+                         values=c("overlap","statistic",
+                                  "jaccard","intersect.target"),
                          txt.col = c("black","white"), rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, show.total=FALSE, ...) {
@@ -232,8 +298,9 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         if ( !missing(col) ) 
             n <- length(col)
         else {
-                col <- grDevices::gray(seq(1,0,length.out=n/2))
-                col <- c(rev(col),col)
+                docols <- colorRampPalette(c("#FFFFFF","#FF0000"))(n/2)
+                upcols <- colorRampPalette(c("#FFFFFF","#0000FF"))(n/2)
+                col <- c(rev(docols), upcols)
         }
         breaks <- seq(log2(p.min),-log2(p.min),length.out=n+1)
     } else { # NO NEGATIVE P-VALS
@@ -266,11 +333,11 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         
         ## cat(paste("text values:", type, "\n"))
         
-        ## TODO: handle jaccard vs. hypergeo better
+        ## TODO: handle jaccard vs. hypergeo vs. t-test vs. wilcox.test better
         ## and align scale/round/short options
         
         ## shorten large overlap numbers?
-        if ( type!="overlap" )
+        if ( !type%in%c("overlap","statistic") )
             short <- FALSE
         
         ## parse and process text values
@@ -346,8 +413,10 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
 sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE) {
 
     ## transpose all, if sorting of x-axis (1) is requested
-    if ( axis==1 )
-        ovl <- lapply(ovl, t)
+    if ( axis==1 ) # ovl <- lapply(ovl, t)
+        for ( i in 1:length(ovl) )
+            if ( class(ovl[[i]])=="matrix" ) 
+                ovl[[i]] <- t(ovl[[i]]) 
 
     pvl <- abs(ovl$p.value)
     cls.srt <- colnames(pvl)
@@ -373,7 +442,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE) {
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
       if ( class(ovl[[i]])=="matrix" ) ## check if matrix is of same dim
-        if ( nrow(ovl[[i]])==n & ncol(ovl[[i]])==m )
+        if ( nrow(ovl[[i]])==n ) #& ncol(ovl[[i]])==m )
           ovl[[i]] <- ovl[[i]][new.srt,]
 
     ## transpose back

@@ -10,7 +10,7 @@ plotOverlaps(
   p.txt = p.min * 5,
   n = 100,
   col,
-  values = c("overlap", "jaccard", "intersect.target"),
+  values = c("overlap", "statistic", "jaccard", "intersect.target"),
   txt.col = c("black", "white"),
   rmz = TRUE,
   short = TRUE,
@@ -72,8 +72,9 @@ on top and right axes}
 }
 \description{
 Plots the significance distribution of cluster-cluster or segment-segment
-overlap statistics provided by \code{\link{clusterCluster}} or
-\code{\link{segmentJaccard}}, where the a white-black gradient is
+overlap statistics provided by \code{\link{clusterCluster}},
+\code{\link{clusterProfile}} or \code{\link{segmentJaccard}}, where
+a color gradient is
 calculated from \code{-log(p)}, and the text shows the overlap numbers,
 e.g., the number of overlapping features for \code{\link{clusterCluster}},
 or the Jaccard index or relative intersect values for

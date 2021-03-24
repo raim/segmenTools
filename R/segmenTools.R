@@ -6,7 +6,7 @@
 #'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout grconvertX grconvertY
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors dev.size
-#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit
+#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit t.test
 ##@bibliography /home/raim/ref/tata.bib
 ##@importFrom segmenTier clusterCor_c 
 NULL # this just ends the global package documentation
