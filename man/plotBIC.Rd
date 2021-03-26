@@ -4,7 +4,7 @@
 \alias{plotBIC}
 \title{plot BIC from flowclusterTimeseries}
 \usage{
-plotBIC(cls, norm = FALSE, ...)
+plotBIC(cls, norm = FALSE, legend = "right", ...)
 }
 \arguments{
 \item{cls}{"clustering" object from function}
@@ -12,6 +12,8 @@ plotBIC(cls, norm = FALSE, ...)
 \item{norm}{logical, indicating whether the plotted BIC/ICL values
 should be normalized by number of (clustered, \code{cluster!="0"})
 data points}
+
+\item{legend}{position of the legend in the plot}
 
 \item{...}{arguments to plot
 \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}}

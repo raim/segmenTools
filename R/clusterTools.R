@@ -1638,10 +1638,11 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 #' @param norm logical, indicating whether the plotted BIC/ICL values
 #' should be normalized by number of (clustered, \code{cluster!="0"})
 #' data points
+#' @param legend position of the legend in the plot
 #' @param ... arguments to plot
 #' \code{\link[segmenTier:flowclusterTimeseries]{flowclusterTimeseries}}
 #' @export
-plotBIC <- function(cls, norm=FALSE, ...) {
+plotBIC <- function(cls, norm=FALSE, legend="right", ...) {
     
     ## BIC/ICL
     bic <- cls$bic
@@ -1695,7 +1696,8 @@ plotBIC <- function(cls, norm=FALSE, ...) {
         points(max.cli, max.icl,lty=2,pch=4,cex=1,col=4)
     }
     points(sel, sel.bic, col=2, pch=19, cex=1.5)
-    legend("right",legend=leg,pch=lpch,lty=llty,col=lcol,pt.cex=lcex)
+    legend(legend,legend=leg,pch=lpch,lty=llty,col=lcol,pt.cex=lcex,
+           bg="#FFFFFF77")
     if ( !is.null(cls$merged.K) ) {
         arrows(x0=mrg.orig,y0=mrg.bic, x1=mrg.cl,y1=mrg.bic)
         abline(v=c(mrg.orig,mrg.cl),lty=2)
