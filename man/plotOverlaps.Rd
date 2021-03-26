@@ -27,7 +27,8 @@ plotOverlaps(
 \code{\link{clusterCluster}}}
 
 \item{p.min}{significance cutoff, p-values equal or smaller to
-this cutoff will appear black; TODO: plot legend}
+this cutoff will appear black (one-sided tests) or red/blue
+(two-sided tests)}
 
 \item{p.txt}{p-value cutoff for showing overlap numbers as white instead
 of black text}
@@ -35,7 +36,8 @@ of black text}
 \item{n}{number of color shades between \code{p=1} (white)
 and \code{p >= p.min} (black)}
 
-\item{col}{color ramp, default are grey values, length of
+\item{col}{color ramp, default are grey values (one-sided) or
+red (above) and blue (below) for two-sided tests, length of
 this vector overrules parameter \code{n}}
 
 \item{values}{selection of text (numeric values) to plot, depends

@@ -59,7 +59,7 @@ fft_window <- function(x, win, Tmax, Tmin, res=1) {
 #' @export
 degree2complex <- function(phase, amplitude=1, unit="degree"){
     ## to radian
-    if ( unit==degree )
+    if ( unit=="degree" )
         phase <- phase*pi/180
     xy.coords(x=amplitude*cos(phase),
               y=amplitude*sin(phase))

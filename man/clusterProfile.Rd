@@ -20,12 +20,12 @@ the total distribution \code{x} as second argument, and returns
 an object with items \code{statistic} and
 \code{p.value}. Negative values in
 \code{statistic} will be differently colored in
-\code{\link{plotOverlapss}} and the sign copied to
+\code{\link{plotOverlaps}} and the sign copied to
 \code{p.value}.}
 }
 \description{
 Calculate t-tests for each cluster in a clustering against the
 total distributions. The resulting tables can be plotted with
 \code{\link{plotOverlaps}} and sorted along one axis by signficance
-with \code{\link{plotOverlapss}}.
+with \code{\link{plotOverlaps}}.
 }

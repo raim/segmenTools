@@ -36,7 +36,7 @@ Calculates mutual overlaps between two clusterings of the same data set
 using hypergeometric distribution statistics for significantly
 enriched or deprived mutual overlaps. The resulting tables can
 be plotted with \code{\link{plotOverlaps}} and sorted along one
-axis by signficance with \code{\link{plotOverlapss}}.
+axis by signficance with \code{\link{plotOverlaps}}.
 TODO: specify wich cl will be rows/columns and to which
 percent refers to
 }

@@ -15,7 +15,7 @@
 #' Calculate t-tests for each cluster in a clustering against the
 #' total distributions. The resulting tables can be plotted with
 #' \code{\link{plotOverlaps}} and sorted along one axis by signficance
-#' with \code{\link{plotOverlapss}}.
+#' with \code{\link{plotOverlaps}}.
 #' @param x matrix of numeric values where columns are different data
 #'     sets and rows must correspond to the clustering in argument
 #'     \code{cls}
@@ -27,7 +27,7 @@
 #'     an object with items \code{statistic} and
 #'     \code{p.value}. Negative values in
 #'     \code{statistic} will be differently colored in
-#'     \code{\link{plotOverlapss}} and the sign copied to
+#'     \code{\link{plotOverlaps}} and the sign copied to
 #'     \code{p.value}.
 ## TODO: instead of passing function, pass a type and handle numbers
 ## betterer, eg. normalized U-statistic for wilcox - OR handle this
@@ -75,7 +75,7 @@ clusterProfile <- function(x, cls, test=stats::t.test) {
 #' using hypergeometric distribution statistics for significantly
 #' enriched or deprived mutual overlaps. The resulting tables can
 #' be plotted with \code{\link{plotOverlaps}} and sorted along one
-#' axis by signficance with \code{\link{plotOverlapss}}.
+#' axis by signficance with \code{\link{plotOverlaps}}.
 #' TODO: specify wich cl will be rows/columns and to which
 #' percent refers to
 #' @param cl1 clustering 1; a vector of cluster associations or an
@@ -221,6 +221,64 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   return(result)
 }
 
+#' plot a legend for \code{\link{plotOverlaps}} plots
+#' @param p.min significance cutoff, p-values equal or smaller to
+#' this cutoff will appear black (one-sided tests) or red/blue
+#' (two-sided tests) 
+#' @param p.txt p-value cutoff for showing overlap numbers as white instead
+#' of black text
+#' @param type 1-sided or 2-sided tests
+#' @param dir horizontal (1) or vertical (2) orientation
+#' @param labels add axis labels
+#' @param side plot side to draw label, use NA to supress
+#' @param l number of fields to show in plot
+#' @param n number of color shades between \code{p=1} (white)
+#' and \code{p >= p.min} (black)
+#' @param col color ramp, default are grey values (one-sided) or
+#' red (above) and blue (below) for two-sided tests, length of
+#' this vector overrules parameter \code{n}
+#' @export
+plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1,
+                               l=5, n=100, col, dir=1, labels=TRUE) {
+
+    leg <- list()
+    pn <- -log10(p.min)
+    leg$p.value <- t(t(10^-seq(pn,0,length.out=l)))
+    leg$overlap <- t(t(-seq(pn,0,length.out=l)))
+    rownames(leg$overlap) <- rownames(leg$p.value) <- leg$overlap
+
+    ## "negative" p-values indicate two directions, eg. from t-tests
+    if ( type==2 ) { # 2-sided
+
+        leg$p.value <- cbind(leg$p.value, -leg$p.value)
+        leg$overlap <- cbind(leg$overlap, leg$overlap)
+
+        if ( missing(col) ) {
+            docols <- colorRampPalette(c("#FFFFFF","#FF0000"))(n/2)
+            upcols <- colorRampPalette(c("#FFFFFF","#0000FF"))(n/2)
+            col <- c(rev(docols), upcols)
+        }
+     } else { # 1-sided
+        if ( missing(col) )
+            col <- grDevices::gray(seq(1,0,length.out=n))
+     }
+
+    if ( dir==2 )  
+        leg <- lapply(leg, t)
+
+    plotOverlaps(leg, p.min=p.min, p.txt=p.txt, round=0,#values="",
+                 col=col, 
+                 ylab=NA, axis1.las=1, axis=NULL,xlab=NA,rmz=FALSE)
+    box()
+    if ( labels ) {
+        side <- ifelse(dir==2, 1, 2)
+        mtext(expression(log[10](p)), side, par("mgp")[1])
+        if ( type==2 )
+            axis(dir, at=1:2, labels=c("higher","lower"))
+    }
+    x<-leg # silent return of used overlap object
+}
+
 #' plot cluster-cluster or segment-segment overlaps
 #'
 #' Plots the significance distribution of cluster-cluster or segment-segment
@@ -244,12 +302,14 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param x a `clusterOverlaps' object returned by
 #' \code{\link{clusterCluster}}
 #' @param p.min significance cutoff, p-values equal or smaller to
-#' this cutoff will appear black; TODO: plot legend
+#' this cutoff will appear black (one-sided tests) or red/blue
+#' (two-sided tests) 
 #' @param p.txt p-value cutoff for showing overlap numbers as white instead
 #' of black text
 #' @param n number of color shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
-#' @param col color ramp, default are grey values, length of
+#' @param col color ramp, default are grey values (one-sided) or
+#' red (above) and blue (below) for two-sided tests, length of
 #' this vector overrules parameter \code{n}
 #' @param values selection of text (numeric values) to plot, depends
 #' on available data in \code{x}, see "Description"
@@ -353,7 +413,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         if ( rmz) txt[txt=="0"] <- ""
         tcol <- txt
         tcol[] <- txt.col[1]
-        tcol[pval >= -log2(p.txt)] <- txt.col[2]
+        tcol[abs(pval) >= -log2(p.txt)] <- txt.col[2]
         ## cut text (high overlap numbers)
         if ( short ) {
             txt <- x[[type]]
