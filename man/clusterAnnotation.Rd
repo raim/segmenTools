@@ -2,7 +2,7 @@
 % Please edit documentation in R/clusterTools.R
 \name{clusterAnnotation}
 \alias{clusterAnnotation}
-\title{clustering enrichment scan}
+\title{Cluster annotation enrichment scan}
 \usage{
 clusterAnnotation(
   cls,
@@ -36,9 +36,12 @@ all enrichments with category "FALSE" (indicating deprivement)}
 \description{
 Scans for overlap enrichments of a clustering in a matrix of
 clusterings, potentially simply a TRUE/FALSE table, eg. indicating
-annotation with a specific Gene Ontology or other term. It reports
+annotation with a specific Gene Ontology or other term. This input
+table can be generated eg. with \code{\link{parseAnnotation}} or
+\code{\link{parseAnnotationList}}. The function reports
 tables of all overlap sizes and their enrichment p-values. The
 function is a wrapper around \code{\link{clusterCluster}}, which
 performs cumulative hypergeometric distribution tests between
-two clusterings.
+two clusterings. The result object can be used with
+\code{\link{sortOverlaps}} and \code{\link{plotOverlaps}}.
 }

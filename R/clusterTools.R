@@ -516,10 +516,34 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE) {
     ovl
 }
 
-#' parse an annotation file (a bidirectional map)
+#' Parse a matrix of ID/annotation mappings
 #' 
-#' parses a bidirectional map of feature IDs vs. annotation terms, e.g.
-#' the GO annotation file at \url{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz}
+#' Parses a 2D ID/annotation mapping where annotations are a list of
+#' terms with a separator. The function returns a TRUE/FALSE table that
+#' can be used as input to \code{\link{clusterAnnotation}}.
+#' @param got a 2D matrix with IDs in the first column and a list of
+#'     annotation terms in the second
+#' @param sep separator used for the list of terms in the second
+#'     column
+#' @export
+parseAnnotationList <- function(got, sep=";") {
+
+    terms <- unique(unlist(strsplit(got[,2],sep)))
+    terms <- terms[!is.na(terms)]
+    mat <- matrix(FALSE, nrow=nrow(got), ncol=length(terms))
+    rownames(mat) <- got[,1]
+    colnames(mat) <- terms
+    
+    for ( term in terms )
+        mat[grep(term,got[,2]),term] <- TRUE
+    mat
+}
+
+#' Parse an annotation file (a bidirectional map)
+#' 
+#' Parses a bidirectional map of feature IDs vs. annotation terms, e.g.
+#' the GO annotation file at \url{ftp://ftp.arabidopsis.org/home/tair/Ontologies/Gene_Ontology/ATH_GO_GOSLIM.txt.gz} and returns a TRUE/FALSE table that
+#' can be used as input to \code{\link{clusterAnnotation}}.
 #' @param got input table, e.g. a GO annotation 
 #' @param idcol column where feature IDs can be found 
 #' @param keycol column where annotation terms are found 
@@ -562,15 +586,18 @@ parseAnnotation <- function(got, idcol=1, keycol=6, termcol, rm.empty=TRUE) {
 }
 
 
-#' clustering enrichment scan
+#' Cluster annotation enrichment scan
 #' 
 #' Scans for overlap enrichments of a clustering in a matrix of
 #' clusterings, potentially simply a TRUE/FALSE table, eg. indicating
-#' annotation with a specific Gene Ontology or other term. It reports
+#' annotation with a specific Gene Ontology or other term. This input
+#' table can be generated eg. with \code{\link{parseAnnotation}} or
+#' \code{\link{parseAnnotationList}}. The function reports
 #' tables of all overlap sizes and their enrichment p-values. The
 #' function is a wrapper around \code{\link{clusterCluster}}, which
 #' performs cumulative hypergeometric distribution tests between
-#' two clusterings.
+#' two clusterings. The result object can be used with
+#' \code{\link{sortOverlaps}} and \code{\link{plotOverlaps}}.
 ## TODO : re-activate and align usage with contStatTable for continuous data
 ## TODO 2017: move away from T/F table, use simple ;-sep string of
 ## annotation terms instead;
@@ -796,12 +823,25 @@ clusterAnnotation <- function(cls, data, p=1,
     ## remove filtered (usually bin.filter==FALSE for a T/F table input)
     if ( !missing(bin.filter) ) 
         pvalues <- pvalues[grep(rm.pat, rownames(pvalues), invert=TRUE),]
+
+
     ## remove all where p-value is below threshold
     rm.pvl <- apply(pvalues,1,function(x) !any(x<=p))
     pvalues <- pvalues[!rm.pvl,]
     overlap <- overlap[rownames(pvalues),]
-    
-    return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap))
+
+    ## replace terms by description
+    if ( !is.null(terms) ) {
+        rownames(pvalues) <- terms[rownames(pvalues)]
+        rownames(overlap) <- terms[rownames(overlap)]
+    }
+
+    ## add total counts
+    num.query <- as.matrix(table(cls)[cls.srt])
+    num.target <- t(as.matrix(apply(got,2,function(x) sum(x))))
+
+    return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap),
+           num.query=num.query, num.target=num.target)
            
 }
 
