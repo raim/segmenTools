@@ -840,8 +840,8 @@ clusterAnnotation <- function(cls, data, p=1,
     num.query <- as.matrix(table(cls)[cls.srt])
     num.target <- t(as.matrix(apply(got,2,function(x) sum(x))))
 
-    return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap),
-           num.query=num.query, num.target=num.target)
+    return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap,
+                num.query=num.query, num.target=num.target))
            
 }
 
