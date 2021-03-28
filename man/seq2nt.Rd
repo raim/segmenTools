@@ -24,8 +24,8 @@ seq2nt(
 
 \item{abc}{sequence letters for which averages are calculated}
 
-\item{skew}{calculate skew for letters 1 and 2 in argument \code{abc}
-(e.g. \code{abc=c("G","C"), skew=(G-C)/(G+C)})}
+\item{skew}{calculate skew for letters 1 and 2 in argument \code{skew}
+(e.g. \code{skew=c("G","C"), skew=(G-C)/(G+C)})}
 
 \item{cum}{set TRUE to calculate cumulative skew after Grigoriev 1998 NAR}
 

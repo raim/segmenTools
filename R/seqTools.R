@@ -55,13 +55,14 @@ range2nt <- function(seq, ranges, coors=c(chr="chr",start="start",end="end") ) {
 #' @param window width of the moving window
 #' @param step step size
 #' @param abc sequence letters for which averages are calculated
-#' @param skew calculate skew for letters 1 and 2 in argument \code{abc}
-#' (e.g. \code{abc=c("G","C"), skew=(G-C)/(G+C)})
+#' @param skew calculate skew for letters 1 and 2 in argument \code{skew}
+#' (e.g. \code{skew=c("G","C"), skew=(G-C)/(G+C)})
 #' @param cum set TRUE to calculate cumulative skew after Grigoriev 1998 NAR
 #' @param circular treat sequence as circular
 #' @param verb print progress messages
 #'@export
-seq2nt <- function(seq, window=100, step=1, abc, skew="", cum=FALSE, circular=FALSE, verb=FALSE) {
+seq2nt <- function(seq, window=100, step=1, abc, skew="",
+                   cum=FALSE, circular=FALSE, verb=FALSE) {
 
   ntprofiles <- NULL
   for ( i in 1:length(seq) ) {
@@ -113,7 +114,7 @@ seq2nt <- function(seq, window=100, step=1, abc, skew="", cum=FALSE, circular=FA
         pos[j] <- bin[floor(length(bin)/2)]
       }
       if ( skew != "" ) {
-        ## calculate skew (.e.g. (G-C)/(G+c)
+        ## calculate skew (.e.g. (G-C)/(G+C)
         nt1 <- sum(ntl[bin,abc[1]])
         nt2 <- sum(ntl[bin,abc[2]])
         nt[j,] <- (nt1 - nt2)/(nt1 + nt2)

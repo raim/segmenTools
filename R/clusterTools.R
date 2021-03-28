@@ -830,15 +830,17 @@ clusterAnnotation <- function(cls, data, p=1,
     pvalues <- pvalues[!rm.pvl,]
     overlap <- overlap[rownames(pvalues),]
 
+    ## add total counts
+    num.target <- t(as.matrix(table(cls)[cls.srt]))
+    num.query <- as.matrix(apply(data,2,function(x) sum(x)))
+
     ## replace terms by description
     if ( !is.null(terms) ) {
         rownames(pvalues) <- terms[rownames(pvalues)]
         rownames(overlap) <- terms[rownames(overlap)]
+        rownames(num.query) <- terms[rownames(num.query)]
     }
 
-    ## add total counts
-    num.query <- as.matrix(table(cls)[cls.srt])
-    num.target <- t(as.matrix(apply(got,2,function(x) sum(x))))
 
     return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap,
                 num.query=num.query, num.target=num.target))
