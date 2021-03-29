@@ -505,7 +505,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE) {
     for ( i in 1:length(ovl) )
       if ( class(ovl[[i]])=="matrix" ) ## check if matrix is of same dim
         if ( nrow(ovl[[i]])==n ) #& ncol(ovl[[i]])==m )
-          ovl[[i]] <- ovl[[i]][new.srt,]
+          ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
 
     ## transpose back
     if ( axis==1 )
