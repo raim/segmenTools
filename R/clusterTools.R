@@ -350,7 +350,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     pval <- x$p.value
 
     ## "negative" p-values indicate two directions, eg. from t-tests
-    if ( any(pval<0) | side==2 ) {
+    if ( any(pval<0) | type==2 ) {
         
         sgn <- sign(pval[abs(pval)<=p.min])
         sgn[sgn==0] <- 1
