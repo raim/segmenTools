@@ -11,6 +11,7 @@ plotOverlaps(
   n = 100,
   col,
   values = c("overlap", "statistic", "jaccard", "intersect.target"),
+  type = 1,
   txt.col = c("black", "white"),
   rmz = TRUE,
   short = TRUE,
@@ -42,6 +43,9 @@ this vector overrules parameter \code{n}}
 
 \item{values}{selection of text (numeric values) to plot, depends
 on available data in \code{x}, see "Description"}
+
+\item{type}{1 for one-sided or 2 for two-sided tests color scheme,
+negative values of two-sided tests are reflected in negative p-values}
 
 \item{txt.col}{two colors used for the plot text, ie., the
 overlap counts; the second is used if `p<p.txt` as a discrete

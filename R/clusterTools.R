@@ -313,6 +313,8 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1,
 #' this vector overrules parameter \code{n}
 #' @param values selection of text (numeric values) to plot, depends
 #' on available data in \code{x}, see "Description"
+#' @param type 1 for one-sided or 2 for two-sided tests color scheme,
+#' negative values of two-sided tests are reflected in negative p-values
 #' @param txt.col two colors used for the plot text, ie., the
 #' overlap counts; the second is used if `p<p.txt` as a discrete
 #' signficance cutoff
@@ -340,7 +342,7 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1,
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
                          values=c("overlap","statistic",
                                   "jaccard","intersect.target"),
-                         txt.col = c("black","white"), rmz=TRUE,
+                         type=1, txt.col = c("black","white"), rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, show.total=FALSE, ...) {
 
@@ -348,7 +350,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     pval <- x$p.value
 
     ## "negative" p-values indicate two directions, eg. from t-tests
-    if ( any(pval<0) ) {
+    if ( any(pval<0) | side==2 ) {
         
         sgn <- sign(pval[abs(pval)<=p.min])
         sgn[sgn==0] <- 1
