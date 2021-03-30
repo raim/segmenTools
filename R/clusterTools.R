@@ -29,11 +29,12 @@
 #'     \code{statistic} will be differently colored in
 #'     \code{\link{plotOverlaps}} and the sign copied to
 #'     \code{p.value}.
+#' @param min.obs minimal number of non-NA observations
 ## TODO: instead of passing function, pass a type and handle numbers
 ## betterer, eg. normalized U-statistic for wilcox - OR handle this
 ## in plotOverlaps by statistic type!
 #' @export
-clusterProfile <- function(x, cls, test=stats::t.test) {
+clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5) {
 
     if ( class(cls)!="factor")
         cls <- factor(cls, levels=unique(cls))
@@ -49,6 +50,7 @@ clusterProfile <- function(x, cls, test=stats::t.test) {
     for ( i in 1:ncol(x) ) {
         for ( cl in levels(cls) ){
             y <- x[which(cls==cl),i]
+            if ( sum(!is.na(y))<min.obs ) next
             ttmp <- test(y, x[,i])
             tt[cl,i] <- ttmp$statistic
             ## set p-values negative for two-sided plot!
@@ -93,7 +95,7 @@ clusterProfile <- function(x, cls, test=stats::t.test) {
 clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                            alternative=c("greater")) {
 
-   # read and return cluster variable name names
+   # read and return cluster variable names
    # can be important for plot Overlaps
    vn1=deparse(substitute(cl1))
    vn2=deparse(substitute(cl2))	 	
@@ -103,12 +105,18 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
         if ( missing(cl1.srt) )
             cl1.srt <- cl1$sorting[[K]]
         cl1 <- cl1$clusters[,K]
+    } else if ( class(cl1)=="factor" ) {
+        if ( missing(cl1.srt) ) cl1.srt <- levels(cl1)
+        cl1 <- as.character(cl1)
     }
     if ( class(cl2)=="clustering" ) {
         K <- selected(cl2)
         if ( missing(cl2.srt) )
             cl2.srt <- cl2$sorting[[K]]
         cl2 <- cl2$clusters[,K]
+    } else if ( class(cl2)=="factor" ) {
+        if ( missing(cl2.srt) ) cl2.srt <- levels(cl2)
+        cl2 <- as.character(cl2)
     }
    
   ## check cluster length

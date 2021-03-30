@@ -4,7 +4,7 @@
 \alias{clusterProfile}
 \title{calculate t-value profiles of clusterings}
 \usage{
-clusterProfile(x, cls, test = stats::t.test)
+clusterProfile(x, cls, test = stats::t.test, min.obs = 5)
 }
 \arguments{
 \item{x}{matrix of numeric values where columns are different data
@@ -22,6 +22,8 @@ an object with items \code{statistic} and
 \code{statistic} will be differently colored in
 \code{\link{plotOverlaps}} and the sign copied to
 \code{p.value}.}
+
+\item{min.obs}{minimal number of non-NA observations}
 }
 \description{
 Calculate t-tests for each cluster in a clustering against the
