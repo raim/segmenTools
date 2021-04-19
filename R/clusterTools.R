@@ -236,8 +236,11 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param p.txt p-value cutoff for showing overlap numbers as white instead
 #' of black text
 #' @param type 1-sided or 2-sided tests
+#' @param round round parameter for numeric text
 #' @param dir horizontal (1) or vertical (2) orientation
 #' @param labels add axis labels
+#' @param show.text show log10(p) as text fields (to indicated text p-value
+#' cutoff)
 #' @param side plot side to draw label, use NA to supress
 #' @param l number of fields to show in plot
 #' @param n number of color shades between \code{p=1} (white)
@@ -245,14 +248,22 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param col color ramp, default are grey values (one-sided) or
 #' red (above) and blue (below) for two-sided tests, length of
 #' this vector overrules parameter \code{n}
+#' @param ... further arguments to \code{\link{plotOverlaps}} 
 #' @export
-plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1,
-                               l=5, n=100, col, dir=1, labels=TRUE) {
+plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
+                               show.text=TRUE,
+                               l=5, n=100, col, dir=1, labels=TRUE, ...) {
 
     leg <- list()
     pn <- -log10(p.min)
     leg$p.value <- t(t(10^-seq(pn,0,length.out=l)))
+    ## use p.values as legend text
     leg$overlap <- t(t(-seq(pn,0,length.out=l)))
+    rmz <- FALSE
+    if ( !show.text ) { # dirty hack to supress text, TODO: clean up!
+        leg$overlap[] <- 0
+        rmz <- TRUE
+    }
     rownames(leg$overlap) <- rownames(leg$p.value) <- leg$overlap
 
     ## "negative" p-values indicate two directions, eg. from t-tests
@@ -274,9 +285,9 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1,
     if ( dir==2 )  
         leg <- lapply(leg, t)
 
-    plotOverlaps(leg, p.min=p.min, p.txt=p.txt, round=0,#values="",
-                 col=col, 
-                 ylab=NA, axis1.las=1, axis=NULL,xlab=NA,rmz=FALSE)
+    plotOverlaps(leg, p.min=p.min, p.txt=p.txt, round=round,#values="",
+                 col=col, rmz=rmz,
+                 ylab=NA, axis1.las=1, axis=NULL,xlab=NA,...)
     box()
     if ( labels ) {
         side <- ifelse(dir==2, 1, 2)
@@ -432,7 +443,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
             if ( rmz) txt[txt=="0"] <- ""
             txt[hg]  <- paste(txt[hg],"k",sep="")
         }
-        
+
         ## TODO: allow the following, but "main" needs to be
         ## removed from ... !?
         ##args <- list(...)
@@ -908,6 +919,7 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
         text(x=rep(1:ncol(z),nrow(z)), y=rep(nrow(z):1,each=ncol(z)),
              paste(t(text)),col=t(text.col),cex=text.cex)
     }
+
     
     ## add axes
     ## TODO : handle axes=FALSE

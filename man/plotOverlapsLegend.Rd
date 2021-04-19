@@ -8,11 +8,14 @@ plotOverlapsLegend(
   p.min = 1e-10,
   p.txt = 1e-05,
   type = 1,
+  round = 0,
+  show.text = TRUE,
   l = 5,
   n = 100,
   col,
   dir = 1,
-  labels = TRUE
+  labels = TRUE,
+  ...
 )
 }
 \arguments{
@@ -24,6 +27,11 @@ this cutoff will appear black (one-sided tests) or red/blue
 of black text}
 
 \item{type}{1-sided or 2-sided tests}
+
+\item{round}{round parameter for numeric text}
+
+\item{show.text}{show log10(p) as text fields (to indicated text p-value
+cutoff)}
 
 \item{l}{number of fields to show in plot}
 
@@ -37,6 +45,8 @@ this vector overrules parameter \code{n}}
 \item{dir}{horizontal (1) or vertical (2) orientation}
 
 \item{labels}{add axis labels}
+
+\item{...}{further arguments to \code{\link{plotOverlaps}}}
 
 \item{side}{plot side to draw label, use NA to supress}
 }
