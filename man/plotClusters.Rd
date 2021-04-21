@@ -10,6 +10,7 @@ plotClusters(
   k,
   each = TRUE,
   type = "rng",
+  fill = TRUE,
   border = 0,
   time,
   time.at,
@@ -67,6 +68,8 @@ averages on one panel (\code{FALSE}) or each cluster on a separate panel
 \item{type}{string specifying the type of plot: "rng" for plotting
 only data ranges (see argument \code{q}) or "all" to plot
 each individual time-course (as thin lines)}
+
+\item{fill}{fill data ranges with transparent version of cluster color}
 
 \item{border}{line width of border line at data ranges}
 

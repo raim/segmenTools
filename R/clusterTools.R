@@ -1925,6 +1925,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param type string specifying the type of plot: "rng" for plotting
 #' only data ranges (see argument \code{q}) or "all" to plot
 #' each individual time-course (as thin lines)
+#' @param fill fill data ranges with transparent version of cluster color
 #' @param border line width of border line at data ranges 
 #' @param each logical value indicating whether to plot all cluster
 #' averages on one panel (\code{FALSE}) or each cluster on a separate panel
@@ -1996,7 +1997,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 ## make function `timeseriesPlot' or `clusterPlot', that takes
 ## either tset/cset or matrix/vector
 #' @export
-plotClusters <- function(x, cls, k, each=TRUE, type="rng", border=0,
+plotClusters <- function(x, cls, k, each=TRUE, type="rng",
+                         fill=TRUE, border=0,
                          time, time.at,
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
@@ -2180,8 +2182,9 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng", border=0,
             }
         }
         if ( "rng"%in%type ) {## polygon
+            pcol <- ifelse(fill, pol.col[cl], NA)
             polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                    col=pol.col[cl],border=NA)
+                    col=pcol,border=NA)
             if ( border>0 ) {
                 lines(time, avg$low[cl,], col=cls.col[cl], lwd=border)
                 lines(time, avg$high[cl,], col=cls.col[cl], lwd=border)
