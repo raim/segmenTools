@@ -13,6 +13,7 @@
 #' @param reverse revert to sequence
 #'@export
 revcomp <- function(sq, type="DNA", na="N", reverse=TRUE) {
+    ## TODO: instead use base R chartr function
   if ( type=="DNA" ) bp <- c(A="T",T="A",C="G",G="C")
   else if ( type=="RNA" ) bp <- c(A="U",U="A",C="G",G="C")
   sq <- unlist(strsplit(sq,""))

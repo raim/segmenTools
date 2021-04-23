@@ -241,7 +241,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param labels add axis labels
 #' @param show.text show log10(p) as text fields (to indicated text p-value
 #' cutoff)
-#' @param side plot side to draw label, use NA to supress
+## @param side plot side to draw label, use NA to supress
 #' @param l number of fields to show in plot
 #' @param n number of color shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
