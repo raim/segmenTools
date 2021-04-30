@@ -47,8 +47,6 @@ this vector overrules parameter \code{n}}
 \item{labels}{add axis labels}
 
 \item{...}{further arguments to \code{\link{plotOverlaps}}}
-
-\item{side}{plot side to draw label, use NA to supress}
 }
 \description{
 plot a legend for \code{\link{plotOverlaps}} plots
