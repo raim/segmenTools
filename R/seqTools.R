@@ -151,3 +151,8 @@ findAACodon <- function(start, aa, strand) {
       pos <- (start+1) - offset
     pos
 }
+
+
+## TODO:
+## di/tri-nucleotide parameter profile
+## position weight matrix 
