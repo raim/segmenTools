@@ -241,7 +241,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param labels add axis labels
 #' @param show.text show log10(p) as text fields (to indicated text p-value
 #' cutoff)
-#' @param side plot side to draw label, use NA to supress
+## @param side plot side to draw label, use NA to supress
 #' @param l number of fields to show in plot
 #' @param n number of color shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
@@ -631,13 +631,16 @@ parseAnnotation <- function(got, idcol=1, keycol=6, termcol, rm.empty=TRUE) {
 #' of genes. Data rows must correspond to clustering in argument \code{cls}
 #' @param p p-value threshold reporting overlaps
 #' @param terms optional map of annotation key to descriptions
+#' @param replace.terms replace annotation terms by the descriptions
+#' in argument \code{terms}
 #' @param bin.filter string, indicating bins (categories in \code{data})
 #' to be globally omitted; useful eg. for logical data to omit
 #' all enrichments with category "FALSE" (indicating deprivement)
 #' @param verbose print progress messages
 #' @export
 clusterAnnotation <- function(cls, data, p=1,
-                              cls.srt, terms=NULL, bin.filter, verbose=TRUE) {
+                              cls.srt, terms=NULL, replace.terms=FALSE,
+                              bin.filter, verbose=TRUE) {
 
     ## sorted list of clusters!
     if ( missing(cls.srt) ) {
@@ -856,7 +859,7 @@ clusterAnnotation <- function(cls, data, p=1,
     num.query <- as.matrix(apply(data,2,function(x) sum(x)))
 
     ## replace terms by description
-    if ( !is.null(terms) ) {
+    if ( !is.null(terms) & replace.terms ) {
         rownames(pvalues) <- terms[rownames(pvalues)]
         rownames(overlap) <- terms[rownames(overlap)]
         rownames(num.query) <- terms[rownames(num.query)]

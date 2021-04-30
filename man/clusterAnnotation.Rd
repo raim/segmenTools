@@ -10,6 +10,7 @@ clusterAnnotation(
   p = 1,
   cls.srt,
   terms = NULL,
+  replace.terms = FALSE,
   bin.filter,
   verbose = TRUE
 )
@@ -26,6 +27,9 @@ of genes. Data rows must correspond to clustering in argument \code{cls}}
 allows also to analyze only a subset of clusters in argument \code{cls}}
 
 \item{terms}{optional map of annotation key to descriptions}
+
+\item{replace.terms}{replace annotation terms by the descriptions
+in argument \code{terms}}
 
 \item{bin.filter}{string, indicating bins (categories in \code{data})
 to be globally omitted; useful eg. for logical data to omit
