@@ -30,11 +30,13 @@
 #'     \code{\link{plotOverlaps}} and the sign copied to
 #'     \code{p.value}.
 #' @param min.obs minimal number of non-NA observations
+#' @param replace test with replacement, i.e., each cluster is tested
+#' against the whole data set, including the cluster items
 ## TODO: instead of passing function, pass a type and handle numbers
 ## betterer, eg. normalized U-statistic for wilcox - OR handle this
 ## in plotOverlaps by statistic type!
 #' @export
-clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5) {
+clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE) {
 
     if ( class(cls)!="factor")
         cls <- factor(cls, levels=unique(cls))
@@ -50,8 +52,12 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5) {
     for ( i in 1:ncol(x) ) {
         for ( cl in levels(cls) ){
             y <- x[which(cls==cl),i]
+            if ( !replace )
+                X <- x[which(cls!=cl),i]
+            else X <- x[,i]
+
             if ( sum(!is.na(y))<min.obs ) next
-            ttmp <- test(y, x[,i])
+            ttmp <- test(y, X)
             tt[cl,i] <- ttmp$statistic
             ## set p-values negative for two-sided plot!
             sgn <- sign(ttmp$statistic)
