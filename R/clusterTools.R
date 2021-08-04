@@ -299,7 +299,7 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
         side <- ifelse(dir==2, 1, 2)
         mtext(expression(log[10](p)), side, par("mgp")[1])
         if ( type==2 )
-            axis(dir, at=1:2, labels=c("higher","lower"))
+            axis(dir, at=1:2, labels=c("lower","higher"))
     }
     x<-leg # silent return of used overlap object
 }
