@@ -4,7 +4,7 @@
 \alias{clusterProfile}
 \title{calculate t-value profiles of clusterings}
 \usage{
-clusterProfile(x, cls, test = stats::t.test, min.obs = 5)
+clusterProfile(x, cls, test = stats::t.test, min.obs = 5, replace = FALSE)
 }
 \arguments{
 \item{x}{matrix of numeric values where columns are different data
@@ -24,6 +24,9 @@ an object with items \code{statistic} and
 \code{p.value}.}
 
 \item{min.obs}{minimal number of non-NA observations}
+
+\item{replace}{test with replacement, i.e., each cluster is tested
+against the whole data set, including the cluster items}
 }
 \description{
 Calculate t-tests for each cluster in a clustering against the
