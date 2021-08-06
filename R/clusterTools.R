@@ -296,10 +296,18 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
                  ylab=NA, axis1.las=1, axis=NULL,xlab=NA,...)
     box()
     if ( labels ) {
+        if ( dir==2 ) {
+            side <- 1
+            at <- 1:2
+        } else {
+            side <- 2
+            at <- 2:1
+        }
         side <- ifelse(dir==2, 1, 2)
+        
         mtext(expression(log[10](p)), side, par("mgp")[1])
         if ( type==2 )
-            axis(dir, at=1:2, labels=c("lower","higher"))
+            axis(dir, at=at, labels=c("lower","higher"))
     }
     x<-leg # silent return of used overlap object
 }
@@ -876,6 +884,36 @@ clusterAnnotation <- function(cls, data, p=1,
                 num.query=num.query, num.target=num.target))
            
 }
+
+#' analyze internal overlaps in a TRUE/FALSE feature annotation table,
+#' where rows are features (eg. genes) and columns are annotation
+#' terms. Columns must be named with the annotation terms/IDs.
+#' @param x a logical (TRUE/FALSE) feature annotation table
+#' @export
+annotationOverlap <- function(x) {
+
+    if ( typeof(x)!="logical" )
+        stop("input must be a logical (TRUE/FALSE) table")
+
+    cids <- colnames(x)
+    cnt <- matrix(0,nrow=length(cids), ncol=length(cids))
+    num.query <- num.target <- rep(0, length(cids))
+    colnames(cnt) <- rownames(cnt) <- cids
+    pvl <- cnt; pvl[] <- 1
+    for ( i in 1:length(cids) )
+        for ( j in i:length(cids) ) {
+            tmp <- clusterCluster(x[,i], x[,j],
+                                  cl1.srt=c("TRUE"), cl2.srt="TRUE",
+                                  alternative=c("greater"))
+            cnt[i,j] <- cnt[j,i] <-tmp$overlap[1,1]
+        pvl[i,j] <- pvl[j,i] <-tmp$p.value[1,1]
+        }
+    num.query <- num.target <- apply(x,2,sum)
+    ovl <- list(overlap=cnt, p.value=pvl,
+                num.query=num.query, num.target=num.target)
+    ovl
+}
+
 
 ### PLOT cluster-cluster overlaps
 #' wrapper for \code{\link[graphics]{image}} plotting a data matrix
