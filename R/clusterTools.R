@@ -902,6 +902,8 @@ annotationOverlap <- function(x) {
     pvl <- cnt; pvl[] <- 1
     for ( i in 1:length(cids) )
         for ( j in i:length(cids) ) {
+            ## TODO: call hypergeo directly here instead of re-routing
+            ## via clusterCluster (check if this would be more efficient)
             tmp <- clusterCluster(x[,i], x[,j],
                                   cl1.srt=c("TRUE"), cl2.srt="TRUE",
                                   alternative=c("greater"))
