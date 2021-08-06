@@ -11,7 +11,9 @@ clusterProfile(x, cls, test = stats::t.test, min.obs = 5, replace = FALSE)
 sets and rows must correspond to the clustering in argument
 \code{cls}}
 
-\item{cls}{a clustering of the rows in argument \code{x}}
+\item{cls}{a clustering of the rows in argument \code{x} or
+a logical TRUE/FALSE table (matrix) with cluster labels as column names
+and rows corresponding to the rows in argument \code{x}}
 
 \item{test}{test function to be applied, default is
 \code{\link[stats]{t.test}}. This can be any function that

@@ -19,7 +19,9 @@
 #' @param x matrix of numeric values where columns are different data
 #'     sets and rows must correspond to the clustering in argument
 #'     \code{cls}
-#' @param cls a clustering of the rows in argument \code{x}
+#' @param cls a clustering of the rows in argument \code{x} or
+#' a logical TRUE/FALSE table (matrix) with cluster labels as column names
+#' and rows corresponding to the rows in argument \code{x}
 #' @param test test function to be applied, default is
 #'     \code{\link[stats]{t.test}}. This can be any function that
 #'     takes the cluster subset of \code{x[cls=<cl>,]} as first and
@@ -38,24 +40,38 @@
 #' @export
 clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE) {
 
-    if ( class(cls)!="factor")
+    if ( !"matrix"%in%class(cls) & class(cls)!="factor")
         cls <- factor(cls, levels=unique(cls))
+    logic <- FALSE
+    if ( "factor"%in%class(cls) )
+        cls.srt <- levels(cls)
+    else if ( "matrix"%in%class(cls) ) {
+        cls.srt <- colnames(cls)
+        logic <- TRUE
+    }
 
     # t-test statistic matrix
-    tt <- matrix(0, ncol=ncol(x), nrow=length(levels(cls))) 
+    tt <- matrix(0, ncol=ncol(x), nrow=length(cls.srt)) 
     colnames(tt) <- colnames(x)
-    rownames(tt) <- levels(cls)
+    rownames(tt) <- cls.srt #levels(cls)
     
     tp <- tt
     tp[] <- 1 # p-value matrix
 
     for ( i in 1:ncol(x) ) {
-        for ( cl in levels(cls) ){
-            y <- x[which(cls==cl),i]
-            if ( !replace )
-                X <- x[which(cls!=cl),i]
-            else X <- x[,i]
+        for ( cl in cls.srt ) {
 
+            if ( logic ) { # logic table
+                y <- x[cls[,cl],i]
+                if ( replace )
+                    X <- x[,i]
+                else X <- x[!cls[,cl],i] 
+            } else { # clustering/factors
+                y <- x[which(cls==cl),i]
+                if ( replace )
+                    X <- x[,i]
+                else X <- x[which(cls!=cl),i]
+            }
             if ( sum(!is.na(y))<min.obs ) next
             ttmp <- test(y, X)
             tt[cl,i] <- ttmp$statistic
@@ -70,9 +86,13 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
     ova$p.value <- tp
     ova$statistic <- tt
 
-    ova$num.query <- as.matrix(table(cls)[levels(cls)])
+    ## counts
     ova$num.target <- t(as.matrix(apply(x,2,function(x) sum(!is.na(x)))))
-#t(as.matrix(table(cl2)[cl2.srt]))
+    if ( logic )
+        ova$num.query <- apply(cls,2,sum)
+    else 
+        ova$num.query <- as.matrix(table(cls)[levels(cls)])
+
     ova
 }
 
