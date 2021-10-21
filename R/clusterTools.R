@@ -1784,10 +1784,6 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
 #' @export
 clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
-    ## get requested functions
-    if ( mode(avg)!="function" )
-        avg <- get(avg, mode="function")
-    
     if ( missing(cls.srt) )
       cls.srt <- sort(unique(cls))
     ## ensure present
@@ -1795,17 +1791,32 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
     ## ensure use of rownames
     cls.srt <- as.character(cls.srt)
-    
+
+    ## set up result matrices
     clavg <- matrix(NA, ncol=ncol(ts), nrow=length(cls.srt))
     rownames(clavg) <- cls.srt
     cllow <- clhig <- clavg
 
+    ## get requested upper/lower range function
     if ( is.numeric(q) ) {
         if ( q<0.5 | q>1 )
-            stop("only q within 0.5 and 1 are allowed")
+            stop("only q within 0.5 and 1 are allowed; tip: if data is normally distributed you can use 'var', 'sd' or 'stderr' but and combine with avg='mean'.")
+        ## q is the fraction of shown values, (1-q)/2 are the calculated
+        ## quantiles
         qf <- (1-q)/2
-    } else qf <- get(q, mode="function")
+    } else {
+        if ( q%in%c("sd","var","stderr") & avg!="mean" ) {
+            avg <- "mean"
+            warning("average avg='mean' enforced, since sd, var and stderr subtraction only make sense for mean.")
+        }
+        qf <- get(q, mode="function")
+    }
 
+    ## get requested average functions
+    if ( mode(avg)!="function" )
+        avg <- get(avg, mode="function")
+    
+    
     ## rm Inf, eg.
     ts[is.infinite(ts)] <- NA
     
