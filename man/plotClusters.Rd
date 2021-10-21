@@ -48,55 +48,65 @@ plotClusters(
 )
 }
 \arguments{
-\item{x}{either a simple data matrix with time points (x-axis) in columns,
-or a processed time-series as provided by
+\item{x}{either a simple data matrix with time points (x-axis) in
+columns, or a processed time-series as provided by
 \code{\link[segmenTier:processTimeseries]{processTimeseries}}}
 
-\item{cls}{eiter a vector (\code{length(cls)==nrow(x)}) or a structure of
-class 'clustering' as returned by segmenTier's
+\item{cls}{eiter a vector (\code{length(cls)==nrow(x)}) or a
+structure of class 'clustering' as returned by segmenTier's
 \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 
-\item{k}{integer or string specifiying the clustering (k:
-cluster numbers) to be used if cls is of class 'clustering';
-if missing (default) the `selected' clustering from \code{cls} is chosen
+\item{k}{integer or string specifiying the clustering (k: cluster
+numbers) to be used if cls is of class 'clustering'; if missing
+(default) the `selected' clustering from \code{cls} is chosen
 (see \code{\link{selected}}).}
 
 \item{each}{logical value indicating whether to plot all cluster
-averages on one panel (\code{FALSE}) or each cluster on a separate panel
-(\code{TRUE})}
+averages on one panel (\code{FALSE}) or each cluster on a
+separate panel (\code{TRUE})}
 
 \item{type}{string specifying the type of plot: "rng" for plotting
-only data ranges (see argument \code{q}) or "all" to plot
-each individual time-course (as thin lines)}
+only data ranges (see argument \code{q}) or "all" to plot each
+individual time-course (as thin lines)}
 
-\item{fill}{fill data ranges with transparent version of cluster color}
+\item{fill}{fill data ranges with transparent version of cluster
+color}
 
 \item{border}{line width of border line at data ranges}
 
-\item{time}{optional numeric vector specifiying x-axis time coordinates}
+\item{time}{optional numeric vector specifiying x-axis time
+coordinates}
 
-\item{time.at}{argument \code{at} for the x-axis (\code{axis(1, at=time.at)})}
+\item{time.at}{argument \code{at} for the x-axis (\code{axis(1,
+at=time.at)})}
 
-\item{avg}{a function (or the name of a function as a string)
-for calculating an `average' value for each cluster; default is
-the \code{median}}
+\item{avg}{a function (or the name of a function as a string) for
+calculating an `average' value for each cluster; default is the
+\code{median}}
 
-\item{q}{the fraction of data to be shown in the ranges plots: either
-numeric 0-1, or a function name for calculating variance (eg. "sd", "var").
-Note that this parameter can also influence \code{ylim}, the limits
-of the y axis}
+\item{q}{either numeric 0.5-1, or a string. If numeric it indicates
+the fraction of data shown as transparent ranges,
+e.g. \code{q=0.9} indicates that 90% of data are within the
+ranges, i.e. the 5% and 95% quantiles are the lower and upper
+borders, and for q=0.5 the ranges correspond to the box limits
+in a boxplot. If q is a string it must be a function name for
+calculating variance (eg. "sd", "var"), which will be added and
+subtracted from the average (argument \code{avg}) for high and
+low data cut-offs.  Note that this parameter can also influence
+\code{ylim}, the limits of the y axis.}
 
-\item{norm}{normalization of the time-series data, must be a function
-that transforms the data, available via \link{segmenTools} are
-\code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations}
+\item{norm}{normalization of the time-series data, must be a
+function that transforms the data, available via
+\link{segmenTools} are \code{lg2r}, \code{ash}, \code{log_1},
+\code{meanzero} normalizations}
 
-\item{cls.col}{optional named cluster color vector, where names indicate
-the clusters (as.caracter(cls)); if cls is of class 'clustering' it
-is taken from there}
+\item{cls.col}{optional named cluster color vector, where names
+indicate the clusters (as.caracter(cls)); if cls is of class
+'clustering' it is taken from there}
 
-\item{cls.srt}{optional cluster sorting, can be used for selection of
-subsets of clusters; if cls is of class 'clustering' it is taken
-from there}
+\item{cls.srt}{optional cluster sorting, can be used for selection
+of subsets of clusters; if cls is of class 'clustering' it is
+taken from there}
 
 \item{axes}{add axes (bottom and left)}
 
@@ -108,14 +118,15 @@ from there}
 
 \item{ylim}{either conventional range of the y-axis, or a string
 specifying whether ylim should be calculated from the average
-(\code{ylim="avg"}), for all data (\code{ylim="all"}), or from the
-lower/upper ranges (\code{ylim="rng"}); in the latter case the y-axis
-depends on argument \code{q}}
+(\code{ylim="avg"}), for all data (\code{ylim="all"}), or from
+the lower/upper ranges (\code{ylim="rng"}); in the latter case
+the y-axis depends on argument \code{q}}
 
-\item{ylim.scale}{if \code{ylim=="avg"}, the calculated ylim will be
-extended by this fraction of the total range on both sides}
+\item{ylim.scale}{if \code{ylim=="avg"}, the calculated ylim will
+be extended by this fraction of the total range on both sides}
 
-\item{avg.col}{color for average line; used only if \code{type="all"}}
+\item{avg.col}{color for average line; used only if
+\code{type="all"}}
 
 \item{avg.lty}{line type for average plots}
 
@@ -125,30 +136,34 @@ extended by this fraction of the total range on both sides}
 
 \item{avg.pch}{point symbol for average plots}
 
-\item{lwd}{line width for indidiual time series plots (if \code{type=="all"})}
+\item{lwd}{line width for indidiual time series plots (if
+\code{type=="all"})}
 
-\item{use.lty}{use individual line types (if \code{type=="all"}); this
-is only useful for very small clusters and is mainly used
+\item{use.lty}{use individual line types (if \code{type=="all"});
+this is only useful for very small clusters and is mainly used
 in the \code{\link{plotSingles}} wrapper}
 
 \item{alpha}{set alpha value of range or individual time series
 colors (color opaqueness)}
 
-\item{embed}{logical, if TRUE and argument \code{each=TRUE} (one plot for
-each cluster), the automatic is suppressed allowing to embed multiple
-plots (for each cluster) into external \code{\link[graphics:layout]{layout}}
-or \code{par(mfcol/mfrow)} setups}
+\item{embed}{logical, if TRUE and argument \code{each=TRUE} (one
+plot for each cluster), the automatic is suppressed allowing to
+embed multiple plots (for each cluster) into external
+\code{\link[graphics:layout]{layout}} or
+\code{par(mfcol/mfrow)} setups}
 
-\item{plot.legend}{add a legend, useful for very small clusters and mainly
-used in the \code{\link{plotSingles}} wrapper}
+\item{plot.legend}{add a legend, useful for very small clusters and
+mainly used in the \code{\link{plotSingles}} wrapper}
 
 \item{leg.xy}{position of the legend, see
 \code{\link[graphics:legend]{legend}}}
 
-\item{leg.ids}{a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}}
+\item{leg.ids}{a named vector providing alternative IDs for
+legends; the names should correspond to the rownames of
+clusterings in \code{cls}}
 
-\item{vline}{x coordinates for vertical lines, useful e.g. to
-mark replicates}
+\item{vline}{x coordinates for vertical lines, useful e.g. to mark
+replicates}
 
 \item{vl_col}{color for vertical line (default to cluster colour)}
 
@@ -157,20 +172,26 @@ mark replicates}
 \item{vl_lty}{vertical line type}
 
 \item{ref.xy}{reference data (either x or xy coordinates, see
-\code{\link[grDevices:xy.coords]{xy.coords}}) for reference data to be
-plotted in the background, e.g. light/dark phases or dissolved oxygen traces}
+\code{\link[grDevices:xy.coords]{xy.coords}}) for reference
+data to be plotted in the background, e.g. light/dark phases or
+dissolved oxygen traces}
 
 \item{ref.col}{color for reference data plot}
 
 \item{ref.ylab}{y-axis label (right y-axis) for reference data}
 
 \item{...}{further arguments to the basic setup call to
-\code{\link[graphics:plot]{plot}}}
+\code{\link[graphics:plot]{plot}} ## TODO: clean up mess
+between plot.clustering, plot.clusteraverages and this ##
+plot.clusteraverages should become a function of
+plot.clustering, ## and clusterAverages can be a private
+function!  ## make function `timeseriesPlot' or `clusterPlot',
+that takes ## either tset/cset or matrix/vector}
 }
 \description{
 plots average time series of clusters as calculated by
-\code{\link{clusterAverages}}, including 
-variations around the average as transparent areas, or all individual data.
-The function is quite flexible and allows to normalize the data and
-set automatic y-limit selections.
+\code{\link{clusterAverages}}, including variations around the
+average as transparent areas, or all individual data.  The function
+is quite flexible and allows to normalize the data and set
+automatic y-limit selections.
 }

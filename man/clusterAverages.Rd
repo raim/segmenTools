@@ -9,24 +9,31 @@ clusterAverages(ts, cls, cls.srt, avg = "median", q = 0.9, rm.inf = TRUE)
 \arguments{
 \item{ts}{a matrix of time series, with time points in columns}
 
-\item{cls}{a clustering of the time series, \code{length(cls)}
-must equal \code{nrow(cls)}}
+\item{cls}{a clustering of the time series, \code{length(cls)} must
+equal \code{nrow(cls)}}
 
 \item{cls.srt}{optional sorting of the clusters}
 
-\item{avg}{a function (or the name of a function as a string)
-for calculating an `average' value for each cluster; default is
-the \code{median}}
+\item{avg}{a function (or the name of a function as a string) for
+calculating an `average' value for each cluster; default is the
+\code{median} ## @param dev a function for calculating
+deviation from the the average, ## default is the standard
+deviation (‘sd’)}
 
-\item{q}{either numeric 0-1, the fraction of data for which high
-and low data cut-offs are calculated, or a function name for
+\item{q}{either numeric 0.5-1, or a string. If numeric it indicates
+the fraction of data shown as transparent ranges,
+e.g. \code{q=0.9} indicates that 90% of data are within the
+ranges, i.e. the 5% and 95% quantiles are the lower and upper
+borders, and for q=0.5 the ranges correspond to the box limits
+in a boxplot. If q is a string it must be a function name for
 calculating variance (eg. "sd", "var"), which will be added and
-subtracted from the average (argument \code{avg}) for high
-and low data cut-offs}
+subtracted from the average (argument \code{avg}) for high and
+low data cut-offs.}
 
-\item{rm.inf}{remove infinite values (e.g. from log transformations)}
+\item{rm.inf}{remove infinite values (e.g. from log
+transformations)}
 }
 \description{
-calculates average values and distributions for each cluster
-and time point of a time series
+calculates average values and distributions for each cluster and
+time point of a time series
 }

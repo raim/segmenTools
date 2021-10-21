@@ -1759,23 +1759,28 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
 
 #' calculates cluster averages
 #' 
-#' calculates average values and distributions for each cluster
-#' and time point of a time series
+#' calculates average values and distributions for each cluster and
+#' time point of a time series
 #' @param ts a matrix of time series, with time points in columns
-#' @param cls a clustering of the time series, \code{length(cls)}
-#' must equal \code{nrow(cls)}
+#' @param cls a clustering of the time series, \code{length(cls)} must
+#'     equal \code{nrow(cls)}
 #' @param cls.srt optional sorting of the clusters
-#' @param avg a function (or the name of a function as a string)
-#' for calculating an `average' value for each cluster; default is
-#' the \code{median}
-## @param dev a function for calculating deviation from the the average,
-## default is the standard deviation (‘sd’)
-#' @param q either numeric 0-1, the fraction of data for which high
-#' and low data cut-offs are calculated, or a function name for
-#' calculating variance (eg. "sd", "var"), which will be added and
-#' subtracted from the average (argument \code{avg}) for high
-#' and low data cut-offs
-#' @param rm.inf remove infinite values (e.g. from log transformations)
+#' @param avg a function (or the name of a function as a string) for
+#'     calculating an `average' value for each cluster; default is the
+#'     \code{median} ## @param dev a function for calculating
+#'     deviation from the the average, ## default is the standard
+#'     deviation (‘sd’)
+#' @param q either numeric 0.5-1, or a string. If numeric it indicates
+#'     the fraction of data shown as transparent ranges,
+#'     e.g. \code{q=0.9} indicates that 90% of data are within the
+#'     ranges, i.e. the 5% and 95% quantiles are the lower and upper
+#'     borders, and for q=0.5 the ranges correspond to the box limits
+#'     in a boxplot. If q is a string it must be a function name for
+#'     calculating variance (eg. "sd", "var"), which will be added and
+#'     subtracted from the average (argument \code{avg}) for high and
+#'     low data cut-offs.
+#' @param rm.inf remove infinite values (e.g. from log
+#'     transformations)
 #' @export
 clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
@@ -1795,9 +1800,11 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
     rownames(clavg) <- cls.srt
     cllow <- clhig <- clavg
 
-    if ( is.numeric(q) )
+    if ( is.numeric(q) ) {
+        if ( q<0.5 | q>1 )
+            stop("only q within 0.5 and 1 are allowed")
         qf <- (1-q)/2
-    else qf <- get(q, mode="function")
+    } else qf <- get(q, mode="function")
 
     ## rm Inf, eg.
     ts[is.infinite(ts)] <- NA
@@ -1977,94 +1984,110 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' plots cluster averages 
 #'
 #' plots average time series of clusters as calculated by
-#' \code{\link{clusterAverages}}, including 
-#' variations around the average as transparent areas, or all individual data.
-#' The function is quite flexible and allows to normalize the data and
-#' set automatic y-limit selections.
-#' @param x either a simple data matrix with time points (x-axis) in columns,
-#' or a processed time-series as provided by
-#' \code{\link[segmenTier:processTimeseries]{processTimeseries}}
-#' @param cls eiter a vector (\code{length(cls)==nrow(x)}) or a structure of
-#' class 'clustering' as returned by segmenTier's
-#' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
-#' @param k integer or string specifiying the clustering (k:
-#' cluster numbers) to be used if cls is of class 'clustering';
-#' if missing (default) the `selected' clustering from \code{cls} is chosen
-#' (see \code{\link{selected}}).
+#' \code{\link{clusterAverages}}, including variations around the
+#' average as transparent areas, or all individual data.  The function
+#' is quite flexible and allows to normalize the data and set
+#' automatic y-limit selections.
+#' @param x either a simple data matrix with time points (x-axis) in
+#'     columns, or a processed time-series as provided by
+#'     \code{\link[segmenTier:processTimeseries]{processTimeseries}}
+#' @param cls eiter a vector (\code{length(cls)==nrow(x)}) or a
+#'     structure of class 'clustering' as returned by segmenTier's
+#'     \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
+#' @param k integer or string specifiying the clustering (k: cluster
+#'     numbers) to be used if cls is of class 'clustering'; if missing
+#'     (default) the `selected' clustering from \code{cls} is chosen
+#'     (see \code{\link{selected}}).
 #' @param type string specifying the type of plot: "rng" for plotting
-#' only data ranges (see argument \code{q}) or "all" to plot
-#' each individual time-course (as thin lines)
-#' @param fill fill data ranges with transparent version of cluster color
-#' @param border line width of border line at data ranges 
+#'     only data ranges (see argument \code{q}) or "all" to plot each
+#'     individual time-course (as thin lines)
+#' @param fill fill data ranges with transparent version of cluster
+#'     color
+#' @param border line width of border line at data ranges
 #' @param each logical value indicating whether to plot all cluster
-#' averages on one panel (\code{FALSE}) or each cluster on a separate panel
-#' (\code{TRUE})
-#' @param time optional numeric vector specifiying x-axis time coordinates
-#' @param time.at argument \code{at} for the x-axis (\code{axis(1, at=time.at)})
-#' @param avg a function (or the name of a function as a string)
-#' for calculating an `average' value for each cluster; default is
-#' the \code{median}
-#' @param norm normalization of the time-series data, must be a function
-#' that transforms the data, available via \link{segmenTools} are
-#' \code{lg2r}, \code{ash}, \code{log_1}, \code{meanzero} normalizations
-#' @param q the fraction of data to be shown in the ranges plots: either
-#' numeric 0-1, or a function name for calculating variance (eg. "sd", "var").
-#' Note that this parameter can also influence \code{ylim}, the limits
-#' of the y axis
-#' @param cls.srt optional cluster sorting, can be used for selection of
-#' subsets of clusters; if cls is of class 'clustering' it is taken
-#' from there
-#' @param cls.col optional named cluster color vector, where names indicate
-#' the clusters (as.caracter(cls)); if cls is of class 'clustering' it
-#' is taken from there
+#'     averages on one panel (\code{FALSE}) or each cluster on a
+#'     separate panel (\code{TRUE})
+#' @param time optional numeric vector specifiying x-axis time
+#'     coordinates
+#' @param time.at argument \code{at} for the x-axis (\code{axis(1,
+#'     at=time.at)})
+#' @param avg a function (or the name of a function as a string) for
+#'     calculating an `average' value for each cluster; default is the
+#'     \code{median}
+#' @param norm normalization of the time-series data, must be a
+#'     function that transforms the data, available via
+#'     \link{segmenTools} are \code{lg2r}, \code{ash}, \code{log_1},
+#'     \code{meanzero} normalizations
+#' @param q either numeric 0.5-1, or a string. If numeric it indicates
+#'     the fraction of data shown as transparent ranges,
+#'     e.g. \code{q=0.9} indicates that 90% of data are within the
+#'     ranges, i.e. the 5% and 95% quantiles are the lower and upper
+#'     borders, and for q=0.5 the ranges correspond to the box limits
+#'     in a boxplot. If q is a string it must be a function name for
+#'     calculating variance (eg. "sd", "var"), which will be added and
+#'     subtracted from the average (argument \code{avg}) for high and
+#'     low data cut-offs.  Note that this parameter can also influence
+#'     \code{ylim}, the limits of the y axis.
+#' @param cls.srt optional cluster sorting, can be used for selection
+#'     of subsets of clusters; if cls is of class 'clustering' it is
+#'     taken from there
+#' @param cls.col optional named cluster color vector, where names
+#'     indicate the clusters (as.caracter(cls)); if cls is of class
+#'     'clustering' it is taken from there
 #' @param axes add axes (bottom and left)
 #' @param xlab x-axis label (auto-selected if missing)
 #' @param xlim \code{xlim} parameter for plot
 #' @param ylab y-axis label (only used if \code{each==FALSE})
 #' @param ylim either conventional range of the y-axis, or a string
-#' specifying whether ylim should be calculated from the average
-#' (\code{ylim="avg"}), for all data (\code{ylim="all"}), or from the
-#' lower/upper ranges (\code{ylim="rng"}); in the latter case the y-axis
-#' depends on argument \code{q}
-#' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will be
-#' extended by this fraction of the total range on both sides
-#' @param avg.col color for average line; used only if \code{type="all"}
-#' @param avg.lty line type for average plots 
-#' @param avg.lwd line width for average plots 
+#'     specifying whether ylim should be calculated from the average
+#'     (\code{ylim="avg"}), for all data (\code{ylim="all"}), or from
+#'     the lower/upper ranges (\code{ylim="rng"}); in the latter case
+#'     the y-axis depends on argument \code{q}
+#' @param ylim.scale if \code{ylim=="avg"}, the calculated ylim will
+#'     be extended by this fraction of the total range on both sides
+#' @param avg.col color for average line; used only if
+#'     \code{type="all"}
+#' @param avg.lty line type for average plots
+#' @param avg.lwd line width for average plots
 #' @param avg.pch point symbol for average plots
-#' @param avg.cex point size for average plots 
-#' @param lwd line width for indidiual time series plots (if \code{type=="all"})
-#' @param use.lty use individual line types (if \code{type=="all"}); this
-#' is only useful for very small clusters and is mainly used
-#' in the \code{\link{plotSingles}} wrapper
+#' @param avg.cex point size for average plots
+#' @param lwd line width for indidiual time series plots (if
+#'     \code{type=="all"})
+#' @param use.lty use individual line types (if \code{type=="all"});
+#'     this is only useful for very small clusters and is mainly used
+#'     in the \code{\link{plotSingles}} wrapper
 #' @param alpha set alpha value of range or individual time series
-#' colors (color opaqueness)
-#' @param plot.legend add a legend, useful for very small clusters and mainly
-#' used in the \code{\link{plotSingles}} wrapper
-#' @param embed logical, if TRUE and argument \code{each=TRUE} (one plot for
-#' each cluster), the automatic is suppressed allowing to embed multiple
-#' plots (for each cluster) into external \code{\link[graphics:layout]{layout}}
-#' or \code{par(mfcol/mfrow)} setups
+#'     colors (color opaqueness)
+#' @param plot.legend add a legend, useful for very small clusters and
+#'     mainly used in the \code{\link{plotSingles}} wrapper
+#' @param embed logical, if TRUE and argument \code{each=TRUE} (one
+#'     plot for each cluster), the automatic is suppressed allowing to
+#'     embed multiple plots (for each cluster) into external
+#'     \code{\link[graphics:layout]{layout}} or
+#'     \code{par(mfcol/mfrow)} setups
 #' @param leg.xy position of the legend, see
-#' \code{\link[graphics:legend]{legend}}
-#' @param vline x coordinates for vertical lines, useful e.g. to
-#' mark replicates
+#'     \code{\link[graphics:legend]{legend}}
+#' @param vline x coordinates for vertical lines, useful e.g. to mark
+#'     replicates
 #' @param vl_col color for vertical line (default to cluster colour)
-#' @param vl_lty vertical line type 
+#' @param vl_lty vertical line type
 #' @param vl_lwd vertical line width
 #' @param ref.xy reference data (either x or xy coordinates, see
-#' \code{\link[grDevices:xy.coords]{xy.coords}}) for reference data to be
-#' plotted in the background, e.g. light/dark phases or dissolved oxygen traces
+#'     \code{\link[grDevices:xy.coords]{xy.coords}}) for reference
+#'     data to be plotted in the background, e.g. light/dark phases or
+#'     dissolved oxygen traces
 #' @param ref.col color for reference data plot
 #' @param ref.ylab y-axis label (right y-axis) for reference data
-#' @param leg.ids a named vector providing alternative IDs for legends; the names should correspond to the rownames of clusterings in \code{cls}
+#' @param leg.ids a named vector providing alternative IDs for
+#'     legends; the names should correspond to the rownames of
+#'     clusterings in \code{cls}
 #' @param ... further arguments to the basic setup call to
-#' \code{\link[graphics:plot]{plot}}
-## TODO: clean up mess between plot.clustering, plot.clusteraverages and this
-## plot.clusteraverages should become a function of plot.clustering,
-## and clusterAverages can be a private function!
-## make function `timeseriesPlot' or `clusterPlot', that takes
-## either tset/cset or matrix/vector
+#'     \code{\link[graphics:plot]{plot}} ## TODO: clean up mess
+#'     between plot.clustering, plot.clusteraverages and this ##
+#'     plot.clusteraverages should become a function of
+#'     plot.clustering, ## and clusterAverages can be a private
+#'     function!  ## make function `timeseriesPlot' or `clusterPlot',
+#'     that takes ## either tset/cset or matrix/vector
 #' @export
 plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                          fill=TRUE, border=0,
