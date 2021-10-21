@@ -20,8 +20,8 @@ calculating an `average' value for each cluster; default is the
 deviation from the the average, ## default is the standard
 deviation (‘sd’)}
 
-\item{q}{either numeric 0.5-1, or a string. If numeric it indicates
-the fraction of data shown as transparent ranges,
+\item{q}{either numeric (0.5-1, or 0), or a string. If numeric it
+indicates the fraction of data shown as transparent ranges,
 e.g. \code{q=0.9} indicates that 90% of data are within the
 ranges, i.e. the 5% and 95% quantiles are the lower and upper
 borders, and for q=0.5 the ranges correspond to the box limits

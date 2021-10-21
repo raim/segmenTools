@@ -1770,8 +1770,8 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
 #'     \code{median} ## @param dev a function for calculating
 #'     deviation from the the average, ## default is the standard
 #'     deviation (‘sd’)
-#' @param q either numeric 0.5-1, or a string. If numeric it indicates
-#'     the fraction of data shown as transparent ranges,
+#' @param q either numeric (0.5-1, or 0), or a string. If numeric it
+#'     indicates the fraction of data shown as transparent ranges,
 #'     e.g. \code{q=0.9} indicates that 90% of data are within the
 #'     ranges, i.e. the 5% and 95% quantiles are the lower and upper
 #'     borders, and for q=0.5 the ranges correspond to the box limits
@@ -1799,8 +1799,8 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
 
     ## get requested upper/lower range function
     if ( is.numeric(q) ) {
-        if ( q<0.5 | q>1 )
-            stop("only q within 0.5 and 1 are allowed; tip: if data is normally distributed you can use 'var', 'sd' or 'stderr' and combine with avg='mean'.")
+        if ( (q<0.5 | q>1) & q!=0 )
+            stop("only q within 0.5 and 1 (or q=0) is allowed; tip: if data is normally distributed you can use 'var', 'sd' or 'stderr' and combine with avg='mean'.")
         ## q is the fraction of shown values, (1-q)/2 are the calculated
         ## quantiles
         qf <- (1-q)/2
@@ -2029,8 +2029,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #'     function that transforms the data, available via
 #'     \link{segmenTools} are \code{lg2r}, \code{ash}, \code{log_1},
 #'     \code{meanzero} normalizations
-#' @param q either numeric 0.5-1, or a string. If numeric it indicates
-#'     the fraction of data shown as transparent ranges,
+#' @param q either numeric (0.5-1, or 0), or a string. If numeric it
+#'     indicates the fraction of data shown as transparent ranges,
 #'     e.g. \code{q=0.9} indicates that 90% of data are within the
 #'     ranges, i.e. the 5% and 95% quantiles are the lower and upper
 #'     borders, and for q=0.5 the ranges correspond to the box limits
