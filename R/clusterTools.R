@@ -1800,7 +1800,7 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
     ## get requested upper/lower range function
     if ( is.numeric(q) ) {
         if ( q<0.5 | q>1 )
-            stop("only q within 0.5 and 1 are allowed; tip: if data is normally distributed you can use 'var', 'sd' or 'stderr' but and combine with avg='mean'.")
+            stop("only q within 0.5 and 1 are allowed; tip: if data is normally distributed you can use 'var', 'sd' or 'stderr' and combine with avg='mean'.")
         ## q is the fraction of shown values, (1-q)/2 are the calculated
         ## quantiles
         qf <- (1-q)/2
