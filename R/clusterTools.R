@@ -55,9 +55,9 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
     colnames(tt) <- colnames(x)
     rownames(tt) <- cls.srt #levels(cls)
     
-    tp <- tt
+    tp <- sg <- tt
     tp[] <- 1 # p-value matrix
-
+    sg[] <- 1 # sign matrix
     for ( i in 1:ncol(x) ) {
         for ( cl in cls.srt ) {
 
@@ -78,13 +78,15 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
             ## set p-values negative for two-sided plot!
             sgn <- sign(ttmp$statistic)
             sgn[sgn==0] <- 1
-            tp[cl,i] <- ttmp$p.value * sgn
+            sg[cl,i] <- sgn # store sign
+            tp[cl,i] <- ttmp$p.value # store pvalue
         }
     }
     ## construct overlap object
     ova <- list()
     ova$p.value <- tp
     ova$statistic <- tt
+    ova$sign <- sg
 
     ## counts
     ova$num.target <- t(as.matrix(apply(x,2,function(x) sum(!is.na(x)))))
@@ -402,10 +404,11 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     ## set up p-value and colors
     pval <- x$p.value
 
-    ## "negative" p-values indicate two directions, eg. from t-tests
-    if ( any(pval<0) | type==2 ) {
-        
-        sgn <- sign(pval[abs(pval)<=p.min])
+    ## "negative" sign indicated two-sided test
+    if ( "sign"%in%names(x) | type==2 ) {
+
+        pval <- pval * x$sign
+        sgn <- x$sign[abs(pval)<=p.min] #sign(pval[abs(pval)<=p.min])
         sgn[sgn==0] <- 1
         pval[abs(pval)<=p.min] <- p.min * sgn
         pval <- -log2(abs(pval))*sign(pval)
