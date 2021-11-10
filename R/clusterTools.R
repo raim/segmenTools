@@ -297,7 +297,8 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
     ## "negative" p-values indicate two directions, eg. from t-tests
     if ( type==2 ) { # 2-sided
 
-        leg$p.value <- cbind(leg$p.value, -leg$p.value)
+        leg$sign <- cbind(rep(1,l), rep(-1,l))
+        leg$p.value <- cbind(leg$p.value, leg$p.value)
         leg$overlap <- cbind(leg$overlap, leg$overlap)
 
         if ( missing(col) ) {
