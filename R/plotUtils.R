@@ -101,3 +101,7 @@ figlabel <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
   text(x1, y1, text, cex=cex, ...)
   return(invisible(c(x,y)))
 }
+
+
+
+

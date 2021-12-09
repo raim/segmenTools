@@ -896,6 +896,10 @@ clusterAnnotation <- function(cls, data, p=1,
     num.target <- t(as.matrix(table(cls)[cls.srt]))
     num.query <- as.matrix(apply(data,2,function(x) sum(x)))
 
+    ## filter those reported in p.values/overlap tables
+    num.query <- num.query[rownames(pvalues),,drop=FALSE]
+    num.target <- num.target[,colnames(pvalues),drop=FALSE]
+
     ## replace terms by description
     if ( !is.null(terms) & replace.terms ) {
         rownames(pvalues) <- terms[rownames(pvalues)]
@@ -2559,3 +2563,14 @@ add_alphas <- function(col, alpha=rep(1,length(col))){
     names(col) <- nms
     col
 }
+
+## numeric values to color range:
+## 
+#' @export
+num2col <- function(x, limits, pal, colf=viridis::viridis, n=100){
+    if ( missing(pal) ) pal <- colf(n)
+    if ( missing(limits) ) limits <- range(x, na.rm=TRUE)
+    pal[findInterval(x,seq(limits[1],limits[2],
+                           length.out=length(pal)+1), all.inside=TRUE)]
+}
+
