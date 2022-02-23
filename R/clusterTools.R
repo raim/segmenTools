@@ -175,9 +175,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   f2 <- levels(as.factor(cl2))
     ## TODO: remember if any was not sorted;
     ## and sort those by sortClusters at the end; sort smaller first
-    if ( !missing(cl1.srt) ) f1 <-  cl1.srt
+    if ( !missing(cl1.srt) ) f1 <-  as.character(cl1.srt)
     else cl1.srt <- as.character(f1)
-    if ( !missing(cl2.srt) ) f2 <-  cl2.srt
+    if ( !missing(cl2.srt) ) f2 <-  as.character(cl2.srt)
     else cl2.srt <- as.character(f2)
       
 
