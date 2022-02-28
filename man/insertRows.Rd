@@ -12,8 +12,8 @@ insertRows(existingDF, newrows, r)
 \item{newrows}{rows to add to \code{existingDF}}
 
 \item{r}{positions in the existing data.frame at which rows are to
-be inserted, \code{length(r)}
-must equal \code{nrow(newrows)}, and all indices \code{r<=nrow(existingDF)+1}}
+be inserted; \code{length(r)} must equal \code{nrow(newrows)}, and
+all indices \code{r<=nrow(existingDF)+1}.}
 }
 \description{
 Util to insert multiple rows at specified positions

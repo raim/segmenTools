@@ -21,7 +21,7 @@ tagDuplicates <- function(names) {
 #' @export
 getChrSum <- function(chrL) c(0,cumsum(chrL))
 
-## util to insert rows, by user Ari B. Friedman at
+## util to insert rows, after suggestion by user Ari B. Friedman at
 ## \url{https://stackoverflow.com/a/11562428}
 insertRow <- function(existingDF, newrow, r) {
     if ( r==nrow(existingDF)+1 ) # insert as last row?
@@ -44,15 +44,15 @@ insertRow <- function(existingDF, newrow, r) {
 #' @param existingDF existing \code{data.frame}
 #' @param newrows rows to add to \code{existingDF}
 #' @param r positions in the existing data.frame at which rows are to
-#' be inserted, \code{length(r)}
-#' must equal \code{nrow(newrows)}, and all indices \code{r<=nrow(existingDF)+1}
+#' be inserted; \code{length(r)} must equal \code{nrow(newrows)}, and
+#' all indices \code{r<=nrow(existingDF)+1}.
 #' @export
 insertRows <- function(existingDF, newrows, r ) {
     ## check that r is sorted and all <= nrow(existingDF)
     r <- sort(r) # SORT!
     if ( any(r>nrow(existingDF)+1) )
         stop("row indices must refer to existing data.frame and",
-             " can not be >nrow(<existing data.frame>)")
+             " can not be >nrow(<existing data.frame>)+1")
     new <- existingDF
     for ( i in 1:nrow(newrows) )
         new <- insertRow(new, newrows[i,], r[i]+i-1)
