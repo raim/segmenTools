@@ -11,8 +11,8 @@ insertRows(existingDF, newrows, r)
 
 \item{newrows}{rows to add to \code{existingDF}}
 
-\item{r}{positions below which rows are to be inserted, \code{length(r)}
-must equal \code{nrow(newrows)}, and \code{r<=nrow(existingDF)}}
+\item{r}{positions at which rows are to be inserted, \code{length(r)}
+must equal \code{nrow(newrows)}, and \code{r<=nrow(existingDF)+1}}
 }
 \description{
 Util to insert multiple rows at specified positions

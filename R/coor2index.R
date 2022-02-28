@@ -24,10 +24,14 @@ getChrSum <- function(chrL) c(0,cumsum(chrL))
 ## util to insert rows, by user Ari B. Friedman at
 ## \url{https://stackoverflow.com/a/11562428}
 insertRow <- function(existingDF, newrow, r) {
-    existingDF <- as.data.frame(existingDF,stringsAsFactors=FALSE)
-    existingDF[seq(r+1,nrow(existingDF)+1),] <-
-        existingDF[seq(r,nrow(existingDF)),]
-    existingDF[r,] <- newrow
+    if ( r==nrow(existingDF)+1 )
+        existingDF <- rbind(existingDF, newrow)
+    else {
+        existingDF <- as.data.frame(existingDF,stringsAsFactors=FALSE)
+        existingDF[seq(r+1,nrow(existingDF)+1),] <-
+            existingDF[seq(r,nrow(existingDF)),]
+        existingDF[r,] <- newrow
+    }
     existingDF
 }
 #' insert rows as specified positions
@@ -38,10 +42,11 @@ insertRow <- function(existingDF, newrow, r) {
 #' \url{https://stackoverflow.com/questions/11561856/add-new-row-to-dataframe-at-specific-row-index-not-appendedlooping through new rows}
 #' @param existingDF existing \code{data.frame}
 #' @param newrows rows to add to \code{existingDF}
-#' @param r positions below which rows are to be inserted, \code{length(r)}
-#' must equal \code{nrow(newrows)}, and \code{r<=nrow(existingDF)}
+#' @param r positions at which rows are to be inserted, \code{length(r)}
+#' must equal \code{nrow(newrows)}, and \code{r<=nrow(existingDF)+1}
 #' @export
 insertRows <- function(existingDF, newrows, r ) {
+    ## check that r is sorted and all <= nrow(existingDF)
     new <- existingDF
     for ( i in 1:nrow(newrows) )
         new <- insertRow(new, newrows[i,], r[i]+i-1)
