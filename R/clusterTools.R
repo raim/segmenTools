@@ -2556,11 +2556,13 @@ shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
 #' @export
 add_alphas <- function(col, alpha=rep(1,length(col))){
     nms <- names(col)
+    nacol <- which(is.na(col))
     lcol <- lapply(col, function(x) c(col2rgb(x)/255))
     col <- sapply(1:length(col), function(x) {
         y <- lcol[[x]]
         rgb(y[1], y[2], y[3], alpha=alpha[x])})
     names(col) <- nms
+    col[nacol] <- NA
     col
 }
 
