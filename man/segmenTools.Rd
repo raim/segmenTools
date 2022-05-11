@@ -4,6 +4,9 @@
 \name{segmenTools}
 \alias{segmenTools}
 \title{segmenTools : analysis of genome segmentations by segmenTier}
+\description{
+tool set for genome and time series analyses by Rainer Machne
+}
 \section{Dependencies}{
  basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 }

@@ -2566,8 +2566,14 @@ add_alphas <- function(col, alpha=rep(1,length(col))){
     col
 }
 
-## numeric values to color range:
-## 
+#' convert numeric values to color range:
+#' @param x a numeric vector
+#' @param limits optional data limits for min/max color, every x
+#' lower/higher will get the extreme colors
+#' @param pal color palette, alternatively \code{colf} and \code{n}
+#' can be supplied
+#' @param colf color palette function
+#' @param n number of different colors
 #' @export
 num2col <- function(x, limits, pal, colf=viridis::viridis, n=100){
     if ( missing(pal) ) pal <- colf(n)

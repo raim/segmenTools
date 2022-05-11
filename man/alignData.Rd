@@ -19,15 +19,14 @@ at which data will be aligned
 (TODO: allow start/end coors and set NA if beyond)}
 
 \item{data}{genome data to be aligned; NOTE, that currently this
-is required to be fully expanded matrix covering each position
+is required to be fully expanded matrix covering each chromosome position,
+i.e. \code{nrow(data)==max(chrS)}
 (TODO: allow non-expanded data)}
 
-\item{dst}{upstream/downstream length to be aligned
-(TODO: allow different upstream and downstream ranges)
-(TODO: allow individual ranges)}
+\item{dst}{upstream/downstream length to be aligned}
 
 \item{chrS}{the chromosome index, indicating the start position
-of each chromosome in the continuous index, derived from chromosome length
+of each chromosome in \code{data}, derived from chromosome length
 information, see function \code{\link{getChrSum}}}
 
 \item{coorCols}{ordered string vector providing the column names

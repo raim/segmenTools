@@ -2,6 +2,7 @@
 #'@author Rainer Machne \email{raim@tbi.univie.ac.at}
 #'@docType package
 #'@name segmenTools
+#' @description tool set for genome and time series analyses by Rainer Machne
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 #'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout grconvertX grconvertY box

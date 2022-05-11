@@ -458,13 +458,14 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
 #' at which data will be aligned
 #' (TODO: allow start/end coors and set NA if beyond)
 #' @param data genome data to be aligned; NOTE, that currently this
-#' is required to be fully expanded matrix covering each position
+#' is required to be fully expanded matrix covering each chromosome position,
+#' i.e. \code{nrow(data)==max(chrS)}
 #' (TODO: allow non-expanded data)
 #' @param dst upstream/downstream length to be aligned
-#' (TODO: allow different upstream and downstream ranges)
-#' (TODO: allow individual ranges)
+## (TODO: allow different upstream and downstream ranges)
+## (TODO: allow individual ranges)
 #' @param chrS the chromosome index, indicating the start position
-#' of each chromosome in the continuous index, derived from chromosome length
+#' of each chromosome in \code{data}, derived from chromosome length
 #' information, see function \code{\link{getChrSum}}
 #' @param coorCols ordered string vector providing the column names
 #' of coordinate columns to be used; must be of length 3 and provide in
@@ -478,50 +479,69 @@ switchStrand <- function(features,chrS, cols=c("start","end","coor")) {
 alignData <- function(coors, data, dst=500, chrS,
                       coorCols=c(chr="chr", position="coor", strand="strand"),
                       reverse=c("-",-1)) {
-  
-  starts <- as.numeric(coors[,coorCols["position"]])
-  chrs <- as.numeric(coors[,coorCols["chr"]])
-  strands <- as.character(coors[,coorCols["strand"]])
 
-  ## add chromosome lengths to get direct index 
-  starts <- chrS[chrs] + starts
-  ## TODO: should rev.strand be shifted by one?
-  rng <- t(apply(t(starts), 2, function(x) (x-dst):(x+dst)))
-  rng <- cbind(!strands%in%reverse,rng)
-  ##  reverse for reverse strand
-  rng <- t(apply(rng,1,function(x)
-                 if (x[1]==1) return(x[2:length(x)])
-                 else return(rev(x[2:length(x)]))))
+    ## get coordinates
+    starts <- as.numeric(coors[,coorCols["position"]])
+    chrs <- as.numeric(coors[,coorCols["chr"]])
+    strands <- as.character(coors[,coorCols["strand"]])
 
-  ## cut chromosome ends
-  ## TODO: implement circular chromsomes!
-    #chr <- feats[,"chr"] ## THIS NOT PASSED!?
-  rng <- cbind(min=chrS[chrs],max=chrS[chrs+1],rng)
-  rng <- t(apply(rng,1,function(x) {
-    rm <- x[3:length(x)] <= x[1] | x[3:length(x)] >= x[2];
-    x <- x[3:length(x)]; x[rm] <- NA;return(x)}))
-  
-  ## get data!
-  ## split off coordinate columns, if not separately supplied
-  firstcol <- 1
-  if ( sum(c("chr","coor")%in%colnames(data))==2 )
-    firstcol <- 3
-
-  geneData <- list()
-  for ( i in firstcol:ncol(data) ) 
-    geneData <- append(geneData,
-                       list(t(apply(rng, 1, function(x) data[x,i]))))
-
-  names(geneData) <- colnames(data)[firstcol:ncol(data)]
+    ## catch wrong coordinates, eg. due to use of coor2index(coors)
+    if ( any(starts>max(chrS) ) ) 
+        stop(sum(starts>max(chrS)),
+             " start coordinates are beyond chromosome length in index `chrS`")
     
-  ## relative coordinates as colnames
-  xax <- -dst:dst
-  geneData <- lapply(geneData, function(x) {colnames(x) <- xax; x})
+    ## catch wrong data dimension
+    if ( nrow(data)!=max(chrS) )
+        stop("`data` rows (", nrow(data),
+             ") do not cover the full chromosome length in index `chrS`")
+    
+    ## add chromosome lengths to get the index (row) in data
+    starts <- chrS[chrs] + starts
+    
+    ## ranges in full data
+    rng <- t(apply(t(starts), 2, function(x) (x-dst):(x+dst)))
+    
+    ##  reverse for reverse strand
+    rng <- cbind(!strands%in%reverse,rng)
+    rng <- t(apply(rng, 1, function(x) {
 
-  ## copy rownames
-  geneData <- lapply(geneData, function(x) {rownames(x) <- rownames(coors);x})
+        if (x[1]==1) return(x[2:length(x)])
+        else return(rev(x[2:length(x)]))
 
-  return(geneData)
+    }))
+
+    ## cut chromosome ends
+    ## TODO: implement circular chromsomes!
+    ## TODO: add warning, eg. if icoors were passed negative
+    ## strand values are beyond chromosome ends
+    rng <- cbind(min=chrS[chrs],max=chrS[chrs+1],rng)
+    rng <- t(apply(rng, 1, function(x) {
+
+        rm <- x[3:length(x)] <= x[1] | x[3:length(x)] >= x[2];
+        x <- x[3:length(x)]; x[rm] <- NA;return(x)
+
+    }))
+  
+    ## split off coordinate columns, if not separately supplied
+    firstcol <- 1
+    if ( sum(c("chr","coor")%in%colnames(data))==2 )
+        firstcol <- 3
+    
+    ## get aligned data for each data column
+    geneData <- list()
+    for ( i in firstcol:ncol(data) ) 
+        geneData <- append(geneData,
+                           list(t(apply(rng, 1, function(x) data[x,i]))))
+    names(geneData) <- colnames(data)[firstcol:ncol(data)]
+    
+    ## relative coordinates as colnames
+    xax <- -dst:dst
+    geneData <- lapply(geneData, function(x) {colnames(x) <- xax; x})
+    
+    ## copy rownames
+    geneData <- lapply(geneData, function(x) {rownames(x) <- rownames(coors);x})
+    
+    return(geneData)
 }
 
 
