@@ -570,7 +570,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
     }
     
     ## resort all matrices in overlap structure (overlap, pvalue, jaccard, ...)
-    ## TODO: do this nicer
+    ## TODO: do this safer, check if everything got sorted?
     n <- nrow(pvl)
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
