@@ -91,7 +91,7 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
     ## counts
     ova$num.target <- t(as.matrix(apply(x,2,function(x) sum(!is.na(x)))))
     if ( logic )
-        ova$num.query <- apply(cls,2,sum)
+        ova$num.query <- as.matrix(apply(cls,2,sum))
     else 
         ova$num.query <- as.matrix(table(cls)[levels(cls)])
 
@@ -522,38 +522,52 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
 #' For each cluster along the pre-sorted (non-selected) axis,
 #' the most significant overlaps (\code{p<p.min}) are chosen
 #' and moved to the top of the matrix.
-#' TODO: align axis selection with nomenclature in clusterCluster
+## TODO:
+## * align axis selection with nomenclature in clusterCluster
+## * allow to pass sorting as argument
 #' @param ovl a `clusterOverlaps' object returned by
 #' \code{\link{clusterCluster}}
 #' @param p.min significance cutoff during sorting
 #' @param cut remove all overlaps without any \code{p<p.min}
 #' @param axis axis to sort (2 for y-axis/rows, 1 for x-axis/columns)
+#' @param srt sorting vector for rows, if this is passed the significance
+#' sorting is skipped
 #' @export
-sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE) {
+sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
 
     ## transpose all, if sorting of x-axis (1) is requested
     if ( axis==1 ) # ovl <- lapply(ovl, t)
         for ( i in 1:length(ovl) )
             if ( class(ovl[[i]])=="matrix" ) 
-                ovl[[i]] <- t(ovl[[i]]) 
+                ovl[[i]] <- t(ovl[[i]])
 
     pvl <- abs(ovl$p.value)
-    cls.srt <- colnames(pvl)
-    sig.srt <- NULL
-    ## first, get highly signficant
-    for ( cl in cls.srt ) {
-        tmp.srt <- order(pvl[,cl], decreasing=FALSE)
-        sig.srt <- c(sig.srt, tmp.srt[tmp.srt %in% which(pvl[,cl]<p.min)])
-    }
-    ## second, sort rest by increasing pval
-    rest.srt <- which(!(1:nrow(pvl)) %in% sig.srt)
-    rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),
-                               decreasing=FALSE)]
-    new.srt <- sig.srt[!duplicated(sig.srt)]
-    if ( !cut ) new.srt <- c(new.srt, rest.srt)
 
-    ## remember row split between sig and non-sig
-    nsig <- sum(!duplicated(sig.srt))
+    ## sort by significance
+    if ( missing(srt) ) {
+        
+        cls.srt <- colnames(pvl)
+        sig.srt <- NULL
+        ## first, get highly significant
+        for ( cl in cls.srt ) {
+            tmp.srt <- order(pvl[,cl], decreasing=FALSE)
+            sig.srt <- c(sig.srt, tmp.srt[tmp.srt %in% which(pvl[,cl]<p.min)])
+        }
+        ## second, sort rest by increasing pval
+        rest.srt <- which(!(1:nrow(pvl)) %in% sig.srt)
+        rest.srt <- rest.srt[order(apply(pvl[rest.srt,,drop=FALSE],1,max),
+                                   decreasing=FALSE)]
+        new.srt <- sig.srt[!duplicated(sig.srt)]
+        if ( !cut ) new.srt <- c(new.srt, rest.srt)
+
+        ## remember row split between sig and non-sig
+        nsig <- sum(!duplicated(sig.srt))
+    } else {
+        ## used passed sorting!
+        new.srt <- srt
+        nsig <- NULL
+        warning("custom sorting via `srt` is untested!")
+    }
     
     ## resort all matrices in overlap structure (overlap, pvalue, jaccard, ...)
     ## TODO: do this nicer
@@ -741,8 +755,10 @@ clusterAnnotation <- function(cls, data, p=1,
         if ( !is.null(tmp) ) {
             ovl <- tmp$overlap # contingency table
             pvl <- tmp$p.value
-            rownames(ovl) <- rownames(pvl) <-
-                paste0(name,ifelse(logic,"",paste0("_",rownames(pvl))))
+            tnm <- name
+            if ( !logic )
+                tnm <- paste0(name,rownames(pvl))
+            rownames(ovl) <- rownames(pvl) <- tnm
             overlap <- rbind(overlap, ovl)
             pvalues <- rbind(pvalues, pvl)
             # copy name in same size to allow easy cbind below
@@ -938,7 +954,8 @@ annotationOverlap <- function(x) {
             cnt[i,j] <- cnt[j,i] <-tmp$overlap[1,1]
         pvl[i,j] <- pvl[j,i] <-tmp$p.value[1,1]
         }
-    num.query <- num.target <- apply(x,2,sum)
+    num.query <- as.matrix(apply(x,2,sum))
+    num.target <- t(as.matrix(apply(x,2,sum)))
     ovl <- list(overlap=cnt, p.value=pvl,
                 num.query=num.query, num.target=num.target)
     ovl

@@ -4,7 +4,7 @@
 \alias{sortOverlaps}
 \title{sorts cluster overlap structure by p-values}
 \usage{
-sortOverlaps(ovl, p.min = 0.05, axis = 2, cut = FALSE)
+sortOverlaps(ovl, p.min = 0.05, axis = 2, cut = FALSE, srt)
 }
 \arguments{
 \item{ovl}{a `clusterOverlaps' object returned by
@@ -15,6 +15,9 @@ sortOverlaps(ovl, p.min = 0.05, axis = 2, cut = FALSE)
 \item{axis}{axis to sort (2 for y-axis/rows, 1 for x-axis/columns)}
 
 \item{cut}{remove all overlaps without any \code{p<p.min}}
+
+\item{srt}{sorting vector for rows, if this is passed the significance
+sorting is skipped}
 }
 \description{
 Sorts one dimension of a cluster overlap structure
@@ -22,5 +25,4 @@ by their p-values along the sorting of the other axis.
 For each cluster along the pre-sorted (non-selected) axis,
 the most significant overlaps (\code{p<p.min}) are chosen
 and moved to the top of the matrix.
-TODO: align axis selection with nomenclature in clusterCluster
 }
