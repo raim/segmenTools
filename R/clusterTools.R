@@ -445,7 +445,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
 
 
     ## NO TEXT:
-    if ( type=="" ) {
+    if ( type=="" | any(is.na(txt.col)) ) {
         txt <- NA
         image_matrix(pval, breaks=breaks, col=col, axis=axis, ...)
     } else {
