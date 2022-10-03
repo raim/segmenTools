@@ -95,6 +95,7 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
     else 
         ova$num.query <- as.matrix(table(cls)[levels(cls)])
 
+    class(ova) <- "clusterOverlaps"
     ova
 }
 
@@ -514,6 +515,21 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     invisible(list(type=type, short=short, round=round, scale=scale, text=txt))
 }
 
+#' transpose cluster overlap object
+#'
+#' TODO: test this systematically!
+#' 
+#' @param x object of class `clusterOverlaps`
+#' @seealso \code{\link{clusterCluster}},
+#'     \code{\link{clusterProfile}}, \code{\link{clusterAnnotation}}
+#' @export
+t.clusterOverlaps <- function(x) {
+    for ( i in 1:length(x) )
+        if ( class(x[[i]])=="matrix" ) 
+            x[[i]] <- t(x[[i]])
+    x
+}
+
 
 #' sorts cluster overlap structure by p-values
 #' 
@@ -924,8 +940,10 @@ clusterAnnotation <- function(cls, data, p=1,
     }
 
 
-    return(list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap,
-                num.query=num.query, num.target=num.target))
+    ovl <- list(tables=sig, psig=psig, p.value=pvalues, overlap=overlap,
+                num.query=num.query, num.target=num.target)
+    class(ovl) <- "clusterOverlaps"
+    return(ovl)
            
 }
 
