@@ -10,7 +10,7 @@ plotOverlaps(
   p.txt = p.min * 5,
   n = 100,
   col,
-  values = c("overlap", "statistic", "jaccard", "intersect.target"),
+  values = c("overlap", "statistic", "jaccard", "intersect.target", "text"),
   type = 1,
   txt.col = c("black", "white"),
   rmz = TRUE,

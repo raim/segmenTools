@@ -10,6 +10,7 @@ plotOverlapsLegend(
   type = 1,
   round = 0,
   show.text = TRUE,
+  text,
   l = 5,
   n = 100,
   col,
@@ -32,6 +33,10 @@ of black text}
 
 \item{show.text}{show log10(p) as text fields (to indicated text p-value
 cutoff)}
+
+\item{text}{optional single character to be shown as black/white text
+in the legend (e.g. \code{text="n"} to indicate the counts used
+in plots of \code{\link{clusterCluster}} results}
 
 \item{l}{number of fields to show in plot}
 

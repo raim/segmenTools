@@ -270,6 +270,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param labels add axis labels
 #' @param show.text show log10(p) as text fields (to indicated text p-value
 #' cutoff)
+#' @param text optional single character to be shown as black/white text
+#' in the legend (e.g. \code{text="n"} to indicate the counts used
+#' in plots of \code{\link{clusterCluster}} results
 ## @param side plot side to draw label, use NA to supress
 #' @param l number of fields to show in plot
 #' @param n number of color shades between \code{p=1} (white)
@@ -280,7 +283,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 #' @param ... further arguments to \code{\link{plotOverlaps}} 
 #' @export
 plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
-                               show.text=TRUE,
+                               show.text=TRUE, text,
                                l=5, n=100, col, dir=1, labels=TRUE, ...) {
 
     leg <- list()
@@ -311,6 +314,12 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
         if ( missing(col) )
             col <- grDevices::gray(seq(1,0,length.out=n))
      }
+
+    if ( !missing(text) ) {
+        leg$text <- leg$overlap
+        leg$text[] <- text
+        leg$overlap <- NULL
+    }
 
     if ( dir==2 )  
         leg <- lapply(leg, t)
@@ -398,7 +407,7 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 #' @export
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
                          values=c("overlap","statistic",
-                                  "jaccard","intersect.target"),
+                                  "jaccard","intersect.target","text"),
                          type=1, txt.col = c("black","white"), rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, show.total=FALSE, ...) {
@@ -459,16 +468,19 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
         ## shorten large overlap numbers?
         if ( !type%in%c("overlap","statistic") )
             short <- FALSE
-        
-        ## parse and process text values
+
         txt <- x[[type]]
-        if ( scale>1 ) txt <- txt*scale
-        ## % of relative intersect
-        if ( type=="intersect.target" ) txt <- txt*100
-        if ( type=="intersect.query" ) txt <- txt*100
-        if ( !missing(round) ) txt <- round(txt,digits=round)
-        else round <- NA
-        
+
+        if ( type!="text" ) {
+            ## parse and process text values
+            if ( scale>1 ) txt <- txt*scale
+            ## % of relative intersect
+            if ( type=="intersect.target" ) txt <- txt*100
+            if ( type=="intersect.query" ) txt <- txt*100
+            if ( !missing(round) ) txt <- round(txt,digits=round)
+            else round <- NA
+        }
+                
         ## select color based on p.txt
         if ( rmz) txt[txt=="0"] <- ""
         tcol <- txt
