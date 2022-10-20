@@ -340,7 +340,8 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
         
         mtext(expression(log[10](p)), side, par("mgp")[1])
         if ( type==2 )
-            axis(dir, at=at, labels=c("lower","higher"))
+            axis(dir, at=at, labels=c("lower","higher"),
+                 las=ifelse(dir==2, 1, 2))
     }
     x<-leg # silent return of used overlap object
 }
@@ -539,6 +540,13 @@ t.clusterOverlaps <- function(x) {
     for ( i in 1:length(x) )
         if ( class(x[[i]])=="matrix" ) 
             x[[i]] <- t(x[[i]])
+    ## switch names - TODO: solve this nicer?
+    if ( "num.query" %in% names(x) )
+        names(x)[which(names(x)=="num.query")] <- "NUM.TARGET"
+    if ( "num.target" %in% names(x) )
+        names(x)[which(names(x)=="num.target")] <- "NUM.QUERY"
+    names(x) <- sub("NUM.TARGET","num.target",
+                    sub("NUM.QUERY","num.query", names(x)))
     x
 }
 
