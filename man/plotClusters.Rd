@@ -44,6 +44,7 @@ plotClusters(
   ref.xy,
   ref.col = "#C0C0C080",
   ref.ylab = "",
+  ref.log = FALSE,
   ...
 )
 }
@@ -179,6 +180,8 @@ dissolved oxygen traces}
 \item{ref.col}{color for reference data plot}
 
 \item{ref.ylab}{y-axis label (right y-axis) for reference data}
+
+\item{ref.log}{logarithmic axis for reference data}
 
 \item{...}{further arguments to the basic setup call to
 \code{\link[graphics:plot]{plot}} ## TODO: clean up mess

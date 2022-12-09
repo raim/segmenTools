@@ -2152,6 +2152,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #'     dissolved oxygen traces
 #' @param ref.col color for reference data plot
 #' @param ref.ylab y-axis label (right y-axis) for reference data
+#' @param ref.log logarithmic axis for reference data
 #' @param leg.ids a named vector providing alternative IDs for
 #'     legends; the names should correspond to the rownames of
 #'     clusterings in \code{cls}
@@ -2176,7 +2177,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                          embed=FALSE,
                          plot.legend=FALSE, leg.xy="topleft", leg.ids, 
 			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,
-                         ref.xy, ref.col="#C0C0C080", ref.ylab="", ...) 
+                         ref.xy, ref.col="#C0C0C080", ref.ylab="",
+                         ref.log=FALSE, ...) 
 {
 
     
@@ -2294,20 +2296,26 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
         if ( !embed ) # don't set mfcol, to embed into externally set layouts
             par(mfcol=c(length(cls.srt),1),mai=newmai)
      } else {
-        if ( !missing(ref.xy) ) {
-            plot(ref.xy,type="l",lty=1,lwd=2,col=ref.col,
-                 axes=FALSE,xlab=NA,ylab=NA,
-                 ylim=round(range(ref.xy[,2])),xlim=xlim)
-            polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
+         if ( !missing(ref.xy) ) {
+             ylog <- ifelse(ref.log,"y", "")
+             rlm <- range(ref.xy[,2])
+             if ( ylog!="y" ) rlm <- round(rlm)
+             plot(ref.xy,type="l",lty=1,lwd=2,col=ref.col,
+                  axes=FALSE,xlab=NA,ylab=NA,
+                  ylim=rlm,xlim=xlim, log=ylog)
+             polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                     y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                     col=ref.col,border=NA)
-            if ( axes ) {
-                axis(4,at=round(range(ref.xy[,2])),las=2,
-                     col=ref.col, col.ticks=ref.col, col.axis=ref.col)
-                mtext(ref.ylab, 4, .35, col=ref.col)
-            }
-            par(new=TRUE)
-        }
+             if ( axes ) {
+                 if ( ylog=="y" )
+                     axis(4,labels=FALSE, las=2,
+                          col=ref.col, col.ticks=ref.col, col.axis=ref.col)
+                 axis(4,at=rlm,las=2,
+                      col=ref.col, col.ticks=ref.col, col.axis=ref.col)
+                 mtext(ref.ylab, 4, .35, col=ref.col)
+             }
+             par(new=TRUE)
+         }
         ## use normalization is ylab
         if ( missing(ylab) ) ylab <- norm
         plot(1,col=NA,axes=FALSE,
@@ -2325,14 +2333,20 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
     for ( cl in cls.srt ) {
         if ( each ) {
             if ( !missing(ref.xy) ) {
+                ylog <- ifelse(ref.log,"y", "")
+                rlm <- range(ref.xy[,2])
+                if ( ylog!="y" ) rlm <- round(rlm)
                 plot(ref.xy,type="l",lty=1,lwd=2,col=ref.col,
                      axes=FALSE,xlab=NA,ylab=NA,
-                     ylim=round(range(ref.xy[,2])),xlim=xlim)
+                     ylim=rlm,xlim=xlim, log=ylog)
                 polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
                         y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
                         col=ref.col,border=NA)
                 if ( axes ) {
-                    axis(4,at=round(range(ref.xy[,2])),las=2,
+                    if ( ylog=="y" ) 
+                        axis(4,labels=FALSE, las=2,
+                             col=ref.col, col.ticks=ref.col, col.axis=ref.col)
+                    axis(4,at=rlm,las=2,
                          col=ref.col, col.ticks=ref.col)
                     mtext(ref.ylab, 4, .35, col=ref.col, col.axis=ref.col)
                 }
