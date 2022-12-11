@@ -2363,7 +2363,10 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
         }
         if ( "rng"%in%type ) {## polygon
             pcol <- ifelse(fill, pol.col[cl], NA)
-            polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
+            x <- c(time,rev(time))
+            y <- c(avg$low[cl,],rev(avg$high[cl,]))
+            if ( any(is.na(y)) ) warning("some data in plot ranges were NA")
+            polygon(x=x[!is.na(y)], y=y[!is.na(y)],
                     col=pcol,border=NA)
             if ( border>0 ) {
                 lines(time, avg$low[cl,], col=cls.col[cl], lwd=border)
@@ -2513,9 +2516,12 @@ plot.clusteraverages <- function(x, cls.srt, cls.col,
                  ylab=paste(ylab,cl,sep=" - "),ylim=ylim, ...)
             axis(1);axis(2)
         }
-        if ( ranges ) { 
-            polygon(c(time,rev(time)),c(avg$low[cl,],rev(avg$high[cl,])),
-                    col=pol.col[cl],border=NA)
+        if ( ranges ) {
+            x <- c(time,rev(time))
+            y <- c(avg$low[cl,],rev(avg$high[cl,]))
+            if ( any(is.na(y)) ) warning("some data in plot ranges were NA")
+
+            polygon(x=x[!is.na(y)],y=y[!is.na(y)], col=pol.col[cl],border=NA)
             if ( border>0 ) {
                 lines(time, avg$low[cl,], col=cls.col[cl], lwd=border)
                 lines(time, avg$high[cl,], col=cls.col[cl], lwd=border)
