@@ -574,7 +574,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
     ## transpose all, if sorting of x-axis (1) is requested
     if ( axis==1 ) # ovl <- lapply(ovl, t)
         for ( i in 1:length(ovl) )
-            if ( class(ovl[[i]])=="matrix" ) 
+            if ( "matrix"%in%class(ovl[[i]]) ) 
                 ovl[[i]] <- t(ovl[[i]])
 
     pvl <- abs(ovl$p.value)
@@ -610,7 +610,7 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
     n <- nrow(pvl)
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
-      if ( class(ovl[[i]])=="matrix" ) ## check if matrix is of same dim
+      if ( "matrix"%in%class(ovl[[i]]) ) ## check if matrix is of same dim
         if ( nrow(ovl[[i]])==n ) #& ncol(ovl[[i]])==m )
           ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
 
@@ -2376,14 +2376,14 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
         if ( "all"%in%type ) {
             idx <- cls==cl
             if ( use.lty )
-                lty <- rep(1:6, len=sum(idx,na.rm=TRUE))
+                lty <- rep(1:6, length.out=sum(idx,na.rm=TRUE))
             else  lty <- rep(1, sum(idx,na.rm=TRUE)) #lty <- all.lty[idx]
             matplot(time, t(ts[idx,,drop=FALSE]), add=TRUE,
                     type="l", lty=lty, col=all.col[idx], lwd=lwd)
             
             ## store for external legend (eg. plotSingles with each=FALSE)
             used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
-                                          lty=lty[idx],col=all.col[idx],
+                                          lty=lty,col=all.col[idx],
                                           stringsAsFactors=FALSE)
             if ( plot.legend ) {
                 nms <- rownames(ts)[idx]
