@@ -511,8 +511,13 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
     ## overlaps sorted by sortClusters indicate where
     ## unsorted non-significant hits start - draw a line: 
     if ( show.sig & "nsig"%in%names(x) )
-        if ( nrow(pval)>x$nsig )
-            abline(h=nrow(pval)-x$nsig+.5, col=2, lwd=2)
+        if ( x$nsigdir== 2 ) {
+            if ( nrow(pval)>x$nsig )
+                abline(h=nrow(pval)-x$nsig+.5, col=2, lwd=2)
+        } else {
+            if ( ncol(pval)>x$nsig )
+                abline(v=x$nsig+.5, col=2, lwd=2)
+        }
 
     if ( show.total ) {
         if ( "num.query"%in%names(x) )
@@ -547,6 +552,8 @@ t.clusterOverlaps <- function(x) {
         names(x)[which(names(x)=="num.target")] <- "NUM.QUERY"
     names(x) <- sub("NUM.TARGET","num.target",
                     sub("NUM.QUERY","num.query", names(x)))
+    if ( "nsigdir"%in%names(x) ) # direction of sign. cut from sortOverlaps
+        x$nsigdir <- ifelse(x$nsigdir==1, 2, 1)
     x
 }
 
@@ -572,10 +579,8 @@ t.clusterOverlaps <- function(x) {
 sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
 
     ## transpose all, if sorting of x-axis (1) is requested
-    if ( axis==1 ) # ovl <- lapply(ovl, t)
-        for ( i in 1:length(ovl) )
-            if ( "matrix"%in%class(ovl[[i]]) ) 
-                ovl[[i]] <- t(ovl[[i]])
+    if ( axis==1 ) 
+        ovl <- t.clusterOverlaps(ovl)
 
     pvl <- abs(ovl$p.value)
 
@@ -616,11 +621,12 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
 
     ## transpose back
     if ( axis==1 )
-        ovl <- lapply(ovl, t)
+        ovl <- t.clusterOverlaps(ovl)
 
 
     ## add number of sorted sig
     ovl$nsig <- nsig
+    ovl$nsigdir <- axis # remember direction
 
     ovl
 }
