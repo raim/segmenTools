@@ -2617,7 +2617,7 @@ shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
   yo <- r*strheight('A')
   
 
-    theta <- seq(pi/4, 2*pi, length.out=8)
+    theta <- seq(pi/4, 2*pi, length.out=100)
     for (i in theta) {
         text( xy$x + cos(i)*xo, xy$y + sin(i)*yo, labels, col=bg, ... )
   }
