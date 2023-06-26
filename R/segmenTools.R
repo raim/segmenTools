@@ -729,6 +729,10 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' than \code{minn} data are available
 #' @param rlim ratio (y-)axis limis
 #' @param jlim Jaccard (x-)axis limits
+#' @param xlb x-axis label
+#' @param ylb1 lower y-axis label for R<1 (Q<T) range
+#' @param ylb2 upper x-axis label for R>1 (Q>T) range
+#' @param yat draw additional y-axis ticks at these positions (for R and 1/R)
 #' @param decorate decorate the plot with Jaccard threshold and quartal
 #' numbers
 #' @param j.thresh Jaccard threshold, line will be drawn at this point,
@@ -742,6 +746,9 @@ plotOverlap <- function(ovlstats,type="rcdf",file.name) {
 #' @export
 jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10, 
                    rlim=c(0,2), jlim=c(0,1.05), decorate=TRUE,
+                   xlb=expression("Jaccard Index"~J==I/U),
+                   ylb1=expression(R==Q/T),
+                   ylb2=expression(1/R==T/Q), yat=0.5,
                    j.thresh=0.5, yd=.1,did="", tot, ...) {
 
     ## legend text
@@ -756,7 +763,7 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
         ratio[which(ratio>1)] <- 2 - 1/ratio[which(ratio>1)]
     
     plot(jaccard,ratio, ylim=rlim, xlim=jlim, col=NA,
-         xlab=expression("Jaccard Index,"~J*"="*I/U),
+         xlab=xlb,
          ylab=NA, axes=FALSE)
 
 
@@ -774,23 +781,22 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
     ##abline(v=1, col="red", lwd=2, lty=2)
     abline(h=1)
     axis(1)
+    mgp <- par("mgp")
     ## construct axes for symmetric plot
     if ( symm ) {
         axis(2, labels=NA, col.ticks=NA) # empty line
-        ## long tick at symmetry axis 1
-        mgp <- par("mgp")
-        mgp1 <- mgp
-        mgp1[2] <- mgp1[2]*2
-        axis(2, at=1, labels=1, cex=1.1, tcl=2*par("tcl"), mgp=mgp1)
-        ## axis for Q/T
-        qt <- pretty(seq(0,1,.1))
-        axis(2, at=qt[-length(qt)])
-        ## axis for T/Q
-        xt <- pretty(seq(1,2,.1))
-        xt <- xt[-1]
-        axis(2, at=xt, labels=2-xt)
-        mtext(expression(R*"="*Q/T), 2, mgp[1], adj=.25)
-        mtext(expression(1/R*"="*T/Q), 2, mgp[1], adj=.75)
+        ##axis(4)
+        ## lower y-axis, R<1
+        yat <- yat[!yat%in%c(0,1,2)]
+        axis(2, at=yat)
+        ## upper y-axis, R>1
+        axis(2, at=2-yat, labels=yat)
+        axis(2, at=c(0,1,2), labels=c(0,1,0))
+        axis(2, labels=FALSE, at=seq(0,2,.1), tcl=-.125)
+        ## axis labels
+        mtext(ylb1, 2, mgp[1], adj=.25)
+        mtext(ylb2, 2, mgp[1], adj=.75)
+        mtext("|", 2, mgp[1])
     } else {
         axis(2)
         mtext(expression("Length Ratio,"~R*"="*Q/T), 2, mgp[1])
@@ -825,10 +831,10 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
         ylow  <- ylim[1]+ydff
         yhigh <- ylim[2]-ydff
         
-        text(j.thresh, yhigh-ydff,
-             bquote(Q>T*":"~.(sum(good,na.rm=TRUE))),pos=4)
-        text(j.thresh, ylow +ydff,
-             bquote(Q<T*":"~.(sum(bad, na.rm=TRUE))),pos=4)
+        shadowtext(j.thresh, yhigh-ydff, col=1,
+             bquote(.(sum(good,na.rm=TRUE))),pos=4) # Q>T*":"~
+        shadowtext(j.thresh, ylow +ydff, col=1,
+             bquote(.(sum(bad, na.rm=TRUE))),pos=4) # Q<T*":"~
         
         ## below jaccard threshold
         long  <- ratio>=1 & jaccard<=j.thresh
@@ -836,8 +842,8 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
         shorts <- sum(short, na.rm=TRUE)
         longs  <- sum(long,  na.rm=TRUE)
         
-        text(j.thresh, yhigh, bquote(Q>T*":"~.(longs)),pos=2)
-        text(j.thresh, ylow,  bquote(Q<T*":"~.(shorts)),pos=2)
+        shadowtext(j.thresh, yhigh, bquote(.(longs)) ,col=1,pos=2) # Q>T*":"~
+        shadowtext(j.thresh, ylow,  bquote(.(shorts)),col=1,pos=2) # Q<T*":"~
         
         ## this was only useful for !symm
         ##if ( any(ratio>rlim[2],na.rm=TRUE) )

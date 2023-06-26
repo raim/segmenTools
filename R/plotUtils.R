@@ -104,4 +104,18 @@ figlabel <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
 
 
 
+#' Map values to colors
+#'
+#' A simple function copied from 
+## from https://stackoverflow.com/questions/15006211/how-do-i-generate-a-mapping-from-numbers-to-colors-in-r to map numeric values to colors
+#' @param x numeric values
+#' @param cols a vector of colors
+#' @param limits min/max cut-off values of x
+#' @export
+val2col <-function(x, cols,limits=NULL) {
+    
+    if(is.null(limits)) limits=range(x)
 
+    cols[findInterval(x,seq(limits[1],limits[2],
+                            length.out=length(cols)+1), all.inside=TRUE)]
+}

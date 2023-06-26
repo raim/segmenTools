@@ -13,6 +13,10 @@ jrplot(
   rlim = c(0, 2),
   jlim = c(0, 1.05),
   decorate = TRUE,
+  xlb = expression("Jaccard Index" ~ J == I/U),
+  ylb1 = expression(R == Q/T),
+  ylb2 = expression(1/R == T/Q),
+  yat = 0.5,
   j.thresh = 0.5,
   yd = 0.1,
   did = "",
@@ -40,6 +44,14 @@ than \code{minn} data are available}
 
 \item{decorate}{decorate the plot with Jaccard threshold and quartal
 numbers}
+
+\item{xlb}{x-axis label}
+
+\item{ylb1}{lower y-axis label for R<1 (Q<T) range}
+
+\item{ylb2}{upper x-axis label for R>1 (Q>T) range}
+
+\item{yat}{draw additional y-axis ticks at these positions (for R and 1/R)}
 
 \item{j.thresh}{Jaccard threshold, line will be drawn at this point,
 and counts reported for values below and above}
