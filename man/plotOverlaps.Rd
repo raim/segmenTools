@@ -8,6 +8,7 @@ plotOverlaps(
   x,
   p.min = 0.01,
   p.txt = p.min * 5,
+  p.max,
   n = 100,
   col,
   values = c("overlap", "statistic", "jaccard", "intersect.target", "text"),
@@ -33,6 +34,9 @@ this cutoff will appear black (one-sided tests) or red/blue
 
 \item{p.txt}{p-value cutoff for showing overlap numbers as white instead
 of black text}
+
+\item{p.max}{p-value cutoff for starting the color scale, e.g. 0.05; useful
+for generally high p-values.}
 
 \item{n}{number of color shades between \code{p=1} (white)
 and \code{p >= p.min} (black)}

@@ -373,6 +373,8 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 #' (two-sided tests) 
 #' @param p.txt p-value cutoff for showing overlap numbers as white instead
 #' of black text
+#' @param p.max p-value cutoff for starting the color scale, e.g. 0.05; useful
+#' for generally high p-values.
 #' @param n number of color shades between \code{p=1} (white)
 #' and \code{p >= p.min} (black)
 #' @param col color ramp, default are grey values (one-sided) or
@@ -406,7 +408,7 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 ## TODO: sort by significance?
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
-plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
+plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
                          values=c("overlap","statistic",
                                   "jaccard","intersect.target","text"),
                          type=1, txt.col = c("black","white"), rmz=TRUE,
@@ -415,6 +417,9 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, n=100, col,
 
     ## set up p-value and colors
     pval <- x$p.value
+
+    ## set p-values above p.max to 1
+    if ( !missing(p.max) ) pval[pval>p.max] <- 1
 
     ## "negative" sign indicated two-sided test
     if ( "sign"%in%names(x) | type==2 ) {
