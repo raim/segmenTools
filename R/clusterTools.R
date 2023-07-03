@@ -612,7 +612,8 @@ sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
         ## used passed sorting!
         new.srt <- srt
         nsig <- NULL
-        warning("custom sorting via `srt` is untested!")
+        ## 202307 - tested well in clusterGo.R
+        ## warning("custom sorting via `srt` is untested!")
     }
     
     ## resort all matrices in overlap structure (overlap, pvalue, jaccard, ...)
