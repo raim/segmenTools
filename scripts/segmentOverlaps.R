@@ -3,7 +3,7 @@
 ## SEGMENT CLASSES OVERLAP STATISTIC
 ## by permutation test analysis
 
-## TODO: implement downstream scan
+## TODO: test downstream implementation, just using negative upstream
 
 library(segmenTools)
 
@@ -170,11 +170,24 @@ if ( upstream!=0 ) {
     start[str%in%rev.str] <-
         apply(utarget[str%in%rev.str,c("start","end")],1,min)
     end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)
+
+    if ( upstream > 0 ) {
+        
+        utarget[str%in%frw.str, c("start","end")] <-
+            cbind(start-upstream, start-1)[str%in%frw.str,]
+
+        utarget[str%in%rev.str, c("start","end")] <-
+            cbind(end+1, end+upstream)[str%in%rev.str,]
+
+    } else { # use negative upstream as downstream from end!
+
+        utarget[str%in%frw.str, c("start","end")] <-
+            cbind(end+1, end-upstream)[str%in%frw.str,]
+
+        utarget[str%in%rev.str, c("start","end")] <-
+            cbind(start+upstream,  start-1)[str%in%rev.str,]
     
-    utarget[str%in%frw.str, c("start","end")] <-
-        cbind(start-upstream,start-1)[str%in%frw.str,]
-    utarget[str%in%rev.str, c("start","end")] <-
-        cbind(end+1,end+upstream)[str%in%rev.str,]
+   }
     target[,c("start","end","strand")] <- utarget
 }
 
@@ -190,7 +203,7 @@ if ( antisense & !self ) {
 if ( upstream!=0 ) {
     ## plot axis labels
     qlab <- paste("query:", qclass)
-    tlab <- paste("target:", tclass, "- upstream", upstream)
+    tlab <- paste("target:", tclass, "- up/downstream", upstream)
 }
 
 if ( verb>0 )
@@ -340,9 +353,11 @@ if ( qclass%in%c("","qclass") ) qclass <- "all"
 
 ## store data
 ##OUTFILE NAME
+
+streamid <- ifelse(upstream>0, "_upstream","_downstream")
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
-                    ifelse(upstream!=0, paste0("_upstream",upstream),""))
+                    ifelse(upstream!=0, paste0(sreamid,upstream),""))
 if ( !interactive() ) {
     save(ovl, file=paste0(file.name,".rda"))
     if ( "annotation" %in% names(ovl) )
