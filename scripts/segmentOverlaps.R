@@ -344,7 +344,7 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0("_upstream",upstream),""))
 if ( !interactive() ) {
-    save(ovl, file=paste0(file.name,".RData"))
+    save(ovl, file=paste0(file.name,".rda"))
     if ( "annotation" %in% names(ovl) )
         write.table(ann, file=paste0(file.name,"_annotation.tsv"),
                     sep="\t", row.names=FALSE, quote=FALSE)
