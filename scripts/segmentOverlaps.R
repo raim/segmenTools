@@ -357,7 +357,7 @@ if ( qclass%in%c("","qclass") ) qclass <- "all"
 streamid <- ifelse(upstream>0, "_upstream","_downstream")
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
-                    ifelse(upstream!=0, paste0(sreamid,upstream),""))
+                    ifelse(upstream!=0, paste0(streamid,upstream),""))
 if ( !interactive() ) {
     save(ovl, file=paste0(file.name,".rda"))
     if ( "annotation" %in% names(ovl) )

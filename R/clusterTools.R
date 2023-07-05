@@ -581,7 +581,7 @@ t.clusterOverlaps <- function(x) {
 #' @param srt sorting vector for rows, if this is passed the significance
 #' sorting is skipped
 #' @export
-sortOverlaps <- function(ovl, p.min=.05, axis=2, cut=FALSE, srt) {
+sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt) {
 
     ## transpose all, if sorting of x-axis (1) is requested
     if ( axis==1 ) 
