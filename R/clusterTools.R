@@ -409,8 +409,8 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 ## TODO: handle jaccard vs. hypergeo better (see comments)
 #' @export
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
-                         values=c("overlap","statistic",
-                                  "jaccard","intersect.target","text"),
+                         values=c("overlap","count","statistic",
+                                  "jaccard","text"),
                          type=1, txt.col = c("black","white"), rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, show.total=FALSE, ...) {
@@ -472,7 +472,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
         ## and align scale/round/short options
         
         ## shorten large overlap numbers?
-        if ( !type%in%c("overlap","statistic") )
+        if ( !type%in%c("overlap","count","statistic") )
             short <- FALSE
 
         txt <- x[[type]]
@@ -480,9 +480,6 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
         if ( type!="text" ) {
             ## parse and process text values
             if ( scale>1 ) txt <- txt*scale
-            ## % of relative intersect
-            if ( type=="intersect.target" ) txt <- txt*100
-            if ( type=="intersect.query" ) txt <- txt*100
             if ( !missing(round) ) txt <- round(txt,digits=round)
             else round <- NA
         }
@@ -492,7 +489,8 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
         tcol <- txt
         tcol[] <- txt.col[1]
         tcol[abs(pval) >= -log2(p.txt)] <- txt.col[2]
-        ## cut text (high overlap numbers)
+
+        ## cut high numbers by 1000: 1321 -> 1.3k
         if ( short ) {
             txt <- x[[type]]
             hg <-txt>1e3

@@ -9,10 +9,12 @@ Description: tools and scripts for analysis of gene clusters and genome segmenta
 Depends:
     R (>= 3.0.0)
 Suggests:
-    segmenTier, 
+    segmenTier,
     circular,
     farms,
-    flowMerge, flowClust, flowCore
+    flowMerge,
+    flowClust,
+    flowCore,
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true

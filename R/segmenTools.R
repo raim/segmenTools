@@ -1264,9 +1264,15 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' @param total total length of the query range (genome length), if missing
 #' the start of the first segment is also used as end
 #' @param perm number of permutations to perform
+#' @param symmetric treat test as symmetric. This is only useful for the
+#' case where overlaps all segments from the forward strand and the reverse
+#' strand are tested, to find antisense overlaps within a
+#' segment classification.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1) {
+segmentJaccard <- function(query, target, qclass, tclass, total,
+                           perm=0, symmetric=FALSE, verb=1) {
+    
     if ( missing(qclass) ) qclass <- ""
     if ( missing(tclass) ) tclass <- ""
 
@@ -1320,20 +1326,56 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     J.real <- matrix(NA, nrow=qN, ncol=tN)
     colnames(J.real) <- tcls.srt
     rownames(J.real) <- qcls.srt
+
     ## additional data
-    I.target <- I.query <- J.real # intersect/target
+    ##I.target <- I.query <-
+    U <- I <- J.test <- J.real # intersect/target
     for ( i in 1:qN ) {
         for ( j in 1:tN ) { 
             is <- length(intersect(qcls.rng[[i]],tcls.rng[[j]]))
             un <- length(union(qcls.rng[[i]],tcls.rng[[j]]))
-            J.real[i,j] <- is/un
-            I.target[i,j] <- is/length(tcls.rng[[j]]) 
-            I.query[i,j] <- is/length(qcls.rng[[i]]) 
-        }
+            U[i,j] <- un
+            I[i,j] <- is
+            ##J.real[i,j] <- is/un
+            ## TODO: why is this normalized by total range?
+            ## is it required anywhere but plotOverlaps?
+            ##I.target[i,j] <- is/length(tcls.rng[[j]]) 
+            ##I.query[i,j] <- is/length(qcls.rng[[i]]) 
+         }
     }
-    #J.real
 
-   
+    ## SYMMETRIC:
+    ## useful ONLY for the antisense with self-test
+    ## sum up intersect and union from both strands in
+    ## upper triangle of the matrix, and set lower to 0.
+    ## NOTE: this can cause wrong values for cases that
+    ## can not be tested here! Correct use is on the user
+    ## side!
+    ## TODO: a good test for this may be to apply to annotated ORF?
+    if ( symmetric ) {
+        
+        ## check if conditions are met
+        if ( length(tcls.srt)!=length(qcls.srt) ) symmetric <- FALSE
+        if ( symmetric )
+            if ( any(tcls.srt!=qcls.srt) ) symmetric <- FALSE
+
+        ## just take the sum of intersects and unions
+        ## for all classes
+        if ( symmetric ){
+            I[upper.tri(I)] <-
+                I[upper.tri(I)] + I[lower.tri(I)]
+            I[lower.tri(I)] <- 0
+            U <- U
+            U[upper.tri(U)] <-
+                U[upper.tri(U)] + U[lower.tri(U)]
+            U[lower.tri(U)] <- 0
+        } else 
+            stop("symmetric requested but target and query classes are not")
+    }
+    ## JACCARD INDEX
+    J.real <-  I/U
+
+    ## PERMUTATIONS
     if ( perm>0 ) {
 
         ## randomize queries
@@ -1353,7 +1395,9 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
             ## TODO: test cluster length distribution?
             
             J.rnd <- segmentJaccard(rquery, target, qclass="type", tclass,
-                                    perm=0)
+                                    perm=0, symmetric=symmetric)
+            ## TODO: for anti-self case, using for/rev strands,
+            ## sum up symmetrically
             J.pval <- J.pval + as.numeric(J.rnd$jaccard >= J.real)
         }
         cat(paste("\n"))
@@ -1365,20 +1409,24 @@ segmentJaccard <- function(query, target, qclass, tclass, total, perm=0, verb=1)
     ## results
     ovl <- list()
     ovl$jaccard <- J.real
-    ovl$intersect.target <- I.target
-    ovl$intersect.query <- I.query
-    ## as matrix to allow auto-sorting via lapply(ovl, function(x), x[cls.srt])
+    ovl$intersect <- I
+    ovl$union <- U
+    
+    ## total sizes
     ovl$total.target <- matrix(unlist(lapply(tcls.rng, length)),nrow=1)
     colnames(ovl$total.target) <- colnames(ovl$jaccard)
     ovl$total.query <- matrix(unlist(lapply(qcls.rng, length)),ncol=1)
-    
     rownames(ovl$total.query) <- rownames(ovl$jaccard)
-    if ( perm>0 ) 
-        ovl$p.value <- J.pval
 
+    ## total numbers of segments
     ovl$num.target <- t(as.matrix(table(tcls)))
     ovl$num.query <- as.matrix(table(qcls))
     
+    ## p values from permutation test
+    if ( perm>0 ) 
+        ovl$p.value <- J.pval
+
+ 
     ovl$columns <- ifelse(tclass!="",tclass,"target")
     ovl$rows <- ifelse(qclass!="",qclass,"query")
 

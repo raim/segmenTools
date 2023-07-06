@@ -280,9 +280,14 @@ if ( intersegment!="" ) {
 }
 
 ## calculate Jaccard Index and permutation test
+
+## symmetric: only for antisense of self!
+symmetric <- antisense & self
+if ( symmetric )
+    cat(paste("\n\tNOTE: symmetric test of antisense to self!\n"))
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
-                      verb=1)
+                      symmetric=symmetric, verb=1)
 
 
 ## ADD COUNTS
@@ -319,6 +324,12 @@ if ( count ) {
     ovl$count <- ovl$p.value
     ovl$count[] <- 0
     tab <- as.matrix(table(ann[,paste0("query_",qclass)], ann[,tclass]))
+
+    if ( symmetric ) {
+        tab[upper.tri(tab)] <-
+            tab[upper.tri(tab)] + tab[lower.tri(tab)]
+        tab[lower.tri(tab)] <- 0
+    }
 
     ## empty dim names
     rstr <- paste(sample(c(letters, LETTERS),12, replace=TRUE),

@@ -4,7 +4,16 @@
 \alias{segmentJaccard}
 \title{Jaccard-Index overlap test for classes of segments (genomic intervals)}
 \usage{
-segmentJaccard(query, target, qclass, tclass, total, perm = 0, verb = 1)
+segmentJaccard(
+  query,
+  target,
+  qclass,
+  tclass,
+  total,
+  perm = 0,
+  symmetric = FALSE,
+  verb = 1
+)
 }
 \arguments{
 \item{query}{query set of segments}
@@ -21,6 +30,11 @@ the target segments, omit or pass empty string ("") to use all}
 the start of the first segment is also used as end}
 
 \item{perm}{number of permutations to perform}
+
+\item{symmetric}{treat test as symmetric. This is only useful for the
+case where overlaps all segments from the forward strand and the reverse
+strand are tested, to find antisense overlaps within a
+segment classification.}
 
 \item{verb}{integer level of verbosity, 0: no messages, 1: show messages}
 }
