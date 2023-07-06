@@ -11,7 +11,7 @@ plotOverlaps(
   p.max,
   n = 100,
   col,
-  values = c("overlap", "count", "statistic", "jaccard", "intersect.target", "text"),
+  values = c("overlap", "count", "statistic", "jaccard", "text"),
   type = 1,
   txt.col = c("black", "white"),
   rmz = TRUE,
