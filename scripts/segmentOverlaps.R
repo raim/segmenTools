@@ -38,9 +38,9 @@ option_list <- list(
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
   make_option(c("--upstream"), type="integer", default=0,
-              help="search range upstream of target (in nt.)"),
-##  make_option(c("--downstream"), type="integer", default=0,
-##              help="search range downstream of target (in nt.)"),
+              help="search upstream (>0) or downstream (<0) of target (in bp)"),
+  make_option(c("--range"), type="integer", default=0,
+              help="search range around target (in bp)"),
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   make_option(c("--count"),  action="store_true", default=FALSE,
@@ -155,6 +155,34 @@ if ( target=="" & (antisense|upstream!=0) ) {
 }
 
 ## scan for range around targets
+if ( range!=0 ) {
+
+
+    ## make sure start < end for both strands
+    ## (only valid for non-circular DNA!!)
+    utarget <- target[,c("start","end","strand")]
+    str <- as.character(utarget[,"strand"])
+    start <- utarget[,"start"]
+    end <- utarget[,"end"]
+    
+    ## order start<end ; TODO: was  & str%in%frw.str required?
+    if ( any(end<start) ) 
+        stop("`end' must be larger then segment `start' on forward strand")
+
+    ## get start and end
+    start[str%in%rev.str] <-
+        apply(utarget[str%in%rev.str,c("start","end")],1,min)
+    end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)
+
+    utarget[str%in%frw.str, c("start","end")] <-
+        cbind(start-range, end+range)[str%in%frw.str,]
+    
+    utarget[str%in%rev.str, c("start","end")] <-
+        cbind(start+range, end-range)[str%in%rev.str,]
+        
+    target[,c("start","end","strand")] <- utarget
+}
+## scan for upstream (>0) or downstream (<0) of target
 if ( upstream!=0 ) {
 
 
@@ -164,9 +192,12 @@ if ( upstream!=0 ) {
     str <- as.character(utarget[,"strand"])
     start <- utarget[,"start"]
     end <- utarget[,"end"]
-    ## order start<end 
-    if ( any(end<start & str%in%frw.str) ) 
+    
+    ## order start<end  
+    if ( any(end<start) ) 
         stop("`end' must be larger then segment `start' on forward strand")
+
+    ## get start and end
     start[str%in%rev.str] <-
         apply(utarget[str%in%rev.str,c("start","end")],1,min)
     end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)

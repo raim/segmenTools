@@ -1363,11 +1363,11 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
         ## for all classes
         if ( symmetric ){
             I[upper.tri(I)] <-
-                I[upper.tri(I)] + I[lower.tri(I)]
+                I[upper.tri(I)] + t(I)[upper.tri(I)]
             I[lower.tri(I)] <- 0
             U <- U
             U[upper.tri(U)] <-
-                U[upper.tri(U)] + U[lower.tri(U)]
+                U[upper.tri(U)] + t(U)[upper.tri(U)]
             U[lower.tri(U)] <- 0
         } else 
             stop("symmetric requested but target and query classes are not")
