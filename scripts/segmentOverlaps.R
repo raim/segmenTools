@@ -400,6 +400,16 @@ streamid <- ifelse(upstream>0, "_upstream","_downstream")
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(upstream!=0, paste0(streamid,upstream),""))
+
+## store settings
+parameters <- list()
+parameters$permutations <- perm
+parameters$genomelength <- total
+parameters$symmetric <- symmetric
+parameters$upstream <- upstream
+parameters$antisense <- antisense
+ovl$parameters <- parameters
+
 if ( !interactive() ) {
     save(ovl, file=paste0(file.name,".rda"))
     if ( "annotation" %in% names(ovl) )

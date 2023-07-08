@@ -1427,8 +1427,8 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
         ovl$p.value <- J.pval
 
  
-    ovl$columns <- ifelse(tclass!="",tclass,"target")
-    ovl$rows <- ifelse(qclass!="",qclass,"query")
+    ovl$target <- ifelse(tclass!="",tclass,"target")
+    ovl$query <- ifelse(qclass!="",qclass,"query")
 
     ## TODO: further align results with clusterCluster
     class(ovl) <-  "clusterOverlaps"
