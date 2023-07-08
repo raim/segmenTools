@@ -405,9 +405,9 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
 parameters <- list()
 parameters$permutations <- perm
 parameters$genomelength <- total
-parameters$symmetric <- symmetric
 parameters$upstream <- upstream
 parameters$antisense <- antisense
+parameters$symmetric <- symmetric
 ovl$parameters <- parameters
 
 if ( !interactive() ) {
