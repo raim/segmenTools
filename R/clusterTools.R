@@ -538,7 +538,9 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
 
 #' transpose cluster overlap object
 #'
-#' TODO: test this systematically!
+#' TODO: solve the problem that target/query info is lost, by
+#' indicating whether target/query is in row or columns.
+#' 
 #' 
 #' @param x object of class `clusterOverlaps`
 #' @seealso \code{\link{clusterCluster}},
@@ -548,13 +550,23 @@ t.clusterOverlaps <- function(x) {
     for ( i in 1:length(x) )
         if ( class(x[[i]])=="matrix" ) 
             x[[i]] <- t(x[[i]])
-    ## switch names - TODO: solve this nicer?
-    if ( "num.query" %in% names(x) )
-        names(x)[which(names(x)=="num.query")] <- "NUM.TARGET"
-    if ( "num.target" %in% names(x) )
-        names(x)[which(names(x)=="num.target")] <- "NUM.QUERY"
-    names(x) <- sub("NUM.TARGET","num.target",
-                    sub("NUM.QUERY","num.query", names(x)))
+    
+    ## switch names
+    ## TODO: this is a bad solution, since the information
+    ## is lost, what the actual query was
+    tmpid <- paste(sample(LETTERS, 5, TRUE),collapse="")
+    names(x) <- sub("target", tmpid, names(x))
+    names(x) <- sub("query", "target", names(x))
+    names(x) <- sub(tmpid, "query", names(x))
+    
+    ## increase transposed counter
+    if ( !"parameters"%in%names(x) ) 
+        x$parameters <- list()
+    if ( !"transposed"%in%names(x$parameters) )
+        x$parameters$transposed <- 0
+    x$parameters$transposed <- x$parameters$transposed  + 1
+
+    ## significane cutoff direction
     if ( "nsigdir"%in%names(x) ) # direction of sign. cut from sortOverlaps
         x$nsigdir <- ifelse(x$nsigdir==1, 2, 1)
     x

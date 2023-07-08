@@ -165,11 +165,7 @@ if ( range!=0 ) {
     start <- utarget[,"start"]
     end <- utarget[,"end"]
     
-    ## order start<end ; TODO: was  & str%in%frw.str required?
-    if ( any(end<start) ) 
-        stop("`end' must be larger then segment `start' on forward strand")
-
-    ## get start and end
+    ## get start and end: independent of start/end definition; using strand info
     start[str%in%rev.str] <-
         apply(utarget[str%in%rev.str,c("start","end")],1,min)
     end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)
@@ -193,11 +189,7 @@ if ( upstream!=0 ) {
     start <- utarget[,"start"]
     end <- utarget[,"end"]
     
-    ## order start<end  
-    if ( any(end<start) ) 
-        stop("`end' must be larger then segment `start' on forward strand")
-
-    ## get start and end
+    ## get start and end: independent of start/end definition; using strand info
     start[str%in%rev.str] <-
         apply(utarget[str%in%rev.str,c("start","end")],1,min)
     end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)

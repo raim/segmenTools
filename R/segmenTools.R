@@ -1426,7 +1426,8 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
     if ( perm>0 ) 
         ovl$p.value <- J.pval
 
- 
+
+    ## store target and query information, CHANGED by transpose
     ovl$target <- ifelse(tclass!="",tclass,"target")
     ovl$query <- ifelse(qclass!="",qclass,"query")
 

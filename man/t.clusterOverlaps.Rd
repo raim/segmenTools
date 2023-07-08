@@ -10,7 +10,8 @@
 \item{x}{object of class `clusterOverlaps`}
 }
 \description{
-TODO: test this systematically!
+TODO: solve the problem that target/query info is lost, by
+indicating whether target/query is in row or columns.
 }
 \seealso{
 \code{\link{clusterCluster}},
