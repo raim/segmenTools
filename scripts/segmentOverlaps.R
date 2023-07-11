@@ -41,6 +41,8 @@ option_list <- list(
               help="search upstream (>0) or downstream (<0) of target (in bp)"),
   make_option(c("--range"), type="integer", default=0,
               help="search range around target (in bp)"),
+  make_option(c("--convergent"), type="integer", default=0,
+              help="search range downstream of query and target (in bp)"),
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   make_option(c("--count"),  action="store_true", default=FALSE,
@@ -94,12 +96,18 @@ if ( verb>0 )
     msg(paste("\n"))
 
 ## catch incompatible options
+if ( antisense & convergent!=0 )
+    stop("options --antisense and --convergent are incompatible!")
 if ( antisense & upstream!=0 )
     stop("options --antisense and --upstream are incompatible!")
 if ( nostrand & antisense )
     stop("options --nostrand and --antisense are incompatible")
 if ( nostrand & upstream!=0 )
     stop("options --nostrand and --upstream are incompatible")
+if ( nostrand & convergent!=0 )
+    stop("options --nostrand and --convergent are incompatible")
+if ( upstream!=0 & convergent!=0 )
+    stop("options --upstream and --convergent are incompatible")
 
 
 if ( verb>0 )
@@ -132,17 +140,18 @@ rev.str <- c("-1","-")
 ## comparison with self on reverse strand!
 ## compare forward with reverse strand!
 self <- FALSE
-if ( target=="" & (antisense|upstream!=0) ) {
+if ( target=="" & (antisense|convergent!=0) ) {
     self <- TRUE
     target <- query
     if ( tclass=="" )
       tclass <- qclass
-    if ( antisense ) {
+    if ( antisense | convergent!=0 ) {
+        ## NOTE: query on forward strand is permutated
         query <- query[as.character(query[,"strand"])%in%frw.str,]
         target <- target[as.character(target[,"strand"])%in%rev.str,]
         ## total length: only one strand
         total <- sum(chrL)
-    }    
+    }  
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
     ## TODO: map chromosome name to index
@@ -156,7 +165,6 @@ if ( target=="" & (antisense|upstream!=0) ) {
 
 ## scan for range around targets
 if ( range!=0 ) {
-
 
     ## make sure start < end for both strands
     ## (only valid for non-circular DNA!!)
@@ -180,7 +188,6 @@ if ( range!=0 ) {
 }
 ## scan for upstream (>0) or downstream (<0) of target
 if ( upstream!=0 ) {
-
 
     ## make sure start < end for both strands
     ## (only valid for non-circular DNA!!)
@@ -210,13 +217,43 @@ if ( upstream!=0 ) {
         utarget[str%in%rev.str, c("start","end")] <-
             cbind(start+upstream,  start-1)[str%in%rev.str,]
     
-   }
+    }
     target[,c("start","end","strand")] <- utarget
 }
 
+if ( convergent!=0 ) {
+    ## same as upstream<0 but for both query and target
+    ## forward strand: max(start,end) + range
+    ## reverse strand: min(start,end) - range
+    for ( tmp in c("query","target") ) {
+        
+        ## make sure start < end for both strands
+        ## (only valid for non-circular DNA!!)
+        udat <- get(tmp)[,c("start","end","strand")]
+        str <- as.character(udat[,"strand"])
+        start <- udat[,"start"]
+        end <- udat[,"end"]
+        
+        ## get start and end: independent of start/end definition; using strand info
+        start[str%in%rev.str] <-
+            apply(udat[str%in%rev.str,c("start","end")],1,min)
+        end[str%in%rev.str] <- apply(udat[str%in%rev.str,c("start","end")],1,max)
+        
+        udat[str%in%frw.str, c("start","end")] <-
+            cbind(end+1, end+convergent)[str%in%frw.str,]
+
+        udat[str%in%rev.str, c("start","end")] <-
+            cbind(start-convergent,  start-1)[str%in%rev.str,]
+        assign(x=paste0("u",tmp), value=udat)
+        
+    }
+    target[,c("start","end","strand")] <- utarget
+    query[,c("start","end","strand")] <- uquery
+}
+
 ## only compare forward and reverse strands for auto-target antisense
-if ( antisense & self ) {
-    ## plot axis labels
+## plot axis labels
+if ( (antisense|convergent!=0) & self ) {
     qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
     tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
 }
@@ -224,7 +261,6 @@ if ( antisense & !self ) {
     tlab <- paste(tlab, "- antisense")
 }
 if ( upstream!=0 ) {
-    ## plot axis labels
     qlab <- paste("query:", qclass)
     tlab <- paste("target:", tclass, "- up/downstream", upstream)
 }
@@ -245,12 +281,18 @@ if ( nostrand ) {
     target$strand <- "+"
 }
 
+## cut chromosome ends:
+## upstream and convergent may have produced non-existent coordinates!
+target <- pruneSegments(target, chrL=chrL, remove.empty=TRUE, verb=1)
+query  <- pruneSegments(query,  chrL=chrL, remove.empty=TRUE, verb=1)
+
 ## converting both to continuous index
-query <- coor2index(query, chrS)
+query  <- coor2index(query, chrS)
 target <- coor2index(target, chrS)
 
-## search on other strand 
-if ( antisense ) 
+## search antisense and convergent targets on other strand
+## for self: targets are reverse strand features, see above
+if ( (antisense|convergent!=0) ) 
     target <- switchStrand(target, chrS)
 
 ## upstream bug yeast - missing 2 micron plasmid - catch here
@@ -305,9 +347,13 @@ if ( intersegment!="" ) {
 ## calculate Jaccard Index and permutation test
 
 ## symmetric: only for antisense of self!
-symmetric <- antisense & self
+symmetric <- (antisense|convergent!=0) & self
 if ( symmetric )
-    cat(paste("\n\tNOTE: symmetric test of antisense to self!\n"))
+    cat(paste("\n\tNOTE: symmetric test of antisense|convergent with self!\n"))
+
+## TODO: replace this (optionally) with segmentoverlaps_bed.sh
+## write out bed files here (before coor2index), using coor2bed,
+## and construct script call, and parse results.
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
                       symmetric=symmetric, verb=1)
@@ -344,7 +390,7 @@ if ( count ) {
     ann <- ann[!is.na(ann[,paste0("query_ID")]),]
     
     ## count table
-    ovl$count <- ovl$p.value
+    ovl$count <- ovl$jaccard
     ovl$count[] <- 0
     tab <- as.matrix(table(ann[,paste0("query_",qclass)], ann[,tclass]))
 
@@ -397,7 +443,9 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
 parameters <- list()
 parameters$permutations <- perm
 parameters$genomelength <- total
+parameters$range <- range
 parameters$upstream <- upstream
+parameters$convergent <- convergent
 parameters$antisense <- antisense
 parameters$symmetric <- symmetric
 ovl$parameters <- parameters

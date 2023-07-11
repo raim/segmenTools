@@ -1,5 +1,6 @@
 ## GENOME UTILS
 
+
 #' Tag duplicate names by increasing numbers.
 #' @param names a vector of characters
 #' @export
@@ -600,4 +601,72 @@ alignData_relative <- function(coors, data, dst=500, chrS,
     geneData <- lapply(geneData, function(x) {rownames(x) <- rownames(coors);x})
     
     return(geneData)
+}
+
+#' export internal coordinate format to bed file format
+#' @param coor genome coordinates
+#' @param file optional name for bed output file
+#' @param coors column names of coordinate columns
+#' @param reverse reverse strand characters
+#' @param name column name for bed file name column (column 4)
+#' @param score column name for bed file score column (column 5)
+#' @param verb verbosity level, 0: silent
+#' @export
+coor2bed <- function(coor, file,
+                     coors=c(chr="chr", start="start", end="end",
+                             strand="strand"),
+                     reverse=c("-",-1), name, score, verb=1) {
+
+    ## add missing columns
+    if ( missing(name) )  {
+
+        rm <- which(colnames(coor)=="name") # rm existing name column
+        if ( length(rm)>0 ) coor <- coor[,-rm]
+        
+        coor <- cbind(coor, name=paste0("id",1:nrow(coor)))
+        name <- "name"
+    }
+    if ( missing(score) ) {
+        rm <- which(colnames(coor)=="score") # rm existing score column
+        if ( length(rm)>0 ) coor <- coor[,-rm]
+        
+        coor <- cbind(coor, score=rep(0, nrow(coor)))
+        score <- "score"
+    }
+
+
+    ## sort start/end
+    starts <- apply(coor[,coors[c("start","end")]], 1, min)
+    ends <- apply(coor[,coors[c("start","end")]], 1, max)
+
+    coor[,coors["start"]] <- starts
+    coor[,coors["end"]] <- ends
+
+    ## convert strand column
+    reverse <- coor[,"strand"] %in% reverse
+    coor[ reverse,coors["strand"]] <- "-"
+    coor[!reverse,coors["strand"]] <- "+"
+
+    ## order by starts
+    coor <- coor[order(coor[,coors["start"]]), ]
+    coor <- coor[order(coor[,coors["chr"]]), ]
+
+    ## convert starts to 0-based
+    ## NOTE: end is non-inclusive in bed-format, and
+    ## thus not corrected!
+    coor[,"start"] <- coor[,"start"]-1
+
+
+    ## chromosomes must begin with chr
+    coor[,coors["chr"]] <- paste0("chr", sprintf("%02d",coor[,coors["chr"]]))
+    
+    bed <- coor[,c(coors[c("chr","start","end")], name, score,coors["strand"])]
+
+    if( !missing(file) ) {
+        if ( verb>0 )
+            cat(paste("writing bed file:", file,"\n"))
+        write.table(x=bed, file=file, sep="\t",
+                    quote=FALSE, row.names=FALSE, col.names=FALSE)
+    }
+    invisible(bed)
 }

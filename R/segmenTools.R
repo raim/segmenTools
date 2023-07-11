@@ -706,13 +706,6 @@ collectOvlStats <- function(ovlStatLst, type) {
     res
 }
 
-## TODO
-plotOverlap <- function(ovlstats,type="rcdf",file.name) {
-    if ( !missing(file.name) )
-        png(file.name,width=400,height=400)
-    ## TODO
-   if ( !missing(file.name) ) dev.off()   
-}
 
 
 #' Jaccard vs. Ratio Segment Overlap Plots
@@ -1231,6 +1224,237 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
     return(res)
 }
 
+#' prune segments at chromosome ends
+#'
+#' Cuts segments coordinates that are beyond chromosome coordinates.
+#' @param x genome coordinate table,
+#' @param chrL chromosome length vector, where the chromosome column
+#' must provide the index in this vector; e.g. for 16 chromosomes,
+#' chrL has length 16 and provides, in this order, the lengths of
+#' chromosomes 1 to 16),
+#' @param coors coordinate column names to cut,
+#' @param chr chromosome column name,
+#' @param remove.empty after pruning, remove any segments with length 0;
+#' NOTE: that this also affects segments that were not pruned, and already
+#' had length 0 in \code{x}.
+#' @param verb integer level of verbosity, 0: no messages, 1: show messages
+#' @export
+pruneSegments <- function(x, chrL, chr="chr", 
+                          coors=c(start="start",end="end", coor="coor"),
+                          remove.empty=FALSE, verb=1) {
+    if ( missing(chrL) )
+        stop("chromosome length index is required to ",
+             "appropriately cut segments")
+    for ( coor in coors )
+        if ( coor %in% colnames(x) ) {
+
+            ## cut starts <0
+            cut <- which(x[,coor]<1)
+            if ( verb>0 & length(cut)>0 )
+                cat(paste("cutting", length(cut), "chromosome starts at",
+                          coor,"\n"))
+            if ( length(cut)>0 )
+                x[cut,coor] <- 1
+
+            ## cut ends > chromosome length
+            cut <- which(x[,coor]> chrL[x[,chr]])
+            if ( verb>0 & length(cut)>0 )
+                cat(paste("cutting", length(cut), "chromosome starts at",
+                              coor,"\n"))
+            if ( length(cut)>0 )
+                x[cut,coor] <- chrL[x[cut,chr]]
+        }
+    ## remove 0 length segments
+    if ( remove.empty ) {
+        remove <- which(x[,coors["start"]] == x[,coors["end"]])
+        if ( verb>0 & length(remove)>0 )
+            cat(paste("removing", length(remove), "segments with length 0\n"))
+        if ( length(remove)>0 )
+            x <- x[-remove,]
+    }
+    x
+}
+
+## reproduces segmentJaccard but based on installed
+## bedtools and commandline calls.
+## TODO: learn how to integrate scripts in R package,
+## simply put in src?
+#' calculate segment overlap statistics using UCSC bedtools
+#'
+#' This function produces the same output as \code{\link{segmentJaccard}},
+#' but using a command-line call to UCSC bedtools, which must be
+#' installed, and starting from normal genome coordinates (w/o indexing;
+#' 0-based and inclusive start and end). It temporarily creates bed files,
+#' and can require quite a lot of disk space. However, it is faster
+#' than \code{\link{segmentJaccard}}, and likely better tested.
+#' @param query query segment table, will be permutated.
+#' @param target target segment table.
+#' @param qclass column name which holds a sub-classification (clustering) of
+#' the query segments, omit to use all.
+#' @param tclass column name which holds a sub-classification (clustering) of
+#' the target segments, omit to use all.
+#' @param chrL obligatory vector of chromosome length, in the order
+#' used as index in the \code{chr} column of query and target.
+#' @param perm number of permutations for calculating statistics.
+#' @param tmpdir temporary directory, useful to provide for debugging,
+#' or exploring detailed results.
+#' @param save.permutations save permutated query bed files used
+#' in p-value calculation. If this is provided together with
+#'  \code{tmpdir}, the randomized bed files can be re-used. However, this
+#' may be dangerous or cause errors when different queries and targets
+#' are used with the same \code{tmpdir}.
+#' @param verb verbosity level, 0: silent.
+#'@export
+segmentJaccard_bed <- function(query, target, qclass, tclass,
+                               chrL, perm, tmpdir, save.permutations=FALSE,
+                               verb=1) {
+
+
+    ## generate temporary directory for all written files, unless provided
+    if ( missing(tmpdir) ) tmpdir <- tempdir()  
+    
+    ## generate genome index file
+    if ( verb>0 ) cat(paste("generating genome index file\n"))
+    chrN <- paste0("chr", sprintf("%02d",1:length(chrL)))
+    genome.idx <- file.path(tmpdir,"genome.idx")
+    write.table(file=genome.idx, x=cbind(chrN, chrL),
+                sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
+
+    ## generate bed files with coor2bed
+    qout <- file.path(tmpdir, "query.bed")
+    tout <- file.path(tmpdir, "target.bed")
+
+    ## generate types here: required
+    if ( missing(tclass) ) {
+        tclass <- "type"
+        target$type <- "all"
+    }
+    if ( missing(qclass) ) {
+        qclass <- "type"
+        query$type <- "all"
+    }
+    
+    ## generate IDs here, if not present: not required but IDs in
+    ## in the temp file helps to debug, or maybe required later
+    idq <- NA
+    if ( "ID" %in% colnames(query) ) idq <- "ID"
+    if ( is.na(idq) & "name" %in% colnames(query) ) idq <- "name"
+    if ( is.na(idq) ) {
+        query$ID <- paste0("id",1:nrow(query))
+        idq <- "ID"
+    }
+    idt <- NA
+    if ( "ID" %in% colnames(target) ) idt <- "ID"
+    if ( is.na(idt) & "name" %in% colnames(target) ) idt <- "name"
+    if ( is.na(idt) ) {
+        target$ID <- paste0("id",1:nrow(target))
+        idt <- "ID"
+    }
+
+    cat(paste(colnames(target)))
+    
+    coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb)
+    coor2bed(target, name=idt, score=tclass, file=tout, verb=verb)
+    
+    ## call bedtools script: query.bed target.bed genome.idx perm
+    if ( verb>0 ) cat(paste("system call to bedtools script\n"))
+    bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
+    outf <- file.path(tmpdir, paste0("overlaps.tsv"))
+    logf <- sub("\\.tsv$", ".log", outf)
+    bcmd <- paste("cd",tmpdir,";",bscript, qout, tout, genome.idx, perm,">", outf, "2>", logf)
+
+    ## call bed tools
+    system(bcmd)
+    
+    ## parse result
+    if ( verb>0 ) cat(paste("parsing results\n"))
+    ovl <- parseJaccard(outf, qclass=qclass, tclass=tclass)#, prefix=prefix
+    if ( !save.permutations ) {
+        unlink(c(qout, tout, genome.idx, outf, file.path(tmpdir,"query_random_*.bed")))
+    }
+    ovl
+}
+
+#' parses overlap statitics produced with bedtools
+#'
+#' Parses a file that is produced by the script \code{segmentoverlaps.sh}
+#' (based on USCS bedtools), into an \code{clusterOverlaps} class.
+#' @param ovfile output file produced by \code{segmentoverlaps.sh}.
+#' @param prefix optional class name prefix that was required for
+#' bed file definition (name, score columns).
+#' @param qclass optional name for the query classes.
+#' @param tclass optional name for the target classes.
+#' @export
+parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
+    
+    ovt <- read.delim(file=ovfile, stringsAsFactors=FALSE)
+    
+    ## remove prefix, that may have been required for bedtools
+    if ( !missing(prefix) ) {
+        ovt$query  <- sub(paste0("^", prefix), "", ovt$query)
+        ovt$target <- sub(paste0("^", prefix), "", ovt$target)
+    }
+    
+    ## total numbers
+    qidx <- which(ovt$target=="" | is.na(ovt$target))
+    qnms <- as.character(ovt[qidx,"query"])
+    nq <- ovt[qidx,"count", drop=FALSE]
+    uq <- ovt[qidx,"union", drop=FALSE]
+    
+    tidx <- which(ovt$query=="" | is.na(ovt$query))
+    tnms <- as.character(ovt[tidx,"target"])
+    nt <- t(ovt[tidx,"count", drop=FALSE])
+    ut <- t(ovt[tidx,"union", drop=FALSE])
+    
+    ## count and p-value tables
+    cnt <- matrix(NA, nrow=nrow(nq), ncol=ncol(nt))
+    
+    rownames(cnt) <- rownames(nq) <- rownames(uq) <- qnms
+    colnames(cnt) <- colnames(nt) <- colnames(ut) <- tnms
+    
+    ## copy matrix for p-values
+    pvl <- J <- U <- I <- cnt
+    
+    ## remove totals from count matrix
+    ovt <- ovt[-c(qidx,tidx),]
+
+    ## collect and calculate values
+    for ( cl in qnms ) {
+        idx <- ovt$query==cl
+        ## intersect, union and jaccard
+        I[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"intersect"]
+        U[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"union"]
+        J[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"jaccard"]
+        ## count of overlaps 
+        cnt[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"count"]
+        ## calculate p-value from permutation counters
+        pvl[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"random"]/ovt[idx,"permutations"]
+    }
+    
+    ## generate "clusterOverlaps" list
+    ovl <- list()
+    
+    ovl$intersect <- I
+    ovl$union <- U
+    ovl$jaccard <- J
+    
+    ovl$count <- cnt
+    ovl$p.value <-pvl
+    ovl$num.target <- nt
+    ovl$num.query <- nq
+
+    ## total sizes
+    ovl$total.target <- ut
+    ovl$total.query <- uq
+
+    ## store target and query information, CHANGED by transpose
+    ovl$target <- tclass
+    ovl$query <- qclass
+
+    class(ovl) <- "clusterOverlaps"
+    ovl
+}
+
 
 #' Jaccard-Index overlap test for classes of segments (genomic intervals)
 #'
@@ -1361,7 +1585,7 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
 
         ## just take the sum of intersects and unions
         ## for all classes
-        if ( symmetric ){
+        if ( symmetric ) {
             I[upper.tri(I)] <-
                 I[upper.tri(I)] + t(I)[upper.tri(I)]
             I[lower.tri(I)] <- 0
@@ -1408,9 +1632,9 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
 
     ## results
     ovl <- list()
-    ovl$jaccard <- J.real
     ovl$intersect <- I
     ovl$union <- U
+    ovl$jaccard <- J.real
     
     ## total sizes
     ovl$total.target <- matrix(unlist(lapply(tcls.rng, length)),nrow=1)
