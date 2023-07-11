@@ -1351,8 +1351,6 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
         idt <- "ID"
     }
 
-    cat(paste(colnames(target)))
-    
     coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb)
     coor2bed(target, name=idt, score=tclass, file=tout, verb=verb)
     
