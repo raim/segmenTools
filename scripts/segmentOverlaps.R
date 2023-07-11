@@ -356,8 +356,8 @@ if ( bedtools ) {
     target <- index2coor(target, chrS)
     ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
                               qclass=qclass, tclass=tclass, perm=perm, 
-                              verb=1, ## TODO: remove this after testing
-                              tmpdir="~/work/yeastSeq2016/test", save.permutations=TRUE)
+                              verb=1)#, ## TODO: remove this after testing
+                              ##tmpdir="~/work/yeastSeq2016/test", save.permutations=TRUE)
 } else {
     
     ## symmetric: only for antisense of self!
