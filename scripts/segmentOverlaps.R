@@ -47,6 +47,8 @@ option_list <- list(
               help="number of permutations"),
   make_option(c("--count"),  action="store_true", default=FALSE,
               help="count individual overlaps"),
+  make_option(c("--bedtools"),  action="store_true", default=FALSE,
+              help="use UCSC bedtools instead of segmenTools overlap functions"),
   ## OUTPUT
   make_option(c("--fig.type"), type="character", default="png",
               help="figure type (png, pdf, eps) [default %default]"),
@@ -348,78 +350,87 @@ if ( intersegment!="" ) {
 
 ## calculate Jaccard Index and permutation test
 
-## symmetric: only for antisense of self!
-symmetric <- (antisense|convergent!=0) & self
-if ( symmetric )
-    cat(paste("\n\tNOTE: symmetric test of antisense|convergent with self!\n"))
-
-## TODO: replace this (optionally) with segmentJaccard_bed
-## BEFORE coor2index call
-ovl <- segmentJaccard(query=query, target=target,
-                      qclass=qclass, tclass=tclass, perm=perm, total=total,
-                      symmetric=symmetric, verb=1)
-
-
-## ADD COUNTS
-if ( count ) {
-    tcol <- tclass
-    qcol <- qclass
-    if ( !"ID"%in%colnames(query) )
-        query <- cbind(query, ID=1:nrow(query))
-    qcol <- c("ID",qcol)
-    qcol <- qcol[qcol!=""]
+if ( bedtools ) {
+    symmetric <- FALSE # not implemented here
+    query <- index2coor(query, chrS)
+    target <- index2coor(target, chrS)
+    ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
+                              qclass=qclass, tclass=tclass, perm=perm, 
+                              verb=1, ## TODO: remove this after testing
+                              tmpdir="~/work/yeastSeq2016/test", save.permutations=TRUE)
+} else {
     
-    if ( !"ID"%in%colnames(target) ) 
-        target <- cbind(target, ID=1:nrow(target))
-    tcol <- c("ID",tcol)
-    tcol <- tcol[tcol!=""]
+    ## symmetric: only for antisense of self!
+    symmetric <- (antisense|convergent!=0) & self
+    if ( symmetric )
+        cat(paste("\n\tNOTE: symmetric test of antisense|convergent with self!\n"))
     
-    ann <- annotateTarget(query=query, target=target,
-                          collapse=FALSE,  details=FALSE, only.best=FALSE,
-                          qcol=qcol, tcol=tcol, prefix="query")
+    ## TODO: replace this (optionally) with segmentJaccard_bed
+    ## BEFORE coor2index call
+    ovl <- segmentJaccard(query=query, target=target,
+                          qclass=qclass, tclass=tclass, perm=perm, total=total,
+                          symmetric=symmetric, verb=1)
     
-    if ( tclass=="" ) {
-        tcol <- tclass <- "tclass"
-        ann <- cbind(ann, tclass="target")
+    
+    ## ADD COUNTS
+    if ( count ) {
+        tcol <- tclass
+        qcol <- qclass
+        if ( !"ID"%in%colnames(query) )
+            query <- cbind(query, ID=1:nrow(query))
+        qcol <- c("ID",qcol)
+        qcol <- qcol[qcol!=""]
+        
+        if ( !"ID"%in%colnames(target) ) 
+            target <- cbind(target, ID=1:nrow(target))
+        tcol <- c("ID",tcol)
+        tcol <- tcol[tcol!=""]
+        
+        ann <- annotateTarget(query=query, target=target,
+                              collapse=FALSE,  details=FALSE, only.best=FALSE,
+                              qcol=qcol, tcol=tcol, prefix="query")
+        
+        if ( tclass=="" ) {
+            tcol <- tclass <- "tclass"
+            ann <- cbind(ann, tclass="target")
+        }
+        if ( qclass=="" ) {
+            qcol <- qclass <- "qclass"
+            ann <- cbind(ann, query_qclass="query")
+        }
+        
+        ## FILTER EMPTY
+        ann <- ann[!is.na(ann[,paste0("query_ID")]),]
+        
+        ## count table
+        ovl$count <- ovl$jaccard
+        ovl$count[] <- 0
+        tab <- as.matrix(table(ann[,paste0("query_",qclass)], ann[,tclass]))
+        
+        if ( symmetric ) {
+            tab[upper.tri(tab)] <-
+                tab[upper.tri(tab)] + tab[lower.tri(tab)]
+            tab[lower.tri(tab)] <- 0
+        }
+        
+        ## empty dim names
+        rstr <- paste(sample(c(letters, LETTERS),12, replace=TRUE),
+                      collapse="")
+        colnames(tab)[colnames(tab)==""] <- rstr
+        colnames(ovl$count)[colnames(ovl$count)==""] <- rstr
+        rownames(tab)[rownames(tab)==""] <- rstr
+        rownames(ovl$count)[rownames(ovl$count)==""] <- rstr
+        
+        ## copy overlap count
+        ovl$count[rownames(tab),colnames(tab)] <- tab
+        
+        ## reset empty dim names
+        colnames(ovl$count)[colnames(ovl$count)==rstr] <- ""
+        rownames(ovl$count)[rownames(ovl$count)==rstr] <- ""
+        
+        ## ADD TO RESULT STRUCTURE
+        ovl$annotation <- ann
     }
-    if ( qclass=="" ) {
-        qcol <- qclass <- "qclass"
-        ann <- cbind(ann, query_qclass="query")
-    }
-
-    ## FILTER EMPTY
-    ann <- ann[!is.na(ann[,paste0("query_ID")]),]
-    
-    ## count table
-    ovl$count <- ovl$jaccard
-    ovl$count[] <- 0
-    tab <- as.matrix(table(ann[,paste0("query_",qclass)], ann[,tclass]))
-
-    if ( symmetric ) {
-        tab[upper.tri(tab)] <-
-            tab[upper.tri(tab)] + tab[lower.tri(tab)]
-        tab[lower.tri(tab)] <- 0
-    }
-
-    ## empty dim names
-    rstr <- paste(sample(c(letters, LETTERS),12, replace=TRUE),
-                  collapse="")
-    colnames(tab)[colnames(tab)==""] <- rstr
-    colnames(ovl$count)[colnames(ovl$count)==""] <- rstr
-    rownames(tab)[rownames(tab)==""] <- rstr
-    rownames(ovl$count)[rownames(ovl$count)==""] <- rstr
-
-    ## copy overlap count
-    ovl$count[rownames(tab),colnames(tab)] <- tab
-
-    ## reset empty dim names
-    colnames(ovl$count)[colnames(ovl$count)==rstr] <- ""
-    rownames(ovl$count)[rownames(ovl$count)==rstr] <- ""
-
-    ## ADD TO RESULT STRUCTURE
-    ovl$annotation <- ann
-    
-
 }
 
 
@@ -443,6 +454,7 @@ file.name <- paste0(outfile,"_",qclass,"_",tclass,
 ## store settings
 parameters <- list()
 parameters$permutations <- perm
+parameters$bedtools <- bedtools
 parameters$genomelength <- total
 parameters$range <- range
 parameters$upstream <- upstream

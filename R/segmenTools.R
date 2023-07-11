@@ -1398,11 +1398,24 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
     ## total numbers
     qidx <- which(ovt$target=="" | is.na(ovt$target))
     qnms <- as.character(ovt[qidx,"query"])
+    ## sort classes, if numeric
+    if ( all(!is.na(as.numeric(qnms))) ) {
+        ord <- order(as.numeric(qnms))
+    } else ord <- order(qnms)
+    qidx <- qidx[ord]
+    qnms <- qnms[ord]
     nq <- ovt[qidx,"count", drop=FALSE]
     uq <- ovt[qidx,"union", drop=FALSE]
+
     
     tidx <- which(ovt$query=="" | is.na(ovt$query))
     tnms <- as.character(ovt[tidx,"target"])
+    ## sort classes, if numeric
+    if ( all(!is.na(as.numeric(tnms))) ) {
+        ord <- order(as.numeric(tnms))
+    } else ord <- order(tnms)
+    tidx <- tidx[ord]
+    tnms <- tnms[ord]
     nt <- t(ovt[tidx,"count", drop=FALSE])
     ut <- t(ovt[tidx,"union", drop=FALSE])
     
