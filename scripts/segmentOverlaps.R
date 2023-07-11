@@ -292,6 +292,8 @@ target <- coor2index(target, chrS)
 
 ## search antisense and convergent targets on other strand
 ## for self: targets are reverse strand features, see above
+### TODO: make this function work on non-indexed genome,
+## or simply swap strands above (before coor2index).
 if ( (antisense|convergent!=0) ) 
     target <- switchStrand(target, chrS)
 
@@ -351,9 +353,8 @@ symmetric <- (antisense|convergent!=0) & self
 if ( symmetric )
     cat(paste("\n\tNOTE: symmetric test of antisense|convergent with self!\n"))
 
-## TODO: replace this (optionally) with segmentoverlaps_bed.sh
-## write out bed files here (before coor2index), using coor2bed,
-## and construct script call, and parse results.
+## TODO: replace this (optionally) with segmentJaccard_bed
+## BEFORE coor2index call
 ovl <- segmentJaccard(query=query, target=target,
                       qclass=qclass, tclass=tclass, perm=perm, total=total,
                       symmetric=symmetric, verb=1)
