@@ -9,8 +9,8 @@ parseJaccard(ovfile, prefix, qclass = "query", tclass = "target")
 \arguments{
 \item{ovfile}{output file produced by \code{segmentoverlaps.sh}.}
 
-\item{prefix}{optional class name prefix that was required for
-bed file definition (name, score columns).}
+\item{prefix}{prefix to be added to the name and score columns of bed
+files (column 4,5) to get unique names.}
 
 \item{qclass}{optional name for the query classes.}
 

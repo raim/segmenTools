@@ -9,6 +9,7 @@ segmentJaccard_bed(
   target,
   qclass,
   tclass,
+  prefix = "cl_",
   chrL,
   perm,
   tmpdir,
@@ -26,6 +27,9 @@ the query segments, omit to use all.}
 
 \item{tclass}{column name which holds a sub-classification (clustering) of
 the target segments, omit to use all.}
+
+\item{prefix}{prefix to be added to the name and score columns of bed
+files (column 4,5), used to get unique names.}
 
 \item{chrL}{obligatory vector of chromosome length, in the order
 used as index in the \code{chr} column of query and target.}

@@ -11,6 +11,7 @@ coor2bed(
   reverse = c("-", -1),
   name,
   score,
+  prefix,
   verb = 1
 )
 }
@@ -26,6 +27,9 @@ coor2bed(
 \item{name}{column name for bed file name column (column 4)}
 
 \item{score}{column name for bed file score column (column 5)}
+
+\item{prefix}{prefix to be added to the name and score columns (column 4,5),
+used by segmenTools interface to bedtools for unique names.}
 
 \item{verb}{verbosity level, 0: silent}
 }

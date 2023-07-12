@@ -356,6 +356,8 @@ if ( bedtools ) {
     symmetric <- FALSE # not implemented here
     query <- index2coor(query, chrS)
     target <- index2coor(target, chrS)
+    if ( random=="" )
+        random <-  tempdir()
     if ( !dir.exists(random) )
         dir.create(random) 
     ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
