@@ -49,6 +49,8 @@ option_list <- list(
               help="count individual overlaps"),
   make_option(c("--bedtools"),  action="store_true", default=FALSE,
               help="use UCSC bedtools instead of segmenTools overlap functions"),
+  make_option(c("--random"),  type="character", default="",
+              help="directory where bedtools randomized queries are stored"),
   ## OUTPUT
   make_option(c("--fig.type"), type="character", default="png",
               help="figure type (png, pdf, eps) [default %default]"),
@@ -222,7 +224,7 @@ if ( upstream!=0 ) {
     }
     target[,c("start","end","strand")] <- utarget
 }
-
+## NOTE: this is the only case that changes queries!
 if ( convergent!=0 ) {
     ## same as upstream<0 but for both query and target
     ## forward strand: max(start,end) + range
@@ -354,10 +356,11 @@ if ( bedtools ) {
     symmetric <- FALSE # not implemented here
     query <- index2coor(query, chrS)
     target <- index2coor(target, chrS)
+    if ( !dir.exists(random) )
+        dir.create(random) 
     ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
                               qclass=qclass, tclass=tclass, perm=perm, 
-                              verb=1)#, ## TODO: remove this after testing
-                              ##tmpdir="~/work/yeastSeq2016/test", save.permutations=TRUE)
+                              verb=1, tmpdir=random, save.permutations=TRUE)
 } else {
     
     ## symmetric: only for antisense of self!

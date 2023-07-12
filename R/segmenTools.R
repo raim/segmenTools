@@ -1317,12 +1317,20 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
     if ( verb>0 ) cat(paste("generating genome index file\n"))
     chrN <- paste0("chr", sprintf("%02d",1:length(chrL)))
     genome.idx <- file.path(tmpdir,"genome.idx")
-    write.table(file=genome.idx, x=cbind(chrN, chrL),
-                sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
-
+    
+    ## if a genome file exists in tmpdir, re-use it
+    if ( !file.exists(genome.idx) )
+        write.table(file=genome.idx, x=cbind(chrN, chrL),
+                    sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
+    
     ## generate bed files with coor2bed
+    ## NOTE: query files are randomized and can be re-used
+    ## between subsequent runs
     qout <- file.path(tmpdir, "query.bed")
-    tout <- file.path(tmpdir, "target.bed")
+
+    ## target files change between runs: generate random ID
+    RNDID <- paste(sample(c(LETTERS,letters), 10), collapse="")
+    tout <- file.path(tmpdir, paste("target_",RNDID,".bed"))
 
     ## generate types here: required
     if ( missing(tclass) ) {
@@ -1351,13 +1359,17 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
         idt <- "ID"
     }
 
-    coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb)
+    ## re-use existing
+    if ( !file.exists(qout) )
+        coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb)
     coor2bed(target, name=idt, score=tclass, file=tout, verb=verb)
     
     ## call bedtools script: query.bed target.bed genome.idx perm
     if ( verb>0 ) cat(paste("system call to bedtools script\n"))
     bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
-    outf <- file.path(tmpdir, paste0("overlaps.tsv"))
+
+    
+    outf <- file.path(tmpdir, paste0("overlaps_",RNDID,".tsv"))
     logf <- sub("\\.tsv$", ".log", outf)
     bcmd <- paste("cd",tmpdir,";",bscript, qout, tout, genome.idx, perm,">", outf, "2>", logf)
 
@@ -1367,9 +1379,16 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
     ## parse result
     if ( verb>0 ) cat(paste("parsing results\n"))
     ovl <- parseJaccard(outf, qclass=qclass, tclass=tclass)#, prefix=prefix
+
+
+    ## cleanup target data, but keep permutations and log files
+    unlink(c(tout, outf))
+
     if ( !save.permutations ) {
-        unlink(c(qout, tout, genome.idx, outf, file.path(tmpdir,"query_random_*.bed")))
-    }
+        unlink(c(qout, genome.idx, file.path(tmpdir,"query_random_*.bed")))
+    } else
+        warning("keeping potentially large randomized data in", tmpdir)
+
     ovl
 }
 

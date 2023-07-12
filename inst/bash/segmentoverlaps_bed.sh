@@ -6,9 +6,8 @@
 
 query=$1
 target=$2
-gidx=$3
+gidx=$3 # genome index file
 PERM=$4
-keep=$5
 
 ## awk function for division
 calc(){ awk "BEGIN { print "$*" }"; }
@@ -29,7 +28,6 @@ Ttypes=`cut -f 5 $target | sort | uniq`
 ## to save time by not regenerating permutations
 ## DELETE once intended for broader use.
 
-##TMPDIR=$(dirname $(mktemp -u))
 pfile=`basename $query | sed 's/.bed//g'`
 
 start=1
