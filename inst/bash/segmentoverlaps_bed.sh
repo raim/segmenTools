@@ -29,6 +29,8 @@ Ttypes=`cut -f 5 $target | sort | uniq`
 ## DELETE once intended for broader use.
 
 pfile=`basename $query | sed 's/.bed//g'`
+mkdir -p tmp
+pfile=tmp/$pfile
 
 start=1
 for (( i=$start; i<=$PERM; i++ )); do
