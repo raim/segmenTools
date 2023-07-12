@@ -480,6 +480,6 @@ if ( !interactive() ) {
 if ( perm>0 ) {
     plotdev(paste0(file.name),type=fig.type)
     plotOverlaps(ovl,p.min=.001, values="count",
-                 ylab=qlab, xlab=tlab)
+                 show.total=TRUE, short=FALSE, qlab=qlab, xlab=tlab)
     dev.off()
 }
