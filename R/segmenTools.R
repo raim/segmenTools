@@ -1324,6 +1324,8 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     if ( !file.exists(genome.idx) )
         write.table(file=genome.idx, x=cbind(chrN, chrL),
                     sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
+    else warning(paste0("using existing genome length file: '",
+                        genome.idx, "'\n"))
     
     ## generate bed files with coor2bed
     ## NOTE: query files are randomized and can be re-used
@@ -1372,20 +1374,24 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     if ( length(emptyt)>0 )
         target[emptyt,tclass] <- "na."
     
-    ## re-use existing
+    ## generate .bed format files, or re-use existing query!
     if ( !file.exists(qout) )
-        coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb, prefix=prefix)
+        coor2bed(query,  name=idq, score=qclass, file=qout,
+                 verb=verb, prefix=prefix)
+    else warning(paste0("using existing bed file: '", qout, "'\n"))
     coor2bed(target, name=idt, score=tclass, file=tout, verb=verb, prefix=prefix)
     
     ## call bedtools script: query.bed target.bed genome.idx perm
     bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
     if ( verb>0 ) cat(paste0("system call to bedtools script\n\t",bscript,"\n",
-                            "\tcheck directory '", tmpdir, "' for progress and log files\n"))
+                             "\tcheck directory '", tmpdir,
+                             "' for progress and log files\n"))
 
     
     outf <- file.path(tmpdir, paste0("overlaps_",RNDID,".tsv"))
     logf <- sub("\\.tsv$", ".log", outf)
-    bcmd <- paste("cd",tmpdir,";",bscript, qout, tout, genome.idx, perm,">", outf, "2>", logf)
+    bcmd <- paste("cd",tmpdir,";",bscript, qout, tout,
+                  genome.idx, perm,">", outf, "2>", logf)
 
     ## call bed tools
     system(bcmd)
