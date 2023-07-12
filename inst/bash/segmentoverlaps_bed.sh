@@ -71,18 +71,22 @@ for Q in $Qtypes; do
 	## grep pattern
 	pQ="\t${Q}\t"
 	pT="\t${T}\t"
+
+	## use randomized target name for temporary files
+	qbed=${target}_Q.bed
+	qbed=${target}_T.bed
 	
-	grep -P $pQ $query  > Q.bed
-	grep -P $pT $target > T.bed
+	grep -P $pQ $query  > $qbed
+	grep -P $pT $target > $tbed
 	
 	## jaccard index
-	jaccard=`bedtools jaccard -a Q.bed -b T.bed -s -nonamecheck| grep -v intersection`
+	jaccard=`bedtools jaccard -a $qbed -b $tbed -s -nonamecheck| grep -v intersection`
 	I=`echo $jaccard | cut -f 1 -d " "`
 	U=`echo $jaccard | cut -f 2 -d " "`
 	J=`echo $jaccard | cut -f 3 -d " "`
 	
 	## count of overlapping
-	count=`bedtools intersect -a Q.bed -b T.bed -s  -nonamecheck|wc -l`
+	count=`bedtools intersect -a $qbed -b $tbed -s  -nonamecheck|wc -l`
 		
 	## permutation p-value
 	cnt=0
@@ -92,7 +96,7 @@ for Q in $Qtypes; do
 	do
 	    let tot++;
 	    rfile=${pfile}_random_${i}.bed
-	    Jr=`grep -P $pQ $rfile | bedtools jaccard -a - -b T.bed -s -nonamecheck | grep -v intersection | cut -f 3`
+	    Jr=`grep -P $pQ $rfile | bedtools jaccard -a - -b $tbed -s -nonamecheck | grep -v intersection | cut -f 3`
 	    if [ $Jr \> $J ]; then let cnt++; fi
 	done
 	## avoid calculation in bash, unless sure of it.
