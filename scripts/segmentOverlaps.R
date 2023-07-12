@@ -359,6 +359,7 @@ if ( bedtools ) {
     if ( !dir.exists(random) )
         dir.create(random) 
     ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
+                              prefix="socl_",
                               qclass=qclass, tclass=tclass, perm=perm, 
                               verb=1, tmpdir=random, save.permutations=TRUE)
 } else {

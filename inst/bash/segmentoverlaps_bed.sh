@@ -74,7 +74,7 @@ for Q in $Qtypes; do
 
 	## use randomized target name for temporary files
 	qbed=${target}_Q.bed
-	qbed=${target}_T.bed
+	tbed=${target}_T.bed
 	
 	grep -P $pQ $query  > $qbed
 	grep -P $pT $target > $tbed

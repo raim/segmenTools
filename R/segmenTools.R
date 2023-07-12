@@ -1293,6 +1293,8 @@ pruneSegments <- function(x, chrL, chr="chr",
 #' the query segments, omit to use all.
 #' @param tclass column name which holds a sub-classification (clustering) of
 #' the target segments, omit to use all.
+#' @param prefix prefix to be added to the name and score columns of bed
+#' files (column 4,5), used to get unique names.
 #' @param chrL obligatory vector of chromosome length, in the order
 #' used as index in the \code{chr} column of query and target.
 #' @param perm number of permutations for calculating statistics.
@@ -1305,7 +1307,7 @@ pruneSegments <- function(x, chrL, chr="chr",
 #' are used with the same \code{tmpdir}.
 #' @param verb verbosity level, 0: silent.
 #'@export
-segmentJaccard_bed <- function(query, target, qclass, tclass,
+segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
                                chrL, perm, tmpdir, save.permutations=FALSE,
                                verb=1) {
 
@@ -1364,8 +1366,8 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
 
     ## re-use existing
     if ( !file.exists(qout) )
-        coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb)
-    coor2bed(target, name=idt, score=tclass, file=tout, verb=verb)
+        coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb, prefix=prefix)
+    coor2bed(target, name=idt, score=tclass, file=tout, verb=verb, prefix=prefix)
     
     ## call bedtools script: query.bed target.bed genome.idx perm
     if ( verb>0 ) cat(paste("system call to bedtools script\n"))
@@ -1381,11 +1383,11 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
     
     ## parse result
     if ( verb>0 ) cat(paste("parsing results\n"))
-    ovl <- parseJaccard(outf, qclass=qclass, tclass=tclass)#, prefix=prefix
+    ovl <- parseJaccard(outf, qclass=qclass, tclass=tclass, prefix=prefix)
 
 
     ## cleanup target data, but keep permutations and log files
-    unlink(c(tout, outf))
+    unlink(c(tout, outf, paste0(outf,"*")))
 
     if ( !save.permutations ) {
         unlink(c(qout, genome.idx, file.path(tmpdir,"query_random_*.bed")))
@@ -1400,8 +1402,8 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
 #' Parses a file that is produced by the script \code{segmentoverlaps.sh}
 #' (based on USCS bedtools), into an \code{clusterOverlaps} class.
 #' @param ovfile output file produced by \code{segmentoverlaps.sh}.
-#' @param prefix optional class name prefix that was required for
-#' bed file definition (name, score columns).
+#' @param prefix prefix to be added to the name and score columns of bed
+#' files (column 4,5) to get unique names.
 #' @param qclass optional name for the query classes.
 #' @param tclass optional name for the target classes.
 #' @export

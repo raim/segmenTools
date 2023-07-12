@@ -610,12 +610,14 @@ alignData_relative <- function(coors, data, dst=500, chrS,
 #' @param reverse reverse strand characters
 #' @param name column name for bed file name column (column 4)
 #' @param score column name for bed file score column (column 5)
+#' @param prefix prefix to be added to the name and score columns (column 4,5),
+#' used by segmenTools interface to bedtools for unique names.
 #' @param verb verbosity level, 0: silent
 #' @export
 coor2bed <- function(coor, file,
                      coors=c(chr="chr", start="start", end="end",
                              strand="strand"),
-                     reverse=c("-",-1), name, score, verb=1) {
+                     reverse=c("-",-1), name, score, prefix, verb=1) {
 
     ## add missing columns
     if ( missing(name) )  {
@@ -656,6 +658,11 @@ coor2bed <- function(coor, file,
     ## thus not corrected!
     coor[,"start"] <- coor[,"start"]-1
 
+    ## add prefix
+    if ( !missing(prefix) ) {
+        coor[,name] <- paste0(prefix, coor[,name])
+        coor[,score] <- paste0(prefix, coor[,score])
+    }
 
     ## chromosomes must begin with chr
     coor[,coors["chr"]] <- paste0("chr", sprintf("%02d",coor[,coors["chr"]]))
