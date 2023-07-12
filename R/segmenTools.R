@@ -1330,7 +1330,7 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
 
     ## target files change between runs: generate random ID
     RNDID <- paste(sample(c(LETTERS,letters), 10), collapse="")
-    tout <- file.path(tmpdir, paste("target_",RNDID,".bed"))
+    tout <- file.path(tmpdir, paste0("target_",RNDID,".bed"))
 
     ## generate types here: required
     if ( missing(tclass) ) {
