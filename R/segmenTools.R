@@ -1365,10 +1365,10 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     }
 
     ## fill up empty classes
-    emptyq <- is.na(query[,qclass]) | query[,qlass]==""
+    emptyq <- which(is.na(query[,qclass]) | query[,qclass]=="")
     if ( length(emptyq)>0 )
         query[emptyq,qclass] <- "NA"
-    emptyt <- is.na(target[,tclass]) | target[,tlass]==""
+    emptyt <- which(is.na(target[,tclass]) | target[,tclass]=="")
     if ( length(emptyt)>0 )
         target[emptyt,tclass] <- "NA"
     
