@@ -1490,8 +1490,8 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
     
     ovl$count <- cnt
     ovl$p.value <-pvl
-    ovl$num.target <- nt
-    ovl$num.query <- nq
+    ovl$num.target <- as.matrix(nt)
+    ovl$num.query <- as.matrix(nq)
 
     ## total sizes
     ovl$total.target <- ut
