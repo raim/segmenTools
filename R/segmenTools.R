@@ -1364,6 +1364,14 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
         idt <- "ID"
     }
 
+    ## fill up empty classes
+    emptyq <- is.na(query[,qclass]) | query[,qlass]==""
+    if ( length(emptyq)>0 )
+        query[emptyq,qclass] <- "NA"
+    emptyt <- is.na(target[,tclass]) | target[,tlass]==""
+    if ( length(emptyt)>0 )
+        target[emptyt,tclass] <- "NA"
+    
     ## re-use existing
     if ( !file.exists(qout) )
         coor2bed(query,  name=idq, score=qclass, file=qout, verb=verb, prefix=prefix)
