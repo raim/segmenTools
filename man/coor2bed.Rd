@@ -36,3 +36,6 @@ used by segmenTools interface to bedtools for unique names.}
 \description{
 export internal coordinate format to bed file format
 }
+\seealso{
+bed2coor
+}

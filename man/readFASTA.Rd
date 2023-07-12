@@ -2,7 +2,7 @@
 % Please edit documentation in R/parsers.R
 \name{readFASTA}
 \alias{readFASTA}
-\title{fasta sequence file parser stolen from (an older version of)
+\title{fasta sequence file parser adapted from (an older version of)
 \code{Biostrings}}
 \usage{
 readFASTA(file, checkComments = TRUE, strip.descs = TRUE, split.desc = "")
@@ -20,6 +20,6 @@ and store in returned structure as \code{details}}
 with argument \code{strip.descs}}
 }
 \description{
-fasta sequence file parser stolen from (an older version of)
+fasta sequence file parser adapted from (an older version of)
 \code{Biostrings}
 }

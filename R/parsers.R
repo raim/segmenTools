@@ -207,7 +207,7 @@ summarizeGEOSoft <- function(data, id="ORF", avg="mean", farms=FALSE,
 
 ## parse GFF file 
 ## 
-## parse a GFF genome annotation file, credit: from davidTiling package via
+## Parses a GFF genome annotation file, credit: from davidTiling package via
 ## \url{https://stat.ethz.ch/pipermail/bioconductor/2008-October/024669.html}
 ## @param gffFile gff file name
 ## @param nrows number of rows to parse
@@ -312,9 +312,27 @@ tab2gff <- function(tab,
     out
 }
 
+#' parse a .bed format file
+#'
+#' UNTESTED: Parses a bed file with 5 (or more) columns into the
+#' segmenTools genomic interval format.
+#' @param file a file in bed format
+#' @param header header names for the parsed bed file
+#' @export
+bed2coor <- function(file, header=c("chr","start","end","name","score")) {
+    dat <- read.delim(file,  header=FALSE)
+    ## todo: add column names if </> 5 are present
+    colnames(dat) <- header
+
+    ## 1-based starts
+    dat$start <- dat$start+1
+    
+    dat
+}
+
 #' parse a GFF3 file into a table
 #' 
-#' parse gff3 files into tables, including conversion of all attributes
+#' Parses gff3 files into tables, including conversion of all attributes
 #' @param file gff file name
 #' @param attrsep main separator of attribute string fields
 #' @param fieldsep separator for attribute <id>=<value> couples
@@ -362,7 +380,7 @@ gff2tab <- function(file, attrsep=";", fieldsep="=") {
 
 
 ## from library("Biostrings")
-#' fasta sequence file parser stolen from (an older version of)
+#' fasta sequence file parser adapted from (an older version of)
 #' \code{Biostrings}
 #' @param file file with sequence(s) in fasta format
 #' @param checkComments remove information after a semi-colon ; in fasta

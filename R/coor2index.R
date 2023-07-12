@@ -613,6 +613,7 @@ alignData_relative <- function(coors, data, dst=500, chrS,
 #' @param prefix prefix to be added to the name and score columns (column 4,5),
 #' used by segmenTools interface to bedtools for unique names.
 #' @param verb verbosity level, 0: silent
+#' @seealso bed2coor
 #' @export
 coor2bed <- function(coor, file,
                      coors=c(chr="chr", start="start", end="end",
@@ -678,20 +679,3 @@ coor2bed <- function(coor, file,
     invisible(bed)
 }
 
-#' parses a bed file
-#'
-#' UNTESTED: Parses a bed file with 5 (or more) columns into the
-#' segmenTools genomic interval format.
-#' @param file a file in bed format
-#' @param header header names for the parsed bed file
-#' @export
-bed2coor <- function(file, header=c("chr","start","end","name","score")) {
-    dat <- read.delim(file,  header=FALSE)
-    ## todo: add column names if </> 5 are present
-    colnames(dat) <- header
-
-    ## 1-based starts
-    dat$start <- dat$start+1
-    
-    dat
-}

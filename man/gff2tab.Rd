@@ -14,5 +14,5 @@ gff2tab(file, attrsep = ";", fieldsep = "=")
 \item{fieldsep}{separator for attribute <id>=<value> couples}
 }
 \description{
-parse gff3 files into tables, including conversion of all attributes
+Parses gff3 files into tables, including conversion of all attributes
 }
