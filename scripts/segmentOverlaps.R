@@ -224,7 +224,7 @@ if ( upstream!=0 ) {
     }
     target[,c("start","end","strand")] <- utarget
 }
-## NOTE: this is the only case that changes queries!
+
 if ( convergent!=0 ) {
     ## same as upstream<0 but for both query and target
     ## forward strand: max(start,end) + range
@@ -351,12 +351,12 @@ if ( intersegment!="" ) {
 }
 
 ## calculate Jaccard Index and permutation test
-
+delete.data.message <- FALSE
 if ( bedtools ) {
     symmetric <- FALSE # not implemented here
     query <- index2coor(query, chrS)
     target <- index2coor(target, chrS)
-    if ( random=="" )
+    if ( random=="" ) 
         random <-  tempdir()
     if ( !dir.exists(random) )
         dir.create(random) 
@@ -364,6 +364,7 @@ if ( bedtools ) {
                               prefix="socl_",
                               qclass=qclass, tclass=tclass, perm=perm, 
                               verb=1, tmpdir=random, save.permutations=TRUE)
+    delete.data.message <- TRUE
 } else {
     
     ## symmetric: only for antisense of self!
@@ -483,3 +484,7 @@ if ( perm>0 ) {
                  show.total=TRUE, short=FALSE, ylab=qlab, xlab=tlab)
     dev.off()
 }
+
+if ( delete.data.message )
+    warning(paste0("please delete randomized sequence files in directory '",
+                   random, "'"))

@@ -1378,8 +1378,9 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     coor2bed(target, name=idt, score=tclass, file=tout, verb=verb, prefix=prefix)
     
     ## call bedtools script: query.bed target.bed genome.idx perm
-    if ( verb>0 ) cat(paste("system call to bedtools script\n"))
     bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
+    if ( verb>0 ) cat(paste0("system call to bedtools script\n\t",bscript,"\n",
+                            "\tcheck directory '", tmpdir, "' for progress and log files\n"))
 
     
     outf <- file.path(tmpdir, paste0("overlaps_",RNDID,".tsv"))
