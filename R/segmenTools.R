@@ -1325,10 +1325,13 @@ segmentJaccard_bed <- function(query, target, qclass, tclass,
     
     ## generate bed files with coor2bed
     ## NOTE: query files are randomized and can be re-used
-    ## between subsequent runs
+    ## between subsequent runs if tmpdir is passed.
+    ## TODO: check existing original and randomized bed
+    ## files for consistency!
     qout <- file.path(tmpdir, "query.bed")
 
-    ## target files change between runs: generate random ID
+    ## target files change between runs: generate random ID,
+    ## TODO: allow to pass ID for informative file names.
     RNDID <- paste(sample(c(LETTERS,letters), 10), collapse="")
     tout <- file.path(tmpdir, paste0("target_",RNDID,".bed"))
 

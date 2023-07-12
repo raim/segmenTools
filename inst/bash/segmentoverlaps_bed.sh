@@ -76,13 +76,13 @@ for Q in $Qtypes; do
 	grep -P $pT $target > T.bed
 	
 	## jaccard index
-	jaccard=`bedtools jaccard -a Q.bed -b T.bed -s | grep -v intersection`
+	jaccard=`bedtools jaccard -a Q.bed -b T.bed -s -nonamecheck| grep -v intersection`
 	I=`echo $jaccard | cut -f 1 -d " "`
 	U=`echo $jaccard | cut -f 2 -d " "`
 	J=`echo $jaccard | cut -f 3 -d " "`
 	
 	## count of overlapping
-	count=`bedtools intersect -a Q.bed -b T.bed -s |wc -l`
+	count=`bedtools intersect -a Q.bed -b T.bed -s  -nonamecheck|wc -l`
 		
 	## permutation p-value
 	cnt=0
@@ -92,7 +92,7 @@ for Q in $Qtypes; do
 	do
 	    let tot++;
 	    rfile=${pfile}_random_${i}.bed
-	    Jr=`grep -P $pQ $rfile | bedtools jaccard -a - -b T.bed -s | grep -v intersection | cut -f 3`
+	    Jr=`grep -P $pQ $rfile | bedtools jaccard -a - -b T.bed -s -nonamecheck | grep -v intersection | cut -f 3`
 	    if [ $Jr \> $J ]; then let cnt++; fi
 	done
 	## avoid calculation in bash, unless sure of it.

@@ -473,9 +473,10 @@ if ( !interactive() ) {
                     sep="\t", row.names=FALSE, quote=FALSE)
 }
   
-## plot
+## plot - TODO: fix this, use counts
 if ( perm>0 ) {
     plotdev(paste0(file.name),type=fig.type)
-    plotOverlaps(ovl,p.min=.001,main="Jaccard Index (*1000) & permutation test",ylab=qlab,xlab=tlab,scale=1000,round=0)
+    plotOverlaps(ovl,p.min=.001, values="count",
+                 ylab=qlab, xlab=tlab)
     dev.off()
 }
