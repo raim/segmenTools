@@ -1367,10 +1367,10 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     ## fill up empty classes
     emptyq <- which(is.na(query[,qclass]) | query[,qclass]=="")
     if ( length(emptyq)>0 )
-        query[emptyq,qclass] <- "NA"
+        query[emptyq,qclass] <- "na."
     emptyt <- which(is.na(target[,tclass]) | target[,tclass]=="")
     if ( length(emptyt)>0 )
-        target[emptyt,tclass] <- "NA"
+        target[emptyt,tclass] <- "na."
     
     ## re-use existing
     if ( !file.exists(qout) )
