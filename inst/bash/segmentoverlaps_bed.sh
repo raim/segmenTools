@@ -89,9 +89,6 @@ for Q in $Qtypes; do
 	U=`echo $jaccard | cut -f 2 -d " "`
 	J=`echo $jaccard | cut -f 3 -d " "`
 
-	## replace e notation for comparison with bc below
-	Jc=`sed -E 's/([+-]?[0-9.]+)[eE]\+?(-?)([0-9]+)/(\1*10^\2\3)/g' <<< $J`
-	
 	## count of overlapping
 	count=`bedtools intersect -a $qbed -b $tbed -s  -nonamecheck|wc -l`
 		
@@ -104,18 +101,12 @@ for Q in $Qtypes; do
 	    let tot++;
 	    rfile=${pfile}_random_${i}.bed
 	    Jr=`grep -P $pQ $rfile | bedtools jaccard -a - -b $tbed -s -nonamecheck | grep -v intersection | cut -f 3`
-
-	    ## replace e notation and compare to real J via bc
-	    Jr=`sed -E 's/([+-]?[0-9.]+)[eE]\+?(-?)([0-9]+)/(\1*10^\2\3)/g' <<< $Jr`
-	    if [ 1 -eq "$(echo "${Jc} <= ${Jr}" | bc)" ]; then
+	    ## is Jr >= J ?
+	    r=$(awk -v j="$J" -v r="$Jr" 'BEGIN{print (j<=r)?1:0}')
+	    if [ 1 -eq $r ]; then
 		let cnt++;
 	    fi
 	done
-	## avoid calculation in bash, unless sure of it.
-	##pvalue=`calc $cnt/$tot`
-
-	## useful for debugging
-	>&2 echo J $J  and last random J $Jr
 
 	## print result
 	echo -e "$Q\t$T\t$I\t$U\t$J\t$count\t$cnt\t$tot" 

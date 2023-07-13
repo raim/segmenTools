@@ -1311,6 +1311,9 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
                                chrL, perm, tmpdir, save.permutations=FALSE,
                                verb=1) {
 
+    ## TODO: instead of calling bash script, do single calls to
+    ## to bedtools package bedr here.
+    if ( !check.binary("bedtools") ) stop("bedtools must be installed")
 
     ## generate temporary directory for all written files, unless provided
     if ( missing(tmpdir) ) tmpdir <- tempdir()  
