@@ -9,11 +9,6 @@ target=$2
 gidx=$3 # genome index file
 PERM=$4
 
-## awk function for division
-calc(){ awk "BEGIN { print "$*" }"; }
-
-
-
 
 ## get segment classes
 Qtypes=`cut -f 5 $query | sort | uniq`
