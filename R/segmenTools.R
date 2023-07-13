@@ -1402,7 +1402,7 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
 
 
     ## cleanup target data, but keep permutations and log files
-    unlink(c(tout, outf, paste0(outf,"*")))
+    ##unlink(c(tout, outf, paste0(outf,"*")))
 
     if ( !save.permutations ) {
         unlink(c(qout, genome.idx, file.path(tmpdir,"query_random_*.bed")))

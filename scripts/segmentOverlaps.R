@@ -3,7 +3,12 @@
 ## SEGMENT CLASSES OVERLAP STATISTIC
 ## by permutation test analysis
 
+
 ## TODO: test downstream implementation, just using negative upstream
+## why does target_lGeIaPbkyL.bed_Q.bed
+## chr16   797650  797904  socl_sg2601_E2_M150_nui3_4      socl_9  -
+## segments_mitoticoriginal_sgCL_type.png has a number
+## 
 
 library(segmenTools)
 
