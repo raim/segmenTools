@@ -13,6 +13,7 @@ segmentJaccard_bed(
   chrL,
   perm,
   tmpdir,
+  runid,
   save.permutations = FALSE,
   verb = 1
 )
@@ -38,6 +39,9 @@ used as index in the \code{chr} column of query and target.}
 
 \item{tmpdir}{temporary directory, useful to provide for debugging,
 or exploring detailed results.}
+
+\item{runid}{use this ID for the run, for more recognizable jobnames.
+This is potentially dangerous since each call MUST have a unique name.}
 
 \item{save.permutations}{save permutated query bed files used
 in p-value calculation. If this is provided together with

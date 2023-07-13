@@ -1301,6 +1301,8 @@ pruneSegments <- function(x, chrL, chr="chr",
 #' @param perm number of permutations for calculating statistics.
 #' @param tmpdir temporary directory, useful to provide for debugging,
 #' or exploring detailed results.
+#' @param runid use this ID for the run, for more recognizable jobnames.
+#' This is potentially dangerous since each call MUST have a unique name.
 #' @param save.permutations save permutated query bed files used
 #' in p-value calculation. If this is provided together with
 #'  \code{tmpdir}, the randomized bed files can be re-used. However, this
@@ -1309,8 +1311,8 @@ pruneSegments <- function(x, chrL, chr="chr",
 #' @param verb verbosity level, 0: silent.
 #'@export
 segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
-                               chrL, perm, tmpdir, save.permutations=FALSE,
-                               verb=1) {
+                               chrL, perm, tmpdir, runid,
+                               save.permutations=FALSE, verb=1) {
 
     ## TODO: instead of calling bash script, do single calls to
     ## to bedtools package bedr here.
@@ -1339,7 +1341,8 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
 
     ## target files change between runs: generate random ID,
     ## TODO: allow to pass ID for informative file names.
-    RNDID <- paste(sample(c(LETTERS,letters), 10), collapse="")
+    RNDID <- ifelse(!missing(runid), runid,
+                    paste(sample(c(LETTERS,letters), 10), collapse=""))
     tout <- file.path(tmpdir, paste0("target_",RNDID,".bed"))
 
     ## generate types here: required

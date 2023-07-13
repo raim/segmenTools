@@ -481,6 +481,7 @@ if ( !interactive() ) {
 ## plot - TODO: fix this, use counts
 if ( perm>0 ) {
     plotdev(paste0(file.name),type=fig.type)
+    par(mai=c(1,1,1,1))
     plotOverlaps(ovl,p.min=.001, values="count",
                  show.total=TRUE, short=FALSE, ylab=qlab, xlab=tlab)
     dev.off()
