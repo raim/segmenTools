@@ -112,5 +112,3 @@ for Q in $Qtypes; do
 	echo -e "$Q\t$T\t$I\t$U\t$J\t$count\t$cnt\t$tot" 
     done
 done 
-## partially clean up; note that main cleaning happens via the
-## segmentJaccard_bed function in segmenTools
