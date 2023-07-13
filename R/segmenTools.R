@@ -1383,13 +1383,11 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     
     ## call bedtools script: query.bed target.bed genome.idx perm
     bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
-    if ( verb>0 ) cat(paste0("system call to bedtools script\n\t",bscript,"\n",
-                             "\tcheck directory '", tmpdir,
-                             "' for progress and log files\n"))
-
-    
     outf <- file.path(tmpdir, paste0("overlaps_",RNDID,".tsv"))
     logf <- sub("\\.tsv$", ".log", outf)
+
+    if ( verb>0 ) cat(paste0("system call to bedtools script\n\t",bscript,"\n",
+                             "\tcheck '", logf, "' for progress.\n"))
     bcmd <- paste("cd",tmpdir,";",bscript, qout, tout,
                   genome.idx, perm,">", outf, "2>", logf)
 
@@ -1402,9 +1400,8 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
 
 
     ## cleanup target data, but keep permutations and log files
-    ##unlink(c(tout, outf, paste0(outf,"*")))
-
     if ( !save.permutations ) {
+        unlink(c(tout, outf, paste0(outf,"*")))
         unlink(c(qout, genome.idx, file.path(tmpdir,"query_random_*.bed")))
     } else
         warning("keeping potentially large randomized data in", tmpdir)

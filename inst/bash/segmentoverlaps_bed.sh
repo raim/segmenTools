@@ -14,8 +14,6 @@ calc(){ awk "BEGIN { print "$*" }"; }
 
 
 
-## generate simple genome order list
-cut -f 1 $gidx > genome.txt
 
 ## get segment classes
 Qtypes=`cut -f 5 $query | sort | uniq`
@@ -24,9 +22,13 @@ Ttypes=`cut -f 5 $target | sort | uniq`
 
 >&2 echo GENERATING $PERM PERMUTATIONS OF QUERY $query $Qtypes
 
-## NOTE: storing permutations in main dir during usage,
-## to save time by not regenerating permutations
-## DELETE once intended for broader use.
+## NOTE: re-using regenerating permutations
+## TODO: make usage saver
+
+## generate simple genome order list
+if [ ! -f genome.txt ]; then
+    cut -f 1 $gidx > genome.txt
+fi
 
 pfile=`basename $query | sed 's/.bed//g'`
 mkdir -p tmp
@@ -86,6 +88,9 @@ for Q in $Qtypes; do
 	I=`echo $jaccard | cut -f 1 -d " "`
 	U=`echo $jaccard | cut -f 2 -d " "`
 	J=`echo $jaccard | cut -f 3 -d " "`
+
+	## replace e notation for comparison with bc below
+	Jc=`sed -E 's/([+-]?[0-9.]+)[eE]\+?(-?)([0-9]+)/(\1*10^\2\3)/g' <<< $J`
 	
 	## count of overlapping
 	count=`bedtools intersect -a $qbed -b $tbed -s  -nonamecheck|wc -l`
@@ -99,7 +104,12 @@ for Q in $Qtypes; do
 	    let tot++;
 	    rfile=${pfile}_random_${i}.bed
 	    Jr=`grep -P $pQ $rfile | bedtools jaccard -a - -b $tbed -s -nonamecheck | grep -v intersection | cut -f 3`
-	    if [ $Jr \> $J ]; then let cnt++; fi
+
+	    ## replace e notation and compare to real J via bc
+	    Jr=`sed -E 's/([+-]?[0-9.]+)[eE]\+?(-?)([0-9]+)/(\1*10^\2\3)/g' <<< $Jr`
+	    if [ 1 -eq "$(echo "${Jc} <= ${Jr}" | bc)" ]; then
+		let cnt++;
+	    fi
 	done
 	## avoid calculation in bash, unless sure of it.
 	##pvalue=`calc $cnt/$tot`
