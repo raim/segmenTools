@@ -104,6 +104,9 @@ for Q in $Qtypes; do
 	## avoid calculation in bash, unless sure of it.
 	##pvalue=`calc $cnt/$tot`
 
+	## useful for debugging
+	>&2 echo J $J  and last random J $Jr
+
 	## print result
 	echo -e "$Q\t$T\t$I\t$U\t$J\t$count\t$cnt\t$tot" 
     done
