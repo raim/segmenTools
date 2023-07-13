@@ -480,10 +480,16 @@ if ( !interactive() ) {
   
 ## plot - TODO: fix this, use counts
 if ( perm>0 ) {
-    plotdev(paste0(file.name),type=fig.type)
-    par(mai=c(1,1,1,1))
+    
+    hbase <- 0.18
+    wdth <- 1.25*hbase*(11+4)
+    wd <- (ncol(ovl$p.value))*hbase + (.75+.6)
+    ht <- (nrow(ovl$p.value))*hbase + (.75+.6)
+    
+    plotdev(paste0(file.name),type=fig.type,width=wd,  height=ht)
+    par(mai=c(.75,.75,.6,.6),mgp=c(1.75,.3,0),tcl=-0.1)
     plotOverlaps(ovl,p.min=.001, values="count",
-                 show.total=TRUE, short=FALSE, ylab=qlab, xlab=tlab)
+                 show.total=TRUE, short=TRUE, ylab=qlab, xlab=tlab)
     dev.off()
 }
 
