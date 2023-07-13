@@ -50,32 +50,34 @@ for Q in $Qtypes; do
     pQ="\t${Q}\t"
     cnt=`grep -P $pQ $query | wc -l`
     ## calculate union via bedtools merge (
-    len=`grep -P $pQ $query | bedtools merge -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
+    len=`grep -P $pQ $query | bedtools merge -s -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
     echo -e "$Q\t\t\t$len\t\t$cnt\t\t"
 done
 for T in $Ttypes; do
     pT="\t${T}\t"
     cnt=`grep -P $pT $target | wc -l`
     ## calculate union via bedtools merge (
-    len=`grep -P $pT $target | bedtools merge -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
+    len=`grep -P $pT $target | bedtools merge -s -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
     echo -e "\t$T\t\t$len\t\t$cnt\t\t"
 done
 
 ## loop through segment types
 for Q in $Qtypes; do
+
+    ## grep pattern
+    pQ="\t${Q}\t"
+    ## use randomized target name for temporary files
+    qbed=${target}_Q.bed
+    ## grep current query
+    grep -P $pQ $query  > $qbed
+
     for T in $Ttypes; do
 
 	>&2 echo QUERY CLASS $Q v TARGET CLASS $T
 
-	## grep pattern
-	pQ="\t${Q}\t"
+	## as above, but for target
 	pT="\t${T}\t"
-
-	## use randomized target name for temporary files
-	qbed=${target}_Q.bed
 	tbed=${target}_T.bed
-	
-	grep -P $pQ $query  > $qbed
 	grep -P $pT $target > $tbed
 	
 	## jaccard index

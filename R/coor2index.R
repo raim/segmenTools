@@ -673,6 +673,7 @@ coor2bed <- function(coor, file,
     if( !missing(file) ) {
         if ( verb>0 )
             cat(paste("writing bed file:", file,"\n"))
+        options(scipen=999) ## avoid scientific notation
         write.table(x=bed, file=file, sep="\t",
                     quote=FALSE, row.names=FALSE, col.names=FALSE)
     }

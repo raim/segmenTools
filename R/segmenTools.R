@@ -1382,19 +1382,26 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
         coor2bed(query,  name=idq, score=qclass, file=qout,
                  verb=verb, prefix=prefix)
     else warning(paste0("using existing bed file: '", qout, "'\n"))
-    coor2bed(target, name=idt, score=tclass, file=tout, verb=verb, prefix=prefix)
+    coor2bed(target, name=idt, score=tclass, file=tout,
+             verb=verb, prefix=prefix)
     
     ## call bedtools script: query.bed target.bed genome.idx perm
+    
     bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
+
+    ## copy script to local script name, for easier recognition
+    ## of running jobs, and log of used script.
+    rscript <- paste0("sovl_",RNDID)
     outf <- file.path(tmpdir, paste0("overlaps_",RNDID,".tsv"))
     logf <- sub("\\.tsv$", ".log", outf)
 
     if ( verb>0 ) cat(paste0("system call to bedtools script\n\t",bscript,"\n",
                              "\tcheck '", logf, "' for progress.\n"))
-    bcmd <- paste("cd",tmpdir,";",bscript, qout, tout,
-                  genome.idx, perm,">", outf, "2>", logf)
 
-    ## call bed tools
+    ## construct command-line call
+    bcmd <- paste("cd",tmpdir,"; cp -a", bscript, rscript, ";",
+                  rscript, qout, tout, genome.idx, perm,">", outf, "2>", logf)
+    ## call script
     system(bcmd)
     
     ## parse result
