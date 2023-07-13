@@ -114,4 +114,3 @@ for Q in $Qtypes; do
 done 
 ## partially clean up; note that main cleaning happens via the
 ## segmentJaccard_bed function in segmenTools
-\rm -f genome.txt
