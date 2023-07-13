@@ -478,7 +478,7 @@ if ( !interactive() ) {
                     sep="\t", row.names=FALSE, quote=FALSE)
 }
   
-## plot - TODO: fix this, use counts
+## plot
 if ( perm>0 ) {
     
     hbase <- 0.18
