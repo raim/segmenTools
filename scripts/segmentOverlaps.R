@@ -481,7 +481,7 @@ if ( !interactive() ) {
 ## plot
 if ( perm>0 ) {
     
-    hbase <- 0.18
+    hbase <- 0.25
     wdth <- 1.25*hbase*(11+4)
     wd <- (ncol(ovl$p.value))*hbase + (.75+.6)
     ht <- (nrow(ovl$p.value))*hbase + (.75+.6)
