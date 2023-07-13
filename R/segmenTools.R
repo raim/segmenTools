@@ -1276,9 +1276,10 @@ pruneSegments <- function(x, chrL, chr="chr",
 }
 
 ## reproduces segmentJaccard but based on installed
-## bedtools and commandline calls.
-## TODO: learn how to integrate scripts in R package,
-## simply put in src?
+## bedtools and commandline calls to a segmenTools bash script.
+## TODO: instead of calling bash script, do single calls to
+## to bedtools package bedr here.
+##
 #' calculate segment overlap statistics using UCSC bedtools
 #'
 #' This function produces the same output as \code{\link{segmentJaccard}},
