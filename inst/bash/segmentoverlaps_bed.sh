@@ -49,15 +49,15 @@ echo -e "query\ttarget\tintersect\tunion\tjaccard\tcount\trandom\tpermutations"
 for Q in $Qtypes; do
     pQ="\t${Q}\t"
     cnt=`grep -P $pQ $query | wc -l`
-    ## calculate union via bedtools merge (
-    len=`grep -P $pQ $query | bedtools merge -s -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
+    ## calculate union via bedtools merge 
+    len=`grep -P $pQ $query | bedtools sort -i - | bedtools merge -s -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
     echo -e "$Q\t\t\t$len\t\t$cnt\t\t"
 done
 for T in $Ttypes; do
     pT="\t${T}\t"
     cnt=`grep -P $pT $target | wc -l`
-    ## calculate union via bedtools merge (
-    len=`grep -P $pT $target | bedtools merge -s -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
+    ## calculate union via bedtools merge 
+    len=`grep -P $pT $target | bedtools sort -i - | bedtools merge -s -i - | awk '{print $3-$2}' - | awk -F',' '{sum+=$0;} END{print sum;}' -`
     echo -e "\t$T\t\t$len\t\t$cnt\t\t"
 done
 

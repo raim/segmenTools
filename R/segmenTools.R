@@ -1224,56 +1224,6 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
     return(res)
 }
 
-#' prune segments at chromosome ends
-#'
-#' Cuts segments coordinates that are beyond chromosome coordinates.
-#' @param x genome coordinate table,
-#' @param chrL chromosome length vector, where the chromosome column
-#' must provide the index in this vector; e.g. for 16 chromosomes,
-#' chrL has length 16 and provides, in this order, the lengths of
-#' chromosomes 1 to 16),
-#' @param coors coordinate column names to cut,
-#' @param chr chromosome column name,
-#' @param remove.empty after pruning, remove any segments with length 0;
-#' NOTE: that this also affects segments that were not pruned, and already
-#' had length 0 in \code{x}.
-#' @param verb integer level of verbosity, 0: no messages, 1: show messages
-#' @export
-pruneSegments <- function(x, chrL, chr="chr", 
-                          coors=c(start="start",end="end", coor="coor"),
-                          remove.empty=FALSE, verb=1) {
-    if ( missing(chrL) )
-        stop("chromosome length index is required to ",
-             "appropriately cut segments")
-    for ( coor in coors )
-        if ( coor %in% colnames(x) ) {
-
-            ## cut starts <0
-            cut <- which(x[,coor]<1)
-            if ( verb>0 & length(cut)>0 )
-                cat(paste("cutting", length(cut), "chromosome starts at",
-                          coor,"\n"))
-            if ( length(cut)>0 )
-                x[cut,coor] <- 1
-
-            ## cut ends > chromosome length
-            cut <- which(x[,coor]> chrL[x[,chr]])
-            if ( verb>0 & length(cut)>0 )
-                cat(paste("cutting", length(cut), "chromosome starts at",
-                              coor,"\n"))
-            if ( length(cut)>0 )
-                x[cut,coor] <- chrL[x[cut,chr]]
-        }
-    ## remove 0 length segments
-    if ( remove.empty ) {
-        remove <- which(x[,coors["start"]] == x[,coors["end"]])
-        if ( verb>0 & length(remove)>0 )
-            cat(paste("removing", length(remove), "segments with length 0\n"))
-        if ( length(remove)>0 )
-            x <- x[-remove,]
-    }
-    x
-}
 
 ## reproduces segmentJaccard but based on installed
 ## bedtools and commandline calls to a segmenTools bash script.

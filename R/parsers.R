@@ -320,12 +320,19 @@ tab2gff <- function(tab,
 #' @param header header names for the parsed bed file
 #' @export
 bed2coor <- function(file, header=c("chr","start","end","name","score")) {
+
     dat <- read.delim(file,  header=FALSE)
     ## todo: add column names if </> 5 are present
     colnames(dat) <- header
 
     ## 1-based starts
     dat$start <- dat$start+1
+
+    ## numeric chromosomes
+    dat$chr <- as.numeric(sub("chr","",dat$chr))
+    ## numeric strand
+    str <- c("+"=1, "-"=-1)
+    dat$strand <- str[as.character(dat$strand)]
     
     dat
 }

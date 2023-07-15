@@ -39,11 +39,11 @@ option_list <- list(
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
   make_option(c("--upstream"), type="integer", default=0,
-              help="search upstream (>0) or downstream (<0) of target (in bp)"),
+              help="search upstream (<0) or downstream (>0) of target (in bp)"),
   make_option(c("--range"), type="integer", default=0,
               help="search range around target (in bp)"),
   make_option(c("--convergent"), type="integer", default=0,
-              help="search range downstream of query and target (in bp)"),
+              help="search convergent (>0) or divergent (<0) overlaps between query and target (in bp)"),
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   make_option(c("--count"),  action="store_true", default=FALSE,
@@ -135,14 +135,12 @@ if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 
 ## TODO: align strand columns to - -> -1 and + -> 1 
 
-## plot axis labels
-qlab <- paste0("query: ", qclass)
-tlab <- paste0("target: ", tclass)
 
 ## target = antisense of query?
 frw.str <- c("1","+")
 rev.str <- c("-1","-")
-## comparison with self on reverse strand!
+
+## COMPARISON WITH SELF on reverse strand!
 ## compare forward with reverse strand!
 self <- FALSE
 if ( target=="" & (antisense|convergent!=0) ) {
@@ -168,107 +166,49 @@ if ( target=="" & (antisense|convergent!=0) ) {
             target <- target[target[,ttypcol]%in%ttypes,]
 }
 
-## scan for range around targets
-if ( range!=0 ) {
-
-    ## make sure start < end for both strands
-    ## (only valid for non-circular DNA!!)
-    utarget <- target[,c("start","end","strand")]
-    str <- as.character(utarget[,"strand"])
-    start <- utarget[,"start"]
-    end <- utarget[,"end"]
-    
-    ## get start and end: independent of start/end definition; using strand info
-    start[str%in%rev.str] <-
-        apply(utarget[str%in%rev.str,c("start","end")],1,min)
-    end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)
-
-    utarget[str%in%frw.str, c("start","end")] <-
-        cbind(start-range, end+range)[str%in%frw.str,]
-    
-    utarget[str%in%rev.str, c("start","end")] <-
-        cbind(start+range, end-range)[str%in%rev.str,]
-        
-    target[,c("start","end","strand")] <- utarget
+## add type columns, if not provided!
+if ( tclass=="" ) {
+    tclass <- "type"
+    if ( tclass%in%colnames(target) ) # remove existing
+        target <- target[, colnames(target)!="type"]
+    target$type <- "all"
 }
-## scan for upstream (>0) or downstream (<0) of target
+if ( qclass=="" ) {
+    qclass <- "type"
+    if ( qclass%in%colnames(query) ) # remove existing
+        query <- query[, colnames(query)!="type"]
+    query$type <- "all"
+}
+
+
+## scan downstream (>0) or upstream (<0) of target
 if ( upstream!=0 ) {
 
-    ## make sure start < end for both strands
-    ## (only valid for non-circular DNA!!)
-    utarget <- target[,c("start","end","strand")]
-    str <- as.character(utarget[,"strand"])
-    start <- utarget[,"start"]
-    end <- utarget[,"end"]
-    
-    ## get start and end: independent of start/end definition; using strand info
-    start[str%in%rev.str] <-
-        apply(utarget[str%in%rev.str,c("start","end")],1,min)
-    end[str%in%rev.str] <- apply(utarget[str%in%rev.str,c("start","end")],1,max)
-
-    if ( upstream > 0 ) {
-        
-        utarget[str%in%frw.str, c("start","end")] <-
-            cbind(start-upstream, start-1)[str%in%frw.str,]
-
-        utarget[str%in%rev.str, c("start","end")] <-
-            cbind(end+1, end+upstream)[str%in%rev.str,]
-
-    } else { # use negative upstream as downstream from end!
-
-        utarget[str%in%frw.str, c("start","end")] <-
-            cbind(end+1, end-upstream)[str%in%frw.str,]
-
-        utarget[str%in%rev.str, c("start","end")] <-
-            cbind(start+upstream,  start-1)[str%in%rev.str,]
-    
-    }
-    target[,c("start","end","strand")] <- utarget
+    ## get new coordinates
+    target <- coorUpstream(coor=target, upstream=upstream)
+    ## prune ends
+    target <- coorPrune(target, chrL=chrL, remove.empty=TRUE, verb=1)
+    ## merge potentially overlapping
+    target <- coorMerge(coor=target, type=tclass)
 }
 
+## scan for convergent (>0) or divergent (<0) overlaps
 if ( convergent!=0 ) {
+
     ## same as upstream<0 but for both query and target
-    ## forward strand: max(start,end) + range
-    ## reverse strand: min(start,end) - range
-    for ( tmp in c("query","target") ) {
-        
-        ## make sure start < end for both strands
-        ## (only valid for non-circular DNA!!)
-        udat <- get(tmp)[,c("start","end","strand")]
-        str <- as.character(udat[,"strand"])
-        start <- udat[,"start"]
-        end <- udat[,"end"]
-        
-        ## get start and end: independent of start/end definition; using strand info
-        start[str%in%rev.str] <-
-            apply(udat[str%in%rev.str,c("start","end")],1,min)
-        end[str%in%rev.str] <- apply(udat[str%in%rev.str,c("start","end")],1,max)
-        
-        udat[str%in%frw.str, c("start","end")] <-
-            cbind(end+1, end+convergent)[str%in%frw.str,]
 
-        udat[str%in%rev.str, c("start","end")] <-
-            cbind(start-convergent,  start-1)[str%in%rev.str,]
-        assign(x=paste0("u",tmp), value=udat)
-        
-    }
-    target[,c("start","end","strand")] <- utarget
-    query[,c("start","end","strand")] <- uquery
+    target <- coorUpstream(coor=target, upstream=convergent)
+    target <- coorPrune(target, chrL=chrL, remove.empty=TRUE, verb=1)
+    target <- coorMerge(coor=target, type=tclass, verb=2)
+
+    query <- coorUpstream(coor=query, upstream=convergent)
+    query <- coorPrune(query,  chrL=chrL, remove.empty=TRUE, verb=1)
+    query <- coorMerge(coor=query, type=qclass, verb=1)
 }
 
-## only compare forward and reverse strands for auto-target antisense
-## plot axis labels
-if ( (antisense|convergent!=0) & self ) {
-    qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
-    tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
-}
-if ( antisense & !self ) {
-    tlab <- paste(tlab, "- antisense")
-}
-if ( upstream!=0 ) {
-    qlab <- paste("query:", qclass)
-    tlab <- paste("target:", tclass, "- up/downstream", upstream)
-}
+## cut chromosome ends:
+## upstream and convergent may have produced non-existent coordinates!
+
 
 if ( verb>0 )
     msg(paste("TARGETS\t", nrow(target), "\n",
@@ -286,10 +226,6 @@ if ( nostrand ) {
     target$strand <- "+"
 }
 
-## cut chromosome ends:
-## upstream and convergent may have produced non-existent coordinates!
-target <- pruneSegments(target, chrL=chrL, remove.empty=TRUE, verb=1)
-query  <- pruneSegments(query,  chrL=chrL, remove.empty=TRUE, verb=1)
 
 ## converting both to continuous index
 query  <- coor2index(query, chrS)
@@ -298,7 +234,7 @@ target <- coor2index(target, chrS)
 ## search antisense and convergent targets on other strand
 ## for self: targets are reverse strand features, see above
 ### TODO: make this function work on non-indexed genome,
-## or simply swap strands above (before coor2index).
+## or simply swap strands above (before coor2index)?
 if ( (antisense|convergent!=0) ) 
     target <- switchStrand(target, chrS)
 
@@ -399,15 +335,7 @@ if ( bedtools ) {
                               collapse=FALSE,  details=FALSE, only.best=FALSE,
                               qcol=qcol, tcol=tcol, prefix="query")
         
-        if ( tclass=="" ) {
-            tcol <- tclass <- "tclass"
-            ann <- cbind(ann, tclass="target")
-        }
-        if ( qclass=="" ) {
-            qcol <- qclass <- "qclass"
-            ann <- cbind(ann, query_qclass="query")
-        }
-        
+       
         ## FILTER EMPTY
         ann <- ann[!is.na(ann[,paste0("query_ID")]),]
         
@@ -418,7 +346,7 @@ if ( bedtools ) {
         
         if ( symmetric ) {
             tab[upper.tri(tab)] <-
-                tab[upper.tri(tab)] + tab[lower.tri(tab)]
+                tab[upper.tri(tab)] + t(tab)[upper.tri(tab)]
             tab[lower.tri(tab)] <- 0
         }
         
@@ -448,14 +376,10 @@ if ( verb>0 )
 if ( verb>0 )
   msg(paste0("writing results\n"))
 
-## write out results
-if ( tclass%in%c("","tclass") ) tclass <- "all"
-if ( qclass%in%c("","qclass") ) qclass <- "all"
-
 ## store data
 ##OUTFILE NAME
 
-streamid <- ifelse(upstream>0, "_upstream","_downstream")
+streamid <- ifelse(upstream<0, "_upstream","_downstream")
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
                     ifelse(convergent!=0,paste0("_convergent",convergent),""),
@@ -482,6 +406,23 @@ if ( !interactive() ) {
   
 ## plot
 if ( perm>0 ) {
+
+    ## only compare forward and reverse strands for auto-target antisense
+    ## plot axis labels
+    ## plot axis labels
+    qlab <- paste0("query: ", qclass)
+    tlab <- paste0("target: ", tclass)
+    if ( (antisense|convergent!=0) & self ) {
+        qlab <- paste0("query: ", qclass, ", strand ", frw.str[2])
+        tlab <- paste0("target: ", tclass, ", strand ", rev.str[2])
+    }
+    if ( antisense & !self ) {
+        tlab <- paste(tlab, "- antisense")
+    }
+    if ( upstream!=0 ) {
+        qlab <- paste("query:", qclass)
+        tlab <- paste("target:", tclass, "- up/downstream", upstream)
+    }
     
     hbase <- 0.25
     wbase <- 1.5*hbase
@@ -495,5 +436,5 @@ if ( perm>0 ) {
     dev.off()
 }
 if ( delete.data.message )
-    warning(paste0("don't forget to delete randomized sequence files in directory '",
-                   random, "'"))
+    warning(paste0("don't forget to delete randomized sequence files ",
+                   "in directory '", random, "'"))

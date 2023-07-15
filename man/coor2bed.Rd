@@ -16,7 +16,7 @@ coor2bed(
 )
 }
 \arguments{
-\item{coor}{genome coordinates}
+\item{coor}{genomic coordinates}
 
 \item{file}{optional name for bed output file}
 
