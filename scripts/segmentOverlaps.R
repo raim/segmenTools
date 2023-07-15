@@ -359,19 +359,20 @@ if ( bedtools ) {
     target <- index2coor(target, chrS)
     if ( random=="" ) 
         random <-  tempdir()
+    else   delete.data.message <- TRUE
     if ( !dir.exists(random) )
-        dir.create(random) 
+        dir.create(random)
     ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
                               prefix="socl_",
                               qclass=qclass, tclass=tclass, perm=perm, 
                               verb=1, tmpdir=random, save.permutations=TRUE)
-    delete.data.message <- TRUE
 } else {
     
     ## symmetric: only for antisense of self!
     symmetric <- (antisense|convergent!=0) & self
     if ( symmetric )
-        cat(paste("\n\tNOTE: symmetric test of antisense|convergent with self!\n"))
+        cat(paste("\n\tNOTE: symmetric test of",
+                  "antisense|convergent with self!\n"))
     
     ## TODO: replace this (optionally) with segmentJaccard_bed
     ## BEFORE coor2index call
@@ -457,7 +458,8 @@ if ( qclass%in%c("","qclass") ) qclass <- "all"
 streamid <- ifelse(upstream>0, "_upstream","_downstream")
 file.name <- paste0(outfile,"_",qclass,"_",tclass,
                     ifelse(antisense,"_antisense",""),
-                    ifelse(upstream!=0, paste0(streamid,upstream),""))
+                    ifelse(convergent!=0,paste0("_convergent",convergent),""),
+                    ifelse(upstream!=0,  paste0(streamid,upstream),""))
 
 ## store settings
 parameters <- list()
@@ -482,8 +484,8 @@ if ( !interactive() ) {
 if ( perm>0 ) {
     
     hbase <- 0.25
-    wdth <- 1.25*hbase*(11+4)
-    wd <- (ncol(ovl$p.value))*hbase + (.75+.6)
+    wbase <- 1.5*hbase
+    wd <- (ncol(ovl$p.value))*wbase + (.75+.6)
     ht <- (nrow(ovl$p.value))*hbase + (.75+.6)
     
     plotdev(paste0(file.name),type=fig.type,width=wd,  height=ht)
@@ -492,7 +494,6 @@ if ( perm>0 ) {
                  show.total=TRUE, short=TRUE, ylab=qlab, xlab=tlab)
     dev.off()
 }
-
 if ( delete.data.message )
-    warning(paste0("please delete randomized sequence files in directory '",
+    warning(paste0("don't forget to delete randomized sequence files in directory '",
                    random, "'"))

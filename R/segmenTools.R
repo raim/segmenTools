@@ -1346,13 +1346,13 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     tout <- file.path(tmpdir, paste0("target_",RNDID,".bed"))
 
     ## generate types here: required
-    if ( missing(tclass) ) {
+    if ( missing(tclass) | tclass=="" ) {
         tclass <- "type"
-        target$type <- "all"
+        target$type <- "target"
     }
-    if ( missing(qclass) ) {
+    if ( missing(qclass) | qclass=="" ) {
         qclass <- "type"
-        query$type <- "all"
+        query$type <- "query"
     }
     
     ## generate IDs here, if not present: not required but IDs in
@@ -1417,7 +1417,7 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
         unlink(c(tout, outf, paste0(outf,"*")))
         unlink(c(qout, genome.idx, file.path(tmpdir,"query_random_*.bed")))
     } else
-        warning("keeping potentially large randomized data in", tmpdir)
+        warning("keeping potentially large randomized data in '", tmpdir, "'")
 
     ovl
 }
@@ -1446,7 +1446,7 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
     qidx <- which(ovt$target=="" | is.na(ovt$target))
     qnms <- as.character(ovt[qidx,"query"])
     ## sort classes, if numeric
-    if ( all(!is.na(as.numeric(qnms))) ) {
+    if ( all(!is.na(suppressWarnings(as.numeric(qnms)))) ) {
         ord <- order(as.numeric(qnms))
     } else ord <- order(qnms)
     qidx <- qidx[ord]
@@ -1458,7 +1458,7 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
     tidx <- which(ovt$query=="" | is.na(ovt$query))
     tnms <- as.character(ovt[tidx,"target"])
     ## sort classes, if numeric
-    if ( all(!is.na(as.numeric(tnms))) ) {
+    if ( all(!is.na(suppressWarnings(as.numeric(tnms)))) ) {
         ord <- order(as.numeric(tnms))
     } else ord <- order(tnms)
     tidx <- tidx[ord]
