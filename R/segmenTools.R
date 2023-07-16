@@ -1349,7 +1349,7 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
         bscript <- system.file('bash/segmentoverlaps_symmetric.sh',
                                package='segmenTools')
     else 
-        bscript <- system.file('bash/segmentoverlaps_bed.sh',
+        bscript <- system.file('bash/segmentoverlaps.sh',
                                package='segmenTools')
 
     ## copy script to local script name, for easier recognition
