@@ -14,6 +14,7 @@ segmentJaccard_bed(
   perm,
   tmpdir,
   runid,
+  symmetric = FALSE,
   save.permutations = FALSE,
   verb = 1
 )
@@ -42,6 +43,11 @@ or exploring detailed results.}
 
 \item{runid}{use this ID for the run, for more recognizable jobnames.
 This is potentially dangerous since each call MUST have a unique name.}
+
+\item{symmetric}{treat test as symmetric. This is only useful for the
+case where overlaps all segments from the forward strand and the reverse
+strand are tested, to find antisense overlaps within a
+segment classification.}
 
 \item{save.permutations}{save permutated query bed files used
 in p-value calculation. If this is provided together with

@@ -1253,6 +1253,10 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' or exploring detailed results.
 #' @param runid use this ID for the run, for more recognizable jobnames.
 #' This is potentially dangerous since each call MUST have a unique name.
+#' @param symmetric treat test as symmetric. This is only useful for the
+#' case where overlaps all segments from the forward strand and the reverse
+#' strand are tested, to find antisense overlaps within a
+#' segment classification.
 #' @param save.permutations save permutated query bed files used
 #' in p-value calculation. If this is provided together with
 #'  \code{tmpdir}, the randomized bed files can be re-used. However, this
@@ -1261,7 +1265,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' @param verb verbosity level, 0: silent.
 #'@export
 segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
-                               chrL, perm, tmpdir, runid,
+                               chrL, perm, tmpdir, runid, symmetric=FALSE,
                                save.permutations=FALSE, verb=1) {
 
     ## TODO: instead of calling bash script, do single calls to
@@ -1331,6 +1335,7 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
         target[emptyt,tclass] <- "na."
     
     ## generate .bed format files, or re-use existing query!
+    ## TODO: coarsly check validity, e.g. line numbers
     if ( !file.exists(qout) )
         coor2bed(query,  name=idq, score=qclass, file=qout,
                  verb=verb, prefix=prefix)
@@ -1339,8 +1344,13 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
              verb=verb, prefix=prefix)
     
     ## call bedtools script: query.bed target.bed genome.idx perm
-    
-    bscript <- system.file('bash/segmentoverlaps_bed.sh', package='segmenTools')
+
+    if ( symmetric )
+        bscript <- system.file('bash/segmentoverlaps_symmetric.sh',
+                               package='segmenTools')
+    else 
+        bscript <- system.file('bash/segmentoverlaps_bed.sh',
+                               package='segmenTools')
 
     ## copy script to local script name, for easier recognition
     ## of running jobs, and log of used script.
@@ -1355,11 +1365,13 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
     bcmd <- paste("cd",tmpdir,"; cp -a", bscript, rscript, ";",
                   rscript, qout, tout, genome.idx, perm,">", outf, "2>", logf)
     ## call script
+    ## TODO: handle error messages
     system(bcmd)
     
     ## parse result
     if ( verb>0 ) cat(paste("parsing results\n"))
-    ovl <- parseJaccard(outf, qclass=qclass, tclass=tclass, prefix=prefix)
+    ovl <- parseJaccard(outf, qclass=qclass, tclass=tclass, prefix=prefix,
+                        symmetric=symmetric)
 
 
     ## cleanup target data, but keep permutations and log files
@@ -1381,8 +1393,13 @@ segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
 #' files (column 4,5) to get unique names.
 #' @param qclass optional name for the query classes.
 #' @param tclass optional name for the target classes.
+#' @param symmetric treat test as symmetric. This is only useful for the
+#' case where overlaps all segments from the forward strand and the reverse
+#' strand are tested, to find antisense overlaps within a
+#' segment classification.
 #' @export
-parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
+parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target",
+                         symmetric=FALSE) {
     
     ovt <- read.delim(file=ovfile, stringsAsFactors=FALSE)
     
@@ -1417,7 +1434,8 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
     ut <- t(ovt[tidx,"union", drop=FALSE])
     
     ## count and p-value tables
-    cnt <- matrix(NA, nrow=nrow(nq), ncol=ncol(nt))
+    ## initialize to 0 to allow symmetric matrix summations
+    cnt <- matrix(0, nrow=nrow(nq), ncol=ncol(nt))
     
     rownames(cnt) <- rownames(nq) <- rownames(uq) <- qnms
     colnames(cnt) <- colnames(nt) <- colnames(ut) <- tnms
@@ -1438,7 +1456,28 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
         ## count of overlaps 
         cnt[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"count"]
         ## calculate p-value from permutation counters
-        pvl[cl, as.character(ovt[idx,"target"])] <- ovt[idx,"random"]/ovt[idx,"permutations"]
+        pvl[cl, as.character(ovt[idx,"target"])] <-
+            ovt[idx,"random"]/ovt[idx,"permutations"]
+    }
+
+    ## make triangular: initialized to 0 or 1 above
+    if ( symmetric ) {
+        I[upper.tri(I)] <-
+            I[upper.tri(I)] + t(I)[upper.tri(I)]
+        I[lower.tri(I)] <- 0
+        U <- U
+        U[upper.tri(U)] <-
+            U[upper.tri(U)] + t(U)[upper.tri(U)]
+        U[lower.tri(U)] <- 0
+        J[upper.tri(J)] <-
+            J[upper.tri(J)] + t(J)[upper.tri(J)]
+        J[lower.tri(J)] <- 0
+        cnt[upper.tri(cnt)] <-
+            cnt[upper.tri(cnt)] + t(cnt)[upper.tri(cnt)]
+        cnt[lower.tri(cnt)] <- 0
+        pvl[upper.tri(pvl)] <-
+            pvl[upper.tri(pvl)] + t(pvl)[upper.tri(pvl)]
+        pvl[lower.tri(pvl)] <- 1
     }
     
     ## generate "clusterOverlaps" list
@@ -1461,6 +1500,9 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target") {
     ovl$target <- tclass
     ovl$query <- qclass
 
+    ## parameters
+    ovl$parameters <- list()
+    ovl$parameters$symmetric <- symmetric
     class(ovl) <- "clusterOverlaps"
     ovl
 }

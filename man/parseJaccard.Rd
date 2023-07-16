@@ -4,7 +4,13 @@
 \alias{parseJaccard}
 \title{parses overlap statitics produced with bedtools}
 \usage{
-parseJaccard(ovfile, prefix, qclass = "query", tclass = "target")
+parseJaccard(
+  ovfile,
+  prefix,
+  qclass = "query",
+  tclass = "target",
+  symmetric = FALSE
+)
 }
 \arguments{
 \item{ovfile}{output file produced by \code{segmentoverlaps.sh}.}
@@ -15,6 +21,11 @@ files (column 4,5) to get unique names.}
 \item{qclass}{optional name for the query classes.}
 
 \item{tclass}{optional name for the target classes.}
+
+\item{symmetric}{treat test as symmetric. This is only useful for the
+case where overlaps all segments from the forward strand and the reverse
+strand are tested, to find antisense overlaps within a
+segment classification.}
 }
 \description{
 Parses a file that is produced by the script \code{segmentoverlaps.sh}

@@ -4,8 +4,6 @@
 ## by permutation test analysis
 
 
-## TODO: test downstream implementation, just using negative upstream
-
 library(segmenTools)
 
 ## nicer timestamp
@@ -23,8 +21,6 @@ option_list <- list(
               help="query set of chromosomal segments"),    
   make_option(c("--qclass"), type="character", default="", 
               help="query classes to test"),
-  make_option(c("--intersegment"), type="character", default="", 
-              help="use this value as additional 'qclass' for inter-segment stretches"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
@@ -143,7 +139,7 @@ rev.str <- c("-1","-")
 ## COMPARISON WITH SELF on reverse strand!
 ## compare forward with reverse strand!
 self <- FALSE
-if ( target=="" & (antisense|convergent!=0) ) {
+if ( target=="" ) {
     self <- TRUE
     target <- query
     if ( tclass=="" )
@@ -157,8 +153,6 @@ if ( target=="" & (antisense|convergent!=0) ) {
     }  
 } else {
     target <- read.delim(target, stringsAsFactors=FALSE)
-    ## TODO: map chromosome name to index
-    ## perhaps allow to pass chromosome map to coor2index
     
     ## FILTER targets
     if ( length(ttypes)>0 )
@@ -206,10 +200,14 @@ if ( convergent!=0 ) {
     query <- coorMerge(coor=query, type=qclass, verb=1)
 }
 
+
+## switch strand for antisense and convergent tests
+sstr <- c("+"=-1, "1"=-1, "+1"=-1, "-"=1, "-1"=1)
+if ( (antisense|convergent!=0) ) 
+    target$strand <- sstr[as.character(target$strand)]
+    
 ## cut chromosome ends:
 ## upstream and convergent may have produced non-existent coordinates!
-
-
 if ( verb>0 )
     msg(paste("TARGETS\t", nrow(target), "\n",
               "QUERIES\t", nrow(query), "\n",sep=""))
@@ -217,101 +215,48 @@ if ( verb>0 )
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
-## TODO: convert to function in R/segmenTools from here:
-
 ## consider only one strand
 if ( nostrand ) {
     total <- total/2
-    query$strand <- "+"
-    target$strand <- "+"
+    query$strand <- "1"
+    target$strand <- "1"
 }
 
 
-## converting both to continuous index
-query  <- coor2index(query, chrS)
-target <- coor2index(target, chrS)
 
-## search antisense and convergent targets on other strand
-## for self: targets are reverse strand features, see above
-### TODO: make this function work on non-indexed genome,
-## or simply swap strands above (before coor2index)?
-if ( (antisense|convergent!=0) ) 
-    target <- switchStrand(target, chrS)
-
-## upstream bug yeast - missing 2 micron plasmid - catch here
-if ( any(is.na(query[,"start"])) ) {
-    rm <- which(is.na(query[,"start"]))
-    warning("removing ", length(rm), " queries due to missing coordinates",
-            "(in yeast: upstream error, missing chr column for 2-micron genes)")
-    query <- query[-rm,]
-}
-if ( any(is.na(target[,"start"])) ) {
-    rm <- which(is.na(target[,"start"]))
-    warning("removing ", length(rm), " queries due to missing coordinates",
-            "(in yeast: upstream error, missing chr column for 2-micron genes)")
-    target <- target[-rm,]
-}
-    
 
 if ( verb>0 )
     msg(paste("CALCULATE OVERLAPS\t",time(),"\n",sep=""))
 
-## add inter-segments here
-if ( intersegment!="" ) {
-
-    ## convert to numeric, if qclass is numeric
-    
-    if ( is.numeric(query[,qclass]) )
-        intersegment <- as.numeric(intersegment)
-
-    maxL <- ifelse(nostrand, max(chrS), 2*max(chrS))
- 
-    emptyseg <- data.frame(ID=paste("is",sprintf("%04d",1:(nrow(query)+1)),
-                                    sep=""),
-                           chr=rep(1,nrow(query)+1),
-                           start=c(1,query[1:nrow(query),"end"]+1),
-                           end=c(query[1:nrow(query),"start"]-1,maxL),
-                           stringsAsFactors=FALSE)
-    emlen <- emptyseg[,"end"] - emptyseg[,"start"] +1 
-    emptyseg <- emptyseg[emlen>0,] # rm 0-length and negative overlaps
-    ## split chromosome end segments
-    emptyseg <- splitsegs(emptyseg,chrS,idcol="ID",verb=verb)
-
-    emq <- as.data.frame(matrix(NA, ncol=ncol(query), nrow=nrow(emptyseg)))
-    colnames(emq) <- colnames(query)
-    emptyseg <- emptyseg[,colnames(emptyseg)%in%colnames(emq)]
-    emq[,colnames(emptyseg)] <- emptyseg
-    if ( qclass%in%colnames(emq) )
-        emq[,qclass] <- intersegment ## add intersegment cluster
-    if ("ID"%in%colnames(query) )
-        query <- rbind(query, emq)
-}
+## symmetric: only for antisense of self!
+symmetric <- (antisense|convergent!=0) & self
+if ( symmetric )
+    cat(paste("\n\tNOTE: symmetric test of",
+              "antisense|convergent with self!\n"))
 
 ## calculate Jaccard Index and permutation test
 delete.data.message <- FALSE
-if ( bedtools ) {
-    symmetric <- FALSE # not implemented here
-    query <- index2coor(query, chrS)
-    target <- index2coor(target, chrS)
+
+if ( bedtools ) { ## OVERLAP via bedtools
+
+    ## temporary file directory
     if ( random=="" ) 
         random <-  tempdir()
     else   delete.data.message <- TRUE
     if ( !dir.exists(random) )
         dir.create(random)
+    
     ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
-                              prefix="socl_",
+                              prefix="socl_", symmetric=symmetric,
                               qclass=qclass, tclass=tclass, perm=perm, 
                               verb=1, tmpdir=random, save.permutations=TRUE)
-} else {
     
-    ## symmetric: only for antisense of self!
-    symmetric <- (antisense|convergent!=0) & self
-    if ( symmetric )
-        cat(paste("\n\tNOTE: symmetric test of",
-                  "antisense|convergent with self!\n"))
+} else { ## OVERLAP via internal functions
     
-    ## TODO: replace this (optionally) with segmentJaccard_bed
-    ## BEFORE coor2index call
+    ## converting both to continuous index
+    query  <- coor2index(query, chrS)
+    target <- coor2index(target, chrS)
+    
     ovl <- segmentJaccard(query=query, target=target,
                           qclass=qclass, tclass=tclass, perm=perm, total=total,
                           symmetric=symmetric, verb=1)
@@ -377,13 +322,6 @@ if ( verb>0 )
   msg(paste0("writing results\n"))
 
 ## store data
-##OUTFILE NAME
-
-streamid <- ifelse(upstream<0, "_upstream","_downstream")
-file.name <- paste0(outfile,"_",qclass,"_",tclass,
-                    ifelse(antisense,"_antisense",""),
-                    ifelse(convergent!=0,paste0("_convergent",convergent),""),
-                    ifelse(upstream!=0,  paste0(streamid,upstream),""))
 
 ## store settings
 parameters <- list()
@@ -397,8 +335,9 @@ parameters$antisense <- antisense
 parameters$symmetric <- symmetric
 ovl$parameters <- parameters
 
+##OUTFILE NAME
 if ( !interactive() ) {
-    save(ovl, file=paste0(file.name,".rda"))
+    save(ovl, file=paste0(outfile,".rda"))
     if ( "annotation" %in% names(ovl) )
         write.table(ann, file=paste0(file.name,"_annotation.tsv"),
                     sep="\t", row.names=FALSE, quote=FALSE)
@@ -429,7 +368,7 @@ if ( perm>0 ) {
     wd <- (ncol(ovl$p.value))*wbase + (.75+.6)
     ht <- (nrow(ovl$p.value))*hbase + (.75+.6)
     
-    plotdev(paste0(file.name),type=fig.type,width=wd,  height=ht)
+    plotdev(paste0(outfile),type=fig.type,width=wd,  height=ht)
     par(mai=c(.75,.75,.6,.6),mgp=c(1.75,.3,0),tcl=-0.1)
     plotOverlaps(ovl,p.min=.001, values="count",
                  show.total=TRUE, short=TRUE, ylab=qlab, xlab=tlab)
