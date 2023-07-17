@@ -97,6 +97,12 @@ Accessing genomic coordinates efficiently by indexing, used by
 [u'r gene bro](https://gitlab.com/raim/genomeBrowser) and
 [Karl](https://github.com/raim/segmenTier).
 
+#### Positional Alignment and DNA Structural Patterns
+
+Align genomic intervals around specific genomic sites, such as transcription
+start sites, and calculate position-specific statistics. E.g. to generate
+sequence or DNA motif enrichment, or average DNA binding data profiles.
+
 #### Sequence Spectra 
 
 ... coming soon
