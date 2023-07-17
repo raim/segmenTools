@@ -126,10 +126,14 @@ collection of attributes into data columns
 
 ## TODO
 
-segmenTools:
-* coor2bed and bed2coor conversion from/to bed format, see genomeBrowser script
-* clusterCluster: add fields for statistical corrections
+* Vignettes:
+    - clusterTools v segmenTools,
+    - time series clustering v genomic intervals,
+    - used in: genomeBrowser; input from: segmenTier, dpseg,
+    - class `clusterOverlaps`: sort and plot overlap enrichment profiles,
+      produced by clusterCluster, clusterAnnotation, clusterProfile, 
+      segmentOverlaps.
 
-segmenTier:
-* clusterTimeseries: re-cluster cset by kmeans with centers initialized by flowclust cluster centers 
-* change indexing to allow segments of length 1, see dpseg
+* clusterCluster: add fields for statistical corrections,
+* clusterTimeseries: re-cluster cset by kmeans with centers initialized by flowclust cluster centers,
+* segmenTier: change indexing to allow segments of length 1, see dpseg.
