@@ -21,6 +21,8 @@ option_list <- list(
               help="query set of chromosomal segments"),    
   make_option(c("--qclass"), type="character", default="", 
               help="query classes to test"),
+  make_option(c("--setup"), action="store_true", default=FALSE,
+              help="set up queries for the given settings; this will generate randomized queries for re-use in real runs, and use a minimal pseudo target to test the whole pipeline"),
   make_option(c("--dontmerge"), action="store_false", default=TRUE,
               help="don't merge query segments (merge is required until bedtools --noOverlapping works)"),
   ## TARGET OPTIONS
@@ -34,6 +36,7 @@ option_list <- list(
               help="name of column with sub-set annotation"),
   make_option(c("--nostrand"), action="store_true", default=FALSE,
               help="ignore strand information in query and target"),
+  ## SEARCH RANGE OPTIONS
   make_option(c("--antisense"), action="store_true", default=FALSE,
               help="search target matches on reverse strand (if target is empty; search will be done for sense query vs. antisense query!"),
   make_option(c("--upstream"), type="integer", default=0,
@@ -42,14 +45,15 @@ option_list <- list(
               help="search range around target (in bp)"),
   make_option(c("--convergent"), type="integer", default=0,
               help="search convergent (>0) or divergent (<0) overlaps between query and target (in bp)"),
+  ## ALGORITHM OPTIONS
   make_option(c("--perm"), type="integer", default=100, 
               help="number of permutations"),
   make_option(c("--count"),  action="store_true", default=FALSE,
-              help="count individual overlaps"),
+              help="count individual overlaps (only required for --bedtools FALSE"),
   make_option(c("--bedtools"),  action="store_true", default=FALSE,
               help="use UCSC bedtools instead of segmenTools overlap functions"),
   make_option(c("--random"),  type="character", default="",
-              help="directory where bedtools randomized queries are stored"),
+              help="directory where (re-usable) bedtools randomized queries are stored"),
   ## OUTPUT
   make_option(c("--fig.type"), type="character", default="png",
               help="figure type (png, pdf, eps) [default %default]"),
@@ -170,7 +174,7 @@ if ( target=="" ) {
         }
 }
 
-## add type columns, if not provided!
+## add type columns, if not provided: all segments are the same class
 if ( tclass=="" ) {
     tclass <- "type"
     if ( tclass%in%colnames(target) ) # remove existing
@@ -258,6 +262,21 @@ if ( !dontmerge | mergeq ) {
     msg(paste("Merging query:\n"))
     query <- segmentMerge(x=query, type=qclass, verb=1)
 }
+
+### TODO: setup run, generate mini-target
+if ( setup ) {
+
+    msg("SETUP RUN: only generating randomized queries and running a test\n")
+
+    if ( random=="" ) 
+        stop(paste("setup run makes no sense without permanently storing",
+                   "randomized queries; use --random option."))
+    
+    target <- data.frame(chr=1, start=1, end=10, strand=1,
+                         type="all", ID="test")
+    tclass <- "type"
+}
+
 
 ## CHECK FINAL SIZES
 if ( verb>0 )
@@ -362,7 +381,14 @@ if ( bedtools ) { ## OVERLAP via bedtools
 
 
 if ( verb>0 )
-  msg(paste0("DONE\t",time(),"\n"))
+    msg(paste0("DONE\t",time(),"\n"))
+
+if ( setup ) {
+    msg(paste0("SETUP DONE; check log files and re-use randomized",
+               " queries in directory '",random,"'\n"))
+    quit(save="no")
+}
+
 if ( verb>0 )
   msg(paste0("writing results\n"))
 
