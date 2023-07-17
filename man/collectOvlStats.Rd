@@ -2,18 +2,18 @@
 % Please edit documentation in R/segmenTools.R
 \name{collectOvlStats}
 \alias{collectOvlStats}
-\title{Collect statistics from from \code{\link{segmentOverlap}}}
+\title{Collect statistics from from \code{\link{segmentAnnotate}}}
 \usage{
 collectOvlStats(ovlStatLst, type)
 }
 \arguments{
 \item{ovlStatLst}{list of overlap statistics, where individual
-entries come from \code{\link{segmentOverlap}}}
+entries come from \code{\link{segmentAnnotate}}}
 
 \item{type}{name of the overlap statistics list first level}
 }
 \description{
-Collect statistics from from \code{\link{segmentOverlap}},
+Collect statistics from from \code{\link{segmentAnnotate}},
 a nested list of overlap statistics in lists
 and vectors for a given segment \code{type}
 }

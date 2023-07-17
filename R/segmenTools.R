@@ -436,14 +436,14 @@ getSegmentClasses <- function(sgtypes, sep="_", gsep=":") {
     sgclasses
 }
 
-### WRAPPERS of segmentOverlap for specific purposes
+### WRAPPERS of segmentAnnotate for specific purposes
 ## calculate overlap between two sets of genome segments, e.g.
 ## test a segmentation of RNA-seq data vs. known features or transcripts
 ## NOTE: all chromosome coordinates must be mapped to a continuous index
 ## via coor2index
 ## NOTE: mod from $TATADIR/yeast/scripts/analyzeSeq2013_utils.R
 
-## wrapper around \code{\link{segmentOverlap}}, used to 
+## wrapper around \code{\link{segmentAnnotate}}, used to 
 ## annotate the query set by a column in the target set
 ## @param query the query set of segments (genomic intervals)
 ## @param target the target set of segments (genomic intervals)
@@ -507,13 +507,13 @@ segmentPairs <- function(query, qcol="ID", chrS, distance, verb=1,
 
 #' annotate target segments by overlapping query segments
 #' 
-#' wrapper around \code{\link{segmentOverlap}}, used to 
+#' wrapper around \code{\link{segmentAnnotate}}, used to 
 #' annotate the target set by a column in the query set. See
 #' Details for required input formats.
 #'
-#' Wrapper around  \code{\link{segmentOverlap}}, used to 
+#' Wrapper around  \code{\link{segmentAnnotate}}, used to 
 #' annotate the target set by a column in the query set. Note that
-#' coordinates must already be `indexed', see \code{?\link{segmentOverlap}}
+#' coordinates must already be `indexed', see \code{?\link{segmentAnnotate}}
 #' and \code{?\link{coor2index}}. The default options (\code{only.best=TRUE},
 #' \code{collapse=TRUE} yield a result matrix with 1 row for each
 #' \code{target} (\code{nrow(results)==nrow(target)}, annotated by
@@ -561,7 +561,7 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     
     ## TODO: use details flag to also bind details of overlap (left/right)
     #cltr <- annotateQuery(query, target, qcol)
-    cltr <- segmentOverlap(query=query, target=target,
+    cltr <- segmentAnnotate(query=query, target=target,
                            collapse=FALSE,
                            add.na=TRUE, sort=sort, untie=FALSE,
                            details=details, msgfile=msgfile)
@@ -653,13 +653,13 @@ annotateTarget <- function(query, target, qcol=colnames(query), tcol,
     ##}
 }
 
-#' Collect statistics from from \code{\link{segmentOverlap}}
+#' Collect statistics from from \code{\link{segmentAnnotate}}
 #' 
-#' Collect statistics from from \code{\link{segmentOverlap}},
+#' Collect statistics from from \code{\link{segmentAnnotate}},
 #' a nested list of overlap statistics in lists
 #' and vectors for a given segment \code{type}
 #' @param ovlStatLst list of overlap statistics, where individual
-#' entries come from \code{\link{segmentOverlap}}
+#' entries come from \code{\link{segmentAnnotate}}
 #' @param type name of the overlap statistics list first level
 #' @export
 collectOvlStats <- function(ovlStatLst, type) {
@@ -872,7 +872,7 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
 #' To analyze relative positions between features on distinct
 #' strands, the target or query has to be mapped to the opposite
 #' strand by \code{\link{switchStrand}} before passing it to
-#' \code{segmentOverlap}.
+#' \code{segmentAnnotate}.
 #' @param query the query set of segments (genomic intervals)
 #' @param target the target set of segments (genomic intervals)
 #' @param details add details on the relative positions of the query
@@ -893,7 +893,7 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
 #' @param msgfile file pointer for progress messages and warnings, defaults to
 #' stdout, useful when using in context of command line pipes
 #' @export
-segmentOverlap <- function(query, target, details=FALSE, distance,
+segmentAnnotate <- function(query, target, details=FALSE, distance,
                            add.na=FALSE, untie=FALSE, collapse=FALSE,
                            sort=FALSE, msgfile=stdout()) {
 
@@ -1081,7 +1081,7 @@ segmentOverlap <- function(query, target, details=FALSE, distance,
 }
 
 #' Statistics of overlaps between two segment sets. 
-#' @param ovl overlap table from \code{\link{segmentOverlap}}
+#' @param ovl overlap table from \code{\link{segmentAnnotate}}
 #' @param ovlth threshold fraction of overlap of
 #' target and query to be counted as 'good' hit
 #' @param minj the minimal Jaccard index above which the fraction
@@ -1103,7 +1103,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
     if ( !any(!is.na(ovl[,"query"])) )
       return(NULL)
     
-    ## input ovl is from \code{segmentOverlap(ovl)}
+    ## input ovl is from \code{segmentAnnotate(ovl)}
     ## Calculate ratios:
     ## Jaccard measure: J(query,target) = intersect/union
     ## ratio:           ratio = qlen/tlen
@@ -1225,19 +1225,19 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 }
 
 
-## reproduces segmentJaccard but based on installed
+## reproduces segmentOverlaps but based on installed
 ## bedtools and commandline calls to a segmenTools bash script.
 ## TODO: instead of calling bash script, do single calls to
 ## to bedtools package bedr here.
 ##
 #' calculate segment overlap statistics using UCSC bedtools
 #'
-#' This function produces the same output as \code{\link{segmentJaccard}},
+#' This function produces the same output as \code{\link{segmentOverlaps}},
 #' but using a command-line call to UCSC bedtools, which must be
 #' installed, and starting from normal genome coordinates (w/o indexing;
 #' 0-based and inclusive start and end). It temporarily creates bed files,
 #' and can require quite a lot of disk space. However, it is faster
-#' than \code{\link{segmentJaccard}}, and likely better tested.
+#' than \code{\link{segmentOverlaps}}, and likely better tested.
 #' @param query query segment table, will be permutated.
 #' @param target target segment table.
 #' @param qclass column name which holds a sub-classification (clustering) of
@@ -1264,7 +1264,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' are used with the same \code{tmpdir}.
 #' @param verb verbosity level, 0: silent.
 #'@export
-segmentJaccard_bed <- function(query, target, qclass, tclass, prefix="cl_",
+segmentOverlaps_bed <- function(query, target, qclass, tclass, prefix="cl_",
                                chrL, perm, tmpdir, runid, symmetric=FALSE,
                                save.permutations=FALSE, verb=1) {
 
@@ -1546,7 +1546,7 @@ parseJaccard <- function(ovfile, prefix, qclass="query", tclass="target",
 #' segment classification.
 #' @param verb integer level of verbosity, 0: no messages, 1: show messages
 #' @export
-segmentJaccard <- function(query, target, qclass, tclass, total,
+segmentOverlaps <- function(query, target, qclass, tclass, total,
                            perm=0, symmetric=FALSE, verb=1) {
     
     if ( missing(qclass) ) qclass <- ""
@@ -1670,7 +1670,7 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
 
             ## TODO: test cluster length distribution?
             
-            J.rnd <- segmentJaccard(rquery, target, qclass="type", tclass,
+            J.rnd <- segmentOverlaps(rquery, target, qclass="type", tclass,
                                     perm=0, symmetric=symmetric)
             ## TODO: for anti-self case, using for/rev strands,
             ## sum up symmetrically
@@ -1712,6 +1712,196 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
     return(ovl)
 }
 
+#' sort genomic coordinates
+#'
+#' Sorts genomic coordinates (genomic intervals) along chromosomes
+#' @param x genomic interval (segments) table.
+#' @param by.strand split by strand.
+#' @param reverse reverse strand identifiers, all others are
+#' considered to stem from the forward strand.
+#' @export
+segmentSort <- function(x, by.strand=FALSE, reverse=c("-1","-")) {
+
+    ## first sort by start<end, independent of strand
+    
+    ## get ordered start/end, independent of strand
+    start <- apply(x[,c("start","end")], 1, min)
+    x <- x[order(start),]
+
+    ## then order by chromosomes
+    x <- x[order(x[,"chr"]), ]
+
+    ## split by chromosomes
+    if ( by.strand ) {
+        idx <- which(x[,"strand"]%in%reverse)
+        x <- rbind(x[-idx,],
+                      x[idx,])
+    }
+    
+    x
+    
+}
+
+#' merge genomic coordinates by type
+#' @param x genomic interval (segments) table.
+#' @param type column name of the types which should be merged
+#' separately.
+#' @param verb verbosity level, 0 for silent
+#' @export
+segmentMerge <- function(x, type, verb=1) {
+
+    ## fill up empty type
+    rm.type <- FALSE
+    if ( missing(type) ) {
+        x <- cbind(x, type="all")
+        type <- "type"
+        rm.type <- TRUE
+    }
+
+    before <- nrow(x)
+    
+    ## loop through classes
+    types <- unique(x[,type])
+
+    
+    ## temporary file names for bedtools
+    bfile <- tempfile()
+    ofile <- tempfile()
+
+    if ( verb>1 ) cat(paste("writing tmp files", bfile, ofile, "\n"))
+    
+    nx <- NULL
+    for ( tp in types ) {
+
+        ## write bedfile
+        sx <- x[x[,type]==tp,]
+        bx <- coor2bed(sx, file=bfile, verb=0)
+
+        ## call bedtools merge: only merge really overlapping (-d -1)
+        syscall <- paste("bedtools sort -i", bfile,
+                         "| bedtools merge -s -d -1 -c 6 -o distinct -i -",
+                         ">", ofile)
+        err <- system(syscall, intern=FALSE, ignore.stderr=FALSE)
+
+        ## parse merged bedfile
+        mx <- bed2coor(ofile, c("chr","start","end","strand"))
+        nx <- rbind.data.frame(nx, cbind(mx, tp))
+    }
+    unlink(c(bfile,ofile))
+
+    colnames(nx) <- c("chr","start","end","strand", type)
+    if ( rm.type ) nx <- nx[,-ncol(nx)]
+
+    after <- nrow(nx)
+    if ( verb>0 ) cat(paste("merged", before, "to", after, "segments\n"))
+    
+    nx
+}
+
+
+#' get upstream or downstream range
+#'
+#' Returns upstream (upstream<0) or downstream (upstream>0) ranges of
+#' the passed features. The reported ranges start at the start or end
+#' coordinates, in a strand-specific way.
+#' @param x genomic interval (segments) table.
+#' @param upstream usptream (<0) or downstream (>0) range of the intervals
+#' in \code{x}.
+#' @param reverse reverse strand identifiers, all others are
+#' considered to stem from the forward strand.
+#' @export
+segmentUpstream <- function(x, upstream, reverse=c("-1","-")) {
+
+    ## (only valid for non-circular DNA!!)
+
+    str <- as.character(x[,"strand"])
+    
+    rev.str <- which( as.character(x[,"strand"])%in%reverse)
+    frw.str <- which(!as.character(x[,"strand"])%in%reverse)
+    
+    ## get ordered start/end, independent of strand
+    start <- apply(x[,c("start","end")], 1, min)
+    end   <- apply(x[,c("start","end")], 1, max)
+
+    if ( upstream==0 ) stop("upstream must be != 0")
+    
+    if ( upstream < 0 ) {
+        upstream <- -upstream
+        ## forward strand features
+        end[frw.str]   <- start[frw.str] -1
+        start[frw.str] <- start[frw.str] -upstream
+        ## reverse strand features
+        start[rev.str] <- end[rev.str] +1
+        end[rev.str]   <- end[rev.str] +upstream
+        
+    } else { # use positive upstream value as downstream from end!
+        downstream <- upstream
+        ## forward strand features
+        start[frw.str]   <- end[frw.str] +1
+        end[frw.str]     <- end[frw.str] +downstream
+        ## reverse strand features
+        end[rev.str]   <- start[rev.str] -1
+        start[rev.str] <- start[rev.str] -downstream
+        
+    }
+    x[,c("start","end")] <- data.frame(start=start, end=end)
+    x
+}
+    
+#' prune genomic coordinates at chromosome ends
+#'
+#' Cuts segments coordinates that are beyond chromosome coordinates.
+#' @param x genomic interval (segments) table.
+#' @param chrL chromosome length vector, where the chromosome column
+#' must provide the index in this vector; e.g. for 16 chromosomes,
+#' chrL has length 16 and provides, in this order, the lengths of
+#' chromosomes 1 to 16).
+#' @param coors coordinate column names to cut.
+#' @param chr chromosome column name.
+#' @param remove.empty after pruning, remove any segments with length 0;
+#' NOTE: that this also affects segments that were not pruned, and already
+#' had length 0 in \code{x}.
+#' @param verb integer level of verbosity, 0: no messages, 1: show messages.
+#' @export
+segmentPrune <- function(x, chrL, chr="chr", 
+                          coors=c(start="start",end="end", coor="coor"),
+                          remove.empty=FALSE, verb=1) {
+    if ( missing(chrL) )
+        stop("chromosome length index is required to ",
+             "appropriately cut segments")
+    
+    for ( coor in coors )
+        if ( coor %in% colnames(x) ) {
+
+            ## cut starts <0
+            cut <- which(x[,coor]<1)
+            if ( verb>0 & length(cut)>0 )
+                cat(paste("cutting", length(cut), "chromosome starts at",
+                          coor,"\n"))
+            if ( length(cut)>0 )
+                x[cut,coor] <- 1
+
+            ## cut ends > chromosome length
+            cut <- which(x[,coor]> chrL[x[,chr]])
+            if ( verb>0 & length(cut)>0 )
+                cat(paste("cutting", length(cut), "chromosome starts at",
+                              coor,"\n"))
+            if ( length(cut)>0 )
+                x[cut,coor] <- chrL[x[cut,chr]]
+        }
+
+    ## remove length 1 segments
+    if ( remove.empty ) {
+        remove <- which(x[,coors["start"]] == x[,coors["end"]])
+        if ( verb>0 & length(remove)>0 )
+            cat(paste("removing", length(remove), "segments with length 1\n"))
+        if ( length(remove)>0 )
+            x <- x[-remove,]
+    }
+    x
+}
+
+
 #' randomize locations of input segments
 #' 
 #' randomizes the locations of input segments, while maintaining
@@ -1723,7 +1913,7 @@ segmentJaccard <- function(query, target, qclass, tclass, total,
 #' for chromosome borders.
 #'
 #' The function is also used for permutation tests in
-#' \code{\link{segmentJaccard}}.
+#' \code{\link{segmentOverlaps}}.
 #' @param query query set of segments to be randomized
 #' @param qclass column name which holds a sub-classification (clustering) of
 #' the query segments, omit or pass empty string ("") to use all
@@ -1803,6 +1993,8 @@ randomSegments <- function(query, qclass, total) {
 }
 
 #' collapse adjacent genome positions into segments
+#'
+#' TODO: align this with segmentsMerge
 #' @param x ordered chromosome coordinates, a matrix or data.frame
 #' with columns "chr" and "coor"
 #' @param dist maximal distance between loci to be collapsed
@@ -2084,7 +2276,7 @@ my.colorpanel <- function (n, low, mid, high)
 
 ### TODO - NOT WORKING CODE
 
-## more general approach (faster/better?) of segmentOverlap
+## more general approach (faster/better?) of segmentAnnotate
 ## loops over segments instead!
 ## Here, we join query and target segments and get the order
 ## of all start and end sides. Then, we go through queries. If a query
@@ -2094,7 +2286,7 @@ my.colorpanel <- function (n, low, mid, high)
 ## requires additional sort of query/target start vs. target/query ends
 ## to find overlapping - not sure whether this would be any time improvement
 ## see e.g BIT algo http://europepmc.org/articles/PMC3530906
-segmentOverlap.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
+segmentAnnotate.v2 <- function(query, target, details=FALSE, add.na=FALSE) {
     cols <- c("start","end")
     all<-rbind(query[,cols],target[cols]);
     n <- nrow(query)

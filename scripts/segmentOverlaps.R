@@ -179,11 +179,11 @@ if ( qclass=="" ) {
 if ( upstream!=0 ) {
 
     ## get new coordinates
-    target <- coorUpstream(coor=target, upstream=upstream)
+    target <- segmentUpstream(x=target, upstream=upstream)
     ## prune ends
-    target <- coorPrune(target, chrL=chrL, remove.empty=TRUE, verb=1)
+    target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
     ## merge potentially overlapping
-    target <- coorMerge(coor=target, type=tclass)
+    target <- segmentMerge(x=target, type=tclass, verb=1)
 }
 
 ## scan for convergent (>0) or divergent (<0) overlaps
@@ -191,13 +191,13 @@ if ( convergent!=0 ) {
 
     ## same as upstream<0 but for both query and target
 
-    target <- coorUpstream(coor=target, upstream=convergent)
-    target <- coorPrune(target, chrL=chrL, remove.empty=TRUE, verb=1)
-    target <- coorMerge(coor=target, type=tclass, verb=2)
+    target <- segmentUpstream(x=target, upstream=convergent)
+    target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
+    target <- segmentMerge(x=target, type=tclass, verb=1)
 
-    query <- coorUpstream(coor=query, upstream=convergent)
-    query <- coorPrune(query,  chrL=chrL, remove.empty=TRUE, verb=1)
-    query <- coorMerge(coor=query, type=qclass, verb=1)
+    query <- segmentUpstream(x=query, upstream=convergent)
+    query <- segmentPrune(x=query,  chrL=chrL, remove.empty=TRUE, verb=1)
+    query <- segmentMerge(x=query, type=qclass, verb=1)
 }
 
 
@@ -206,14 +206,6 @@ sstr <- c("+"=-1, "1"=-1, "+1"=-1, "-"=1, "-1"=1)
 if ( (antisense|convergent!=0) ) 
     target$strand <- sstr[as.character(target$strand)]
     
-## cut chromosome ends:
-## upstream and convergent may have produced non-existent coordinates!
-if ( verb>0 )
-    msg(paste("TARGETS\t", nrow(target), "\n",
-              "QUERIES\t", nrow(query), "\n",sep=""))
-
-if ( nrow(query)==0 | nrow(target)==0 )
-    stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
 ## CONSIDER ONLY ONE STRAND:
 ## either by command line argument, or by absence of strand
@@ -227,10 +219,27 @@ if ( !"strand"%in%colnames(query) | !"strand"%in%colnames(target) ) {
 }
 if ( nostrand ) {
     total <- total/2
+
+    mergeq <- FALSE
+    if ( "strand"%in%colnames(query) )
+        mergeq <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
+
     query$strand <- "1"
     target$strand <- "1"
+    
+    ## merge stranded features in randomized query!
+    if ( mergeq )
+        query <- segmentMerge(x=query, type=qclass, verb=1)
 }
 
+
+## CHECK FINAL SIZES
+if ( verb>0 )
+    msg(paste("TARGETS\t", nrow(target), "\n",
+              "QUERIES\t", nrow(query), "\n",sep=""))
+
+if ( nrow(query)==0 | nrow(target)==0 )
+    stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
 
 
@@ -255,10 +264,10 @@ if ( bedtools ) { ## OVERLAP via bedtools
     if ( !dir.exists(random) )
         dir.create(random)
     
-    ovl <- segmentJaccard_bed(query=query, target=target, chrL=chrL,
-                              prefix="socl_", symmetric=symmetric,
-                              qclass=qclass, tclass=tclass, perm=perm, 
-                              verb=1, tmpdir=random, save.permutations=TRUE)
+    ovl <- segmentOverlaps_bed(query=query, target=target, chrL=chrL,
+                               prefix="socl_", symmetric=symmetric,
+                               qclass=qclass, tclass=tclass, perm=perm, 
+                               verb=1, tmpdir=random, save.permutations=TRUE)
     
 } else { ## OVERLAP via internal functions
     
@@ -266,9 +275,9 @@ if ( bedtools ) { ## OVERLAP via bedtools
     query  <- coor2index(query, chrS)
     target <- coor2index(target, chrS)
     
-    ovl <- segmentJaccard(query=query, target=target,
-                          qclass=qclass, tclass=tclass, perm=perm, total=total,
-                          symmetric=symmetric, verb=1)
+    ovl <- segmentOverlaps(query=query, target=target,
+                           qclass=qclass, tclass=tclass, perm=perm, total=total,
+                           symmetric=symmetric, verb=1)
     
     
     ## ADD COUNTS

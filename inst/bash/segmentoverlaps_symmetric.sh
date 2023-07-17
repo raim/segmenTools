@@ -37,7 +37,7 @@ start=1
 for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
     if [ ! -f "$rfile" ]; then
-	bedtools shuffle -i $query -g $gidx -seed $i  | bedtools sort -i - -faidx  genome.txt > $rfile
+	bedtools shuffle -i $query -g $gidx -seed $i -noOverlapping | bedtools sort -i - -faidx  genome.txt > $rfile
     else
 	>&2 echo $rfile exists
     fi

@@ -50,14 +50,14 @@ into a single row, with ;-separated strings in the respective fields.}
 stdout, useful when using in context of command line pipes}
 }
 \description{
-wrapper around \code{\link{segmentOverlap}}, used to 
+wrapper around \code{\link{segmentAnnotate}}, used to 
 annotate the target set by a column in the query set. See
 Details for required input formats.
 }
 \details{
-Wrapper around  \code{\link{segmentOverlap}}, used to 
+Wrapper around  \code{\link{segmentAnnotate}}, used to 
 annotate the target set by a column in the query set. Note that
-coordinates must already be `indexed', see \code{?\link{segmentOverlap}}
+coordinates must already be `indexed', see \code{?\link{segmentAnnotate}}
 and \code{?\link{coor2index}}. The default options (\code{only.best=TRUE},
 \code{collapse=TRUE} yield a result matrix with 1 row for each
 \code{target} (\code{nrow(results)==nrow(target)}, annotated by

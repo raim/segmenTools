@@ -272,24 +272,24 @@ for ( test.type in test.types ) {
             sgs <- sgs[1:1000,]
 
         
-        ovl <- segmentOverlap(query=sgs, target=target,
-                              add.na=TRUE, details=TRUE,
-                              untie=FALSE, collapse=FALSE, sort=FALSE,
-                              msgfile=stdout())
+        ovl <- segmentAnnotate(query=sgs, target=target,
+                               add.na=TRUE, details=TRUE,
+                               untie=FALSE, collapse=FALSE, sort=FALSE,
+                               msgfile=stdout())
         if ( !any(!is.na(ovl[,"query"])) ) next
         sts <- getOverlapStats(ovl, ovlth=ovlth, minj=minj, minf=minf,
                                hrng=c(.8,1.2),
                                tnum=nrow(target),qnum=nrow(sgs),
                                qid=type, tid=test.type)
-
+        
         ovlstats[[test.type]][[type]] <- sts
 
         if ( randomize ) {
             
-            rnd <- segmentOverlap(query=sgs, target=target.rnd,
-                                  add.na=TRUE, details=TRUE,
-                                  untie=FALSE, collapse=FALSE, sort=FALSE,
-                                  msgfile=stdout())
+            rnd <- segmentAnnotate(query=sgs, target=target.rnd,
+                                   add.na=TRUE, details=TRUE,
+                                   untie=FALSE, collapse=FALSE, sort=FALSE,
+                                   msgfile=stdout())
             #if ( !any(!is.na(ovl[,"query"])) ) next
             sts.rnd <- getOverlapStats(rnd, ovlth=ovlth, minj=minj, minf=minf,
                                        hrng=c(.8,1.2),
@@ -971,8 +971,8 @@ if ( !interactive() ) quit(save="no")
 #### TODO; allow segmentRevery to work with transcripts vs features
 
 ## ORF recovery by transcripts!
-trcl <- segmentOverlap(query=clorf,target=genes,
-                       add.na=TRUE,details=TRUE,sort=TRUE)
+trcl <- segmentAnnotate(query=clorf,target=genes,
+                        add.na=TRUE,details=TRUE,sort=TRUE)
 ## plot cluster gene recovery by published transcripts
 trst <- getOverlapStats(trcl,tnum=nrow(genes),
                         qnum=nrow(clorf),qid="clorf", ovlth=ovlth)
@@ -1022,7 +1022,7 @@ for ( test.type in test.types ) {
      
     cat(paste("transcript overlap with",test.type,"\t",time(),"\n"))
     
-    ovl <- segmentOverlap(query=query,target=target, add.na=TRUE,details=TRUE)
+    ovl <- segmentAnnotate(query=query,target=target, add.na=TRUE,details=TRUE)
     sts <- list(CDF=NA,hitnum=0,qid=test.type,tid="ORF")
 
     if ( any(!is.na(ovl[,"query"])))

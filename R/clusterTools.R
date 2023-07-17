@@ -249,7 +249,7 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
 
     ## TODO: add test number for later bonferroni correction
     ## TODO: add total numbers as result$num.query/total
-    ## TODO: align with nomenclature in segmentJaccard and plotOverlaps
+    ## TODO: align with nomenclature in segmentOverlaps and plotOverlaps
     
     result$num.target <- t(as.matrix(table(cl2)[cl2.srt]))
     result$num.query <- as.matrix(table(cl1)[cl1.srt])
@@ -350,14 +350,14 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 #'
 #' Plots the significance distribution of cluster-cluster or segment-segment
 #' overlap statistics provided by \code{\link{clusterCluster}},
-#' \code{\link{clusterProfile}} or \code{\link{segmentJaccard}}, where
+#' \code{\link{clusterProfile}} or \code{\link{segmentOverlaps}}, where
 #' a color gradient is
 #' calculated from \code{-log(p)}, and the text shows the overlap numbers,
 #' e.g., the number of overlapping features for \code{\link{clusterCluster}},
 #' or the Jaccard index or relative intersect values for
-#' \code{\link{segmentJaccard}}. Option \code{text} allows to select
+#' \code{\link{segmentOverlaps}}. Option \code{text} allows to select
 #' which values to plot as text. Only "overlap" is available for a
-#' \code{\link{clusterCluster}} results, while for \code{\link{segmentJaccard}}
+#' \code{\link{clusterCluster}} results, while for \code{\link{segmentOverlaps}}
 #' the Jaccard index ("jaccard"), or the relative intersect size can
 #' be shown: "intersect.target" and "intersect.query" are the intersect
 #' divided by total target or query length, respectively.

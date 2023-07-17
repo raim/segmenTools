@@ -13,5 +13,5 @@ with columns "chr" and "coor"}
 \item{dist}{maximal distance between loci to be collapsed}
 }
 \description{
-collapse adjacent genome positions into segments
+TODO: align this with segmentsMerge
 }

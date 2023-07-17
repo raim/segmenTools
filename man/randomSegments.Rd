@@ -26,5 +26,5 @@ for chromosome borders.
 }
 \details{
 The function is also used for permutation tests in
-\code{\link{segmentJaccard}}.
+\code{\link{segmentOverlaps}}.
 }

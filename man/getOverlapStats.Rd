@@ -17,7 +17,7 @@ getOverlapStats(
 )
 }
 \arguments{
-\item{ovl}{overlap table from \code{\link{segmentOverlap}}}
+\item{ovl}{overlap table from \code{\link{segmentAnnotate}}}
 
 \item{ovlth}{threshold fraction of overlap of
 target and query to be counted as 'good' hit}
