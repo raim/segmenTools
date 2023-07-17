@@ -293,7 +293,8 @@ if ( bedtools ) { ## OVERLAP via bedtools
     ovl <- segmentOverlaps_bed(query=query, target=target, chrL=chrL,
                                prefix="socl_", symmetric=symmetric,
                                qclass=qclass, tclass=tclass, perm=perm, 
-                               verb=1, tmpdir=random, save.permutations=TRUE)
+                               verb=1, tmpdir=random, save.permutations=TRUE,
+                               runid=basename(outfile))
     
 } else { ## OVERLAP via internal functions
     
