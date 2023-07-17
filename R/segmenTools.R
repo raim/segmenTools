@@ -2029,6 +2029,8 @@ collapsePositions <- function(x, dist=1) {
         CIL[,-2,drop=FALSE]
     }
 
+    CIL
+
 }
 
 ## FILL UP GENOME ADD MISSING SEGMENTS

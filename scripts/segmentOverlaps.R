@@ -232,6 +232,12 @@ if ( nostrand ) {
         query <- segmentMerge(x=query, type=qclass, verb=1)
 }
 
+## sort and merge both query to make sure bedtools etc.
+## work properly (TODO: required?)
+
+query <- segmentSort(query)
+target <- segmentSort(target)
+
 
 ## CHECK FINAL SIZES
 if ( verb>0 )
