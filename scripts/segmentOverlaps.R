@@ -163,8 +163,11 @@ if ( target=="" ) {
     
     ## FILTER targets
     if ( length(ttypes)>0 )
-        if( ttypes!="" )
+        if( all(ttypes!="") ) {
             target <- target[target[,ttypcol]%in%ttypes,]
+        } else {
+            stop("--ttypes must be a string") 
+        }
 }
 
 ## add type columns, if not provided!
