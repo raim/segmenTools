@@ -215,7 +215,16 @@ if ( verb>0 )
 if ( nrow(query)==0 | nrow(target)==0 )
     stop("Empty query (",nrow(query),") or target (", nrow(target), ")")
 
-## consider only one strand
+## CONSIDER ONLY ONE STRAND:
+## either by command line argument, or by absence of strand
+## column
+
+if ( !"strand"%in%colnames(query) | !"strand"%in%colnames(target) ) {
+    if ( !nostrand )
+        warning(paste0("missing strand information, ",
+                       "strand information is ignored, --nostrand activated"))
+    nostrand <- TRUE
+}
 if ( nostrand ) {
     total <- total/2
     query$strand <- "1"
