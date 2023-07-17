@@ -21,6 +21,8 @@ option_list <- list(
               help="query set of chromosomal segments"),    
   make_option(c("--qclass"), type="character", default="", 
               help="query classes to test"),
+  make_option(c("--dontmerge"), action="store_false", default=TRUE,
+              help="don't merge query segments (merge is required until bedtools --noOverlapping works)"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
@@ -136,9 +138,14 @@ if ( verb>0 ) msg(paste("Loading target:", target, "\t\n"))
 frw.str <- c("1","+")
 rev.str <- c("-1","-")
 
+## on the fly flags for further processing
+mergeq <- FALSE  # should query be merged?
+merget <- FALSE  # should target be merged?
+self <- FALSE    # symmetric comparison between forward and reverse strand?
+
+
 ## COMPARISON WITH SELF on reverse strand!
 ## compare forward with reverse strand!
-self <- FALSE
 if ( target=="" ) {
     self <- TRUE
     target <- query
@@ -180,10 +187,7 @@ if ( upstream!=0 ) {
 
     ## get new coordinates
     target <- segmentUpstream(x=target, upstream=upstream)
-    ## prune ends
-    target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
-    ## merge potentially overlapping
-    target <- segmentMerge(x=target, type=tclass, verb=1)
+    merget <- TRUE
 }
 
 ## scan for convergent (>0) or divergent (<0) overlaps
@@ -192,12 +196,10 @@ if ( convergent!=0 ) {
     ## same as upstream<0 but for both query and target
 
     target <- segmentUpstream(x=target, upstream=convergent)
-    target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
-    target <- segmentMerge(x=target, type=tclass, verb=1)
+    merget <- TRUE
 
     query <- segmentUpstream(x=query, upstream=convergent)
-    query <- segmentPrune(x=query,  chrL=chrL, remove.empty=TRUE, verb=1)
-    query <- segmentMerge(x=query, type=qclass, verb=1)
+    mergeq <- TRUE
 }
 
 
@@ -220,23 +222,33 @@ if ( !"strand"%in%colnames(query) | !"strand"%in%colnames(target) ) {
 if ( nostrand ) {
     total <- total/2
 
-    mergeq <- FALSE
+    ## merge queries from both strands
     if ( "strand"%in%colnames(query) )
         mergeq <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
 
     query$strand <- "1"
     target$strand <- "1"
-    
-    ## merge stranded features in randomized query!
-    if ( mergeq )
-        query <- segmentMerge(x=query, type=qclass, verb=1)
 }
 
-## sort and merge both query to make sure bedtools etc.
-## work properly (TODO: required?)
+## PRUNE, SORT AND MERGE both query and target
+## to make sure randomizations work properly (assumed non-overlapping!)
+## and overlap statistics are exact.
+
+msg(paste("Pruning target:\n"))
+target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
+msg(paste("Pruning query:\n"))
+query <- segmentPrune(x=query,  chrL=chrL, remove.empty=TRUE, verb=1)
 
 query <- segmentSort(query)
 target <- segmentSort(target)
+
+if ( !dontmerge | mergeq ) {
+    msg(paste("Merging query:\n"))
+    query <- segmentMerge(x=query, type=qclass, verb=1)
+}
+if ( !dontmerge | merget ) 
+    msg(paste("Merging target:\n"))
+    target <- segmentMerge(x=target, type=tclass, verb=1)
 
 
 ## CHECK FINAL SIZES
@@ -255,7 +267,7 @@ if ( verb>0 )
 ## symmetric: only for antisense of self!
 symmetric <- (antisense|convergent!=0) & self
 if ( symmetric )
-    cat(paste("\n\tNOTE: symmetric test of",
+    msg(paste("\n\tNOTE: symmetric test of",
               "antisense|convergent with self!\n"))
 
 ## calculate Jaccard Index and permutation test
