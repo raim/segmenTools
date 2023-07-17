@@ -245,16 +245,18 @@ target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
 msg(paste("Pruning query:\n"))
 query <- segmentPrune(x=query,  chrL=chrL, remove.empty=TRUE, verb=1)
 
-query <- segmentSort(query)
+## sorting both
 target <- segmentSort(target)
+query <- segmentSort(query)
 
-if ( !dontmerge | mergeq ) {
-    msg(paste("Merging query:\n"))
-    query <- segmentMerge(x=query, type=qclass, verb=1)
-}
+## merging if required by the processing steps
 if ( !dontmerge | merget )  {
     msg(paste("Merging target:\n"))
     target <- segmentMerge(x=target, type=tclass, verb=1)
+}
+if ( !dontmerge | mergeq ) {
+    msg(paste("Merging query:\n"))
+    query <- segmentMerge(x=query, type=qclass, verb=1)
 }
 
 ## CHECK FINAL SIZES
