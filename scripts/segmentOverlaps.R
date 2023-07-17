@@ -237,6 +237,9 @@ if ( nostrand ) {
 ## to make sure randomizations work properly (assumed non-overlapping!)
 ## and overlap statistics are exact.
 
+## TODO: prune by default? pruning may fail to catch errors in the input data.
+## perhaps, this is too tolerant?
+
 msg(paste("Pruning target:\n"))
 target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
 msg(paste("Pruning query:\n"))
@@ -249,10 +252,10 @@ if ( !dontmerge | mergeq ) {
     msg(paste("Merging query:\n"))
     query <- segmentMerge(x=query, type=qclass, verb=1)
 }
-if ( !dontmerge | merget ) 
+if ( !dontmerge | merget )  {
     msg(paste("Merging target:\n"))
     target <- segmentMerge(x=target, type=tclass, verb=1)
-
+}
 
 ## CHECK FINAL SIZES
 if ( verb>0 )
