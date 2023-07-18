@@ -31,6 +31,8 @@ pfile=tmp/$pfile
 
 ## TODO: in bedtools v2.27.1 shuffle doesn't finish with -noOverlapping option
 ## it works with -allowBeyondChromEnd!
+## NOTE: e.g. eccDNA_all : all segment clusters become significant with p=0
+## when randomization occurs with -noOverlapping -allowBeyondChromEnd
 
 ## generate randomized queries
 start=1
