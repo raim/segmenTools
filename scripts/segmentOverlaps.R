@@ -263,7 +263,7 @@ if ( length(rmq)+length(rmt)>0 ) {
     msg(paste0("Removing undefined chromosomes:\n\tquery: ", length(rmq),
                "\n\ttarget: ", length(rmt), "\n"))
     query <- query[-rmq,]
-    target <- target[-rmq,]
+    target <- target[-rmt,]
 }
 
 ## merging if required by the processing steps
