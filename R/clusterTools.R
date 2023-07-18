@@ -590,9 +590,39 @@ t.clusterOverlaps <- function(x) {
 #' @param axis axis to sort (2 for y-axis/rows, 1 for x-axis/columns)
 #' @param srt sorting vector for rows, if this is passed the significance
 #' sorting is skipped
+#' @param symmetric indicate whether the overlap matrix is symmetric with
+#' \code{symmetric="upper"} or \code{symmetric="lower"}
 #' @export
-sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt) {
+sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
+                         symmetric="no") {
 
+    
+    ## handle triangle matrix
+    ## NOTE: currently only produced by segmentOverlaps, where
+    ## p.values=1 and counts=0 in the lower triangle
+    if ( symmetric!="no" ) {
+
+        if ( symmetric=="upper" )
+            symm.tri <- lower.tri ## NOTE: assume upper part is filled!
+        else if ( symmetric=="lower" )
+            symm.tri <- upper.tri
+        
+        ## copy upper to lower
+        pvl <- abs(ovl$p.value)
+        n <- nrow(pvl)
+        m <- ncol(pvl)
+        if ( n!=m )
+            stop("symmetric handling requested for non-symmetric matrix")
+        for ( i in 1:length(ovl) ) {
+            x <- ovl[[i]]
+            if ( "matrix"%in%class(x) ) 
+                if ( nrow(x)==n & ncol(x)==m )
+                    x[symm.tri(x)] <- t(x)[symm.tri(x)]
+            ovl[[i]] <- x
+        }
+    }
+
+    
     ## transpose all, if sorting of x-axis (1) is requested
     if ( axis==1 ) 
         ovl <- t.clusterOverlaps(ovl)
@@ -631,18 +661,40 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt) {
     n <- nrow(pvl)
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
-      if ( "matrix"%in%class(ovl[[i]]) ) ## check if matrix is of same dim
-        if ( nrow(ovl[[i]])==n ) #& ncol(ovl[[i]])==m )
-          ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
-
+      if ( "matrix"%in%class(ovl[[i]]) ) { ## check if matrix is of same dim
+        if ( nrow(ovl[[i]])==n ) 
+            ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
+        if ( symmetric!="no" & ncol(ovl[[i]])==m ) ## symmetric case!
+            ovl[[i]] <- ovl[[i]][,new.srt,drop=FALSE]
+      }
     ## transpose back
     if ( axis==1 )
         ovl <- t.clusterOverlaps(ovl)
+
+    ## symmetric case: set other to NA
+    if ( symmetric!="no" ) {
+
+        ## copy upper to lower
+        pvl <- abs(ovl$p.value)
+        n <- nrow(pvl)
+        m <- ncol(pvl)
+        if ( n!=m )
+            stop("symmetric handling requested for non-symmetric matrix")
+        for ( i in 1:length(ovl) ) {
+            x <- ovl[[i]]
+            replace <- ifelse(names(ovl)[i]=="p.value", 1, 0)
+            if ( "matrix"%in%class(x) ) 
+                if ( nrow(x)==n & ncol(x)==m )
+                    x[symm.tri(x)] <- replace
+            ovl[[i]] <- x
+        }
+    }
 
 
     ## add number of sorted sig
     ovl$nsig <- nsig
     ovl$nsigdir <- axis # remember direction
+
 
     ovl
 }

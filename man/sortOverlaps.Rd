@@ -4,7 +4,7 @@
 \alias{sortOverlaps}
 \title{sorts cluster overlap structure by p-values}
 \usage{
-sortOverlaps(ovl, axis = 2, p.min = 0.05, cut = FALSE, srt)
+sortOverlaps(ovl, axis = 2, p.min = 0.05, cut = FALSE, srt, symmetric = "no")
 }
 \arguments{
 \item{ovl}{a `clusterOverlaps' object returned by
@@ -18,6 +18,9 @@ sortOverlaps(ovl, axis = 2, p.min = 0.05, cut = FALSE, srt)
 
 \item{srt}{sorting vector for rows, if this is passed the significance
 sorting is skipped}
+
+\item{symmetric}{indicate whether the overlap matrix is symmetric with
+\code{symmetric="upper"} or \code{symmetric="lower"}}
 }
 \description{
 Sorts one dimension of a cluster overlap structure
