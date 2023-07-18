@@ -231,9 +231,7 @@ if ( nostrand ) {
 
     ## merge if queries or targets from both strands are present
     if ( "strand"%in%colnames(query) )
-        mergeq <- merget <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
-    if ( "strand"%in%colnames(target) )
-        mergeq <- merget <- ifelse(length(unique(query$target))>1, TRUE, FALSE)
+        mergeq <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
 
     query$strand <- "1"
     target$strand <- "1"
