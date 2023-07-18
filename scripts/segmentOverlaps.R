@@ -23,8 +23,8 @@ option_list <- list(
               help="query classes to test"),
   make_option(c("--setup"), action="store_true", default=FALSE,
               help="set up queries for the given settings; this will generate randomized queries for re-use in real runs, and use a minimal pseudo target to test the whole pipeline"),
-  make_option(c("--dontmerge"), action="store_false", default=TRUE,
-              help="don't merge query segments (merge is required until bedtools --noOverlapping works)"),
+  make_option(c("--merge"), action="store_true", default=FALSE,
+              help="don't merge query and target segments (merge is required until bedtools --noOverlapping works)"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
@@ -229,9 +229,11 @@ if ( !"strand"%in%colnames(query) | !"strand"%in%colnames(target) ) {
 if ( nostrand ) {
     total <- total/2
 
-    ## merge queries from both strands
+    ## merge if queries or targets from both strands are present
     if ( "strand"%in%colnames(query) )
-        mergeq <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
+        mergeq <- merget <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
+    if ( "strand"%in%colnames(target) )
+        mergeq <- merget <- ifelse(length(unique(query$target))>1, TRUE, FALSE)
 
     query$strand <- "1"
     target$strand <- "1"
@@ -253,12 +255,25 @@ query <- segmentPrune(x=query,  chrL=chrL, remove.empty=TRUE, verb=1)
 target <- segmentSort(target)
 query <- segmentSort(query)
 
+## PRUNING CHROMOSOMES
+## only use number of chromosomes in the chromosome index file;
+## this is e.g. useful to just skip the mitochondrial genome
+nchr <- length(chrL)
+rmq <- which(query$chr > nchr)
+rmt <- which(target$chr > nchr)
+if ( length(rmq)+length(rmt)>0 ) {
+    msg(paste0("Removing undefined chromosomes:\n\tquery: ", length(rmq),
+               "\n\ttarget: ", length(rmt), "\n"))
+    query <- query[-rmq,]
+    target <- target[-rmq,]
+}
+
 ## merging if required by the processing steps
-if ( !dontmerge | merget )  {
+if ( merge | merget )  {
     msg(paste("Merging target:\n"))
     target <- segmentMerge(x=target, type=tclass, verb=1)
 }
-if ( !dontmerge | mergeq ) {
+if ( merge | mergeq ) {
     msg(paste("Merging query:\n"))
     query <- segmentMerge(x=query, type=qclass, verb=1)
 }
