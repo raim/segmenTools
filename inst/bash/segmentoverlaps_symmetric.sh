@@ -38,7 +38,7 @@ start=1
 for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
     if [ ! -f "$rfile" ]; then
-	bedtools shuffle -i $query -g $gidx -seed $i  -noOverlapping -allowBeyondChromEnd| bedtools sort -i - -faidx $gidx > $rfile
+	bedtools shuffle -i $query -g $gidx -seed $i | bedtools sort -i - -faidx $gidx > $rfile
     else
 	>&2 echo $rfile exists
     fi

@@ -30,7 +30,8 @@ mkdir -p tmp
 pfile=tmp/$pfile
 
 ## TODO: in bedtools v2.27.1 shuffle doesn't finish with -noOverlapping option
-## it works with -allowBeyondChromEnd!
+## it works with -allowBeyondChromEnd -
+## HOWEVER, this will also no allow overlapping features from opposite strands,
 ## NOTE: e.g. eccDNA_all : all segment clusters become significant with p=0
 ## when randomization occurs with -noOverlapping -allowBeyondChromEnd
 
@@ -39,7 +40,7 @@ start=1
 for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
     if [ ! -f "$rfile" ]; then
-	bedtools shuffle -i $query -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd| bedtools sort -i - -faidx $gidx > $rfile
+	bedtools shuffle -i $query -g $gidx -seed $i | bedtools sort -i - -faidx $gidx > $rfile
     else
 	>&2 echo $rfile exists
     fi
