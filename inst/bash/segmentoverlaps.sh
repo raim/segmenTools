@@ -42,7 +42,7 @@ pfile=tmp/$pfile
 start=1
 for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
-    tfile=rfile.tmp
+    tfile=${pfile}_random.bed
     if [ ! -f "$rfile" ]; then
 	grep -P "\t\\+$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd > $tfile
 	grep -P "\t\\-$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd  >> $tfile
