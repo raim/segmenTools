@@ -34,13 +34,19 @@ pfile=tmp/$pfile
 ## HOWEVER, this will also no allow overlapping features from opposite strands,
 ## NOTE: e.g. eccDNA_all : all segment clusters become significant with p=0
 ## when randomization occurs with -noOverlapping -allowBeyondChromEnd
+## NOTE: shuffling each strand separately with -noOverlapping option, to allow
+## antisense overlaps; most closely reflects original data and internal
+## randomization, but also requires the -allowBeyondChromEnd option to finish.
 
 ## generate randomized queries
 start=1
 for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
+    tfile=rfile.tmp
     if [ ! -f "$rfile" ]; then
-	bedtools shuffle -i $query -g $gidx -seed $i | bedtools sort -i - -faidx $gidx > $rfile
+	grep -P "\t\\+$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd > $tfile
+	grep -P "\t\\-$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd  >> $tfile
+	bedtools sort -i $tfile -faidx $gidx > $rfile
     else
 	>&2 echo $rfile exists
     fi

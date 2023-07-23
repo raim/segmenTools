@@ -37,8 +37,11 @@ pfile=tmp/$pfile
 start=1
 for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
+    tfile=rfile.tmp
     if [ ! -f "$rfile" ]; then
-	bedtools shuffle -i $query -g $gidx -seed $i | bedtools sort -i - -faidx $gidx > $rfile
+	grep -P "\t\\+$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd > $tfile
+	grep -P "\t\\-$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd  >> $tfile
+	bedtools sort -i $tfile -faidx $gidx > $rfile
     else
 	>&2 echo $rfile exists
     fi
