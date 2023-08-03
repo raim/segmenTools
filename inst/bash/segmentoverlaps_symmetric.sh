@@ -6,13 +6,9 @@
 
 query=$1
 target=$2
-gidx=$3 # genome index file
-PERM=$4
-
-#query=query.bed
-#target=target.bed
-#gidx=genome.idx
-#PERM=5
+gidx=$3    # genome index file
+PERM=$4    # number of permutations
+overlap=$5 # allow overlaps? pass yes 
 
 ## get segment classes
 Qtypes=($(cut -f 5 $query | sort | uniq))
@@ -20,6 +16,9 @@ qlen=${#Qtypes[@]}
 
  
 >&2 echo GENERATING $PERM PERMUTATIONS OF QUERY $query $qlen "${Qtypes[*]}"
+if [ "$overlap"  = "yes" ]; then
+    >&2 echo -e "\tALLOWING OVERLAPS IN PERMUTATIONS"
+fi
 
 ## NOTE: re-using regenerating permutations
 ## TODO: make usage saver
@@ -39,9 +38,15 @@ for (( i=$start; i<=$PERM; i++ )); do
     rfile=${pfile}_random_${i}.bed
     tfile=${pfile}_random.bed
     if [ ! -f "$rfile" ]; then
-	grep -P "\t\\+$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd > $tfile
-	grep -P "\t\\-$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd  >> $tfile
-	bedtools sort -i $tfile -faidx $gidx > $rfile
+	if [ "$overlap"  = "yes" ]; then
+	    ## allowing overlaps:
+	    bedtools shuffle -i $query -g $gidx -seed $i | bedtools sort -i - -faidx $gidx > $rfile
+	else
+	    ## no overlaps, strand-wise!
+	    grep -P "\t\\+$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd > $tfile
+	    grep -P "\t\\-$" $query | bedtools shuffle -i - -g $gidx -seed $i -noOverlapping -allowBeyondChromEnd  >> $tfile
+	    bedtools sort -i $tfile -faidx $gidx > $rfile
+	fi
     else
 	>&2 echo $rfile exists
     fi

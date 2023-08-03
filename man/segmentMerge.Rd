@@ -2,7 +2,7 @@
 % Please edit documentation in R/segmenTools.R
 \name{segmentMerge}
 \alias{segmentMerge}
-\title{merge genomic coordinates by type}
+\title{merge genomic coordinates by type.}
 \usage{
 segmentMerge(x, type, verb = 1)
 }
@@ -15,5 +15,6 @@ separately.}
 \item{verb}{verbosity level, 0 for silent}
 }
 \description{
-merge genomic coordinates by type
+NOTE: merging segments requires bedtools!
+TODO: allow merging without bedtools.
 }

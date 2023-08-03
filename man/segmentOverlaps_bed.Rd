@@ -14,6 +14,7 @@ segmentOverlaps_bed(
   perm,
   tmpdir,
   runid,
+  overlaps = FALSE,
   symmetric = FALSE,
   save.permutations = FALSE,
   verb = 1
@@ -43,6 +44,8 @@ or exploring detailed results.}
 
 \item{runid}{use this ID for the run, for more recognizable jobnames.
 This is potentially dangerous since each call MUST have a unique name.}
+
+\item{overlaps}{allow overlaps in the permutations of query segments.}
 
 \item{symmetric}{treat test as symmetric. This is only useful for the
 case where overlaps all segments from the forward strand and the reverse

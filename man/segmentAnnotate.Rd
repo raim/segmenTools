@@ -49,7 +49,7 @@ stdout, useful when using in context of command line pipes}
 Simple sweeping algorithm to find overlapping intervals. Both
 intervals must be in continuous index (coor2index) and start<end,
 with strand information implied in the continuous index position.
-see \code{bedtools} \code{intersects}, the Binary Interval
+See \code{bedtools} \code{intersects}, the Binary Interval
 Search (BITS) algorithm, and the \code{NClist} algorithm (implemented
 in packages IRanges and GenomicRanges) for similar tools.
 It loops over targets and collects all queries that match, and

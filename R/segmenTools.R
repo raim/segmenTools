@@ -857,7 +857,7 @@ jrplot <- function(jaccard, ratio, symm=TRUE, nbin=512,  minn=10,
 #' Simple sweeping algorithm to find overlapping intervals. Both
 #' intervals must be in continuous index (coor2index) and start<end,
 #' with strand information implied in the continuous index position.
-#' see \code{bedtools} \code{intersects}, the Binary Interval
+#' See \code{bedtools} \code{intersects}, the Binary Interval
 #' Search (BITS) algorithm, and the \code{NClist} algorithm (implemented
 #' in packages IRanges and GenomicRanges) for similar tools.
 #' It loops over targets and collects all queries that match, and
@@ -1253,6 +1253,7 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' or exploring detailed results.
 #' @param runid use this ID for the run, for more recognizable jobnames.
 #' This is potentially dangerous since each call MUST have a unique name.
+#' @param overlaps allow overlaps in the permutations of query segments.
 #' @param symmetric treat test as symmetric. This is only useful for the
 #' case where overlaps all segments from the forward strand and the reverse
 #' strand are tested, to find antisense overlaps within a
@@ -1265,8 +1266,9 @@ getOverlapStats <- function(ovl, ovlth=.8, minj=0.8, minf=0.2, hrng=c(.8,1.2), t
 #' @param verb verbosity level, 0: silent.
 #'@export
 segmentOverlaps_bed <- function(query, target, qclass, tclass, prefix="cl_",
-                               chrL, perm, tmpdir, runid, symmetric=FALSE,
-                               save.permutations=FALSE, verb=1) {
+                                chrL, perm, tmpdir, runid,
+                                overlaps=FALSE, symmetric=FALSE,
+                                save.permutations=FALSE, verb=1) {
 
     ## TODO: instead of calling bash script, do single calls to
     ## to bedtools package bedr here.
@@ -1358,12 +1360,14 @@ segmentOverlaps_bed <- function(query, target, qclass, tclass, prefix="cl_",
     outf <- file.path(tmpdir, paste0("overlaps_",RNDID,".tsv"))
     logf <- sub("\\.tsv$", ".log", outf)
 
-    if ( verb>0 ) cat(paste0("system call to bedtools script\n\t",bscript,"\n",
+    if ( verb>0 ) cat(paste0("system call to bedtools script:\n\t",bscript,"\n",
                              "\tcheck '", logf, "' for progress.\n"))
 
     ## construct command-line call
     bcmd <- paste("cd",tmpdir,"; cp -a", bscript, rscript, ";",
-                  rscript, qout, tout, genome.idx, perm,">", outf, "2>", logf)
+                  rscript, qout, tout, genome.idx, perm,
+                  ifelse(overlaps,"yes","no"),
+                  ">", outf, "2>", logf)
     ## call script
     ## TODO: handle error messages
     system(bcmd)
@@ -1742,7 +1746,10 @@ segmentSort <- function(x, by.strand=FALSE, reverse=c("-1","-")) {
     
 }
 
-#' merge genomic coordinates by type
+#' merge genomic coordinates by type.
+#'
+#' NOTE: merging segments requires bedtools!
+#' TODO: allow merging without bedtools.
 #' @param x genomic interval (segments) table.
 #' @param type column name of the types which should be merged
 #' separately.
@@ -1957,12 +1964,13 @@ randomSegments <- function(query, qclass, total) {
     islen <- islen-1
     
     ## debug check whether total lengt is reproduced
-    ## TODO: allow this check, but requires chrL to be known!
     if ( sum(islen)+sum(sglen) != total )
         stop()
+    ## TODO: test correct handling of overlapping segments!
     if ( FALSE )
         if ( any(islen<0) )
-            cat(paste("NOTE: overlapping segments in randomized query set!\n"))
+            cat(paste("NOTE: overlapping segments in randomized query set!\n\t",
+                      paste(unique(islen[islen<0]),collapse=";"),"\n"))
     
     ## RANDOMIZATION
     ## sample segment lengths

@@ -24,7 +24,7 @@ option_list <- list(
   make_option(c("--setup"), action="store_true", default=FALSE,
               help="set up queries for the given settings; this will generate randomized queries for re-use in real runs, and use a minimal pseudo target to test the whole pipeline"),
   make_option(c("--merge"), action="store_true", default=FALSE,
-              help="don't merge query and target segments (merge is required until bedtools --noOverlapping works)"),
+              help="merge overlapping query and target segments (only same class segments will be merged)"),
   ## TARGET OPTIONS
   make_option(c("-t", "--target"), type="character", default="", 
               help="target set of chromosomal segments, stdin is used if missing, allowing for command line pipes"),    
@@ -53,7 +53,7 @@ option_list <- list(
   make_option(c("--bedtools"),  action="store_true", default=FALSE,
               help="use UCSC bedtools instead of segmenTools overlap functions"),
   make_option(c("--random"),  type="character", default="",
-              help="directory where (re-usable) bedtools randomized queries are stored"),
+              help="directory where (re-usable) bedtools permutated queries are stored (if not provided, permutated queries are generated in a temporary folder and deleted after the run)"),
   ## OUTPUT
   make_option(c("--fig.type"), type="character", default="png",
               help="figure type (png, pdf, eps) [default %default]"),
@@ -229,10 +229,14 @@ if ( !"strand"%in%colnames(query) | !"strand"%in%colnames(target) ) {
 if ( nostrand ) {
     total <- total/2
 
-    ## merge if queries or targets from both strands are present
-    if ( "strand"%in%colnames(query) )
+    ## merge overlaps if queries from both strands are present
+    if ( "strand"%in%colnames(query) ) 
         mergeq <- ifelse(length(unique(query$strand))>1, TRUE, FALSE)
+    ## merge if targets from both strands are present
+    if ( "strand"%in%colnames(target) )
+        merget <- ifelse(length(unique(target$strand))>1, TRUE, FALSE)
 
+    ## set all strands to positive
     query$strand <- "1"
     target$strand <- "1"
 }
@@ -241,19 +245,30 @@ if ( nostrand ) {
 ## to make sure randomizations work properly (assumed non-overlapping!)
 ## and overlap statistics are exact.
 
-## TODO: prune by default? pruning may fail to catch errors in the input data.
-## perhaps, this is too tolerant?
+## ENSURE start < end!
+sortCoors <- function(x, verb=1) {
+    rev <- which(x[,"start"]>x[,"end"])
+    ends <- x[rev,"start"]
+    x[rev,"start"] <- x[rev,"end"]
+    x[rev,"end"] <- ends
+    if ( verb>0 )
+        cat(paste("swapping", length(rev),"coordinates to start<end\n"))
+    x
+}
+query <- sortCoors(query)
+target <- sortCoors(target)
 
+## cutting segments coordinates that are beyond chromosome coordinates.
 msg(paste("Pruning target:\n"))
 target <- segmentPrune(x=target, chrL=chrL, remove.empty=TRUE, verb=1)
 msg(paste("Pruning query:\n"))
 query <- segmentPrune(x=query,  chrL=chrL, remove.empty=TRUE, verb=1)
 
-## sorting both
+## sorting segments (note: not by.strand)
 target <- segmentSort(target)
 query <- segmentSort(query)
 
-## PRUNING CHROMOSOMES
+## pruning chromosomes:
 ## only use number of chromosomes in the chromosome index file;
 ## this is e.g. useful to just skip the mitochondrial genome
 nchr <- length(chrL)
@@ -268,7 +283,7 @@ if ( length(rmq)+length(rmt)>0 ) {
         target <- target[-rmt,]
 }
 
-## merging if required by the processing steps
+## merging if required by the processing steps or requested by argument
 if ( merge | merget )  {
     msg(paste("Merging target:\n"))
     target <- segmentMerge(x=target, type=tclass, verb=1)
@@ -277,6 +292,22 @@ if ( merge | mergeq ) {
     msg(paste("Merging query:\n"))
     query <- segmentMerge(x=query, type=qclass, verb=1)
 }
+
+## CHECK IF QUERIES ARE OVERLAPPING (independent of query class!)
+## to choose permutation strategy for bedtools!
+overlaps <- FALSE
+qi <- coor2index(query, chrS=chrS) 
+qi <- qi[order(qi$start),]
+qn <- nrow(qi)
+is <-  qi[2:qn,"start"] - qi[2:qn-1,"end"]  # intersegment length
+if ( any(is<1) ) {
+    cat(paste0("detected ",sum(is<1)," overlapping segments in query set\n",
+               "\tALLOWING OVERLAPS IN QUERY PERMUTATIONS\n\n"))
+    overlaps <- TRUE
+} else {
+    cat(paste0("detected no overlapping segments in query set\n",
+               "\tNOT ALLOWING OVERLAPS IN QUERY PERMUTATIONS\n\n"))
+}    
 
 ### TODO: setup run, generate mini-target
 if ( setup ) {
@@ -325,7 +356,8 @@ if ( bedtools ) { ## OVERLAP via bedtools
         dir.create(random)
     
     ovl <- segmentOverlaps_bed(query=query, target=target, chrL=chrL,
-                               prefix="socl_", symmetric=symmetric,
+                               prefix="socl_",
+                               overlaps=overlaps, symmetric=symmetric,
                                qclass=qclass, tclass=tclass, perm=perm, 
                                verb=1, tmpdir=random, save.permutations=TRUE,
                                runid=basename(outfile))
@@ -425,7 +457,7 @@ ovl$parameters <- parameters
 if ( !interactive() ) {
     save(ovl, file=paste0(outfile,".rda"))
     if ( "annotation" %in% names(ovl) )
-        write.table(ann, file=paste0(file.name,"_annotation.tsv"),
+        write.table(ann, file=paste0(outfile,"_annotation.tsv"),
                     sep="\t", row.names=FALSE, quote=FALSE)
 }
   
