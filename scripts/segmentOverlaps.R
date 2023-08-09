@@ -105,8 +105,8 @@ if ( verb>0 )
 ## catch incompatible options
 if ( antisense & convergent!=0 )
     stop("options --antisense and --convergent are incompatible!")
-if ( antisense & upstream!=0 )
-    stop("options --antisense and --upstream are incompatible!")
+##if ( antisense & upstream!=0 )
+##    stop("options --antisense and --upstream are incompatible!")
 if ( nostrand & antisense )
     stop("options --nostrand and --antisense are incompatible")
 if ( nostrand & upstream!=0 )
@@ -210,7 +210,7 @@ if ( convergent!=0 ) {
 }
 
 
-## switch strand for antisense and convergent tests
+## switch target strand for antisense and convergent tests
 sstr <- c("+"=-1, "1"=-1, "+1"=-1, "-"=1, "-1"=1)
 if ( (antisense|convergent!=0) ) 
     target$strand <- sstr[as.character(target$strand)]
