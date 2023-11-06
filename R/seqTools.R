@@ -153,6 +153,28 @@ findAACodon <- function(start, aa, strand) {
     pos
 }
 
+#' mutate positions in a string
+#' @param seq a string to be mutated
+#' @param mutations a list of strings of the format 'A3T'
+#' where the A at position 3 of the string should be changed
+#' to a T
+#' @export
+mutatePositions <- function(seq, mutations) {
+
+    str <- strsplit(seq,"")[[1]]
+    fromto <- do.call(cbind,strsplit(mutations, "[0-9]+"))
+    at <- as.numeric(gsub("[A-Z]","", mutations))
+    if ( any(duplicated(at)) )
+        stop("duplicated mutation loci are not supported")
+    if ( any(is.na(at)) )
+        stop("location not found")
+    for ( j in 1:ncol(fromto) ) {
+        if ( str[at[j]]!=fromto[1,j] )
+            stop("mutated position ", j, " is not as indicated\n")
+        else str[at[j]] <- fromto[2,j]
+    }
+    paste(str, collapse="")
+}
 
 ## TODO:
 ## di/tri-nucleotide parameter profile
