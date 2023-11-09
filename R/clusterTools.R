@@ -548,7 +548,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
 #' @export
 t.clusterOverlaps <- function(x) {
     for ( i in 1:length(x) )
-        if ( class(x[[i]])=="matrix" ) 
+        if ( "matrix"%in%class(x[[i]]) ) 
             x[[i]] <- t(x[[i]])
     
     ## switch names
@@ -1679,7 +1679,7 @@ phasesortClusters <- function(ts, cls, phase, cycles) {
 
     
     orig <- NULL
-    if ( class(ts)=="timeseries" )
+    if ( "timeseries"%in%class(ts) )
         ts <- ts$ts
     if ( is.vector(cls) )
         cls <- matrix(cls,ncol=1)
@@ -1795,7 +1795,7 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
 
     ## dft
     ## can be a segmenTier timeseries object
-    if ( class(dft)=="timeseries" )
+    if ( "timeseries"%in%class(dft) )
         dft <- dft$dft
  
     ## colors
@@ -2302,7 +2302,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
     }
 
     ## TIME SERIES
-    if ( class(x)=="timeseries" )
+    if ( "timeseries"%in%class(x) )
         ts <- x$ts
     else ts <- data.matrix(x)
 
