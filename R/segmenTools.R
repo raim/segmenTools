@@ -57,7 +57,7 @@ lg2r <- function(x,na.rm=TRUE) {
 bc <- function(x,lambda) (sign(x)*abs(x)^lambda-1)/lambda
 ## amplitude box-cox trafo for complex polar coordinates 
 bcdft <- function(x, lambda) {
-    if ( class(x)=="matrix" )
+    if ( inherits(x, "matrix") )
         return(apply(x,2, bcdft, lambda))
     ## Box-Cox transform amplitude
     y <- bc(abs(x), lambda)
@@ -74,7 +74,7 @@ testbcdft <- function(tset, lambda=.5, cycle=3, col) {
     ## colors
     if ( missing(col) )
         col <- rep("#00000077",nrow(tset$dat))
-    else if ( class(col)=="clustering" )
+    else if ( inherits(col, "clustering") )
         col <- clusterColors(col)
 
     #png("test_amplitude_boxcox.png",units="in",res=100,width=4.7,height=9)
@@ -99,7 +99,7 @@ testbc <- function(tset, lambda=.9, cycle=2, col) {
     ## colors
     if ( missing(col) )
         col <- rep("#00000077",nrow(tset$dat))
-    else if ( class(col)=="clustering" )
+    else if ( inherits(col, "clustering") )
         col <- clusterColors(col)
 
     par(mfcol=c(2,1),mai=c(.5,.7,.01,.01),mgp=c(1,.25,0))
@@ -2013,7 +2013,7 @@ collapsePositions <- function(x, dist=1) {
 
     ## convert to dataframe
     ## TODO: avoid
-    if ( class(x)=="matrix" )
+    if ( inherits(x, "matrix") )
     x <- data.frame(x)
     
     ## get rows with distance > dist and avoid chromosome ends by <0

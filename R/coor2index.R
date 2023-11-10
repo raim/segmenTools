@@ -369,7 +369,7 @@ index2coor <- function(features, chrS, chrMap,
         if ( relCol%in%colnames(features) )  {
             cpcols <- c(cpcols, relCol)
             ## CONVERT TO CHARACTER
-            if ( class(features[,relCol])=="factor" ) {
+            if ( inherits(features[,relCol], "factor") ) {
                 features[,relCol] <- as.character(features[,relCol])
                 rel2factor <- TRUE                
             }

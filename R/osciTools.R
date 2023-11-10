@@ -171,7 +171,7 @@ circ.dens <- function(x, bw=18, n=512, freq=FALSE, units="degrees", high.mem=FAL
 #' @export
 calculatePhase <- function(x, cycles, degrees=TRUE) {
 
-    if ( class(x)=="timeseries" ) # segmenTier class !
+    if ( inherits(x, "timeseries") ) # segmenTier class !
         dft <- x$dft
     else dft <- get_fft(data.matrix(x))
 

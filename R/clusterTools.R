@@ -40,12 +40,12 @@
 #' @export
 clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE) {
 
-    if ( !"matrix"%in%class(cls) & class(cls)!="factor")
+    if ( !inherits(cls, "matrix") & !inherits(cls,"factor") )
         cls <- factor(cls, levels=unique(cls))
     logic <- FALSE
-    if ( "factor"%in%class(cls) )
+    if ( inherits(cls, "factor") )
         cls.srt <- levels(cls)
-    else if ( "matrix"%in%class(cls) ) {
+    else if ( inherits(cls, "matrix") ) {
         cls.srt <- colnames(cls)
         logic <- TRUE
     }
@@ -129,21 +129,21 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
    vn1=deparse(substitute(cl1))
    vn2=deparse(substitute(cl2))	 	
 	 
-    if ( class(cl1)=="clustering" ) {
+    if ( inherits(cl1, "clustering") ) {
         K <- selected(cl1)
         if ( missing(cl1.srt) )
             cl1.srt <- cl1$sorting[[K]]
         cl1 <- cl1$clusters[,K]
-    } else if ( class(cl1)=="factor" ) {
+    } else if ( inherits(cl1, "factor") ) {
         if ( missing(cl1.srt) ) cl1.srt <- levels(cl1)
         cl1 <- as.character(cl1)
     }
-    if ( class(cl2)=="clustering" ) {
+    if ( inherits(cl2, "clustering") ) {
         K <- selected(cl2)
         if ( missing(cl2.srt) )
             cl2.srt <- cl2$sorting[[K]]
         cl2 <- cl2$clusters[,K]
-    } else if ( class(cl2)=="factor" ) {
+    } else if ( inherits(cl2, "factor") ) {
         if ( missing(cl2.srt) ) cl2.srt <- levels(cl2)
         cl2 <- as.character(cl2)
     }
@@ -548,7 +548,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
 #' @export
 t.clusterOverlaps <- function(x) {
     for ( i in 1:length(x) )
-        if ( "matrix"%in%class(x[[i]]) ) 
+        if ( inherits(x[[i]], "matrix") ) 
             x[[i]] <- t(x[[i]])
     
     ## switch names
@@ -615,7 +615,7 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
             stop("symmetric handling requested for non-symmetric matrix")
         for ( i in 1:length(ovl) ) {
             x <- ovl[[i]]
-            if ( "matrix"%in%class(x) ) 
+            if ( inherits(x, "matrix") ) 
                 if ( nrow(x)==n & ncol(x)==m )
                     x[symm.tri(x)] <- t(x)[symm.tri(x)]
             ovl[[i]] <- x
@@ -661,7 +661,7 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     n <- nrow(pvl)
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
-      if ( "matrix"%in%class(ovl[[i]]) ) { ## check if matrix is of same dim
+      if ( inherits(ovl[[i]], "matrix") ) { ## check if matrix is of same dim
         if ( nrow(ovl[[i]])==n ) 
             ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
         if ( symmetric!="no" & ncol(ovl[[i]])==m ) ## symmetric case!
@@ -683,7 +683,7 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
         for ( i in 1:length(ovl) ) {
             x <- ovl[[i]]
             replace <- ifelse(names(ovl)[i]=="p.value", 1, 0)
-            if ( "matrix"%in%class(x) ) 
+            if ( inherits(x, "matrix") ) 
                 if ( nrow(x)==n & ncol(x)==m )
                     x[symm.tri(x)] <- replace
             ovl[[i]] <- x
@@ -1610,9 +1610,9 @@ mergeCluster <- function(tset, cset, selected) {
     obj <- try(flowMerge::flowObj(fc, flowCore::flowFrame(clsDat)))
 
     ## start flowMerge
-    if ( class(obj)!="try-error" ) {
+    if ( !inherits(obj, "try-error") ) {
         mrg <- try(flowMerge::merge(obj))
-        if ( class(mrg)!="try-error" ) {
+        if ( !inherits(mrg, "try-error") ) {
             mrg.cl <- flowMerge::fitPiecewiseLinreg(mrg)
             obj <- mrg[[mrg.cl]]
             mcls[!rm.vals] <- flowClust::Map(obj, rm.outliers=FALSE)
@@ -1679,11 +1679,11 @@ phasesortClusters <- function(ts, cls, phase, cycles) {
 
     
     orig <- NULL
-    if ( "timeseries"%in%class(ts) )
+    if ( inherits(ts, "timeseries") )
         ts <- ts$ts
     if ( is.vector(cls) )
         cls <- matrix(cls,ncol=1)
-    if ( class(cls)=="clustering" ) {
+    if ( inherits(cls, "clustering") ) {
         ## store if cls is a clustering set
         orig <- cls
         cls <- cls$clusters
@@ -1734,8 +1734,9 @@ phasesortClusters <- function(ts, cls, phase, cycles) {
 ## to the clustering object and use this in plot functions!
 #' @export
 relabelClusters <- function(cls) {
-    if ( class(cls)!="clustering" )
-        stop("function requires class 'clustering', as returned by clusterTimeseries2")
+    if ( !inherits(cls, "clustering") )
+        stop("function requires class 'clustering',",
+             " as returned by clusterTimeseries2")
     for ( i in 1:length(cls$sorting) ) {
         k <- names(cls$sorting)[i]
         srt <- 1:length(cls$sorting[[i]])
@@ -1795,13 +1796,13 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
 
     ## dft
     ## can be a segmenTier timeseries object
-    if ( "timeseries"%in%class(dft) )
+    if ( inherits(dft, "timeseries") )
         dft <- dft$dft
  
     ## colors
     if ( missing(col) )
         col <- rep("#00000077",nrow(dft))
-    else if ( class(col)=="clustering" )
+    else if ( inherits(col, "clustering") )
         col <- clusterColors(col, expand=TRUE)
     else if ( length(col)==1 )
         col <- rep(col,nrow(dft))
@@ -1822,7 +1823,7 @@ plotDFT <- function(dft, col, cycles=3, radius=.9, lambda=1, bc="component", ...
     bccmp <- function(x,lambda) (sign(x)*abs(x)^lambda-1)/lambda
     ## amplitude box-cox trafo for complex polar coordinates 
     bcdft <- function(x, lambda) {
-        if ( class(x)=="matrix" )
+        if ( inherits(x, "matrix") )
             return(apply(x,2, bcdft, lambda))
         ## Box-Cox transform amplitude
         y <- bccmp(abs(x), lambda)
@@ -2256,7 +2257,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
 {
 
     
-    if ( class(cls)=="clustering" ) {
+    if ( inherits(cls, "clustering") ) {
 
         if ( missing(k) )
             k <- selected(cls, name=TRUE)
@@ -2302,7 +2303,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
     }
 
     ## TIME SERIES
-    if ( "timeseries"%in%class(x) )
+    if ( inherits(x, "timeseries") )
         ts <- x$ts
     else ts <- data.matrix(x)
 
