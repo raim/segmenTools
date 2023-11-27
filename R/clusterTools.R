@@ -1073,6 +1073,151 @@ annotationOverlap <- function(x) {
     ovl
 }
 
+#' a wrapper for  \code{gprofiler2}'s \code{gost} function
+#'
+#' takes a gene clustering, a named vector of gene categories, where
+#' the names are gene IDs, and calls the \code{gost} function of the
+#' \code{gprofiler2} to do enrichment analysis for all gene
+#' annotations available. It then parses the output of the \code{gost}
+#' function of the \code{gprofiler2} R package into overlap tables for
+#' use with \code{segmenTools}' cluster analysis pipeline.
+#' 
+#' @param cls a name vector of a gene classification, where the names
+#' are gene IDs recognized by \code{gprofiler2} in the respective
+#' \code{organism},
+#' @param organism the organism ID to which gene IDs of the \code{cls}
+#' argument refer to; see \code{?gprofiler2::gost},
+#' @param cls.srt an optional sorting of gene classes in \code{cls},
+#' @param categories annotation source categories to report,
+#' @param terms list of annotation terms to report (over all categories),
+#' a name list of terms to report,
+#' @param verb level of verbosity, 0: no output, 1: progress messages,
+#' @param ... further arguments to \code{gprofiler2}'s \code{gost} function.
+#' @export
+runGost <- function(cls, organism="hsapiens",
+                    cls.srt, categories, terms, verb=1, ...) {
+
+
+    ## prepare clustering
+    cls.lst <- split(names(cls), f=as.character(cls))
+
+    if ( missing(cls.srt) )
+        cls.srt <- names(cls.lst)
+
+    ## sorting and size
+    cls.lst <- cls.lst[cls.srt]
+    cls.sze <- table(cls)[cls.srt]
+
+
+    if ( verb>0 ) cat(paste("calculating enrichments in organism",
+                            organism, "\n"))
+    gores <- gprofiler2::gost(query=cls.lst, organism = organism,
+                              significant=FALSE, ...)
+
+
+    ## parse results into overlap enrichment tables (class "clusterOverlaps")
+
+    if ( verb>0 ) cat(paste("parsing calculated enrichments\n"))
+    
+    ovll <- list()
+
+    ## filter requested categories
+    if ( missing(categories)  )
+        categories <- unique(gores$result$source)
+    else {
+        gores$result <- gores$result[gores$result$source %in% categories,]
+    }
+
+    ## USE REQUESTED TERMS!
+    ## NOTE: major alternative use case, using requested terms
+    ## as categories
+    if ( !missing(terms) ) {
+        newres <- list()
+        if ( verb>0 )
+            cat(paste("filtering and restructuring results",
+                      "by requested terms\n"))
+        for ( i in seq_along(terms) ) {
+            trms <- terms[[i]]
+            idx <- numeric()
+            for ( j in seq_along(trms) ) {
+                idx <- c(idx,
+                         grep(trms[j], gores$result$term_name))
+            }
+            idx <- unique(idx)
+            trm.results <- gores$result[idx,]
+            ## add source to tern name
+            trm.results$term_name <- paste0(trm.results$source, ": ",
+                                            trm.results$term_name)
+            ## replace source by function category
+            trm.results$source <- names(terms)[i]
+            newres[[i]] <- trm.results
+        }
+        newres <- do.call(rbind, newres)
+        gores$result <- newres
+        categories <- names(terms)
+    }
+
+    for ( ctgy in categories ) { 
+        
+        go <- gores$result
+        go <- go[go$source==ctgy,]
+
+        if ( verb>0 )
+            cat(paste("analyzing category", ctgy, "with",
+                      length(unique(go$term_id)), "entries\n"))
+    
+        ## collect terms
+        terms <- go[,c("term_id","term_name","term_size")]
+        terms <- terms[!duplicated(terms$term_id),]
+        rownames(terms) <- terms$term_id
+        
+
+        ## construct overlap matrix
+        govl <- matrix(NA, nrow=nrow(terms), ncol=length(cls.lst))
+        colnames(govl) <- names(cls.lst)
+        rownames(govl) <- terms$term_name
+        
+        gopvl <- gocnt <- govl
+        
+        ## generate overlap structure:
+        ## fill matrices with overlap p-values and counts, num.query, num.target
+        ## TODO: do this more efficiently, one loop and vectors.
+        for ( i in 1:nrow(govl) ) 
+            for ( j in 1:ncol(govl) ) {
+                idx <- which(go$query==colnames(govl)[j] &
+                             go$term_id==terms$term_id[i])
+                if ( length(idx)>1 ) {
+                    stop("too many fields; shouldn't happen")
+                    break
+                } else if ( length(idx)==0 ) {
+                    gopvl[i,j] <- 1
+                    gocnt[i,j] <- 0
+                } else {
+                    gopvl[i,j] <- go$p_value[idx]
+                    gocnt[i,j] <- go$intersection_size[idx]
+                }
+            }
+        
+        ## construct overlap class
+        ovl <- list()
+        ovl$p.value <- gopvl
+        ovl$count <- gocnt
+
+        ## add annotation term sizes
+        ovl$num.query <- as.matrix(terms[,"term_size",drop=FALSE])
+        rownames(ovl$num.query) <- terms$term_name
+
+        ## add cluster sizes
+        ovl$num.target <- t(as.matrix(cls.sze))
+        
+        class(ovl) <- "clusterOverlaps"
+
+        ## append to list
+        ovll[[ctgy]] <- ovl
+    }
+    return(ovll)
+}
+
 
 ### PLOT cluster-cluster overlaps
 #' wrapper for \code{\link[graphics]{image}} plotting a data matrix
