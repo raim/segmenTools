@@ -1111,8 +1111,14 @@ runGost <- function(cls, organism="hsapiens",
 
     if ( verb>0 ) cat(paste("calculating enrichments in organism",
                             organism, "\n"))
+
+    ## filter requested categories
+    if ( missing(categories)  ) {
+        categories <- gprofiler2::get_version_info(organism=organism)$sources
+        categories <- names(categories)
+    }    
     gores <- gprofiler2::gost(query=cls.lst, organism = organism,
-                              significant=FALSE, ...)
+                              source=categories, significant=FALSE, ...)
 
 
     ## parse results into overlap enrichment tables (class "clusterOverlaps")
@@ -1121,12 +1127,6 @@ runGost <- function(cls, organism="hsapiens",
     
     ovll <- list()
 
-    ## filter requested categories
-    if ( missing(categories)  )
-        categories <- unique(gores$result$source)
-    else {
-        gores$result <- gores$result[gores$result$source %in% categories,]
-    }
 
     ## USE REQUESTED TERMS!
     ## NOTE: major alternative use case, using requested terms
