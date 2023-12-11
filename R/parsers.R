@@ -10,35 +10,67 @@
 #' summarized for features with \code{\link{summarizeGEOSoft}}.
 #' @param file a GEO Soft archive file (eg. GSE18902_family.soft.gz)
 #' @param idcol columns to retrieve from the platform table
+#' @param exp number of the platform to retrieve from a GEO file
+#' with multiple platforms. TODO: allow to parse
+#' multiple platforms.
+#' @param only.info only parse information on probes and experiments, but
+#' skip the actual data
 #' @param only.data skip all samples without data
 #' @param valcol value column (currently only 1 is allowed) in the sample tables
 #' @param title if TRUE a sample title will be retrieved
 #' @param desc if TRUE, value descriptions in field "#<valcol>" will be retrieved
 #' @seealso \code{\link{summarizeGEOSoft}}
 #' @export
-parseGEOSoft <- function(file, idcol, only.data=TRUE, valcol="VALUE", title=TRUE, desc=TRUE) {
+parseGEOSoft <- function(file, idcol, exp=1, only.info=FALSE,
+                         only.data=TRUE,
+                         valcol="VALUE", title=TRUE, desc=TRUE) {
+
 
     ## working with IDs, set this to false!
     old <- unlist(options("stringsAsFactors"))
     op <- options(stringsAsFactors=FALSE)
     
     ## parse all lines
+    ## TODO: grep a  max line in file to avoid reading all lines, or
+    ## avoid re-reading the file multiple times below
     cnx <- gzfile(file)
     lines <- readLines(cnx)
     ## find probe-ID map
     start <- grep("^!platform_table_begin",lines)
     end <- grep("^!platform_table_end",lines)
+    if ( length(start)!=length(end) )
+        stop("different number of platform_table_begin and _end tags")
+
     ids <- NULL
+    skip.multi <- FALSE
     if ( length(start)>0 & length(end)>0 ) {
+
+        if ( length(start)>1 ) {
+            ## TODO: allow loop
+            cat(paste("taking experiment", exp, "of", length(start), "\n"))
+            start <- start[exp]
+            end <- end[exp]
+
+            ### TODO: skipe these from parsing below!!
+            ## skip multiple tables also below, since we are not sure
+            ## to which IDs they refer
+            skip.multi <- TRUE
+        }
+
+        ## parse data table
         ids <- read.delim(cnx, skip=start, nrow=end-start-2, row.names=1)
+
         if ( missing(idcol) )
           idcol <- colnames(ids)
         ids <- ids[,idcol,drop=FALSE]
         ##ids[ids=="",idcol[1]] <- rownames(ids)[ids==""]
     } else cat(paste("no data!\n"))
+
     ## find samples
     idx <- grep("^\\^SAMPLE", lines)
 
+    ## TODO: reduce to a subset, e.g. only the platform
+    ## which IDs were parsed above!
     
     ## reduce by those with actual data
     cidx <- grep("^!Sample_data_row_count", lines) ## data rows present?
@@ -72,13 +104,17 @@ parseGEOSoft <- function(file, idcol, only.data=TRUE, valcol="VALUE", title=TRUE
     ## data tables
     sidx <- grep("^!sample_table_begin", lines)
     eidx <- grep("^!sample_table_end", lines)-1
-    if ( !is.null(ids) ) {
+    if ( !is.null(ids) & !only.info ) {
         dat <- matrix(NA, nrow=nrow(ids), ncol=length(idx))
         rownames(dat) <- rownames(ids)
         colnames(dat) <- sampleids
+        cat(paste("parsing",length(idx), "sample series: "))
         for ( i in 1:length(idx) ) {
+
+            cat(paste(i,","))
             tmp <- read.delim(gzfile(file),
                               skip=sidx[i], nrow=eidx[i]-sidx[i]-1,row.names=1)
+
             ## filter rows which are not in ids!
             miss <- which(!rownames(tmp)%in%rownames(dat))
             if ( length(miss)>0 ) {
@@ -88,11 +124,16 @@ parseGEOSoft <- function(file, idcol, only.data=TRUE, valcol="VALUE", title=TRUE
             }
             dat[rownames(tmp),i] <- tmp[,valcol]
         }
-        
+        cat(paste("done, parsed", nrow(dat), "data rows\n"))
+      
         res <- list(data=dat, ids=ids, title=tit, description=description)
         class(res) <- "geosoft"
     } else {
-        res <- list(ids=sampleids, title=tit, description=description)
+        if ( !is.null(ids) )
+            res <- list(ids=ids, samples=sampleids,
+                        title=tit, description=description)
+        else 
+            res <- list(samples=sampleids, title=tit, description=description)
         class(res) <- "geosoft_info"
     }
     # reset option
