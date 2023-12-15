@@ -522,15 +522,28 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
                 abline(v=x$nsig+.5, col=2, lwd=2)
         }
 
-    if ( show.total ) {
+    toty <- totx <- FALSE
+    if ( is.logical(show.total) ) {
+        if ( show.total )
+            toty <- totx <- TRUE
+    } else if ( is.character(show.total) ) {
+        if ( show.total=="x" ) totx <- TRUE
+        if ( show.total=="y" ) toty <- TRUE
+        if ( show.total%in%c("xy","yx") ) toty <- totx <- TRUE
+    }
+    
+        
+    if ( toty ) 
         if ( "num.query"%in%names(x) )
             axis(4, at=length(x$num.query):1, labels=x$num.query,
                  las=2, lwd=0, lwd.ticks=1)
+    if ( totx )
         if ( "num.target"%in%names(x) )
             axis(3, at=1:length(x$num.target), labels=x$num.target,
                  las=2, lwd=0, lwd.ticks=1)            
+    if ( toty|totx )
         figlabel("total", region="figure", pos="topright",cex=par("cex"))
-    }
+    
 
     ## return plot settings silently
     invisible(list(type=type, short=short, round=round, scale=scale, text=txt))
@@ -2332,6 +2345,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #' @param xlab x-axis label (auto-selected if missing)
 #' @param xlim \code{xlim} parameter for plot
 #' @param ylab y-axis label (only used if \code{each==FALSE})
+#' @param ylab.size add cluster size to cluster-wise ylab
+#' @param ylab.cex font size of ylab
 #' @param ylim either conventional range of the y-axis, or a string
 #'     specifying whether ylim should be calculated from the average
 #'     (\code{ylim="avg"}), for all data (\code{ylim="all"}), or from
@@ -2390,7 +2405,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                          avg="median",  q=.9, norm, 
                          cls.col, cls.srt,  
                          axes=TRUE, xlab, xlim,
-                         ylab, ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
+                         ylab, ylab.size=TRUE, ylab.cex=1,
+                         ylim=ifelse(each,"avg","rng"), ylim.scale=.1,
                          avg.col="#000000",avg.lty=1,avg.lwd=3,
                          avg.cex=1,avg.pch=1,
                          lwd=.5, use.lty=FALSE, alpha=.2,
@@ -2536,12 +2552,13 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
              }
              par(new=TRUE)
          }
-        ## use normalization is ylab
+        ## use normalization as ylab
         if ( missing(ylab) ) ylab <- norm
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=xlim,
-             ylab=ylab,ylim=ylim, ...)
-        if ( axes ) {
+             ylab=NA,ylim=ylim, ...)
+         mtext(ylb, 2, par("mgp")[1], cex=ylab.cex)
+         if ( axes ) {
             axis(1, at=time.at);axis(2)
             axis(3, at=time, labels=FALSE, tcl=-par("tcl"))
             mtext("samples", 3, 1.2)
@@ -2568,15 +2585,20 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                              col=ref.col, col.ticks=ref.col, col.axis=ref.col)
                     axis(4,at=rlm,las=2,
                          col=ref.col, col.ticks=ref.col)
-                    mtext(ref.ylab, 4, .35, col=ref.col, col.axis=ref.col)
+                    mtext(ref.ylab, 4, .35, col=ref.col, col.axis=ref.col,
+                          cex=ylab.cex)
                 }
                 par(new=TRUE)
             }
             if ( missing(ylab) )
-                ylb <- paste(cl," (",cls.sze[cl],")",sep="")
+                if ( ylab.size )
+                    ylb <- paste(cl," (",cls.sze[cl],")",sep="")
+                else
+                    ylb <- cl
             else ylb <- ylab
             plot(1,col=NA,axes=FALSE, xlab=NA, xlim=xlim,
-                 ylab=ylb,ylim=ylim, ...)
+                 ylab=NA,ylim=ylim, ...)
+            mtext(ylb, 2, par("mgp")[1], cex=ylab.cex)
             if ( axes ) {
                 axis(1, at=time.at);axis(2)
             }

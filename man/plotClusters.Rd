@@ -23,6 +23,7 @@ plotClusters(
   xlab,
   xlim,
   ylab,
+  ylab.size = TRUE,
   ylim = ifelse(each, "avg", "rng"),
   ylim.scale = 0.1,
   avg.col = "#000000",
@@ -116,6 +117,8 @@ taken from there}
 \item{xlim}{\code{xlim} parameter for plot}
 
 \item{ylab}{y-axis label (only used if \code{each==FALSE})}
+
+\item{ylab.size}{add cluster size to cluster-wise ylab}
 
 \item{ylim}{either conventional range of the y-axis, or a string
 specifying whether ylim should be calculated from the average
