@@ -712,6 +712,174 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     ovl
 }
 
+
+
+#' Alluvial plot for cluster matrices.
+#'
+#' Adapted from the code of \cite{alluvial::alluvial}.
+#' @param clusters a matrix of different clusterings (columns).
+#' @param srt a list of cluster orders for each column in \cite{clusters}.
+#' @param cls.col a list of cluster colors used for boxes at start and end
+#' of flow; must have the same order as clusters in \code{srt}.
+#'@export
+clusterFlow <- function (clusters, srt, cls.col, 
+                         col = "gray", border = 0, layer,
+                         hide = FALSE, alpha = 0.5, gap.width = 0.05,
+                         xw = 0.1, cw = 0.1, blocks = TRUE, 
+                         axis_labels = NULL, cex = par("cex"),
+                         font = par("font"),
+                         cex.axis = par("cex.axis")) 
+{
+
+    ## TODO: make sure all is correct: srt, cls.col
+
+    ## renumber clusters to reflect sorting!
+    ## pad 0 since, sorting is alphabetical
+    if ( !missing(srt) ) {
+        for ( j in seq_along(srt) ) {
+            clusters[,j] <- sprintf("%02d",
+                                    match(as.character(clusters[,j]),
+                                          rev(srt[[j]])))
+         }
+    }
+
+    ## flows along clustering columns
+    flows <- apply(clusters, 1, paste, collapse=" ")
+    ## occurence of each flow pattern
+    freq <- table(flows)
+    tab <- do.call(rbind, strsplit(names(freq), " "))
+    colnames(tab) <- colnames(clusters)
+    if ( length(col)>1 )
+        cols <- rev(col)[as.numeric(tab[,1])] # todo: colorings for all
+    else cols <- col
+    
+    p <- data.frame(tab, freq = unlist(c(freq)), 
+                    col=cols, alpha, border, hide, 
+                    stringsAsFactors = FALSE)
+    np <- ncol(p) - 5
+
+
+    n <- nrow(p)
+    if (missing(layer)) {
+        layer <- 1:n
+    }
+    p$layer <- layer
+    d <- p[, 1:np, drop = FALSE]
+    p <- p[, -c(1:np), drop = FALSE]
+    p$freq <- with(p, freq/sum(freq))
+    col <- col2rgb(p$col, alpha = TRUE)
+    if (!identical(alpha, FALSE)) {
+        col["alpha", ] <- p$alpha * 256
+    }
+    p$col <- apply(col, 2, function(x) do.call(rgb, c(as.list(x), 
+                                                      maxColorValue = 256)))
+
+    ## really suppress colors!
+    p$col[is.na(cols)] <- NA
+    
+    isch <- sapply(d, is.character)
+    d[isch] <- lapply(d[isch], as.factor)
+    if (length(blocks) == 1) {
+        blocks <- if (!is.na(as.logical(blocks))) {
+            rep(blocks, np)
+        }
+        else if (blocks == "bookends") {
+            c(TRUE, rep(FALSE, np - 2), TRUE)
+        }
+    }
+    if (is.null(axis_labels)) {
+        axis_labels <- names(d)
+    }
+    else {
+        if (length(axis_labels) != ncol(d)) 
+            stop("`axis_labels` should have length ", names(d), 
+                ", has ", length(axis_labels))
+    }
+    getp <- function(i, d, f, w = gap.width) {
+        a <- c(i, (1:ncol(d))[-i])
+
+        ## top-down order generated here!
+        o <- do.call(order, d[a])
+
+        x <- c(0, cumsum(f[o])) * (1 - w)
+        x <- cbind(x[-length(x)], x[-1])
+        gap <- cumsum(c(0L, diff(as.numeric(d[o, i])) != 0))
+        mx <- max(gap)
+        if (mx == 0) 
+            mx <- 1
+        gap <- gap/mx * w
+        (x + gap)[order(o), ]
+    }
+    dd <- lapply(seq_along(d), getp, d = d, f = p$freq)
+
+
+    
+    rval <- list(endpoints = dd)
+    ##op <- par(mar = c(2, 1, 1, 1))
+    plot(NULL, type = "n", xlim = c(1 - cw, np + cw), ylim = c(0, 
+        1), xaxt = "n", yaxt = "n", xaxs = "i", yaxs = "i", xlab = "", 
+        ylab = "", frame = FALSE)
+    ind <- which(!p$hide)[rev(order(p[!p$hide, ]$layer))]
+    for (i in ind) {
+        for (j in 1:(np - 1)) {
+            
+            xspline(c(j, j, j + xw, j + 1 - xw, j + 1, j + 1, 
+                j + 1 - xw, j + xw, j) + rep(c(cw, -cw, cw), 
+                c(3, 4, 2)), c(dd[[j]][i, c(1, 2, 2)], rev(dd[[j + 
+                1]][i, c(1, 1, 2, 2)]), dd[[j]][i, c(1, 1)]), 
+                shape = c(0, 0, 1, 1, 0, 0, 1, 1, 0, 0), open = FALSE, 
+                col = p$col[i], border = p$border[i])
+        }
+    }
+    for (j in seq_along(dd)) {
+        ax <- lapply(split(dd[[j]], d[, j]), range)
+        if (blocks[j]) {
+            for (k in seq_along(ax)) {
+                colk <- border <- NA ## TODO make nicer
+                if ( !missing(cls.col) )
+                    colk <- rev(cls.col[[j]])[k]
+                else border <- 1
+                rect(j - cw, ax[[k]][1], j + cw, ax[[k]][2],
+                     col=colk, border=border)
+            }
+        }
+        else {
+            for (i in ind) {
+                x <- j + c(-1, 1) * cw
+                y <- t(dd[[j]][c(i, i), ])
+                w <- xw * (x[2] - x[1])
+                
+                xspline(x = c(x[1], x[1], x[1] + w, x[2] - w, 
+                  x[2], x[2], x[2] - w, x[1] + w, x[1]), y = c(y[c(1, 
+                  2, 2), 1], y[c(2, 2, 1, 1), 2], y[c(1, 1), 
+                  1]), shape = c(0, 0, 1, 1, 0, 0, 1, 1, 0, 0), 
+                  open = FALSE, col = p$col[i], border = p$border[i])
+            }
+        }
+        for (k in seq_along(ax)) {
+
+            nme <- names(ax)[k]
+            if ( !missing(srt) )
+                nme <- rev(srt[[j]])[k]
+            bg <- "white"
+            if ( !missing(cls.col) )
+                    bg <- rev(cls.col[[j]])[k]
+               
+            shadowtext(j, mean(ax[[k]]), labels = nme, cex = cex,
+                       font=font, col=1, auto=TRUE)
+        }
+    }
+    axis(1, at = rep(c(-cw, cw), ncol(d)) + rep(seq_along(d), 
+        each = 2), line = 0.5, col = "white", col.ticks = "black", 
+        labels = FALSE)
+    axis(1, at = seq_along(d), tick = FALSE, labels = axis_labels, 
+        cex.axis = cex.axis)
+###par(op)
+     return(p)
+    invisible(rval)
+}
+
+
 #' Parse a matrix of ID/annotation mappings
 #' 
 #' Parses a 2D ID/annotation mapping where annotations are a list of
