@@ -823,12 +823,15 @@ clusterFlow <- function (clusters, srt, cls.col,
     for (i in ind) {
         for (j in 1:(np - 1)) {
             
-            xspline(c(j, j, j + xw, j + 1 - xw, j + 1, j + 1, 
-                j + 1 - xw, j + xw, j) + rep(c(cw, -cw, cw), 
-                c(3, 4, 2)), c(dd[[j]][i, c(1, 2, 2)], rev(dd[[j + 
-                1]][i, c(1, 1, 2, 2)]), dd[[j]][i, c(1, 1)]), 
-                shape = c(0, 0, 1, 1, 0, 0, 1, 1, 0, 0), open = FALSE, 
-                col = p$col[i], border = p$border[i])
+            graphics::xspline(c(j, j, j + xw, j + 1 - xw, j + 1, j + 1, 
+                                j + 1 - xw, j + xw, j) +
+                              rep(c(cw, -cw, cw), c(3, 4, 2)),
+                              c(dd[[j]][i, c(1, 2, 2)],
+                                rev(dd[[j + 1]][i, c(1, 1, 2, 2)]),
+                                dd[[j]][i, c(1, 1)]), 
+                              shape = c(0, 0, 1, 1, 0, 0, 1, 1, 0, 0),
+                              open = FALSE, 
+                              col = p$col[i], border = p$border[i])
         }
     }
     for (j in seq_along(dd)) {
@@ -839,8 +842,8 @@ clusterFlow <- function (clusters, srt, cls.col,
                 if ( !missing(cls.col) )
                     colk <- rev(cls.col[[j]])[k]
                 else border <- 1
-                rect(j - cw, ax[[k]][1], j + cw, ax[[k]][2],
-                     col=colk, border=border)
+                graphics::rect(j - cw, ax[[k]][1], j + cw, ax[[k]][2],
+                               col=colk, border=border)
             }
         }
         else {
@@ -849,10 +852,12 @@ clusterFlow <- function (clusters, srt, cls.col,
                 y <- t(dd[[j]][c(i, i), ])
                 w <- xw * (x[2] - x[1])
                 
-                xspline(x = c(x[1], x[1], x[1] + w, x[2] - w, 
-                  x[2], x[2], x[2] - w, x[1] + w, x[1]), y = c(y[c(1, 
-                  2, 2), 1], y[c(2, 2, 1, 1), 2], y[c(1, 1), 
-                  1]), shape = c(0, 0, 1, 1, 0, 0, 1, 1, 0, 0), 
+                graphics::xspline(x = c(x[1], x[1], x[1] + w, x[2] - w, 
+                                        x[2], x[2], x[2] - w, x[1] + w, x[1]),
+                                  y = c(y[c(1, 2, 2), 1],
+                                        y[c(2, 2, 1, 1), 2],
+                                        y[c(1, 1),  1]),
+                                  shape = c(0, 0, 1, 1, 0, 0, 1, 1, 0, 0), 
                   open = FALSE, col = p$col[i], border = p$border[i])
             }
         }
@@ -864,9 +869,9 @@ clusterFlow <- function (clusters, srt, cls.col,
             bg <- "white"
             if ( !missing(cls.col) )
                     bg <- rev(cls.col[[j]])[k]
-               
+            ## TODO: best color selection?
             shadowtext(j, mean(ax[[k]]), labels = nme, cex = cex,
-                       font=font, col=1, auto=TRUE)
+                       font=font, col=1)
         }
     }
     axis(1, at = rep(c(-cw, cw), ncol(d)) + rep(seq_along(d), 
