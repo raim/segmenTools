@@ -104,8 +104,9 @@ figlabel <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
 
 
 
-#' Map values to colors
+#' obselete, use \code{\link{num2col}} 
 #'
+#' Maps values to colors.
 #' A simple function copied from 
 ## from https://stackoverflow.com/questions/15006211/how-do-i-generate-a-mapping-from-numbers-to-colors-in-r to map numeric values to colors
 #' @param x numeric values
@@ -118,4 +119,131 @@ val2col <-function(x, cols,limits=NULL) {
 
     cols[findInterval(x,seq(limits[1],limits[2],
                             length.out=length(cols)+1), all.inside=TRUE)]
+}
+
+#' convert numeric values to color range:
+#' @param x a numeric vector
+#' @param limits optional data limits for min/max color, every x
+#' lower/higher will get the extreme colors
+#' @param q auto-select limits by these quantiles
+#' @param pal color palette, alternatively \code{colf} and \code{n}
+#' can be supplied
+#' @param colf color palette function
+#' @param n number of different colors
+#' @export
+num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
+    if ( missing(pal) ) pal <- colf(n)
+    if ( missing(limits) ) limits <- range(x, na.rm=TRUE)
+    if ( !missing(q) ) limits <- quantile(x, q=q)
+    pal[findInterval(x,seq(limits[1],limits[2],
+                           length.out=length(pal)+1), all.inside=TRUE)]
+}
+
+#' scatter plot with statistics
+#'
+#' @param x the x coordinates of the points in the plot.
+#' @param y the y coordinates of the points in the plot.
+#' @param cor.method method to calculate correlation and p-value via
+#'     \code{\link[stat:cor.test]{cor.test}}.
+#' @param line.methods regression line methods, where \code{"ols"} is
+#'     a linear regression (ordinary least squares) with R's
+#'     \code{\link[stats:lm]{lm}} and \code{"tls"} (total least squares)
+#'     is calculated wih \code{\link[tls:tls]{tls}}.
+#' @param line.col colors of the regression lines drawn with
+#'     \code{line.methods}.
+#' @param line.type line types of the regression lines drawn with
+#'     \code{line.methods}.
+#' @param signif number of digits to be shown for p-values in the plot
+#'     legend (argument \code{digits} to \code{\link{signif}}.
+#' @param round number of decimal places to be shown for correlation
+#'     values in the plot legend (argument \code{digits} to
+#'     \code{\link{round}}.
+#' @param density indicate local point densities by using
+#'     \link{dense2d} instead of the base \code{\link{plot}} function.
+#' @param col color(s) of plotted points, if \code{density=FALSE}, or
+#'     color palette function if \code{density=TRUE} (argument
+#'     \code{colf} to \code{\link{dense2d}}).
+#' @param ... further arguments to the plotting function;
+#'     \code{\link{plot}} or, if \code{density=TRUE},
+#'     \code{\link{dense2d}}.
+#' @export
+plotCor <- function(x, y, cor.method=c("pearson","kendall", "spearman"),
+                    line.methods=c("ols","tls"), line.col=c(1,2),
+                    line.type=c(1,2),
+                    signif=1, round=1, density=TRUE, col, ...) {
+}
+
+#' 2D density heatmap plot
+#'
+#' Uses base R's \code{\link[grDevices:densCols]{densCols}} to
+#' calculate local densities at each point in a scatterplot, and then
+#' replaces them by a colored scheme, copied from Josh O'Brien posted
+#' at
+#' https://stackoverflow.com/questions/17093935/r-scatter-plot-symbol-color-represents-number-of-overlapping-points/17096661#17096661
+#' @param x x-coordinates
+#' @param y y-coordinates
+#' @param xlim, numeric vectors of length 2, giving the x 
+#'     coordinate ranges.
+#' @param ylim as \code{xlim} for y.
+#' @param pch \code{pch} argument to plot
+#' @param nbin number of bins for both dimensions, can be a single.
+#'     number for both dimensions, or separate numbers, see argument
+#'     \code{nbins} to function
+#'     \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
+#'     to \code{\link[KernSmooth:bkde2D]{bkde2D}}.
+#' @param circular treat x and y as circular coordinates in radian.
+#' @param colf color map function used to create a color gradient,
+#'     eg. \code{\link[grDevices:colorRampPalette]{colorRampPalette}}
+#'     or \code{viridis}.
+#' @param ... arguments to plot (hint:cex can be useful).
+#' @return the plotted data.frame, including local densities.
+#' @export
+dense2d <- function(x, y, pch=20, nbin=c(128,128), circular=FALSE,
+                    xlim, ylim,
+                    colf=grDevices::colorRampPalette(c("#000099","#00FEFF",
+                                                      "#45FE4F", "#FCFF00",
+                                                      "#FF9400", "#FF3100")),
+                    ...) {
+
+    if ( circular ) {
+        ## add data +/- 2*pi to get circular density
+        xa <- c(x-2*pi,x,x+2*pi,
+                x-2*pi,x,x+2*pi,
+                x-2*pi,x,x+2*pi)
+        ya <- c(y,y,y,
+                y-2*pi,y-2*pi,y-2*pi,
+                y+2*pi,y+2*pi,y+2*pi)
+        if ( missing(xlim) ) xlim <- c(-pi,pi)
+        if ( missing(ylim) ) ylim <- c(-pi,pi)
+        df <- data.frame(x=xa, y=ya)
+        
+    } else {
+        df <- data.frame(x=x, y=y)
+        if ( missing(xlim) ) xlim <- range(x)
+        if ( missing(ylim) ) ylim <- range(y)
+    }
+    
+    ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
+    ## KernSmooth::bkde2D(cbind(x, y), bandwidth=c(20,20), gridsize=c(128,128))
+    ## Use densCols() output to get density at each point
+    xcol <- grDevices::densCols(df$x, df$y, nbin=nbin, 
+                                colramp=grDevices::colorRampPalette(c("black",
+                                                                      "white")))
+    ## black - white, rgb components equal
+    ## each corresponds to density, convert to number between 1 and 256
+    df$dens <- col2rgb(xcol)[1,] + 1L
+  
+    ## Map densities to colors
+    ncol <- 256 # TODO: fixed due to RGB range? 
+    cols <- colf(ncol)
+    df$col <- cols[df$dens]
+    
+    ## Plot it, reordering rows so that densest points are plotted on top
+    plot(y~x, data=df[order(df$dens),], pch=pch, col=col,
+         xlim=xlim, ylim=ylim, ...)
+    
+    ## normalize to 1, for legend?
+    df$dens <- df$dens/ncol
+    
+    invisible(df)
 }

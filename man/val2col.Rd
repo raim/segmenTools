@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotUtils.R
 \name{val2col}
 \alias{val2col}
-\title{Map values to colors}
+\title{obselete, use \code{\link{num2col}}}
 \usage{
 val2col(x, cols, limits = NULL)
 }
@@ -14,5 +14,6 @@ val2col(x, cols, limits = NULL)
 \item{limits}{min/max cut-off values of x}
 }
 \description{
+Maps values to colors.
 A simple function copied from
 }

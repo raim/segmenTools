@@ -2443,7 +2443,10 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     leg.ids <- names(goi)
     names(leg.ids) <- goi
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each, alpha=1, use.lty=TRUE, type=c("all"), plot.legend=each&plot.legend, leg.xy=leg.xy, leg.ids=leg.ids, ...)
+    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each,
+                        alpha=1, use.lty=TRUE, type=c("all"),
+                        plot.legend=each&plot.legend,
+                        leg.xy=leg.xy, leg.ids=leg.ids, ...)
     leg <- do.call(rbind,avg$legend)
     if ( !is.null(names(goi)) ) {
         if ( grep ) {
@@ -3054,21 +3057,5 @@ add_alphas <- function(col, alpha=rep(1,length(col))){
     names(col) <- nms
     col[nacol] <- NA
     col
-}
-
-#' convert numeric values to color range:
-#' @param x a numeric vector
-#' @param limits optional data limits for min/max color, every x
-#' lower/higher will get the extreme colors
-#' @param pal color palette, alternatively \code{colf} and \code{n}
-#' can be supplied
-#' @param colf color palette function
-#' @param n number of different colors
-#' @export
-num2col <- function(x, limits, pal, colf=viridis::viridis, n=100){
-    if ( missing(pal) ) pal <- colf(n)
-    if ( missing(limits) ) limits <- range(x, na.rm=TRUE)
-    pal[findInterval(x,seq(limits[1],limits[2],
-                           length.out=length(pal)+1), all.inside=TRUE)]
 }
 

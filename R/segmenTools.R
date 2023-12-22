@@ -7,7 +7,7 @@
 #'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout grconvertX grconvertY box rect xspline
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors dev.size
-#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit t.test
+#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit t.test cor.test lm 
 ##@bibliography /home/raim/ref/tata.bib
 ##@importFrom segmenTier clusterCor_c 
 NULL # this just ends the global package documentation
@@ -139,58 +139,6 @@ ci95 <- function(x,na.rm=FALSE) {
 
 ##
 
-#' 2D density heatmap plot
-#'
-#' Uses base R's \code{\link[grDevices:densCols]{densCols}} to
-#' calculate local densities at each point in a scatterplot, and then
-#' replaces them by a colored scheme, copied from Josh O'Brien posted
-#' at
-#' https://stackoverflow.com/questions/17093935/r-scatter-plot-symbol-color-represents-number-of-overlapping-points/17096661#17096661
-#' @param x x-coordinates
-#' @param y y-coordinates
-#' @param pch \code{pch} argument to plot
-#' @param nbin number of bins for both dimensions, can be a single
-#'     number for both dimensions, or separate numbers, see argument
-#'     \code{nbins} to function
-#'     \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
-#'     to \code{\link[KernSmooth:bkde2D]{bkde2D}}
-#' @param colf color map function used to create a color gradient,
-#'     eg. \code{\link[grDevices:colorRampPalette]{colorRampPalette}}
-#'     or \code{viridis}
-#' @param ... arguments to plot (hint:cex can be useful)
-#' @return the plotted data.frame, including local densities
-#' @export
-dense2d <- function(x, y, pch=20, nbin=c(128,128), 
-                    colf=grDevices::colorRampPalette(c("#000099","#00FEFF",
-                                                      "#45FE4F", "#FCFF00",
-                                                      "#FF9400", "#FF3100")),
-                    ...) {
-    
-    df <- data.frame(x, y)
-    
-    ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
-    ## KernSmooth::bkde2D(cbind(x, y), bandwidth=c(20,20), gridsize=c(128,128))
-    ## Use densCols() output to get density at each point
-    xcol <- grDevices::densCols(x, y, nbin=nbin,
-                                colramp=grDevices::colorRampPalette(c("black",
-                                                                      "white")))
-    ## black - white, rgb components equal
-    ## each corresponds to density, convert to number between 1 and 256
-    df$dens <- col2rgb(xcol)[1,] + 1L
-  
-    ## Map densities to colors
-    ncol <- 256 # TODO: fixed due to RGB range? 
-    cols <- colf(ncol)
-    df$col <- cols[df$dens]
-    
-    ## Plot it, reordering rows so that densest points are plotted on top
-    plot(y~x, data=df[order(df$dens),], pch=pch, col=col, ...)
-    
-    ## normalize to 1, for legend?
-    df$dens <- df$dens/ncol
-    
-    invisible(df)
-}
 
 #' Map a distribution to a color scheme
 #'
