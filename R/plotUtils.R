@@ -124,17 +124,22 @@ val2col <-function(x, cols,limits=NULL) {
 #' convert numeric values to color range:
 #' @param x a numeric vector
 #' @param limits optional data limits for min/max color, every x
-#' lower/higher will get the extreme colors
-#' @param q auto-select limits by these quantiles
+#'     lower/higher will get the extreme colors
+#' @param q auto-select limits by these two quantiles (argument
+#'     \code{prob} in function \code{\link[stat:quantile]{quantile}}
 #' @param pal color palette, alternatively \code{colf} and \code{n}
-#' can be supplied
+#'     can be supplied
 #' @param colf color palette function
 #' @param n number of different colors
 #' @export
 num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
     if ( missing(pal) ) pal <- colf(n)
     if ( missing(limits) ) limits <- range(x, na.rm=TRUE)
-    if ( !missing(q) ) limits <- quantile(x, probs=q)
+    if ( !missing(q) ) {
+        if ( length(q)!=2 )
+            stop("argument q must be of length 2")
+        limits <- quantile(x, probs=q)
+    }
     pal[findInterval(x,seq(limits[1],limits[2],
                            length.out=length(pal)+1), all.inside=TRUE)]
 }
