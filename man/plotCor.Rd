@@ -24,7 +24,7 @@ plotCor(
 \item{y}{the y coordinates of the points in the plot.}
 
 \item{cor.method}{method to calculate correlation and p-value via
-\code{\link[stat:cor.test]{cor.test}}.}
+\code{\link[stats:cor.test]{cor.test}}.}
 
 \item{line.methods}{regression line methods, where \code{"ols"} is
 a linear regression (ordinary least squares) with R's

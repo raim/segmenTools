@@ -126,7 +126,7 @@ val2col <-function(x, cols,limits=NULL) {
 #' @param limits optional data limits for min/max color, every x
 #'     lower/higher will get the extreme colors
 #' @param q auto-select limits by these two quantiles (argument
-#'     \code{prob} in function \code{\link[stat:quantile]{quantile}}
+#'     \code{prob} in function \code{\link[stats:quantile]{quantile}}
 #' @param pal color palette, alternatively \code{colf} and \code{n}
 #'     can be supplied
 #' @param colf color palette function
@@ -149,7 +149,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param x the x coordinates of the points in the plot.
 #' @param y the y coordinates of the points in the plot.
 #' @param cor.method method to calculate correlation and p-value via
-#'     \code{\link[stat:cor.test]{cor.test}}.
+#'     \code{\link[stats:cor.test]{cor.test}}.
 #' @param line.methods regression line methods, where \code{"ols"} is
 #'     a linear regression (ordinary least squares) with R's
 #'     \code{\link[stats:lm]{lm}} and \code{"tls"} (total least squares)
