@@ -134,7 +134,7 @@ val2col <-function(x, cols,limits=NULL) {
 num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
     if ( missing(pal) ) pal <- colf(n)
     if ( missing(limits) ) limits <- range(x, na.rm=TRUE)
-    if ( !missing(q) ) limits <- quantile(x, q=q)
+    if ( !missing(q) ) limits <- quantile(x, probs=q)
     pal[findInterval(x,seq(limits[1],limits[2],
                            length.out=length(pal)+1), all.inside=TRUE)]
 }
