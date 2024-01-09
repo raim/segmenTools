@@ -7,8 +7,9 @@
 plotCor(
   x,
   y,
-  cor.method = c("pearson", "kendall", "spearman"),
-  line.methods = c("ols", "tls"),
+  cor.method = c("pearson", "kendall", "spearman", "circular"),
+  line.methods = c("ols", "tls", "c-c", "c-l"),
+  na.rm = FALSE,
   line.col = c(1, 2),
   line.type = c(1, 2),
   signif = 1,

@@ -184,7 +184,7 @@ plotCor <- function(x, y, cor.method=c("pearson","kendall",
     }
     
     ## line fit and r-squared
-    if ( method=="circular" ) {
+    if ( cor.method=="circular" ) {
         ## TODO: bpnreg
         cfit <- circular::lm.circular(y~x, type=line.methods)
     } else {
@@ -193,7 +193,7 @@ plotCor <- function(x, y, cor.method=c("pearson","kendall",
     ## correlation
 
     if ( density )
-        dense2d(x, y, circular=method=="circular", ...)
+        dense2d(x, y, circular=cor.method=="circular", ...)
     else
         plot(x, y, ...)
 }
