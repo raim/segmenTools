@@ -172,10 +172,30 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{plot}} or, if \code{density=TRUE},
 #'     \code{\link{dense2d}}.
 #' @export
-plotCor <- function(x, y, cor.method=c("pearson","kendall", "spearman"),
-                    line.methods=c("ols","tls"), line.col=c(1,2),
-                    line.type=c(1,2),
+plotCor <- function(x, y, cor.method=c("pearson","kendall",
+                                       "spearman","circular"),
+                    line.methods=c("ols","tls", "c-c", "c-l"),
+                    na.rm=FALSE,
+                    line.col=c(1,2), line.type=c(1,2),
                     signif=1, round=1, density=TRUE, col, ...) {
+
+    ## clean data from NA
+    if ( na.rm ) {
+    }
+    
+    ## line fit and r-squared
+    if ( method=="circular" ) {
+        ## TODO: bpnreg
+        cfit <- circular::lm.circular(y~x, type=line.methods)
+    } else {
+        lfit <- lm(y~x, line.methods=line.methods)
+    }
+    ## correlation
+
+    if ( density )
+        dense2d(x, y, circular=method=="circular", ...)
+    else
+        plot(x, y, ...)
 }
 
 #' 2D density heatmap plot
