@@ -2,20 +2,20 @@
 % Please edit documentation in R/plotUtils.R
 \name{plotCor}
 \alias{plotCor}
-\title{scatter plot with statistics}
+\title{scatter plot with correlation statistics}
 \usage{
 plotCor(
   x,
   y,
-  cor.method = c("pearson", "kendall", "spearman", "circular"),
-  line.methods = c("ols", "tls", "c-c", "c-l"),
+  cor.method = c("pearson", "kendall", "spearman"),
+  line.methods = c("ols", "tls"),
   na.rm = FALSE,
+  circular = FALSE,
+  cor.legend = TRUE,
   line.col = c(1, 2),
-  line.type = c(1, 2),
   signif = 1,
   round = 1,
   density = TRUE,
-  col,
   ...
 )
 }
@@ -30,12 +30,16 @@ plotCor(
 \item{line.methods}{regression line methods, where \code{"ols"} is
 a linear regression (ordinary least squares) with R's
 \code{\link[stats:lm]{lm}} and \code{"tls"} (total least squares)
-is calculated wih \code{\link[tls:tls]{tls}}.}
+is calculated manually via \code{\link[base:eigen]{eigen}} and
+\code{\link[stats:cov]{cov}}.}
+
+\item{na.rm}{remove NA values from x and y.}
+
+\item{circular}{NOT fully implement, treat data as circular.}
+
+\item{cor.legend}{plot correlation, p-value and slope (TLS) as a legend.}
 
 \item{line.col}{colors of the regression lines drawn with
-\code{line.methods}.}
-
-\item{line.type}{line types of the regression lines drawn with
 \code{line.methods}.}
 
 \item{signif}{number of digits to be shown for p-values in the plot
@@ -48,14 +52,10 @@ values in the plot legend (argument \code{digits} to
 \item{density}{indicate local point densities by using
 \link{dense2d} instead of the base \code{\link{plot}} function.}
 
-\item{col}{color(s) of plotted points, if \code{density=FALSE}, or
-color palette function if \code{density=TRUE} (argument
-\code{colf} to \code{\link{dense2d}}).}
-
 \item{...}{further arguments to the plotting function;
 \code{\link{plot}} or, if \code{density=TRUE},
 \code{\link{dense2d}}.}
 }
 \description{
-scatter plot with statistics
+scatter plot with correlation statistics
 }

@@ -144,20 +144,24 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
                            length.out=length(pal)+1), all.inside=TRUE)]
 }
 
-#' scatter plot with statistics
+#' scatter plot with correlation statistics
 #'
 #' @param x the x coordinates of the points in the plot.
 #' @param y the y coordinates of the points in the plot.
+#' @param na.rm remove NA values from x and y.
 #' @param cor.method method to calculate correlation and p-value via
 #'     \code{\link[stats:cor.test]{cor.test}}.
 #' @param line.methods regression line methods, where \code{"ols"} is
 #'     a linear regression (ordinary least squares) with R's
 #'     \code{\link[stats:lm]{lm}} and \code{"tls"} (total least squares)
-#'     is calculated wih \code{\link[tls:tls]{tls}}.
+#'     is calculated manually via \code{\link[base:eigen]{eigen}} and
+#'     \code{\link[stats:cov]{cov}}.
 #' @param line.col colors of the regression lines drawn with
 #'     \code{line.methods}.
-#' @param line.type line types of the regression lines drawn with
-#'     \code{line.methods}.
+## @param line.type line types of the regression lines drawn with
+##     \code{line.methods}.
+#' @param circular NOT fully implement, treat data as circular.
+#' @param cor.legend plot correlation, p-value and slope (TLS) as a legend.
 #' @param signif number of digits to be shown for p-values in the plot
 #'     legend (argument \code{digits} to \code{\link{signif}}.
 #' @param round number of decimal places to be shown for correlation
@@ -165,37 +169,102 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{round}}.
 #' @param density indicate local point densities by using
 #'     \link{dense2d} instead of the base \code{\link{plot}} function.
-#' @param col color(s) of plotted points, if \code{density=FALSE}, or
-#'     color palette function if \code{density=TRUE} (argument
-#'     \code{colf} to \code{\link{dense2d}}).
+## @param col color(s) of plotted points, if \code{density=FALSE}, or
+##     color palette function if \code{density=TRUE} (argument
+##     \code{colf} to \code{\link{dense2d}}).
 #' @param ... further arguments to the plotting function;
 #'     \code{\link{plot}} or, if \code{density=TRUE},
 #'     \code{\link{dense2d}}.
 #' @export
-plotCor <- function(x, y, cor.method=c("pearson","kendall",
-                                       "spearman","circular"),
-                    line.methods=c("ols","tls", "c-c", "c-l"),
-                    na.rm=FALSE,
-                    line.col=c(1,2), line.type=c(1,2),
-                    signif=1, round=1, density=TRUE, col, ...) {
+plotCor <- function(x, y,
+                    cor.method=c("pearson", "kendall", "spearman"),
+                    line.methods=c("ols","tls"),
+                    na.rm=FALSE, circular=FALSE,
+                    cor.legend=TRUE, line.col=c(1,2), 
+                    signif=1, round=1, density=TRUE, ...) {
+
+    xy <- data.frame(x=x, y=y)
 
     ## clean data from NA
     if ( na.rm ) {
+        rmna <- apply(xy,1, function(x) any(is.na(x)))
+        warning("removing", sum(rmna), "rows with NA values")
+        xy <- xy[!rmna,]
     }
+
     
     ## line fit and r-squared
-    if ( cor.method=="circular" ) {
+    if ( circular ) {
+        xyc <- as.data.frame(circular(xy, units="radians", type="angles"))
+
+        ## TODO: implement circular correlation and line fit!
+        ## TODO: convert to circular first
         ## TODO: bpnreg
-        cfit <- circular::lm.circular(y~x, type=line.methods)
+        lfit <- circular::lm.circular(y=xyc$y, x=xyc$x, type="c-c", order=2)
+        ## add polynomial fit
+        fline <- lfit$fitted
+        fline[fline>pi] <- fline[fline>pi] - 2*pi
+        ##points(as.numeric(df$x), fline, col=1, pch=19,cex=.3)
+
+        crt <- circular::cor.circular(x=xyc$x, y=xyc$y, test=TRUE)
+        cr <- round(crt$cor, round)
+        pv <- signif(crt$p.value, signif)
+
+        tls <- NULL 
     } else {
-        lfit <- lm(y~x, line.methods=line.methods)
+        ## lin.reg (OLS)
+        lfit <- lm(y ~ x, data=xy)
+        ## TLS, via eigen(cov)
+        v <- eigen(cov(xy))$vectors
+        beta <- v[2,1]/v[1,1] # slope
+        alpha <- mean(xy$y) - beta*mean(xy$x) # intercept
+        tls <- list(alpha=alpha, beta=beta)
+        ## correlation
+        crt <- cor.test(xy$x, xy$y, method=cor.method, use="pairwise.complete")
+
+        ## roundes values for legend
+        sl <- round(beta, round)
+        cr <- round(crt$estimate, round)
+        pv <- signif(crt$p.value, signif)
+
     }
-    ## correlation
 
     if ( density )
-        dense2d(x, y, circular=cor.method=="circular", ...)
+        dense2d(xy$x, xy$y, circular=circular, ...)
     else
-        plot(x, y, ...)
+        plot(xy$x, xy$y, ...)
+    if ( !circular ) {
+        if ( "ols"%in%line.methods )
+            abline(lfit, col=line.col[1])
+        if ( "tls"%in%line.methods )
+            abline(a=tls$alpha, b=tls$beta, col=line.col[2])
+    } else {
+        points(as.numeric(xy$x), fline, col=1, pch=19, cex=.3)
+    }
+    if ( cor.legend ) {
+        leg <- lty <- lcol <- NULL
+        if ( !circular ) {
+            if ( "ols" %in% line.methods ) {
+                leg <- c(as.expression(bquote(r == .(cr))),
+                         as.expression(bquote(p == .(pv))))
+                lty <- c(1, NA)
+                lcol <- c(line.col[1], NA)
+            }
+            if ( "tls" %in% line.methods ) {
+                leg <- c(leg, as.expression(bquote(beta == .(sl))))
+                lty <- c(lty, 1)
+            lcol <- c(lcol, line.col[2])
+            }
+        } else {
+            leg <- c(as.expression(bquote(r == .(cr))),
+                     as.expression(bquote(p == .(pv))))
+        }
+        legend(ifelse(cr<0,"topright","topleft"),
+               legend=leg,
+               col=lcol, lty=lty, seg.len=.5, bty="n",
+               y.intersp=.75, x.intersp=0.75)
+    }
+    invisible(list(xy=xy, cor=crt, fit=lfit, tls=tls))
 }
 
 #' 2D density heatmap plot
