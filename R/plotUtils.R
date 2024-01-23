@@ -188,7 +188,7 @@ plotCor <- function(x, y,
     ## clean data from NA
     if ( na.rm ) {
         rmna <- apply(xy,1, function(x) any(is.na(x)))
-        warning("removing", sum(rmna), "rows with NA values")
+        warning("removing ", sum(rmna), " rows with NA values")
         xy <- xy[!rmna,]
     }
 
