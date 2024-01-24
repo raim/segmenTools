@@ -1277,11 +1277,13 @@ annotationOverlap <- function(x) {
 #' @param categories annotation source categories to report,
 #' @param terms list of annotation terms to report (over all categories),
 #' a name list of terms to report,
+#' @param significant only report significant hits, option to \code{gost}.
 #' @param verb level of verbosity, 0: no output, 1: progress messages,
 #' @param ... further arguments to \code{gprofiler2}'s \code{gost} function.
 #' @export
 runGost <- function(cls, organism="hsapiens",
-                    cls.srt, categories, terms, verb=1, ...) {
+                    cls.srt, categories, terms, verb=1,
+                    significant=FALSE, ...) {
 
 
     ## prepare clustering
@@ -1295,14 +1297,16 @@ runGost <- function(cls, organism="hsapiens",
     cls.sze <- table(cls)[cls.srt]
 
 
-    if ( verb>0 ) cat(paste("calculating enrichments in organism",
-                            organism, "\n"))
 
-    ## filter requested categories
+    ## get categories
     if ( missing(categories)  ) {
+        if ( verb>0 ) cat(paste("loading categories\n"))
         categories <- gprofiler2::get_version_info(organism=organism)$sources
         categories <- names(categories)
     }    
+
+    if ( verb>0 ) cat(paste("calculating enrichments in organism",
+                            organism, "\n"))
     gores <- gprofiler2::gost(query=cls.lst, organism = organism,
                               source=categories, significant=FALSE, ...)
 

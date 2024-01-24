@@ -4,7 +4,15 @@
 \alias{runGost}
 \title{a wrapper for  \code{gprofiler2}'s \code{gost} function}
 \usage{
-runGost(cls, organism = "hsapiens", cls.srt, categories, terms, verb = 1, ...)
+runGost(
+  cls,
+  organism = "hsapiens",
+  cls.srt,
+  categories,
+  terms,
+  verb = 1,
+  significant = FALSE...
+)
 }
 \arguments{
 \item{cls}{a name vector of a gene classification, where the names
@@ -22,6 +30,8 @@ argument refer to; see \code{?gprofiler2::gost},}
 a name list of terms to report,}
 
 \item{verb}{level of verbosity, 0: no output, 1: progress messages,}
+
+\item{significant}{only report significant hits, option to \code{gost}.}
 
 \item{...}{further arguments to \code{gprofiler2}'s \code{gost} function.}
 }
