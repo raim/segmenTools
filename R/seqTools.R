@@ -163,14 +163,15 @@ mutatePositions <- function(seq, mutations) {
 
     str <- strsplit(seq,"")[[1]]
     fromto <- do.call(cbind,strsplit(mutations, "[0-9]+"))
-    at <- as.numeric(gsub("[A-Z]","", mutations))
+    at <- as.numeric(gsub("\\*","",gsub("[A-Z]","", mutations)))
     if ( any(duplicated(at)) )
         stop("duplicated mutation loci are not supported")
     if ( any(is.na(at)) )
         stop("location not found")
     for ( j in 1:ncol(fromto) ) {
         if ( str[at[j]]!=fromto[1,j] )
-            stop("mutated position ", j, " is not as indicated\n")
+            stop("mutated position ", j, " is not as indicated.",
+                 "searched: ",fromto[1,j], ", but found: ", str[at[j]])
         else str[at[j]] <- fromto[2,j]
     }
     paste(str, collapse="")
