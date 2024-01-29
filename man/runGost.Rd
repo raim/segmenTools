@@ -11,7 +11,8 @@ runGost(
   categories,
   terms,
   verb = 1,
-  significant = FALSE...
+  significant = FALSE,
+  ...
 )
 }
 \arguments{

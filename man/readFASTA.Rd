@@ -5,7 +5,13 @@
 \title{fasta sequence file parser adapted from (an older version of)
 \code{Biostrings}}
 \usage{
-readFASTA(file, checkComments = TRUE, strip.descs = TRUE, split.desc = "")
+readFASTA(
+  file,
+  checkComments = TRUE,
+  strip.descs = TRUE,
+  split.desc = "",
+  grepID = FALSE
+)
 }
 \arguments{
 \item{file}{file with sequence(s) in fasta format}
@@ -18,6 +24,8 @@ and store in returned structure as \code{details}}
 
 \item{split.desc}{pattern to split header into description and details
 with argument \code{strip.descs}}
+
+\item{grepID}{use ID in description field as names of sequence list.}
 }
 \description{
 fasta sequence file parser adapted from (an older version of)

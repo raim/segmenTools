@@ -437,9 +437,10 @@ gff2tab <- function(file, attrsep=";", fieldsep="=") {
 #' and store in returned structure as \code{details}
 #' @param split.desc pattern to split header into description and details
 #' with argument \code{strip.descs}
+#' @param grepID use ID in description field as names of sequence list.
 #' @export
 readFASTA <- function (file, checkComments=TRUE, strip.descs=TRUE,
-                       split.desc="") 
+                       split.desc="", grepID=FALSE) 
 {    
     if (is.character(file)) {
         if ( length(grep("\\.gz$",file)) )
@@ -470,7 +471,7 @@ readFASTA <- function (file, checkComments=TRUE, strip.descs=TRUE,
     dp <- descriptions + 1L
     dm <- descriptions - 1L
     end <- c(dm[-1], length(s1))
-    lapply(seq_len(numF), function(i) {
+    fas <- lapply(seq_len(numF), function(i) {
         desc <- s1[descriptions[i]]
         if (strip.descs) 
             desc <- substr(desc, 2L, nchar(desc))
@@ -492,4 +493,12 @@ readFASTA <- function (file, checkComments=TRUE, strip.descs=TRUE,
         seq <- gsub("/","",seq)
         list(desc = desc, details=details, seq = seq)
     })
+    if ( grepID ) {
+        
+        desc <- lapply(fas, function(x) {unlist(strsplit(trimws(x$desc), " "))})
+        ids <- unlist(lapply(desc, function(x) x[1]))
+        ids <- sub(",$","", ids)
+        names(fas) <- ids
+    }
+    fas
 }
