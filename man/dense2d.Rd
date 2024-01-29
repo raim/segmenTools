@@ -12,8 +12,7 @@ dense2d(
   circular = FALSE,
   xlim,
   ylim,
-  colf = grDevices::colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00",
-    "#FF9400", "#FF3100")),
+  colf = viridis::viridis,
   ...
 )
 }

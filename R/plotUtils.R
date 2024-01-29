@@ -294,11 +294,14 @@ plotCor <- function(x, y,
 #' @export
 dense2d <- function(x, y, pch=20, nbin=c(128,128), circular=FALSE,
                     xlim, ylim,
-                    colf=grDevices::colorRampPalette(c("#000099","#00FEFF",
-                                                      "#45FE4F", "#FCFF00",
-                                                      "#FF9400", "#FF3100")),
+                    colf=viridis::viridis,
                     ...) {
 
+    ## NOTE, previous default color function was
+    ## grDevices::colorRampPalette(c("#000099","#00FEFF",
+    ##                               "#45FE4F", "#FCFF00",
+    ##                               "#FF9400", "#FF3100"))
+    
     if ( circular ) {
         ## add data +/- 2*pi to get circular density
         xa <- c(x-2*pi,x,x+2*pi,
