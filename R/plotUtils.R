@@ -179,7 +179,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 plotCor <- function(x, y,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
-                    na.rm=FALSE, circular=FALSE,
+                    na.rm=TRUE, circular=FALSE,
                     cor.legend=TRUE, line.col=c(1,2), 
                     signif=1, round=1, density=TRUE, ...) {
 
@@ -188,7 +188,9 @@ plotCor <- function(x, y,
     ## clean data from NA
     if ( na.rm ) {
         rmna <- apply(xy,1, function(x) any(is.na(x)))
-        warning("removing ", sum(rmna), " rows with NA values")
+        if ( sum(rmna)>0 )
+            warning("removing ", sum(rmna), " of ",nrow(xy),
+                    " rows with NA values")
         xy <- xy[!rmna,]
     }
 
