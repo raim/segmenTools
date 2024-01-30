@@ -1438,9 +1438,14 @@ runGost <- function(cls, organism="hsapiens",
 #' to select colors
 #' @export
 image_matrix <- function(z, x, y, text, text.col, text.cex=1,
-                         axis=1:2, axis.cex=1.5,
+                         axis=1:2, axis.cex=1.5, cut=FALSE, breaks,
                          axis1.col, axis1.las=2,
                          axis2.col, axis2.las=2, ...) {
+
+    if ( cut ) {
+        z[z<min(breaks)] <- min(breaks)
+        z[z>max(breaks)] <- max(breaks)
+    }
 
     ## reverse columns and transpose
     if ( nrow(z)>1 )
@@ -1451,8 +1456,10 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
     axis2.numeric <- !missing(y)
     if ( missing(x) ) x <- 1:ncol(z)
     if ( missing(y) ) y <- 1:nrow(z)
-    image(x=x, y=y, z=imgdat, axes=FALSE, ...)
-
+    if ( cut )
+        image(x=x, y=y, z=imgdat, axes=FALSE, ...)
+    else
+        image(x=x, y=y, z=imgdat, axes=FALSE, breaks=breaks)
     ## add text
     if ( !missing(text) ) {
         if ( missing(text.col) )

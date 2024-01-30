@@ -9,7 +9,7 @@ plotCor(
   y,
   cor.method = c("pearson", "kendall", "spearman"),
   line.methods = c("ols", "tls"),
-  na.rm = FALSE,
+  na.rm = TRUE,
   circular = FALSE,
   cor.legend = TRUE,
   line.col = c(1, 2),
