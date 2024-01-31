@@ -222,7 +222,7 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,
             hist(x.cut2,breaks=brk, border=2, col=2,
                  xlim=xlim, ylim=ylim, axes=FALSE, main=NA)
         }
-        hist(x,breaks=brk, add=TRUE)
+        hist(x,breaks=brk, add=TRUE, border=1, col=NA)
         abline(v=c(mn,mx), col=2, lty=2)
         axis(2)
         axis(1, labels=NA)
