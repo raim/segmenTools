@@ -1457,9 +1457,9 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
     if ( missing(x) ) x <- 1:ncol(z)
     if ( missing(y) ) y <- 1:nrow(z)
     if ( cut )
-        image(x=x, y=y, z=imgdat, axes=FALSE, ...)
+        image(x=x, y=y, z=imgdat, axes=FALSE, breaks=breaks, ...)
     else
-        image(x=x, y=y, z=imgdat, axes=FALSE, breaks=breaks)
+        image(x=x, y=y, z=imgdat, axes=FALSE, ...)
     ## add text
     if ( !missing(text) ) {
         if ( missing(text.col) )

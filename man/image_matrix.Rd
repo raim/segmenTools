@@ -14,6 +14,8 @@ image_matrix(
   text.cex = 1,
   axis = 1:2,
   axis.cex = 1.5,
+  cut = FALSE,
+  breaks,
   axis1.col,
   axis1.las = 2,
   axis2.col,
