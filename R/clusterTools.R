@@ -50,7 +50,22 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
         logic <- TRUE
     }
 
-    # t-test statistic matrix
+    ## TODO: changeuse of option test or make
+    ## this wrapper for wilcox.test available in the package!
+    w.test <- function(x,y) {
+        res <- stats::wilcox.test(x,y)
+        ## normalized U-statistic
+        tt <- res$statistic/(sum(!is.na(x))*sum(!is.na(y))) -0.5
+        rt <- list()
+        rt$statistic <- unlist(tt)
+        rt$p.value <- unlist(res$p.value)
+        rt
+    }
+
+    if ( inherits(test, "character") )
+        test <- get(test, mode="function")
+    
+    ## t-test statistic matrix
     tt <- matrix(0, ncol=ncol(x), nrow=length(cls.srt)) 
     colnames(tt) <- colnames(x)
     rownames(tt) <- cls.srt #levels(cls)
