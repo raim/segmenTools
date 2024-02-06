@@ -561,7 +561,8 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
     
 
     ## return plot settings silently
-    invisible(list(type=type, short=short, round=round, scale=scale, text=txt))
+    invisible(list(type=type, short=short, round=round, scale=scale, text=txt,
+                   col=col, breaks=breaks, pval=pval))
 }
 
 #' transpose cluster overlap object
@@ -1457,6 +1458,19 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                          axis1.col, axis1.las=2,
                          axis2.col, axis2.las=2, ...) {
 
+
+    if ( FALSE ) {
+        ## TODO: 20240206, clarify strange behaviour for SAAP/LSCC data
+        ## ## these behave differently, first is wrong, WHY?
+        #z <- tmp$pval
+        imgdat <- t(apply(z, 2, rev))
+        x <- 1:ncol(z)
+        y <- 1:nrow(z)
+        image_matrix(z=z, breaks=tmp$breaks, col=tmp$col)
+        image(z=imgdat, x=x, y=y, breaks=tmp$breaks, col=tmp$col)
+    }
+
+    
     if ( cut ) {
         z[z<min(breaks)] <- min(breaks)
         z[z>max(breaks)] <- max(breaks)
