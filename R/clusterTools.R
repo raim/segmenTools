@@ -1470,10 +1470,13 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
         image(z=imgdat, x=x, y=y, breaks=tmp$breaks, col=tmp$col)
     }
 
-    
+    if ( !missing(breaks) )
+        cut <- TRUE
     if ( cut ) {
-        z[z<min(breaks)] <- min(breaks)
-        z[z>max(breaks)] <- max(breaks)
+##        if ( any(z<min(breaks)) )
+            z[z<min(breaks)] <- min(breaks)
+##        if ( any(z<max(breaks)) )
+            z[z>max(breaks)] <- max(breaks)
     }
 
     ## reverse columns and transpose
@@ -1485,6 +1488,8 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
     axis2.numeric <- !missing(y)
     if ( missing(x) ) x <- 1:ncol(z)
     if ( missing(y) ) y <- 1:nrow(z)
+
+    ## WHY IS THAT? do we not use breaks when called cut=FALSE?
     if ( cut )
         image(x=x, y=y, z=imgdat, axes=FALSE, breaks=breaks, ...)
     else
