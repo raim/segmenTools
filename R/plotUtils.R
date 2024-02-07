@@ -196,6 +196,8 @@ plotCor <- function(x, y,
 
     
     ## line fit and r-squared
+    lfit <- tls <- beta <- crt <- NULL
+
     if ( circular ) {
         xyc <- as.data.frame(circular(xy, units="radians", type="angles"))
 
@@ -211,26 +213,29 @@ plotCor <- function(x, y,
         crt <- circular::cor.circular(x=xyc$x, y=xyc$y, test=TRUE)
         cr <- round(crt$cor, round)
         pv <- signif(crt$p.value, signif)
-
-        tls <- NULL 
     } else {
         ## lin.reg (OLS)
-        lfit <- lm(y ~ x, data=xy)
+        if ( "ols" %in% line.methods )
+            lfit <- lm(y ~ x, data=xy)
         ## TLS, via eigen(cov)
-        v <- eigen(cov(xy))$vectors
-        beta <- v[2,1]/v[1,1] # slope
-        alpha <- mean(xy$y) - beta*mean(xy$x) # intercept
-        tls <- list(alpha=alpha, beta=beta)
+        if ( "tls" %in% line.methods ) {
+            v <- eigen(cov(xy))$vectors
+            beta <- v[2,1]/v[1,1] # slope
+            alpha <- mean(xy$y) - beta*mean(xy$x) # intercept
+            tls <- list(alpha=alpha, beta=beta)
+            ## for legend
+            sl <- round(beta, round)
+        }
         ## correlation
-        crt <- cor.test(xy$x, xy$y, method=cor.method, use="pairwise.complete")
-
-        ## roundes values for legend
-        sl <- round(beta, round)
-        cr <- round(crt$estimate, round)
-        pv <- signif(crt$p.value, signif)
-
+        if ( cor.method[1]!="" ) {
+            crt <- cor.test(xy$x, xy$y,
+                            method=cor.method, use="pairwise.complete")
+            ## for legend
+            cr <- round(crt$estimate, round)
+            pv <- signif(crt$p.value, signif)
+        }
     }
-
+    
     if ( density )
         dense2d(xy$x, xy$y, circular=circular, ...)
     else
@@ -244,27 +249,32 @@ plotCor <- function(x, y,
         points(as.numeric(xy$x), fline, col=1, pch=19, cex=.3)
     }
     if ( cor.legend ) {
+        ## construct legend from available data
         leg <- lty <- lcol <- NULL
         if ( !circular ) {
-            if ( "ols" %in% line.methods ) {
-                leg <- c(as.expression(bquote(r == .(cr))),
+            if ( cor.method[1]!="" ) {
+                leg <- c(leg,
+                         as.expression(bquote(r == .(cr))),
                          as.expression(bquote(p == .(pv))))
-                lty <- c(1, NA)
-                lcol <- c(line.col[1], NA)
+                lty <- c(lty, 1, NA)
+                lcol <- c(lcol, line.col[1], NA)
+                
             }
             if ( "tls" %in% line.methods ) {
-                leg <- c(leg, as.expression(bquote(beta == .(sl))))
+                leg <- c(leg,
+                         as.expression(bquote(beta == .(sl))))
                 lty <- c(lty, 1)
-            lcol <- c(lcol, line.col[2])
+                lcol <- c(lcol, line.col[2])
             }
-        } else {
+        } else { # circular
             leg <- c(as.expression(bquote(r == .(cr))),
                      as.expression(bquote(p == .(pv))))
         }
-        legend(ifelse(cr<0,"topright","topleft"),
-               legend=leg,
-               col=lcol, lty=lty, seg.len=.5, bty="n",
-               y.intersp=.75, x.intersp=0.75)
+        if ( length(leg)>0 )
+            legend(ifelse(cr<0,"topright","topleft"),
+                   legend=leg,
+                   col=lcol, lty=lty, seg.len=.5, bty="n",
+                   y.intersp=.75, x.intersp=0.75)
     }
     invisible(list(xy=xy, cor=crt, fit=lfit, tls=tls))
 }
