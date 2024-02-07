@@ -1459,23 +1459,13 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                          axis2.col, axis2.las=2, ...) {
 
 
-    if ( FALSE ) {
-        ## TODO: 20240206, clarify strange behaviour for SAAP/LSCC data
-        ## ## these behave differently, first is wrong, WHY?
-        #z <- tmp$pval
-        imgdat <- t(apply(z, 2, rev))
-        x <- 1:ncol(z)
-        y <- 1:nrow(z)
-        image_matrix(z=z, breaks=tmp$breaks, col=tmp$col)
-        image(z=imgdat, x=x, y=y, breaks=tmp$breaks, col=tmp$col)
-    }
-
+    ## TODO: 20240206, clarify strange behaviour for SAAP/LSCC data
+    ## ## these behave differently, first is wrong, WHY?
+ 
     if ( !missing(breaks) )
         cut <- TRUE
     if ( cut ) {
-##        if ( any(z<min(breaks)) )
             z[z<min(breaks)] <- min(breaks)
-##        if ( any(z<max(breaks)) )
             z[z>max(breaks)] <- max(breaks)
     }
 
@@ -1489,11 +1479,9 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
     if ( missing(x) ) x <- 1:ncol(z)
     if ( missing(y) ) y <- 1:nrow(z)
 
-    ## WHY IS THAT? do we not use breaks when called cut=FALSE?
-    if ( cut )
-        image(x=x, y=y, z=imgdat, axes=FALSE, breaks=breaks, ...)
-    else
-        image(x=x, y=y, z=imgdat, axes=FALSE, ...)
+    ## call image with transformed data, pass breaks and all arguments
+    image(x=x, y=y, z=imgdat, axes=FALSE, breaks=breaks, ...)
+
     ## add text
     if ( !missing(text) ) {
         if ( missing(text.col) )
