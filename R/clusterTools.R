@@ -451,9 +451,10 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
         if ( !missing(col) ) 
             n <- length(col)
         else {
-                docols <- colorRampPalette(c("#FFFFFF","#FF0000"))(n/2)
-                upcols <- colorRampPalette(c("#FFFFFF","#0000FF"))(n/2)
+                docols <- colorRampPalette(c("#FFFFFF","#0000FF"))(n/2)
+                upcols <- colorRampPalette(c("#FFFFFF","#FF0000"))(n/2)
                 col <- unique(c(rev(docols), upcols))
+                n <- length(col)
         }
         breaks <- seq(log2(p.min),-log2(p.min),length.out=n+1)
     } else { # NO NEGATIVE P-VALS
