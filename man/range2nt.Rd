@@ -7,7 +7,7 @@
 range2nt(seq, ranges, coors = c(chr = "chr", start = "start", end = "end"))
 }
 \arguments{
-\item{seq}{a sequence object as returned by \code{readFasta}}
+\item{seq}{a sequence object as returned by \code{readFASTA}}
 
 \item{ranges}{a table provided ranges in each string}
 
@@ -16,6 +16,5 @@ range2nt(seq, ranges, coors = c(chr = "chr", start = "start", end = "end"))
 \description{
 calculates letter frequences in ranges of strings, e.g.,
 nucleotide sequences. The input is a sequence object
-as returned by (genomeBrowser's version of) \code{readFasta}.
-TODO: move readFasta here and document!
+as returned by \code{readFASTA}.
 }

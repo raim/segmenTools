@@ -252,11 +252,14 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   if ( do.prich & !do.ppoor ) p.value <- prich
   if ( do.ppoor & !do.prich ) p.value <- ppoor
 
-  ## take smaller p-value, if both are requested!
-  if ( do.ppoor &  do.prich )
-    for ( prow in 1:nrow(prich) )
-      for ( pcol in 1:ncol(prich) )
-        p.value[prow,pcol] <- min(prich[prow,pcol],ppoor[prow,pcol])
+    ## two.sided!
+    ## take smaller p-value, if both are requested!
+    if ( do.ppoor &  do.prich ) {
+        p.value <- prich
+        p.value[ppoor<prich] <- ppoor[ppoor<prich]
+        result$sign <- ifelse(ppoor<prich,-1,1)
+
+    }
 
     result <- append(result, list(p.value=p.value))
     result$alternative <- alternative

@@ -27,9 +27,8 @@ revcomp <- function(sq, type="DNA", na="N", reverse=TRUE) {
 #'
 #' calculates letter frequences in ranges of strings, e.g.,
 #' nucleotide sequences. The input is a sequence object
-#' as returned by (genomeBrowser's version of) \code{readFasta}.
-#' TODO: move readFasta here and document!
-#' @param seq a sequence object as returned by \code{readFasta}
+#' as returned by \code{readFASTA}.
+#' @param seq a sequence object as returned by \code{readFASTA}
 #' @param ranges a table provided ranges in each string 
 #' @param coors coordinate names in ranges table
 #' @export
