@@ -201,15 +201,16 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
   overlap <- matrix(NA, nrow=length(f1), ncol=length(f2))
   rownames(overlap) <- f1
   colnames(overlap) <- f2
-    jaccard <- percent <- overlap
+    jaccard <- percent <- frequency <- ratio <- overlap
   if ( do.prich ) prich <- overlap
   if ( do.ppoor ) ppoor <- overlap
   
   
   for ( i in 1:length(f1) ) { # white and black balls
       
-      m=sum(cl1==f1[i]); # number of white balls
-      n=sum(cl1!=f1[i]); # number of black balls
+      m <- sum(cl1==f1[i]); # number of white balls
+      n <- sum(cl1!=f1[i]); # number of black balls
+      N <- m+n # total number of balls
       
       for ( j in 1:length(f2) ) { # balls drawn
           
@@ -217,7 +218,9 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
           k <- sum(cl2==f2[j]) # number of balls drawn
           
           overlap[i,j] <- q
-          percent[i,j] <- round(100*q/k, digits = 2)
+          frequency[i,j] <- q/k  # frequency 
+          ratio[i,j] <- frequency[i,j] * N/m # frequency ratio
+          percent[i,j] <- round(100*frequency[i,j], digits = 2) # TODO: rm this?
           
           ## Calculate cumulative HYPERGEOMETRIC distributions 
           
@@ -245,7 +248,11 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
       }
   }
   
-  result <- list(overlap=overlap,percent=percent,jaccard=jaccard)
+    result <- list(overlap=overlap,   # TODO: rename to counts
+                   frequency=frequency,
+                   ratio=ratio,
+                   percent=percent,
+                   jaccard=jaccard)
 
   ## append p-values
   #p.value <- prich
