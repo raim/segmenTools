@@ -7,12 +7,16 @@
 plotCor(
   x,
   y,
+  outliers,
   cor.method = c("pearson", "kendall", "spearman"),
   line.methods = c("ols", "tls"),
   na.rm = TRUE,
   circular = FALSE,
   cor.legend = TRUE,
   line.col = c(1, 2),
+  pch = 20,
+  cex = 1,
+  legpos,
   signif = 1,
   round = 1,
   density = TRUE,
@@ -23,6 +27,9 @@ plotCor(
 \item{x}{the x coordinates of the points in the plot.}
 
 \item{y}{the y coordinates of the points in the plot.}
+
+\item{outliers}{vector of indices or logical vector of x,y values to
+exclude from correlation analysis.}
 
 \item{cor.method}{method to calculate correlation and p-value via
 \code{\link[stats:cor.test]{cor.test}}.}
@@ -41,6 +48,12 @@ is calculated manually via \code{\link[base:eigen]{eigen}} and
 
 \item{line.col}{colors of the regression lines drawn with
 \code{line.methods}.}
+
+\item{pch}{point symbols.}
+
+\item{cex}{point size.}
+
+\item{legpos}{position of the legend.}
 
 \item{signif}{number of digits to be shown for p-values in the plot
 legend (argument \code{digits} to \code{\link{signif}}.}

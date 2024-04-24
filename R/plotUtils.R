@@ -148,6 +148,8 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'
 #' @param x the x coordinates of the points in the plot.
 #' @param y the y coordinates of the points in the plot.
+#' @param outliers vector of indices or logical vector of x,y values to
+#' exclude from correlation analysis.
 #' @param na.rm remove NA values from x and y.
 #' @param cor.method method to calculate correlation and p-value via
 #'     \code{\link[stats:cor.test]{cor.test}}.
@@ -169,6 +171,9 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{round}}.
 #' @param density indicate local point densities by using
 #'     \link{dense2d} instead of the base \code{\link{plot}} function.
+#' @param pch point symbols.
+#' @param cex point size.
+#' @param legpos position of the legend.
 ## @param col color(s) of plotted points, if \code{density=FALSE}, or
 ##     color palette function if \code{density=TRUE} (argument
 ##     \code{colf} to \code{\link{dense2d}}).
@@ -180,7 +185,7 @@ plotCor <- function(x, y, outliers,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
                     na.rm=TRUE, circular=FALSE,
-                    cor.legend=TRUE, line.col=c(1,2), pch=19, cex=1,
+                    cor.legend=TRUE, line.col=c(1,2), pch=20, cex=1,
                     legpos,
                     signif=1, round=1, density=TRUE, ...) {
 
@@ -189,7 +194,7 @@ plotCor <- function(x, y, outliers,
     xyo <- NULL
     if ( !missing(outliers) ) {
         if ( is.logical(outliers) )
-            outliers <- which(outliers, na.rm=TRUE)
+            outliers <- which(outliers)
         xyo <- xy[outliers,]
         xy <- xy[-outliers,]
     }
@@ -245,7 +250,7 @@ plotCor <- function(x, y, outliers,
     }
     
     if ( density )
-        dense2d(xy$x, xy$y, circular=circular, ...)
+        dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, ...)
     else
         plot(xy$x, xy$y, pch=pch, cex=cex, ...)
     if ( !circular ) {
