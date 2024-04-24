@@ -176,15 +176,23 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{plot}} or, if \code{density=TRUE},
 #'     \code{\link{dense2d}}.
 #' @export
-plotCor <- function(x, y,
+plotCor <- function(x, y, outliers,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
                     na.rm=TRUE, circular=FALSE,
-                    cor.legend=TRUE, line.col=c(1,2), 
+                    cor.legend=TRUE, line.col=c(1,2), pch=19, cex=1,
+                    legpos,
                     signif=1, round=1, density=TRUE, ...) {
 
     xy <- data.frame(x=x, y=y)
 
+    xyo <- NULL
+    if ( !missing(outliers) ) {
+        if ( is.logical(outliers) )
+            outliers <- which(outliers, na.rm=TRUE)
+        xyo <- xy[outliers,]
+        xy <- xy[-outliers,]
+    }
     ## clean data from NA
     if ( na.rm ) {
         rmna <- apply(xy,1, function(x) any(is.na(x)))
@@ -239,7 +247,7 @@ plotCor <- function(x, y,
     if ( density )
         dense2d(xy$x, xy$y, circular=circular, ...)
     else
-        plot(xy$x, xy$y, ...)
+        plot(xy$x, xy$y, pch=pch, cex=cex, ...)
     if ( !circular ) {
         if ( "ols"%in%line.methods )
             abline(lfit, col=line.col[1])
@@ -248,32 +256,52 @@ plotCor <- function(x, y,
     } else {
         points(as.numeric(xy$x), fline, col=1, pch=19, cex=.3)
     }
+
+    if ( !missing(outliers) )
+        points(xyo$x, xyo$y, col=2, pch=4, cex=cex, ...)
+
+    ## TODO: replace line legend by TLS and OLS
     if ( cor.legend ) {
         ## construct legend from available data
-        leg <- lty <- lcol <- NULL
+        leg <- lty <- lcol <- lpch <- NULL
         if ( !circular ) {
             if ( cor.method[1]!="" ) {
                 leg <- c(leg,
                          as.expression(bquote(r == .(cr))),
                          as.expression(bquote(p == .(pv))))
-                lty <- c(lty, 1, NA)
-                lcol <- c(lcol, line.col[1], NA)
+                lty <- c(lty, NA, NA)
+                lcol <- c(lcol, NA, NA)
+                lpch <- c(lpch, NA, NA)
                 
             }
+            if ( "ols" %in% line.methods ) {
+                leg <- c(leg, expression(OLS))
+                lty <- c(lty, 1)
+                lcol <- c(lcol, line.col[1])
+                lpch <- c(lpch, NA)
+            }
             if ( "tls" %in% line.methods ) {
-                leg <- c(leg,
-                         as.expression(bquote(beta == .(sl))))
+                leg <- c(leg, expression(TLS))
                 lty <- c(lty, 1)
                 lcol <- c(lcol, line.col[2])
+                lpch <- c(lpch, NA)
             }
         } else { # circular
             leg <- c(as.expression(bquote(r == .(cr))),
                      as.expression(bquote(p == .(pv))))
         }
+        if ( !missing(outliers) ) {
+            leg <- c(leg, expression(excluded))
+            lty <- c(lty, NA)
+            lcol <- c(lcol, 2)
+            lpch <- c(lpch, 4) 
+        }
         if ( length(leg)>0 )
-            legend(ifelse(cr<0,"topright","topleft"),
+            if ( missing(legpos) )
+                legpos <- ifelse(cr<0,"topright","topleft") 
+            legend(legpos,
                    legend=leg,
-                   col=lcol, lty=lty, seg.len=.5, bty="n",
+                   col=lcol, lty=lty, pch=lpch, seg.len=.5, bty="n",
                    y.intersp=.75, x.intersp=0.75)
     }
     invisible(list(xy=xy, cor=crt, fit=lfit, tls=tls))
