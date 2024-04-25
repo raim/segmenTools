@@ -9,14 +9,18 @@
 #' @export
 plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
                     bg="white") {
-  file.name <- paste(file.name, type, sep=".")
+    file.name <- paste(file.name, type, sep=".")
+    ##if ( type=="cairopdf" )
+    ##    file.name <- sub("\\.cairopdf$", ".pdf", file.name)
   if ( type == "png" )
     grDevices::png(file.name, width=width, height=height, units="in", res=res)
   if ( type == "eps" )
     grDevices::postscript(file.name, width=height, height=width,paper="special",
                           horizontal = FALSE, onefile = FALSE)
-  if ( type == "pdf" )
-    grDevices::pdf(file.name, width=width, height=height, bg=bg)
+  ## NOTE 20240425: added cairopdf to allow fonts
+  ## this may change pdf output of older scripts!!
+  if ( type == "pdf" ) 
+    grDevices::cairo_pdf(file.name, width=width, height=height, bg=bg)
   if ( type == "tiff" )
     grDevices::tiff(file.name, width=width, height=height, units="in", res=res)
   if ( type == "svg" )
