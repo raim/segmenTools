@@ -276,11 +276,12 @@ plotCor <- function(x, y, outliers,
         if ( !circular ) {
             if ( cor.method[1]!="" ) {
                 leg <- c(leg,
+                         as.expression(bquote(n == .(nrow(xy)))),
                          as.expression(bquote(r == .(cr))),
                          as.expression(bquote(p == .(pv))))
-                lty <- c(lty, NA, NA)
-                lcol <- c(lcol, NA, NA)
-                lpch <- c(lpch, NA, NA)
+                lty <- c(lty, NA, NA, NA)
+                lcol <- c(lcol, NA, NA, NA)
+                lpch <- c(lpch, NA, NA, NA)
                 
             }
             if ( "ols" %in% line.methods ) {
