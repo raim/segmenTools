@@ -666,7 +666,10 @@ coor2bed <- function(coor, file,
     }
 
     ## chromosomes must begin with chr
-    coor[,coors["chr"]] <- paste0("chr", sprintf("%02d",coor[,coors["chr"]]))
+    if ( inherits(coor[,coors["chr"]], "character") )
+        coor[,coors["chr"]] <- paste0("chr",sprintf("%s",coor[,coors["chr"]]))
+    else 
+        coor[,coors["chr"]] <- paste0("chr",sprintf("%02d",coor[,coors["chr"]]))
     
     bed <- coor[,c(coors[c("chr","start","end")], name, score,coors["strand"])]
 

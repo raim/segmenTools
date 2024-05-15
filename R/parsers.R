@@ -370,7 +370,10 @@ bed2coor <- function(file, header=c("chr","start","end","name","score")) {
     dat$start <- dat$start+1
 
     ## numeric chromosomes
-    dat$chr <- as.numeric(sub("chr","",dat$chr))
+    dat$chr <- sub("chr","",dat$chr)
+    if ( all(is.numeric(dat$chr)) )
+        dat$chr <- as.numeric(dat$chr)
+    
     ## numeric strand
     str <- c("+"=1, "-"=-1)
     dat$strand <- str[as.character(dat$strand)]
