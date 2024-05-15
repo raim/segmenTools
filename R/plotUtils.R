@@ -175,6 +175,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{round}}.
 #' @param density indicate local point densities by using
 #'     \link{dense2d} instead of the base \code{\link{plot}} function.
+#' @param col point color if \code{density==FALSE}.
 #' @param pch point symbols.
 #' @param cex point size.
 #' @param legpos position of the legend.
@@ -191,7 +192,7 @@ plotCor <- function(x, y, outliers,
                     na.rm=TRUE, circular=FALSE,
                     cor.legend=TRUE, line.col=c(1,2), pch=20, cex=1,
                     legpos,
-                    signif=1, round=1, density=TRUE, ...) {
+                    signif=1, round=1, density=TRUE, col, ...) {
 
     xy <- data.frame(x=x, y=y)
 
@@ -255,8 +256,10 @@ plotCor <- function(x, y, outliers,
     
     if ( density )
         dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, ...)
-    else
-        plot(xy$x, xy$y, pch=pch, cex=cex, ...)
+    else {
+        if ( missing(col) ) col <- "#000000AA"
+        plot(xy$x, xy$y, pch=pch, cex=cex, col=col, ...)
+    }
     if ( !circular ) {
         if ( "ols"%in%line.methods )
             abline(lfit, col=line.col[1])

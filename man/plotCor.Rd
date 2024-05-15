@@ -20,6 +20,7 @@ plotCor(
   signif = 1,
   round = 1,
   density = TRUE,
+  col,
   ...
 )
 }
@@ -64,6 +65,8 @@ values in the plot legend (argument \code{digits} to
 
 \item{density}{indicate local point densities by using
 \link{dense2d} instead of the base \code{\link{plot}} function.}
+
+\item{col}{point color if \code{density==FALSE}.}
 
 \item{...}{further arguments to the plotting function;
 \code{\link{plot}} or, if \code{density=TRUE},
