@@ -17,6 +17,7 @@ plotCor(
   pch = 20,
   cex = 1,
   legpos,
+  legbg = "#FFFFFF00",
   signif = 1,
   round = 1,
   density = TRUE,
@@ -55,6 +56,9 @@ is calculated manually via \code{\link[base:eigen]{eigen}} and
 \item{cex}{point size.}
 
 \item{legpos}{position of the legend.}
+
+\item{legbg}{background color of the legend, default: transparent
+via alpha=0.}
 
 \item{signif}{number of digits to be shown for p-values in the plot
 legend (argument \code{digits} to \code{\link{signif}}.}
