@@ -673,11 +673,17 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     if ( missing(srt) ) {
         
         cls.srt <- colnames(pvl)
+
+        if ( is.null(colnames(pvl)) )
+            stop("missing column names in p-value matrix")
+        
         sig.srt <- NULL
         ## first, get highly significant
         for ( cl in cls.srt ) {
             tmp.srt <- order(pvl[,cl], decreasing=FALSE)
-            sig.srt <- c(sig.srt, tmp.srt[tmp.srt %in% which(pvl[,cl]<p.min)])
+            ## cut by p value
+            sig.srt <- c(sig.srt,
+                         tmp.srt[tmp.srt %in% which(pvl[,cl] < p.min)])
         }
         ## second, sort rest by increasing pval
         rest.srt <- which(!(1:nrow(pvl)) %in% sig.srt)
