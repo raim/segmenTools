@@ -615,26 +615,29 @@ t.clusterOverlaps <- function(x) {
 
 #' sorts cluster overlap structure by p-values
 #' 
-#' Sorts one dimension of a cluster overlap structure
-#' by their p-values along the sorting of the other axis.
-#' For each cluster along the pre-sorted (non-selected) axis,
-#' the most significant overlaps (\code{p<p.min}) are chosen
-#' and moved to the top of the matrix.
+#' Sorts one dimension of a cluster overlap structure by their
+#' p-values along the sorting of the other axis.  For each cluster
+#' along the pre-sorted (non-selected) axis, the most significant
+#' overlaps (\code{p<p.min}) are chosen and moved to the top of the
+#' matrix.
+
 ## TODO:
 ## * align axis selection with nomenclature in clusterCluster
-## * allow to pass sorting as argument
+
 #' @param ovl a `clusterOverlaps' object returned by
-#' \code{\link{clusterCluster}}
+#'     \code{\link{clusterCluster}}
 #' @param p.min significance cutoff during sorting
 #' @param cut remove all overlaps without any \code{p<p.min}
 #' @param axis axis to sort (2 for y-axis/rows, 1 for x-axis/columns)
-#' @param srt sorting vector for rows, if this is passed the significance
-#' sorting is skipped
-#' @param symmetric indicate whether the overlap matrix is symmetric with
-#' \code{symmetric="upper"} or \code{symmetric="lower"}
+#' @param srt sorting vector for rows, if this is passed the
+#'     significance sorting is skipped
+#' @param sign sort only by p-values of this sign (\code{-1,+1}) for
+#'     two-sided tests.
+#' @param symmetric indicate whether the overlap matrix is symmetric
+#'     with \code{symmetric="upper"} or \code{symmetric="lower"}.
 #' @export
 sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
-                         symmetric="no") {
+                         sign=0, symmetric="no") {
 
     
     ## handle triangle matrix
@@ -649,6 +652,11 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
         
         ## copy upper to lower
         pvl <- abs(ovl$p.value)
+
+        ## only consider p-values of the correct sign for two-sided tests
+        if ( sign!=0 & "sign"%in%names(ovl) )
+            pvl[sign(ovl$sign) != sign(sign)] <- 1
+        
         n <- nrow(pvl)
         m <- ncol(pvl)
         if ( n!=m )
@@ -669,6 +677,11 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
 
     pvl <- abs(ovl$p.value)
 
+    ## only consider p-values of the correct sign for two-sided tests
+    if ( sign!=0 & "sign"%in%names(ovl) )
+            pvl[sign(ovl$sign) != sign(sign)] <- 1
+        
+    
     ## sort by significance
     if ( missing(srt) ) {
         
