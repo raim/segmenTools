@@ -4,7 +4,15 @@
 \alias{sortOverlaps}
 \title{sorts cluster overlap structure by p-values}
 \usage{
-sortOverlaps(ovl, axis = 2, p.min = 0.05, cut = FALSE, srt, symmetric = "no")
+sortOverlaps(
+  ovl,
+  axis = 2,
+  p.min = 0.05,
+  cut = FALSE,
+  srt,
+  sign = 0,
+  symmetric = "no"
+)
 }
 \arguments{
 \item{ovl}{a `clusterOverlaps' object returned by
@@ -16,16 +24,19 @@ sortOverlaps(ovl, axis = 2, p.min = 0.05, cut = FALSE, srt, symmetric = "no")
 
 \item{cut}{remove all overlaps without any \code{p<p.min}}
 
-\item{srt}{sorting vector for rows, if this is passed the significance
-sorting is skipped}
+\item{srt}{sorting vector for rows, if this is passed the
+significance sorting is skipped}
 
-\item{symmetric}{indicate whether the overlap matrix is symmetric with
-\code{symmetric="upper"} or \code{symmetric="lower"}}
+\item{sign}{sort only by p-values of this sign (\code{-1,+1}) for
+two-sided tests.}
+
+\item{symmetric}{indicate whether the overlap matrix is symmetric
+with \code{symmetric="upper"} or \code{symmetric="lower"}.}
 }
 \description{
-Sorts one dimension of a cluster overlap structure
-by their p-values along the sorting of the other axis.
-For each cluster along the pre-sorted (non-selected) axis,
-the most significant overlaps (\code{p<p.min}) are chosen
-and moved to the top of the matrix.
+Sorts one dimension of a cluster overlap structure by their
+p-values along the sorting of the other axis.  For each cluster
+along the pre-sorted (non-selected) axis, the most significant
+overlaps (\code{p<p.min}) are chosen and moved to the top of the
+matrix.
 }
