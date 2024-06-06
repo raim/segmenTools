@@ -13,7 +13,8 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
     ##if ( type=="cairopdf" )
     ##    file.name <- sub("\\.cairopdf$", ".pdf", file.name)
   if ( type == "png" )
-    grDevices::png(file.name, width=width, height=height, units="in", res=res)
+      grDevices::png(file.name, width=width, height=height, units="in",
+                     res=res, bg=bg)
   if ( type == "eps" )
     grDevices::postscript(file.name, width=height, height=width,paper="special",
                           horizontal = FALSE, onefile = FALSE)
@@ -22,11 +23,13 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
   if ( type == "pdf" ) 
     grDevices::cairo_pdf(file.name, width=width, height=height, bg=bg)
   if ( type == "tiff" )
-    grDevices::tiff(file.name, width=width, height=height, units="in", res=res)
+      grDevices::tiff(file.name, width=width, height=height, units="in",
+                      res=res, bg=bg)
   if ( type == "svg" )
     grDevices::svg(file.name, width=width, height=height)
   if ( type == "jpeg" )
-    grDevices::jpeg(file.name, width=width, height=height, units="in", res=res)
+      grDevices::jpeg(file.name, width=width, height=height, units="in",
+                      res=res, bg=bg)
 }
 
 
