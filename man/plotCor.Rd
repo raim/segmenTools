@@ -13,13 +13,15 @@ plotCor(
   na.rm = TRUE,
   circular = FALSE,
   cor.legend = TRUE,
+  line.legend = FALSE,
+  title = FALSE,
   line.col = c(1, 2),
   pch = 20,
   cex = 1,
   legpos,
-  legbg = "#FFFFFF00",
+  legbg = "#FFFFFF99",
   signif = 1,
-  round = 1,
+  round = 2,
   density = TRUE,
   col,
   ...
@@ -30,26 +32,34 @@ plotCor(
 
 \item{y}{the y coordinates of the points in the plot.}
 
-\item{outliers}{vector of indices or logical vector of x,y values to
-exclude from correlation analysis.}
+\item{outliers}{vector of indices or logical vector of x,y values
+to exclude from correlation analysis.}
 
 \item{cor.method}{method to calculate correlation and p-value via
 \code{\link[stats:cor.test]{cor.test}}.}
 
 \item{line.methods}{regression line methods, where \code{"ols"} is
 a linear regression (ordinary least squares) with R's
-\code{\link[stats:lm]{lm}} and \code{"tls"} (total least squares)
-is calculated manually via \code{\link[base:eigen]{eigen}} and
+\code{\link[stats:lm]{lm}} and \code{"tls"} (total least
+squares) is calculated manually via
+\code{\link[base:eigen]{eigen}} and
 \code{\link[stats:cov]{cov}}.}
 
 \item{na.rm}{remove NA values from x and y.}
 
 \item{circular}{NOT fully implement, treat data as circular.}
 
-\item{cor.legend}{plot correlation, p-value and slope (TLS) as a legend.}
+\item{cor.legend}{plot correlation, p-value and slope (TLS) as a
+legend.}
+
+\item{line.legend}{plot line fit method as a legend.}
+
+\item{title}{plot correlation parameters (as in legend) on the top
+of the plot.}
 
 \item{line.col}{colors of the regression lines drawn with
-\code{line.methods}.}
+\code{line.methods}.  ## @param line.type line types of the
+regression lines drawn with ## \code{line.methods}.}
 
 \item{pch}{point symbols.}
 
@@ -58,7 +68,10 @@ is calculated manually via \code{\link[base:eigen]{eigen}} and
 \item{legpos}{position of the legend.}
 
 \item{legbg}{background color of the legend, default: transparent
-via alpha=0.}
+via alpha=0.  ## @param col color(s) of plotted points, if
+\code{density=FALSE}, or ## color palette function if
+\code{density=TRUE} (argument ## \code{colf} to
+\code{\link{dense2d}}).}
 
 \item{signif}{number of digits to be shown for p-values in the plot
 legend (argument \code{digits} to \code{\link{signif}}.}

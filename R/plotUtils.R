@@ -155,22 +155,26 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'
 #' @param x the x coordinates of the points in the plot.
 #' @param y the y coordinates of the points in the plot.
-#' @param outliers vector of indices or logical vector of x,y values to
-#' exclude from correlation analysis.
+#' @param outliers vector of indices or logical vector of x,y values
+#'     to exclude from correlation analysis.
 #' @param na.rm remove NA values from x and y.
 #' @param cor.method method to calculate correlation and p-value via
 #'     \code{\link[stats:cor.test]{cor.test}}.
 #' @param line.methods regression line methods, where \code{"ols"} is
 #'     a linear regression (ordinary least squares) with R's
-#'     \code{\link[stats:lm]{lm}} and \code{"tls"} (total least squares)
-#'     is calculated manually via \code{\link[base:eigen]{eigen}} and
+#'     \code{\link[stats:lm]{lm}} and \code{"tls"} (total least
+#'     squares) is calculated manually via
+#'     \code{\link[base:eigen]{eigen}} and
 #'     \code{\link[stats:cov]{cov}}.
 #' @param line.col colors of the regression lines drawn with
-#'     \code{line.methods}.
-## @param line.type line types of the regression lines drawn with
-##     \code{line.methods}.
+#'     \code{line.methods}.  ## @param line.type line types of the
+#'     regression lines drawn with ## \code{line.methods}.
 #' @param circular NOT fully implement, treat data as circular.
-#' @param cor.legend plot correlation, p-value and slope (TLS) as a legend.
+#' @param title plot correlation parameters (as in legend) on the top
+#'     of the plot.
+#' @param cor.legend plot correlation, p-value and slope (TLS) as a
+#'     legend.
+#' @param line.legend plot line fit method as a legend.
 #' @param signif number of digits to be shown for p-values in the plot
 #'     legend (argument \code{digits} to \code{\link{signif}}.
 #' @param round number of decimal places to be shown for correlation
@@ -183,10 +187,10 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param cex point size.
 #' @param legpos position of the legend.
 #' @param legbg background color of the legend, default: transparent
-#' via alpha=0.
-## @param col color(s) of plotted points, if \code{density=FALSE}, or
-##     color palette function if \code{density=TRUE} (argument
-##     \code{colf} to \code{\link{dense2d}}).
+#'     via alpha=0.  ## @param col color(s) of plotted points, if
+#'     \code{density=FALSE}, or ## color palette function if
+#'     \code{density=TRUE} (argument ## \code{colf} to
+#'     \code{\link{dense2d}}).
 #' @param ... further arguments to the plotting function;
 #'     \code{\link{plot}} or, if \code{density=TRUE},
 #'     \code{\link{dense2d}}.
@@ -195,9 +199,11 @@ plotCor <- function(x, y, outliers,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
                     na.rm=TRUE, circular=FALSE,
-                    cor.legend=TRUE, line.col=c(1,2), pch=20, cex=1,
-                    legpos, legbg="#FFFFFF00",
-                    signif=1, round=1, density=TRUE, col, ...) {
+                    cor.legend=TRUE, line.legend=FALSE,
+                    title=FALSE,
+                    line.col=c(1,2), pch=20, cex=1,
+                    legpos, legbg="#FFFFFF99", 
+                    signif=1, round=2, density=TRUE, col, ...) {
 
     xy <- data.frame(x=x, y=y)
 
@@ -292,17 +298,19 @@ plotCor <- function(x, y, outliers,
                 lpch <- c(lpch, NA, NA, NA)
                 
             }
-            if ( "ols" %in% line.methods ) {
-                leg <- c(leg, expression(OLS))
-                lty <- c(lty, 1)
-                lcol <- c(lcol, line.col[1])
-                lpch <- c(lpch, NA)
-            }
-            if ( "tls" %in% line.methods ) {
-                leg <- c(leg, expression(TLS))
-                lty <- c(lty, 1)
-                lcol <- c(lcol, line.col[2])
-                lpch <- c(lpch, NA)
+            if ( line.legend ) {
+                if ( "ols" %in% line.methods ) {
+                    leg <- c(leg, expression(OLS))
+                    lty <- c(lty, 1)
+                    lcol <- c(lcol, line.col[1])
+                    lpch <- c(lpch, NA)
+                }
+                if ( "tls" %in% line.methods ) {
+                    leg <- c(leg, expression(TLS))
+                    lty <- c(lty, 1)
+                    lcol <- c(lcol, line.col[2])
+                    lpch <- c(lpch, NA)
+                }
             }
         } else { # circular
             leg <- c(as.expression(bquote(r == .(cr))),
@@ -314,16 +322,27 @@ plotCor <- function(x, y, outliers,
             lcol <- c(lcol, 2)
             lpch <- c(lpch, 4) 
         }
+
+        if ( all(is.na(lty)) ) lty <- NULL
         if ( length(leg)>0 )
             if ( missing(legpos) )
                 legpos <- ifelse(cr<0,"topright","topleft") 
             legend(legpos,
                    legend=leg,
-                   col=lcol, lty=lty, pch=lpch, seg.len=.5,
+                   col=lcol, lty=lty,
+                   pch=lpch, seg.len=.5,
                    box.col=NA, bg=legbg,
                    y.intersp=.75, x.intersp=0.75)
     }
-    invisible(list(xy=xy, cor=crt, fit=lfit, tls=tls))
+    if ( title ) {
+        titl <- as.expression(bquote(n == .(nrow(xy))*","~
+                                         r == .(cr)*","~
+                                             p == .(pv)))
+        mtext(titl,3,0)
+    }
+        
+    invisible(list(xy=xy, n=nrow(xy), r=cr, p=pv, 
+                   cor=crt, fit=lfit, tls=tls))
 }
 
 #' 2D density heatmap plot
