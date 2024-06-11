@@ -710,7 +710,12 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     } else {
         ## used passed sorting!
         new.srt <- srt
+
+        ## convert to numeric based on pvl rownames
+        if ( inherits(new.srt, "character") )
+            new.srt <- match(rownames(pvl), new.srt)
         nsig <- NULL
+
         ## 202307 - tested well in clusterGo.R
         ## warning("custom sorting via `srt` is untested!")
     }
@@ -721,8 +726,9 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
       if ( inherits(ovl[[i]], "matrix") ) { ## check if matrix is of same dim
-        if ( nrow(ovl[[i]])==n ) 
+          if ( nrow(ovl[[i]])==n )  {
             ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
+        }
         if ( symmetric!="no" & ncol(ovl[[i]])==m ) ## symmetric case!
             ovl[[i]] <- ovl[[i]][,new.srt,drop=FALSE]
       }
