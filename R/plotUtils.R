@@ -221,6 +221,11 @@ plotCor <- function(x, y, outliers,
             warning("removing ", sum(rmna), " of ",nrow(xy),
                     " rows with NA values")
         xy <- xy[!rmna,]
+        rminf <- apply(xy, 1, function(x) any(is.infinite(x)))
+        if ( sum(rminf)>0 )
+            warning("removing ", sum(rminf), " of ",nrow(xy),
+                    " rows with INF values")
+        xy <- xy[!rminf,]
     }
 
     
