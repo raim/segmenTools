@@ -710,10 +710,6 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     } else {
         ## used passed sorting!
         new.srt <- srt
-
-        ## convert to numeric based on pvl rownames
-        if ( inherits(new.srt, "character") )
-            new.srt <- match(rownames(pvl), new.srt)
         nsig <- NULL
 
         ## 202307 - tested well in clusterGo.R
