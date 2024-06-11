@@ -725,13 +725,16 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     n <- nrow(pvl)
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
-      if ( inherits(ovl[[i]], "matrix") ) { ## check if matrix is of same dim
-          if ( nrow(ovl[[i]])==n )  {
-            ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
+        if ( inherits(ovl[[i]], "matrix") ) {
+            ## check if matrix is of same dim and if rows are >1
+            ## to avoid clash of num.target when new.srt is only of length 1
+            if ( nrow(ovl[[i]])==n & nrow(ovl[[i]])>1 )  {
+                ovl[[i]] <- ovl[[i]][new.srt,,drop=FALSE]
+            }
+            ## symmetric case!
+            if ( symmetric!="no" & (ncol(ovl[[i]])==m & ncol(ovl[[i]])>1) ) 
+                ovl[[i]] <- ovl[[i]][,new.srt,drop=FALSE]
         }
-        if ( symmetric!="no" & ncol(ovl[[i]])==m ) ## symmetric case!
-            ovl[[i]] <- ovl[[i]][,new.srt,drop=FALSE]
-      }
     ## transpose back
     if ( axis==1 )
         ovl <- t.clusterOverlaps(ovl)
