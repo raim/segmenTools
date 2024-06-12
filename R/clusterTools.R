@@ -755,7 +755,13 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     }
 
 
-    ## add number of sorted sig
+    ## add cutoff and number of sorted sig
+    if ( missing(srt) ) {
+        if ( cut )
+            ovl$p.min <- p.min
+        ovl$p.srt <- p.min
+    } else ovl$srt <- srt
+    
     ovl$nsig <- nsig
     ovl$nsigdir <- axis # remember direction
 
