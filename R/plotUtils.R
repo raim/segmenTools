@@ -343,7 +343,7 @@ plotCor <- function(x, y, outliers,
         titl <- as.expression(bquote(n == .(nrow(xy))*","~
                                          r == .(cr)*","~
                                              p == .(pv)))
-        mtext(titl,3,0)
+        mtext(titl,3,0, cex=.9)
     }
         
     invisible(list(xy=xy, n=nrow(xy), r=cr, p=pv, 

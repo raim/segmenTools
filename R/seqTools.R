@@ -169,8 +169,8 @@ mutatePositions <- function(seq, mutations) {
         stop("location not found")
     for ( j in 1:ncol(fromto) ) {
         if ( str[at[j]]!=fromto[1,j] )
-            stop("mutated position ", j, " is not as indicated.",
-                 "searched: ",fromto[1,j], ", but found: ", str[at[j]])
+            stop("mutated position ", j, " is not as indicated: ",
+                 "searched: ",fromto[1,j], ", but found: ", str[at[j]],".")
         else str[at[j]] <- fromto[2,j]
     }
     paste(str, collapse="")
