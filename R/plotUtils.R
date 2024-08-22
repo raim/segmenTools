@@ -186,6 +186,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param pch point symbols.
 #' @param cex point size.
 #' @param legpos position of the legend.
+#' @param legcex font size (cex) of the legend.
 #' @param legbg background color of the legend, default: transparent
 #'     via alpha=0.  ## @param col color(s) of plotted points, if
 #'     \code{density=FALSE}, or ## color palette function if
@@ -202,7 +203,7 @@ plotCor <- function(x, y, outliers,
                     cor.legend=TRUE, line.legend=FALSE,
                     title=FALSE,
                     line.col=c(1,2), pch=20, cex=1,
-                    legpos, legbg="#FFFFFF99", 
+                    legpos, legbg="#FFFFFF99", legcex=cex,
                     signif=1, round=2, density=TRUE, col, ...) {
 
     xy <- data.frame(x=x, y=y)
@@ -336,7 +337,7 @@ plotCor <- function(x, y, outliers,
                    legend=leg,
                    col=lcol, lty=lty,
                    pch=lpch, seg.len=.5,
-                   box.col=NA, bg=legbg,
+                   box.col=NA, bg=legbg, cex=legcex,
                    y.intersp=.75, x.intersp=0.75)
     }
     if ( title ) {

@@ -20,6 +20,7 @@ plotCor(
   cex = 1,
   legpos,
   legbg = "#FFFFFF99",
+  legcex = cex,
   signif = 1,
   round = 2,
   density = TRUE,
@@ -72,6 +73,8 @@ via alpha=0.  ## @param col color(s) of plotted points, if
 \code{density=FALSE}, or ## color palette function if
 \code{density=TRUE} (argument ## \code{colf} to
 \code{\link{dense2d}}).}
+
+\item{legcex}{font size (cex) of the legend.}
 
 \item{signif}{number of digits to be shown for p-values in the plot
 legend (argument \code{digits} to \code{\link{signif}}.}

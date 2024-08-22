@@ -2,7 +2,6 @@
 % Please edit documentation in R/segmenTools.R
 \docType{package}
 \name{segmenTools}
-\alias{segmenTools-package}
 \alias{segmenTools}
 \title{segmenTools : analysis of genome segmentations by segmenTier}
 \description{
@@ -12,14 +11,6 @@ tool set for genome and time series analyses by Rainer Machne
  basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
 }
 
-\seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/raim/segmenTools}
-  \item Report bugs at \url{https://github.com/raim/segmenTools/issues}
-}
-
-}
 \author{
 Rainer Machne \email{raim@tbi.univie.ac.at}
 }
