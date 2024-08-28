@@ -371,12 +371,14 @@ bed2coor <- function(file, header=c("chr","start","end","name","score")) {
 
     ## numeric chromosomes
     dat$chr <- sub("chr","",dat$chr)
-    if ( all(!is.na(as.numeric(dat$chr))) )
+    if ( all(!is.na(suppressWarnings(as.numeric(dat$chr)))) )
         dat$chr <- as.numeric(dat$chr)
     
     ## numeric strand
-    str <- c("+"=1, "-"=-1)
-    dat$strand <- str[as.character(dat$strand)]
+    if ( "strand" %in% colnames(dat) ){
+        str <- c("+"=1, "-"=-1)
+        dat$strand <- str[as.character(dat$strand)]
+    }
     
     dat
 }
