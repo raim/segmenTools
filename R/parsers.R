@@ -362,7 +362,7 @@ tab2gff <- function(tab,
 #' @export
 bed2coor <- function(file, header=c("chr","start","end","name","score")) {
 
-    dat <- read.delim(file,  header=FALSE)
+    dat <- data.table::fread(file,  header=FALSE)
     ## todo: add column names if </> 5 are present
     colnames(dat) <- header
 
