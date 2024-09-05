@@ -1,6 +1,6 @@
 #' segmenTools : analysis of genome segmentations by segmenTier
 #'@author Rainer Machne \email{raim@tbi.univie.ac.at}
-#'@docType package
+#'@docType _PACKAGE
 #'@name segmenTools
 #' @description tool set for genome and time series analyses by Rainer Machne
 #'@section Dependencies: basic (\code{stats}, \code{graphics}, \code{grDevices}), clustering, \code{flowClust}, \code{flowMerge}
