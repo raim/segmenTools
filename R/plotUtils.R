@@ -428,3 +428,19 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128), circular=FALSE,
     
     invisible(df)
 }
+
+
+#' Color Ramp Palette `arno`
+#'
+#' generates colors similar to viridis::inferno but with a more visible
+#' yellow, taken from viridis::viridis. Named after Arno because it
+#' was his birthday.
+#' @param n number of colors to return
+#' @export
+arno <- function(n) {
+    
+    mcol <- viridis::inferno(5)
+    vcol <- viridis::viridis(5)
+    mcol[5] <- vcol[5]
+    colorRampPalette(mcol)(n)
+}
