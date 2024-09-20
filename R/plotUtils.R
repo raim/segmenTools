@@ -400,8 +400,8 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128), circular=FALSE,
         
     } else {
         df <- data.frame(x=x, y=y)
-        if ( missing(xlim) ) xlim <- range(x, na.rm=TRUE)
-        if ( missing(ylim) ) ylim <- range(y, na.rm=TRUE)
+        if ( missing(xlim) ) xlim <- range(x[is.finite(x)], na.rm=TRUE)
+        if ( missing(ylim) ) ylim <- range(y[is.finite(y)], na.rm=TRUE)
     }
     
     ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
