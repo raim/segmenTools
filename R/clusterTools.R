@@ -2807,7 +2807,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
         plot(1,col=NA,axes=FALSE,
              xlab=xlab,xlim=xlim,
              ylab=NA,ylim=ylim, ...)
-         mtext(ylb, 2, par("mgp")[1], cex=ylab.cex)
+         mtext(ylab, 2, par("mgp")[1], cex=ylab.cex)
          if ( axes ) {
             axis(1, at=time.at);axis(2)
             axis(3, at=time, labels=FALSE, tcl=-par("tcl"))
