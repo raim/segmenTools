@@ -212,8 +212,10 @@ plotCor <- function(x, y, outliers,
     if ( !missing(outliers) ) {
         if ( is.logical(outliers) )
             outliers <- which(outliers)
-        xyo <- xy[outliers,]
-        xy <- xy[-outliers,]
+        if ( length(outliers)>0 ) {
+            xyo <- xy[outliers,]
+            xy <- xy[-outliers,]
+        }
     }
     ## clean data from NA
     if ( na.rm ) {
@@ -323,10 +325,12 @@ plotCor <- function(x, y, outliers,
                      as.expression(bquote(p == .(pv))))
         }
         if ( !missing(outliers) ) {
-            leg <- c(leg, expression(excluded))
-            lty <- c(lty, NA)
-            lcol <- c(lcol, 2)
-            lpch <- c(lpch, 4) 
+            if ( length(outliers)>0 ) {
+                leg <- c(leg, expression(excluded))
+                lty <- c(lty, NA)
+                lcol <- c(lcol, 2)
+                lpch <- c(lpch, 4) 
+            }
         }
 
         if ( all(is.na(lty)) ) lty <- NULL
