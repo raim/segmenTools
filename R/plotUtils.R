@@ -374,6 +374,8 @@ plotCor <- function(x, y, outliers,
 #'     \code{\link[grDevices:densCols]{densCols}} and \code{gridsize}
 #'     to \code{\link[KernSmooth:bkde2D]{bkde2D}}.
 #' @param circular treat x and y as circular coordinates in radian.
+#' @param x.circular treat x as circular coordinates in radian.
+#' @param y.circular treat y as circular coordinates in radian.
 #' @param colf color map function used to create a color gradient,
 #'     eg. \code{\link[grDevices:colorRampPalette]{colorRampPalette}}
 #'     or \code{viridis}.
@@ -381,6 +383,7 @@ plotCor <- function(x, y, outliers,
 #' @return the plotted data.frame, including local densities.
 #' @export
 dense2d <- function(x, y, pch=20, nbin=c(128,128), circular=FALSE,
+                    x.circular=FALSE, y.circular=FALSE,
                     xlim, ylim,
                     colf=viridis::viridis,
                     ...) {
@@ -389,24 +392,38 @@ dense2d <- function(x, y, pch=20, nbin=c(128,128), circular=FALSE,
     ## grDevices::colorRampPalette(c("#000099","#00FEFF",
     ##                               "#45FE4F", "#FCFF00",
     ##                               "#FF9400", "#FF3100"))
+
     
-    if ( circular ) {
+    xa <- x
+    ya <- y
+
+    if ( circular ) x.circular <- y.circular <- TRUE
+    if ( x.circular & !y.circular ) {
         ## add data +/- 2*pi to get circular density
+        xa <- c(x-2*pi,x,x+2*pi)
+        ya <- c(y,y,y)
+        if ( missing(xlim) ) xlim <- c(-pi,pi)
+    } else if ( y.circular & !x.circular ) {
+        ya <- c(y,
+                y-2*pi,
+                y+2*pi)
+        xa <- c(x,x,x)        
+        if ( missing(ylim) ) ylim <- c(-pi,pi)
+    } else if ( circular ) {
         xa <- c(x-2*pi,x,x+2*pi,
                 x-2*pi,x,x+2*pi,
                 x-2*pi,x,x+2*pi)
+        if ( missing(xlim) ) xlim <- c(-pi,pi)
         ya <- c(y,y,y,
                 y-2*pi,y-2*pi,y-2*pi,
                 y+2*pi,y+2*pi,y+2*pi)
-        if ( missing(xlim) ) xlim <- c(-pi,pi)
         if ( missing(ylim) ) ylim <- c(-pi,pi)
-        df <- data.frame(x=xa, y=ya)
-        
-    } else {
-        df <- data.frame(x=x, y=y)
-        if ( missing(xlim) ) xlim <- range(x[is.finite(x)], na.rm=TRUE)
-        if ( missing(ylim) ) ylim <- range(y[is.finite(y)], na.rm=TRUE)
     }
+
+    df <- data.frame(x=xa, y=ya)
+
+    if ( missing(xlim) ) xlim <- range(x[is.finite(x)], na.rm=TRUE)
+    if ( missing(ylim) ) ylim <- range(y[is.finite(y)], na.rm=TRUE)
     
     ## TODO: nbin = 128 in densCols, vs. 256 colors in colorRampPalette
     ## KernSmooth::bkde2D(cbind(x, y), bandwidth=c(20,20), gridsize=c(128,128))

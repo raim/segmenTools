@@ -10,6 +10,8 @@ dense2d(
   pch = 20,
   nbin = c(128, 128),
   circular = FALSE,
+  x.circular = FALSE,
+  y.circular = FALSE,
   xlim,
   ylim,
   colf = viridis::viridis,
@@ -30,6 +32,10 @@ number for both dimensions, or separate numbers, see argument
 to \code{\link[KernSmooth:bkde2D]{bkde2D}}.}
 
 \item{circular}{treat x and y as circular coordinates in radian.}
+
+\item{x.circular}{treat x as circular coordinates in radian.}
+
+\item{y.circular}{treat y as circular coordinates in radian.}
 
 \item{xlim, }{numeric vectors of length 2, giving the x 
 coordinate ranges.}
