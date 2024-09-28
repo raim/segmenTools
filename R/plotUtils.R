@@ -236,11 +236,19 @@ plotCor <- function(x, y, outliers,
     lfit <- tls <- beta <- crt <- NULL
 
     if ( circular ) {
-        xyc <- as.data.frame(circular(xy, units="radians", type="angles"))
 
-        ## TODO: implement circular correlation and line fit!
-        ## TODO: convert to circular first
-        ## TODO: bpnreg
+        ## circular correlation and line fit!
+
+        xyc <- as.data.frame(circular::circular(xy,
+                                                units="radians", type="angles"))
+        
+        ## TODO: use bpnreg ?
+        ## TODO: allow only 1D circular+ type='c-l': maximum
+        ## likelihood regression model proposed by Fisher and Lee (1992),
+        ## with linear variable x:
+        ## lfit <- lm.circular(x=y, y=x, type='c-l', init=0)
+
+        ## lm.circular.cc: 
         lfit <- circular::lm.circular(y=xyc$y, x=xyc$x, type="c-c", order=2)
         ## add polynomial fit
         fline <- lfit$fitted
