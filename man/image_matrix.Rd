@@ -43,6 +43,10 @@ be used as tick labels}
 
 \item{axis.cex}{if axis[1|2].col is provided, this sets the tick label size}
 
+\item{cut}{if TRUE data is cut at min and max of breaks.}
+
+\item{breaks}{breakst to use for color selection.}
+
 \item{axis1.col}{invididual colors for x-axis tick labels, length must
 equal the number of columns of \code{dat}}
 
