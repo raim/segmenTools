@@ -1491,6 +1491,8 @@ runGost <- function(cls, organism="hsapiens",
 #' @param axis.cex if axis[1|2].col is provided, this sets the tick label size
 #' @param axis1.las parameter \code{las} (tick label orientation) for x axis
 #' @param axis2.las parameter \code{las} (tick label orientation) for y axis
+#' @param breaks breakst to use for color selection.
+#' @param cut if TRUE data is cut at min and max of breaks.
 #' @param ... further arguments to \code{\link[graphics]{image}}, e.g., col
 #' to select colors
 #' @export
