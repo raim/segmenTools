@@ -2628,6 +2628,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #'     \code{par(mfcol/mfrow)} setups
 #' @param leg.xy position of the legend, see
 #'     \code{\link[graphics:legend]{legend}}
+#' @param sample.ticks draw ticks on top axis for each actual sample
 #' @param vline x coordinates for vertical lines, useful e.g. to mark
 #'     replicates
 #' @param vl_col color for vertical line (default to cluster colour)
@@ -2663,7 +2664,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                          avg.cex=1,avg.pch=1,
                          lwd=.5, use.lty=FALSE, alpha=.2,
                          embed=FALSE,
-                         plot.legend=FALSE, leg.xy="topleft", leg.ids, 
+                         plot.legend=FALSE, leg.xy="topleft", leg.ids,
+                         sample.ticks=TRUE,
 			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,
                          ref.xy, ref.col="#C0C0C080", ref.ylab="",
                          ref.log=FALSE, ...) 
@@ -2811,9 +2813,11 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
              ylab=NA,ylim=ylim, ...)
          mtext(ylab, 2, par("mgp")[1], cex=ylab.cex)
          if ( axes ) {
-            axis(1, at=time.at);axis(2)
-            axis(3, at=time, labels=FALSE, tcl=-par("tcl"))
-            mtext("samples", 3, 1.2)
+             axis(1, at=time.at);axis(2)
+             if ( sample.ticks ) {
+                 axis(3, at=time, labels=FALSE, tcl=-par("tcl"))
+                 mtext("samples", 3, 1.2)
+             }
         }
     }
     ## plot each cluster in cls.srt

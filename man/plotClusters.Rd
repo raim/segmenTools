@@ -39,6 +39,7 @@ plotClusters(
   plot.legend = FALSE,
   leg.xy = "topleft",
   leg.ids,
+  sample.ticks = TRUE,
   vline = "",
   vl_col = 0,
   vl_lwd = 3,
@@ -168,6 +169,8 @@ mainly used in the \code{\link{plotSingles}} wrapper}
 \item{leg.ids}{a named vector providing alternative IDs for
 legends; the names should correspond to the rownames of
 clusterings in \code{cls}}
+
+\item{sample.ticks}{draw ticks on top axis for each actual sample}
 
 \item{vline}{x coordinates for vertical lines, useful e.g. to mark
 replicates}
