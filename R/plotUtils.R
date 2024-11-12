@@ -169,7 +169,10 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param line.col colors of the regression lines drawn with
 #'     \code{line.methods}.  ## @param line.type line types of the
 #'     regression lines drawn with ## \code{line.methods}.
-#' @param circular NOT fully implement, treat data as circular.
+#' @param circular treat data as circular, NOT fully implemented/tested.
+#' @param circular.jitter hack for equispaced phases (for circular=TRUE),
+#'     adds jitter to x or y (arguments circular.jitter=c('x','y')) to
+#'     avoid NA in cor.circular.
 #' @param title plot correlation parameters (as in legend) on the top
 #'     of the plot.
 #' @param cor.legend plot correlation, p-value and slope (TLS) as a
@@ -199,7 +202,8 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 plotCor <- function(x, y, outliers,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
-                    na.rm=TRUE, circular=FALSE,
+                    na.rm=TRUE,
+                    circular=FALSE, circular.jitter='',
                     cor.legend=TRUE, line.legend=FALSE,
                     title=FALSE,
                     line.col=c(1,2), pch=20, cex=1,
@@ -239,9 +243,15 @@ plotCor <- function(x, y, outliers,
 
         ## circular correlation and line fit!
 
-        xyc <- as.data.frame(circular::circular(xy,
-                                                units="radians", type="angles"))
+        xyc <- xy
+        for ( var in circular.jitter )
+          xyc[[var]] <- jitter(xyc[[var]])
+  
+        xyc <- as.data.frame(circular::circular(xyc,
+                                                units="radians",
+                                                type="angles"))
         
+ 
         ## TODO: use bpnreg ?
         ## TODO: allow only 1D circular+ type='c-l': maximum
         ## likelihood regression model proposed by Fisher and Lee (1992),

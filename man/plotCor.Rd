@@ -12,6 +12,7 @@ plotCor(
   line.methods = c("ols", "tls"),
   na.rm = TRUE,
   circular = FALSE,
+  circular.jitter = "",
   cor.legend = TRUE,
   line.legend = FALSE,
   title = FALSE,
@@ -48,7 +49,11 @@ squares) is calculated manually via
 
 \item{na.rm}{remove NA values from x and y.}
 
-\item{circular}{NOT fully implement, treat data as circular.}
+\item{circular}{treat data as circular, NOT fully implemented/tested.}
+
+\item{circular.jitter}{hack for equispaced phases (for circular=TRUE),
+adds jitter to x or y (arguments circular.jitter=c('x','y')) to
+avoid NA in cor.circular.}
 
 \item{cor.legend}{plot correlation, p-value and slope (TLS) as a
 legend.}
