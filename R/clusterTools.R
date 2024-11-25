@@ -1076,6 +1076,11 @@ clusterAnnotation <- function(cls, data, p=1,
     pvalues <- NULL ## hypergeometric distribution test p.value
     hyp.names <- NULL
 
+    ## ANNOTATION DATA
+
+    ## convert data.frame to matrix
+    if ( inherits(data, 'data.frame') ) data <- as.matrix(data)
+
     ## is it a TRUE/FALSE table?
     logic <- typeof(data)=="logical"
     if ( logic ) { # for TRUE/FALSE table, rm FALSE and rm TRUE from names
@@ -1110,7 +1115,7 @@ clusterAnnotation <- function(cls, data, p=1,
             pvl <- tmp$p.value
             tnm <- name
             if ( !logic )
-                tnm <- paste0(name,rownames(pvl))
+                tnm <- paste0(name,': ',rownames(pvl))
             rownames(ovl) <- rownames(pvl) <- tnm
             overlap <- rbind(overlap, ovl)
             pvalues <- rbind(pvalues, pvl)
@@ -1217,7 +1222,7 @@ clusterAnnotation <- function(cls, data, p=1,
     }
     names(hyp.tables) <- cls.srt
 
-    if (verbose) cat(paste(" ... done;\n"))
+    if (verbose) cat(paste(" ... done;\n\tSUMMARIZING\n"))
 
     ## cluster averages in summary table
     only.clusters <- rownames(psig)!="total" 
@@ -1263,7 +1268,12 @@ clusterAnnotation <- function(cls, data, p=1,
 
     ## add total counts
     num.target <- t(as.matrix(table(cls)[cls.srt]))
-    num.query <- as.matrix(apply(data,2,function(x) sum(x)))
+    ## NOTE: only works for logical
+    ## TODO: find good alternative
+    if ( logic )
+        num.query <- as.matrix(apply(data,2,function(x) sum(x)))
+    else num.query <- as.matrix(setNames(rep(NA, nrow(pvalues)),
+                                         rownames(pvalues)))
 
     ## filter those reported in p.values/overlap tables
     num.query <- num.query[rownames(pvalues),,drop=FALSE]
@@ -1497,7 +1507,7 @@ runGost <- function(cls, organism="hsapiens",
 #' to select colors
 #' @export
 image_matrix <- function(z, x, y, text, text.col, text.cex=1,
-                         axis=1:2, axis.cex=1.5, cut=FALSE, breaks,
+                         axis=1:2, axis.cex=1, cut=FALSE, breaks,
                          axis1.col, axis1.las=2,
                          axis2.col, axis2.las=2, ...) {
 
@@ -1544,7 +1554,8 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                          col.axis=axis1.col[i], col=axis1.col[i],
                          las=axis1.las, cex.axis=axis.cex, lwd=2)
             else if ( !axis1.numeric )
-                axis(1, at=1:ncol(z), labels=colnames(z), las=axis1.las)
+                axis(1, at=1:ncol(z), labels=colnames(z), las=axis1.las,
+                     cex.axis=axis.cex)
             else axis(1)               
         if ( 3 %in% axis ) 
             if ( !missing(axis1.col) ) # colored ticks
@@ -1553,7 +1564,8 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                          col.axis=axis1.col[i], col=axis1.col[i],
                          las=axis1.las, cex.axis=axis.cex, lwd=2)
             else if ( !axis1.numeric )
-                axis(3, at=1:ncol(z), labels=colnames(z), las=axis1.las)
+                axis(3, at=1:ncol(z), labels=colnames(z), las=axis1.las,
+                     cex.axis=axis.cex)
             else axis(3)               
         if ( 2 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
@@ -1562,7 +1574,8 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                              col.axis=axis2.col[i], col=axis2.col[i],
                              las=axis2.las, cex.axis=axis.cex, lwd=2)
             else if ( !axis2.numeric )
-                axis(2, at=nrow(z):1, rownames(z),las=axis2.las)        
+                axis(2, at=nrow(z):1, rownames(z),las=axis2.las,
+                     cex.axis=axis.cex)        
             else axis(2)               
         if ( 4 %in% axis )
             if ( !missing(axis2.col) ) # colored ticks
@@ -1571,7 +1584,8 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                              col.axis=axis2.col[i], col=axis2.col[i],
                              las=axis2.las, cex.axis=axis.cex, lwd=2)
             else if ( !axis2.numeric )
-                axis(4, at=nrow(z):1, rownames(z),las=axis2.las)
+                axis(4, at=nrow(z):1, rownames(z),las=axis2.las,
+                     cex.axis=axis.cex)
             else axis(4)
     }
 } 
