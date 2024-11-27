@@ -10,6 +10,27 @@
 
 ### COMPARE CLUSTERINGS 
 
+#' Wilcoxon test wrapper that returns a normalized U-statistic
+#'
+#' This wrapper just calls \link[stats:wilcox.test]{wilcox.test} but
+#' normalizes the test's U-statistic by the product of the lengths
+#' (counts of non-NA values) of x and y such that values U>0 indicate
+#' that x is generally larger than y and opposite for U<0.
+#' @param x,y as x and y passed to
+#'     \link[stats:wilcox.test]{wilcox.test}
+#' @param ... further parameters passed on to
+#'     \link[stats:wilcox.test]{wilcox.test}
+#' @export
+w.test <- function(x, y, ...) {
+    res <- stats::wilcox.test(x, y, ...)
+    ## normalized U-statistic
+    tt <- res$statistic/(sum(!is.na(x))*sum(!is.na(y))) -0.5
+    rt <- list()
+    rt$statistic <- unlist(tt)
+    rt$p.value <- unlist(res$p.value)
+    rt
+}
+
 #' calculate t-value profiles of clusterings
 #'
 #' Calculate t-tests for each cluster in a clustering against the
@@ -38,7 +59,8 @@
 ## betterer, eg. normalized U-statistic for wilcox - OR handle this
 ## in plotOverlaps by statistic type!
 #' @export
-clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE) {
+clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5,
+                           replace=FALSE) {
 
     if ( !inherits(cls, "matrix") & !inherits(cls,"factor") )
         cls <- factor(cls, levels=unique(cls))
@@ -50,17 +72,6 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5, replace=FALSE)
         logic <- TRUE
     }
 
-    ## TODO: changeuse of option test or make
-    ## this wrapper for wilcox.test available in the package!
-    w.test <- function(x,y) {
-        res <- stats::wilcox.test(x,y)
-        ## normalized U-statistic
-        tt <- res$statistic/(sum(!is.na(x))*sum(!is.na(y))) -0.5
-        rt <- list()
-        rt$statistic <- unlist(tt)
-        rt$p.value <- unlist(res$p.value)
-        rt
-    }
 
     if ( inherits(test, "character") )
         test <- get(test, mode="function")

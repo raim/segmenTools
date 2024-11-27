@@ -13,7 +13,7 @@ image_matrix(
   text.col,
   text.cex = 1,
   axis = 1:2,
-  axis.cex = 1.5,
+  axis.cex = 1,
   cut = FALSE,
   breaks,
   axis1.col,
