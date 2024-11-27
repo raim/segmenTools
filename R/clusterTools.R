@@ -31,33 +31,36 @@ w.test <- function(x, y, ...) {
     rt
 }
 
-#' calculate t-value profiles of clusterings
+#' Calculate biases of numerical data between clusterings.
 #'
-#' Calculate t-tests for each cluster in a clustering against the
-#' total distributions. The resulting tables can be plotted with
-#' \code{\link{plotOverlaps}} and sorted along one axis by signficance
-#' with \code{\link{plotOverlaps}}.
+#' Calculate t-tests or wilcoxon (rank sum) tests for each cluster in
+#' a clustering against the total distributions. The resulting tables
+#' can be plotted with \code{\link{plotOverlaps}} and sorted along one
+#' axis by signficance with \code{\link{plotOverlaps}}.
 #' @param x matrix of numeric values where columns are different data
 #'     sets and rows must correspond to the clustering in argument
 #'     \code{cls}
-#' @param cls a clustering of the rows in argument \code{x} or
-#' a logical TRUE/FALSE table (matrix) with cluster labels as column names
-#' and rows corresponding to the rows in argument \code{x}
+#' @param cls a clustering of the rows in argument \code{x} or a
+#'     logical TRUE/FALSE table (matrix) with cluster labels as column
+#'     names and rows corresponding to the rows in argument \code{x}
 #' @param test test function to be applied, default is
 #'     \code{\link[stats]{t.test}}. This can be any function that
 #'     takes the cluster subset of \code{x[cls=<cl>,]} as first and
 #'     the total distribution \code{x} as second argument, and returns
 #'     an object with items \code{statistic} and
-#'     \code{p.value}. Negative values in
-#'     \code{statistic} will be differently colored in
-#'     \code{\link{plotOverlaps}} and the sign copied to
-#'     \code{p.value}.
+#'     \code{p.value}. Negative values in \code{statistic} will be
+#'     differently colored in \code{\link{plotOverlaps}} and the sign
+#'     copied to \code{p.value}. This package provides
+#'     \code{\link{w.test}}, a wrapper for
+#'     \code{\link[stats]{wilcoxon.test}} that normalizes the tests'
+#'     U-statistics such that it can be used in the same way as
+#'     the t-statistic.
 #' @param min.obs minimal number of non-NA observations
 #' @param replace test with replacement, i.e., each cluster is tested
-#' against the whole data set, including the cluster items
-## TODO: instead of passing function, pass a type and handle numbers
-## betterer, eg. normalized U-statistic for wilcox - OR handle this
-## in plotOverlaps by statistic type!
+#'     against the whole data set, including the cluster items ##
+#'     TODO: instead of passing function, pass a type and handle
+#'     numbers ## betterer, eg. normalized U-statistic for wilcox - OR
+#'     handle this ## in plotOverlaps by statistic type!
 #' @export
 clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5,
                            replace=FALSE) {
