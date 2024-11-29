@@ -483,3 +483,16 @@ arno <- function(n) {
     mcol[5] <- vcol[5]
     colorRampPalette(mcol)(n)
 }
+
+
+#' R colors with alpha value.
+#'
+#' @param col and R color specifications such as numeric string colors.
+#' @param alpha the desired alpha (opaqueness) level from 0
+#'     (transparent) to 1 (opaque).
+#' @export
+col2alpha <- function(col='red', alpha=1)  {
+    
+    apply(grDevices::col2rgb(col, alpha=FALSE), 2, function(x)
+        grDevices::rgb(x[1]/255, x[2]/255, x[3]/255, alpha))
+}
