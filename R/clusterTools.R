@@ -442,6 +442,7 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 #' draws a red line where unsorted non-significant hits start
 #' @param show.total show total numbers (counts) of overlapping features
 #' on top and right axes
+#' @inheritParams image_matrix
 #' @param ... arguments to \code{\link{image_matrix}}
 ## TODO: define as plot.clusterOverlaps method?
 ## TODO: sort by significance?
@@ -450,7 +451,8 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
 plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
                          values=c("overlap","count","statistic",
                                   "jaccard","text"),
-                         type=1, txt.col = c("black","white"), rmz=TRUE,
+                         type=1, txt.col = c("black","white"), text.cex=1,
+                         rmz=TRUE,
                          short=TRUE, scale=1, round, axis=1:2,
                          show.sig=TRUE, show.total=FALSE, ...) {
 
@@ -499,6 +501,11 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
         } 
     }
 
+    ## overrule some arguments
+    ## TODO: better handle incompatible options round vs. short
+    if ( !missing(round) )
+        short <- FALSE
+
 
     ## NO TEXT:
     if ( type=="" | any(is.na(txt.col)) ) {
@@ -523,7 +530,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
             if ( !missing(round) ) txt <- round(txt,digits=round)
             else round <- NA
         }
-                
+             
         ## select color based on p.txt
         if ( rmz) txt[txt=="0"] <- ""
         tcol <- txt
@@ -548,7 +555,7 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
         ##    main <- paste0("p.min=", p.min, ", p.txt=",p.txt)
         
         image_matrix(pval, breaks=breaks, col=col, axis=axis,
-                     text=txt, text.col=tcol, ...)
+                     text=txt, text.col=tcol, text.cex=text.cex, ...)
     }
     
     ## overlaps sorted by sortClusters indicate where
@@ -576,13 +583,14 @@ plotOverlaps <- function(x, p.min=0.01, p.txt=p.min*5, p.max, n=100, col,
     if ( toty ) 
         if ( "num.query"%in%names(x) )
             axis(4, at=length(x$num.query):1, labels=x$num.query,
-                 las=2, lwd=0, lwd.ticks=1)
+                 las=2, lwd=0, lwd.ticks=1, cex.axis=text.cex)
     if ( totx )
         if ( "num.target"%in%names(x) )
             axis(3, at=1:length(x$num.target), labels=x$num.target,
-                 las=2, lwd=0, lwd.ticks=1)            
-    if ( toty|totx )
-        figlabel("total", region="figure", pos="topright",cex=par("cex"))
+                 las=2, lwd=0, lwd.ticks=1, cex.axis=text.cex)
+    ## TODOL place this smarter
+    ##if ( toty|totx )
+    ##    figlabel("total", region="figure", pos="topright",cex=par("cex"))
     
 
     ## return plot settings silently

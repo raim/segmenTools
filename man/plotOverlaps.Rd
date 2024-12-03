@@ -14,6 +14,7 @@ plotOverlaps(
   values = c("overlap", "count", "statistic", "jaccard", "text"),
   type = 1,
   txt.col = c("black", "white"),
+  text.cex = 1,
   rmz = TRUE,
   short = TRUE,
   scale = 1,
@@ -54,6 +55,8 @@ negative values of two-sided tests are reflected in negative p-values}
 \item{txt.col}{two colors used for the plot text, ie., the
 overlap counts; the second is used if `p<p.txt` as a discrete
 signficance cutoff}
+
+\item{text.cex}{relative font size for text fields}
 
 \item{rmz}{remove 0 from text values}
 
