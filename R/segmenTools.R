@@ -7,7 +7,8 @@
 #'@importFrom utils write.table read.delim read.table
 #'@importFrom graphics image axis par plot matplot points lines legend arrows strheight strwidth text abline hist spineplot polygon mtext layout grconvertX grconvertY box rect xspline
 #'@importFrom grDevices png dev.off rainbow gray xy.coords rgb col2rgb  colorRampPalette densCols gray.colors dev.size
-#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit t.test cor.test lm cov
+#'@importFrom stats mvfft ecdf loess predict qt quantile runmed sd var phyper heatmap rnorm kmeans approx fft smooth.spline median na.omit t.test cor.test lm cov setNames
+##@importFrom data.table fread
 ##@importFrom circular
 ##@bibliography /home/raim/ref/tata.bib
 ##@importFrom segmenTier clusterCor_c 

@@ -24,9 +24,9 @@ an object with items \code{statistic} and
 differently colored in \code{\link{plotOverlaps}} and the sign
 copied to \code{p.value}. This package provides
 \code{\link{w.test}}, a wrapper for
-\code{\link[stats]{wilcoxon.test}} that normalizes the tests'
-U-statistics such that it can be used in the same way as
-the t-statistic.}
+\code{\link[stats:wilcox.test]{wilcox.test}} that
+normalizes the tests' U-statistics such that it can be used in
+the same way as the t-statistic.}
 
 \item{min.obs}{minimal number of non-NA observations}
 

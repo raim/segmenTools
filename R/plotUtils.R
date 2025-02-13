@@ -373,6 +373,34 @@ plotCor <- function(x, y, outliers,
                    cor=crt, fit=lfit, tls=tls))
 }
 
+
+## TODO: fix labels for base=exp(1)!!
+##
+#' Logarithmic axis ticks
+#' @inheritParams graphics::axis
+#' @param lat as argument \code{at} of \link[graphics:axis]{axis} but
+#'     as the exponents of \code{log(y, base=base)}
+#' @param base base of the logarithm
+#' @export
+logaxis <- function(side, lat=-10:10, base=10, ...) {
+    for ( ax in side ) {
+        
+        axis(ax, at=lat, labels=base^lat, ...)
+
+        ## log-distance ticks at half tick length
+        ## TODO: fix minor tick marks for log bases other than 10
+        if ( base==10 ) {
+          ##lticks<- log10(rep(1:10,  length(lat)) *   10^rep(lat-1, each=10))
+            lticks <- log(rep(1:base, length(lat)) * base^rep(lat-1, each=base),
+                          base=10)
+            axis(ax, at=lticks,
+                 tcl=par('tcl')/2, labels=FALSE, ...)
+        } else {
+            warning('minor ticks marks only implement for log-base 10')
+        }
+    }
+}
+
 #' 2D density heatmap plot
 #'
 #' Uses base R's \code{\link[grDevices:densCols]{densCols}} to

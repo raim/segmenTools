@@ -52,9 +52,9 @@ w.test <- function(x, y, ...) {
 #'     differently colored in \code{\link{plotOverlaps}} and the sign
 #'     copied to \code{p.value}. This package provides
 #'     \code{\link{w.test}}, a wrapper for
-#'     \code{\link[stats]{wilcoxon.test}} that normalizes the tests'
-#'     U-statistics such that it can be used in the same way as
-#'     the t-statistic.
+#'     \code{\link[stats:wilcox.test]{wilcox.test}} that
+#'     normalizes the tests' U-statistics such that it can be used in
+#'     the same way as the t-statistic.
 #' @param min.obs minimal number of non-NA observations
 #' @param replace test with replacement, i.e., each cluster is tested
 #'     against the whole data set, including the cluster items ##
