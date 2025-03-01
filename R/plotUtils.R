@@ -228,17 +228,23 @@ plotCor <- function(x, y, outliers,
             warning("removing ", sum(rmna), " of ",nrow(xy),
                     " rows with NA values")
         xy <- xy[!rmna,]
+        if ( !missing(col) )
+           col <- col[!rmna]
+
         rminf <- apply(xy, 1, function(x) any(is.infinite(x)))
         if ( sum(rminf)>0 )
             warning("removing ", sum(rminf), " of ",nrow(xy),
                     " rows with INF values")
         xy <- xy[!rminf,]
+        if ( !missing(col) )
+            col <- col[!rminf]
     }
 
     
     ## line fit and r-squared
     lfit <- tls <- beta <- crt <- NULL
 
+    pv <- NA
     if ( circular ) {
 
         ## circular correlation and line fit!
@@ -288,9 +294,31 @@ plotCor <- function(x, y, outliers,
             ## for legend
             cr <- round(crt$estimate, round)
             pv <- signif(crt$p.value, signif)
+
+            ## TODO: use .Machine$double.xmin (2.2e-308) or
+            ## .Machine$double.eps (2.2e-16) as cutoff and plot < in legend 
+            
         }
     }
-    
+
+    ## LEGEND EXPRESSIONS
+    ## p-value legend expression
+    nexpr <- bquote(n == .(nrow(xy)))
+    if ( !is.na(cr) )
+        cexpr <- bquote(r == .(cr))
+    if ( !is.na(pv) )
+        if ( pv < .Machine$double.xmin ) {
+            pexpr <- bquote(p < .(signif(.Machine$double.xmin,2)))
+            texpr <- bquote(n == .(nrow(xy))*","~
+                                r == .(cr)*","~
+                                    p < .(signif(.Machine$double.xmin,2)))
+        } else {
+            pexpr <- bquote(p == .(pv))
+            texpr <- bquote(n == .(nrow(xy))*","~
+                                r == .(cr)*","~
+                                    p == .(pv))
+        }
+            
     if ( density )
         dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, ...)
     else {
@@ -316,9 +344,9 @@ plotCor <- function(x, y, outliers,
         if ( !circular ) {
             if ( cor.method[1]!="" ) {
                 leg <- c(leg,
-                         as.expression(bquote(n == .(nrow(xy)))),
-                         as.expression(bquote(r == .(cr))),
-                         as.expression(bquote(p == .(pv))))
+                         as.expression(nexpr),
+                         as.expression(cexpr),
+                         as.expression(pexpr))
                 lty <- c(lty, NA, NA, NA)
                 lcol <- c(lcol, NA, NA, NA)
                 lpch <- c(lpch, NA, NA, NA)
@@ -339,8 +367,8 @@ plotCor <- function(x, y, outliers,
                 }
             }
         } else { # circular
-            leg <- c(as.expression(bquote(r == .(cr))),
-                     as.expression(bquote(p == .(pv))))
+            leg <- c(as.expression(cexpr),
+                     as.expression(pexpr))
         }
         if ( !missing(outliers) ) {
             if ( length(outliers)>0 ) {
@@ -363,9 +391,7 @@ plotCor <- function(x, y, outliers,
                    y.intersp=.75, x.intersp=0.75)
     }
     if ( title ) {
-        titl <- as.expression(bquote(n == .(nrow(xy))*","~
-                                         r == .(cr)*","~
-                                             p == .(pv)))
+        titl <- as.expression(texpr)
         mtext(titl,3,0, cex=.9)
     }
         
