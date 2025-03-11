@@ -408,10 +408,12 @@ plotCor <- function(x, y, outliers,
 #'     as the exponents of \code{log(y, base=base)}
 #' @param base base of the logarithm
 #' @export
-logaxis <- function(side, lat=-10:10, base=10, ...) {
+logaxis <- function(side, lat=-10:10, base=10, labels, ...) {
+
+    if ( missing(labels) ) labels <- base^lat
     for ( ax in side ) {
         
-        axis(ax, at=lat, labels=base^lat, ...)
+        axis(ax, at=lat, labels=labels, ...)
 
         ## log-distance ticks at half tick length
         ## TODO: fix minor tick marks for log bases other than 10
