@@ -410,7 +410,12 @@ plotCor <- function(x, y, outliers,
 #' @export
 logaxis <- function(side, lat=-10:10, base=10, labels, ...) {
 
+    ## handle lables argument
     if ( missing(labels) ) labels <- base^lat
+    ## FALSE should suppress labels, TRUE: overwrite with labels
+    if ( is.logical(labels) ) if ( labels ) labels <- base^lat
+
+    ## plot all sides; NOTE: vectorized
     for ( ax in side ) {
         
         axis(ax, at=lat, labels=labels, ...)
