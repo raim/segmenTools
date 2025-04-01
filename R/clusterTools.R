@@ -385,6 +385,83 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
     x<-leg # silent return of used overlap object
 }
 
+#' dotplot
+#'
+#' plots dotplot profiles of `clusterOverlaps' objects.
+#' @export
+## TODO: implement different automatic coloring by type, and integrate with
+## other functions
+dotplot <- function(x,
+                    p.min=0.01,
+                    dot.sze=c(.3,2), 
+                    value=c("overlap","count","statistic","jaccard","text"),
+                    n=100, col=viridis::viridis(n), breaks,
+                    xpd=FALSE, show.total=FALSE, tot.cex=.8,
+                    file, ...) {
+
+    ## values for coloring
+    vals <- x[[value]]
+    ##if ( lg2 ) {
+    ##    vals <- log2(vals)
+    ##    if ( missing(mxr) ) mxr <- max(abs(vals))
+    ##    vals[vals >  mxr] <-  mxr
+    ##    vals[vals < -mxr] <- -mxr
+    ##}
+    
+    ## breaks
+    if ( missing(breaks) )
+        breaks <- seq(min(vals,na.rm=TRUE), max(vals, na.rm=TRUE),
+                     length.out=length(col)+1)
+
+    ## plot empty image
+    navals <- vals
+    navals[] <- NA
+    image_matrix(navals, breaks=breaks, col=col, ...)
+
+    ## dot size scaling by p-value
+    p <- x$p.value
+    p <- -log10(p)
+    p[p>-log10(p.min)] <- -log10(p.min)
+    z <- p/-log10(p.min)
+    d.sze <- dot.sze[1]+dot.sze[2]*c(t(z))
+
+    ## intersect data to colors
+    cols <- col[findInterval(t(vals),
+                               seq(min(breaks), max(breaks),
+                                   length.out=length(breaks)),
+                               all.inside = TRUE)]
+    points(x = rep(1:ncol(z), nrow(z)),
+           y = rep(nrow(z):1, each= ncol(z)),
+           cex=d.sze, pch=19,
+           col=cols, xpd=xpd)
+    
+    toty <- totx <- FALSE
+    if (is.logical(show.total)) {
+        if (show.total) 
+            toty <- totx <- TRUE
+    }
+    else if (is.character(show.total)) {
+        if (show.total == "x") 
+            totx <- TRUE
+        if (show.total == "y") 
+            toty <- TRUE
+        if (show.total %in% c("xy", "yx")) 
+            toty <- totx <- TRUE
+    }
+    if (toty) 
+        if ("num.query" %in% names(x)) 
+            axis(4, at = length(x$num.query):1, mgp=c(0,0,0),
+                 labels = format(x$num.query, big.mark=",", trim=TRUE), 
+                las = 2, lwd = 0, lwd.ticks = 0, cex.axis=tot.cex)
+    if (totx) 
+        if ("num.target" %in% names(x)) 
+            axis(3, at = 1:length(x$num.target), mgp=c(0,0,0),
+                 labels = format(x$num.target, big.mark=",", trim=TRUE), 
+                 las = 2, lwd = 0, lwd.ticks = 0, cex.axis=tot.cex)
+    
+}
+
+
 #' plot cluster-cluster or segment-segment overlaps
 #'
 #' Plots the significance distribution of cluster-cluster or segment-segment
