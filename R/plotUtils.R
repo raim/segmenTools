@@ -303,6 +303,7 @@ plotCor <- function(x, y, outliers,
 
     ## LEGEND EXPRESSIONS
     ## p-value legend expression
+    nexpr <- cexpr <- pexpr <- texpr <- "NA"
     nexpr <- bquote(n == .(nrow(xy)))
     if ( !is.na(cr) )
         cexpr <- bquote(r == .(cr))
@@ -383,12 +384,12 @@ plotCor <- function(x, y, outliers,
         if ( length(leg)>0 )
             if ( missing(legpos) )
                 legpos <- ifelse(cr<0,"topright","topleft") 
-            legend(legpos,
-                   legend=leg,
-                   col=lcol, lty=lty,
-                   pch=lpch, seg.len=.5,
-                   box.col=NA, bg=legbg, cex=legcex,
-                   y.intersp=.75, x.intersp=0.75)
+        legend(legpos,
+               legend=leg,
+               col=lcol, lty=lty,
+               pch=lpch, seg.len=.5,
+               box.col=NA, bg=legbg, cex=legcex,
+               y.intersp=.75, x.intersp=0.75)
     }
     if ( title ) {
         titl <- as.expression(texpr)
