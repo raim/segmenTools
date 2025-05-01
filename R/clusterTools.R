@@ -395,7 +395,7 @@ dotplot <- function(x,
                     p.min=0.01,
                     dot.sze=c(.3,2), 
                     value=c("overlap","count","statistic","jaccard","text"),
-                    n=100, col=viridis::viridis(n), breaks,
+                    n=100, col=segmenTools::arno(n), breaks,
                     xpd=FALSE, show.total=FALSE, tot.cex=.8,
                     file, ...) {
 
@@ -1649,7 +1649,7 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
         if ( 1 %in% axis ) 
             if ( !missing(axis1.col) ) # colored ticks
                 for ( i in 1:ncol(z) )
-                    axis(1, at=i,colnames(z)[i],
+                    axis(1, at=i, colnames(z)[i],
                          col.axis=axis1.col[i], col=axis1.col[i],
                          las=axis1.las, cex.axis=axis.cex, lwd=2)
             else if ( !axis1.numeric )
