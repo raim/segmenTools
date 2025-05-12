@@ -206,7 +206,7 @@ plotCor <- function(x, y, outliers,
                     circular=FALSE, circular.jitter='',
                     cor.legend=TRUE, line.legend=FALSE,
                     title=FALSE,
-                    line.col=c(1,2), pch=20, cex=1,
+                    line.col=c(1,2), pch=20, cex=1, axes=TRUE,
                     legpos, legbg="#FFFFFF99", legcex=cex,
                     signif=1, round=2, density=TRUE, col, ...) {
 
@@ -321,10 +321,10 @@ plotCor <- function(x, y, outliers,
         }
             
     if ( density )
-        dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, ...)
+        dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, axes=axes, ...)
     else {
         if ( missing(col) ) col <- "#000000AA"
-        plot(xy$x, xy$y, pch=pch, cex=cex, col=col, ...)
+        plot(xy$x, xy$y, pch=pch, cex=cex, col=col, axes=axes, ...)
     }
     if ( !circular ) {
         if ( "ols"%in%line.methods )

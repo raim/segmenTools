@@ -19,6 +19,7 @@ plotCor(
   line.col = c(1, 2),
   pch = 20,
   cex = 1,
+  axes = TRUE,
   legpos,
   legbg = "#FFFFFF99",
   legcex = cex,

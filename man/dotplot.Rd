@@ -10,7 +10,7 @@ dotplot(
   dot.sze = c(0.3, 2),
   value = c("overlap", "count", "statistic", "jaccard", "text"),
   n = 100,
-  col = viridis::viridis(n),
+  col = segmenTools::arno(n),
   breaks,
   xpd = FALSE,
   show.total = FALSE,
