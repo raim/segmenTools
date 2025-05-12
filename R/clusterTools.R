@@ -138,59 +138,85 @@ clusterProfile <- function(x, cls, test=stats::t.test, min.obs=5,
 #' axis by signficance with \code{\link{plotOverlaps}}.
 #' TODO: specify wich cl will be rows/columns and to which
 #' percent refers to
-#' @param cl1 clustering 1; a vector of cluster associations or an
+#' @param query clustering 1; a vector of cluster associations or an
 #' object of class "clustering" by segmenTier's
 #' \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}
-#' @param cl2 clustering 2; see argument \code{cl1}
+#' @param target clustering 2; see argument \code{query}
 #' @param na.string replace NA or empty strings by `<na.string>'
-#' @param cl1.srt optional cluster sorting of clustering 1
-#' @param cl2.srt optional cluster sorting of clustering 2
+#' @param q.srt optional cluster sorting of clustering 1
+#' @param t.srt optional cluster sorting of clustering 2
+#' @param cl1 obsolete: use query
+#' @param cl2 obsolete: use target
+#' @param cl1.srt obsolete: use q.srt
+#' @param cl2.srt obsolte: use t.srt
 #' @param alternative a character string specifying the alternative hypothesis,
 #' must be one of `"greater"' to calculate enrichment (default),
 #' `"less"' to calculate deprivation, or `"two.sided"' to report the more
 #' more signficant p-value of both
 #'@export
-clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
-                           alternative=c("greater")) {
+clusterCluster <- function(query, target, q.srt, t.srt, na.string="na",
+                           alternative=c("greater"),
+                           cl1, cl2, cl1.srt, cl2.srt) {
 
+    flag.obsolete <- FALSE
+    if ( missing(query) & !missing(cl1) ) {
+        query <- cl1
+        flag.obsolete <- TRUE
+    }
+    if ( missing(target) & !missing(cl2) ) {
+        target <- cl2
+        flag.obsolete <- TRUE
+    }
+    if ( missing(q.srt) & !missing(cl1.srt) ) {
+        q.srt <- cl1.srt
+        flag.obsolete <- TRUE
+    }
+    if ( missing(t.srt) & !missing(cl2.srt) ) {
+        t.srt <- cl2.srt
+        flag.obsolete <- TRUE
+    }
+    if ( flag.obsolete )
+        warning("options cl1/cl1.srt and cl2/cl2.srt are outdated, please",
+                " use query/target and q.srt, t.srt.")
+    
    # read and return cluster variable names
    # can be important for plot Overlaps
-   vn1=deparse(substitute(cl1))
-   vn2=deparse(substitute(cl2))	 	
+   vn1=deparse(substitute(query))
+   vn2=deparse(substitute(target))	 	
 	 
-    if ( inherits(cl1, "clustering") ) {
-        K <- selected(cl1)
-        if ( missing(cl1.srt) )
-            cl1.srt <- cl1$sorting[[K]]
-        cl1 <- cl1$clusters[,K]
-    } else if ( inherits(cl1, "factor") ) {
-        if ( missing(cl1.srt) ) cl1.srt <- levels(cl1)
-        cl1 <- as.character(cl1)
+    if ( inherits(query, "clustering") ) {
+        K <- selected(query)
+        if ( missing(q.srt) )
+            q.srt <- query$sorting[[K]]
+        query <- query$clusters[,K]
+    } else if ( inherits(query, "factor") ) {
+        if ( missing(q.srt) ) q.srt <- levels(query)
+        query <- as.character(query)
     }
-    if ( inherits(cl2, "clustering") ) {
-        K <- selected(cl2)
-        if ( missing(cl2.srt) )
-            cl2.srt <- cl2$sorting[[K]]
-        cl2 <- cl2$clusters[,K]
-    } else if ( inherits(cl2, "factor") ) {
-        if ( missing(cl2.srt) ) cl2.srt <- levels(cl2)
-        cl2 <- as.character(cl2)
+    if ( inherits(target, "clustering") ) {
+        K <- selected(target)
+        if ( missing(t.srt) )
+            t.srt <- target$sorting[[K]]
+        target <- target$clusters[,K]
+    } else if ( inherits(target, "factor") ) {
+        if ( missing(t.srt) ) t.srt <- levels(target)
+        target <- as.character(target)
     }
    
   ## check cluster length
-  if ( length(cl1) != length(cl2) ) 
-      stop("ERROR cluster vectors of different size:", length(cl1),length(cl2))
+  if ( length(query) != length(target) ) 
+      stop("ERROR cluster vectors of different size:", length(query),length(target))
   
   ## add NA cluster
-  if ( sum(is.na(cl1)) )
-    cl1[is.na(cl1)] <- na.string
-  if ( sum(is.na(cl2)) )
-    cl2[is.na(cl2)] <- na.string
+  if ( sum(is.na(query)) )
+    query[is.na(query)] <- na.string
+  if ( sum(is.na(target)) )
+    target[is.na(target)] <- na.string
   ## also rename empty strings!
-  if ( sum(cl1=="") )
-    cl1[cl1==""] <- na.string
-  if ( sum(cl2=="") )
-    cl2[cl2==""] <- na.string
+  if ( sum(query=="") )
+    query[query==""] <- na.string
+  if ( sum(target=="") )
+    target[target==""] <- na.string
   
   
   ## get requested values
@@ -201,40 +227,49 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
     do.ppoor <- do.prich <- TRUE
   
   ## get clusters
-  f1 <- levels(as.factor(cl1))
-  f2 <- levels(as.factor(cl2))
+  f1 <- levels(as.factor(query))
+  f2 <- levels(as.factor(target))
     ## TODO: remember if any was not sorted;
     ## and sort those by sortClusters at the end; sort smaller first
-    if ( !missing(cl1.srt) ) f1 <-  as.character(cl1.srt)
-    else cl1.srt <- as.character(f1)
-    if ( !missing(cl2.srt) ) f2 <-  as.character(cl2.srt)
-    else cl2.srt <- as.character(f2)
+    if ( !missing(q.srt) ) f1 <-  as.character(q.srt)
+    else q.srt <- as.character(f1)
+    if ( !missing(t.srt) ) f2 <-  as.character(t.srt)
+    else t.srt <- as.character(f2)
       
 
   ## result matrices
   overlap <- matrix(NA, nrow=length(f1), ncol=length(f2))
   rownames(overlap) <- f1
   colnames(overlap) <- f2
-    jaccard <- percent <- frequency <- ratio <- overlap
+    jaccard <- percent <- frequency <- qfraction <- tfraction <- ratio <- overlap
   if ( do.prich ) prich <- overlap
   if ( do.ppoor ) ppoor <- overlap
   
   
   for ( i in 1:length(f1) ) { # white and black balls
       
-      m <- sum(cl1==f1[i]); # number of white balls
-      n <- sum(cl1!=f1[i]); # number of black balls
+      m <- sum(query==f1[i]); # number of white balls
+      n <- sum(query!=f1[i]); # number of black balls
       N <- m+n # total number of balls
       
       for ( j in 1:length(f2) ) { # balls drawn
           
-          q <- sum(cl1==f1[i] & cl2==f2[j]) # white balls drawn
-          k <- sum(cl2==f2[j]) # number of balls drawn
+          q <- sum(query==f1[i] & target==f2[j]) # white balls drawn
+          k <- sum(target==f2[j]) # number of balls drawn
           
           overlap[i,j] <- q
+
+          ## old, remove?
           frequency[i,j] <- q/k  # frequency 
           ratio[i,j] <- frequency[i,j] * N/m # frequency ratio
-          percent[i,j] <- round(100*frequency[i,j], digits = 2) # TODO: rm this?
+          ## TODO: rm this?
+          percent[i,j] <- round(100*frequency[i,j], digits = 2)
+          
+          ## fraction of  white balls (query, cl1) of total balls drawn
+          qfraction[i,j] <- q/k
+          tfraction[i,j] <- q/m
+          
+
           
           ## Calculate cumulative HYPERGEOMETRIC distributions 
           
@@ -266,6 +301,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
                    frequency=frequency,
                    ratio=ratio,
                    percent=percent,
+                   fraction.query=qfraction,
+                   fraction.target=tfraction,
                    jaccard=jaccard)
 
   ## append p-values
@@ -290,8 +327,8 @@ clusterCluster <- function(cl1, cl2, na.string="na", cl1.srt, cl2.srt,
     ## TODO: add total numbers as result$num.query/total
     ## TODO: align with nomenclature in segmentOverlaps and plotOverlaps
     
-    result$num.target <- t(as.matrix(table(cl2)[cl2.srt]))
-    result$num.query <- as.matrix(table(cl1)[cl1.srt])
+    result$num.target <- t(as.matrix(table(target)[t.srt]))
+    result$num.query <- as.matrix(table(query)[q.srt])
 
     class(result) <- "clusterOverlaps"
   return(result)
@@ -1202,11 +1239,11 @@ clusterAnnotation <- function(cls, data, p=1,
         ## TODO: take sum of bonferroni correction factors
         ## correct below in bin.filter
         if ( logic )
-            tmp <- clusterCluster(bins, cls, cl1.srt=c("TRUE"),
-                                  alternative=c("greater"),cl2.srt=cls.srt)
+            tmp <- clusterCluster(bins, cls, q.srt=c("TRUE"),
+                                  alternative=c("greater"),t.srt=cls.srt)
         else 
             tmp <- clusterCluster(bins, cls,
-                                  alternative=c("greater"),cl2.srt=cls.srt)
+                                  alternative=c("greater"),t.srt=cls.srt)
         
         # get overlap and p.values in original bin order
         if ( !is.null(tmp) ) {
@@ -1413,7 +1450,7 @@ annotationOverlap <- function(x) {
             ## TODO: call hypergeo directly here instead of re-routing
             ## via clusterCluster (check if this would be more efficient)
             tmp <- clusterCluster(x[,i], x[,j],
-                                  cl1.srt=c("TRUE"), cl2.srt="TRUE",
+                                  q.srt=c("TRUE"), t.srt="TRUE",
                                   alternative=c("greater"))
             cnt[i,j] <- cnt[j,i] <-tmp$overlap[1,1]
         pvl[i,j] <- pvl[j,i] <-tmp$p.value[1,1]

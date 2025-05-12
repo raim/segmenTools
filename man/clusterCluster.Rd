@@ -5,31 +5,43 @@
 \title{calculates overlaps between two clusterings}
 \usage{
 clusterCluster(
+  query,
+  target,
+  q.srt,
+  t.srt,
+  na.string = "na",
+  alternative = c("greater"),
   cl1,
   cl2,
-  na.string = "na",
   cl1.srt,
-  cl2.srt,
-  alternative = c("greater")
+  cl2.srt
 )
 }
 \arguments{
-\item{cl1}{clustering 1; a vector of cluster associations or an
+\item{query}{clustering 1; a vector of cluster associations or an
 object of class "clustering" by segmenTier's
 \code{\link[segmenTier:clusterTimeseries]{clusterTimeseries}}}
 
-\item{cl2}{clustering 2; see argument \code{cl1}}
+\item{target}{clustering 2; see argument \code{query}}
+
+\item{q.srt}{optional cluster sorting of clustering 1}
+
+\item{t.srt}{optional cluster sorting of clustering 2}
 
 \item{na.string}{replace NA or empty strings by `<na.string>'}
-
-\item{cl1.srt}{optional cluster sorting of clustering 1}
-
-\item{cl2.srt}{optional cluster sorting of clustering 2}
 
 \item{alternative}{a character string specifying the alternative hypothesis,
 must be one of `"greater"' to calculate enrichment (default),
 `"less"' to calculate deprivation, or `"two.sided"' to report the more
 more signficant p-value of both}
+
+\item{cl1}{obsolete: use query}
+
+\item{cl2}{obsolete: use target}
+
+\item{cl1.srt}{obsolete: use q.srt}
+
+\item{cl2.srt}{obsolte: use t.srt}
 }
 \description{
 Calculates mutual overlaps between two clusterings of the same data set
