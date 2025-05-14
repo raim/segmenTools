@@ -205,10 +205,11 @@ clusterCluster <- function(query, target, q.srt, t.srt, na.string="na",
    
   ## check cluster length
   if ( length(query) != length(target) ) 
-      stop("ERROR cluster vectors of different size:", length(query),length(target))
+      stop("ERROR cluster vectors of different size:",
+           length(query), length(target))
   
   ## add NA cluster
-  if ( sum(is.na(query)) )
+  if ( sum(is.na(query)) ) 
     query[is.na(query)] <- na.string
   if ( sum(is.na(target)) )
     target[is.na(target)] <- na.string
@@ -229,6 +230,7 @@ clusterCluster <- function(query, target, q.srt, t.srt, na.string="na",
   ## get clusters
   f1 <- levels(as.factor(query))
   f2 <- levels(as.factor(target))
+
     ## TODO: remember if any was not sorted;
     ## and sort those by sortClusters at the end; sort smaller first
     if ( !missing(q.srt) ) f1 <-  as.character(q.srt)
@@ -241,7 +243,8 @@ clusterCluster <- function(query, target, q.srt, t.srt, na.string="na",
   overlap <- matrix(NA, nrow=length(f1), ncol=length(f2))
   rownames(overlap) <- f1
   colnames(overlap) <- f2
-    jaccard <- percent <- frequency <- qfraction <- tfraction <- ratio <- overlap
+    jaccard <- percent <- frequency <-
+        qfraction <- tfraction <- ratio <- overlap
   if ( do.prich ) prich <- overlap
   if ( do.ppoor ) ppoor <- overlap
   
@@ -327,11 +330,13 @@ clusterCluster <- function(query, target, q.srt, t.srt, na.string="na",
     ## TODO: add total numbers as result$num.query/total
     ## TODO: align with nomenclature in segmentOverlaps and plotOverlaps
     
-    result$num.target <- t(as.matrix(table(target)[t.srt]))
-    result$num.query <- as.matrix(table(query)[q.srt])
-
+    num.target <- t(sapply(t.srt, function(x) sum(target==x, na.rm=TRUE)))
+    num.query <- sapply(q.srt, function(x) sum(query==x, na.rm=TRUE))
+    result$num.target <- num.target
+    result$num.query <- num.query
+    
     class(result) <- "clusterOverlaps"
-  return(result)
+    return(result)
 }
 
 #' plot a legend for \code{\link{plotOverlaps}} plots
