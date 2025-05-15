@@ -427,6 +427,7 @@ plotOverlapsLegend <- function(p.min=1e-10, p.txt=1e-5, type=1, round=0,
     x<-leg # silent return of used overlap object
 }
 
+
 #' dotplot
 #'
 #' plots dotplot profiles of `clusterOverlaps' objects.

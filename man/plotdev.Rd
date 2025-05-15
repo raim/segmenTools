@@ -10,7 +10,12 @@ plotdev(
   width = 5,
   height = 5,
   res = 100,
-  bg = "white"
+  bg = "white",
+  mai,
+  overlap,
+  w = 0.25,
+  h = 0.2,
+  verb = 0
 )
 }
 \arguments{
@@ -22,9 +27,16 @@ plotdev(
 
 \item{height}{figure height in inches}
 
-\item{res}{resolution in ppi (pixels per inch), only for 'png' and 'tiff'}
+\item{res}{resolution in ppi (pixels per inch), only for 'png' and
+'tiff'}
 
 \item{bg}{background color}
+
+\item{mai}{optional par("mai") setting, used for automatic plot
+dimensions}
+
+\item{overlap}{an object of class clusterOverlaps from which plot
+dimensions are calculated; useful for plotOverlaps and dotplot}
 }
 \description{
 Switch between plot devices

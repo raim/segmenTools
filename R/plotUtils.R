@@ -1,35 +1,69 @@
 ### PLOT UTILS
+
+#' calculate plot device dimensions for an overlap object
+#' 
+#' @export
+sizeOverlaps <- function(x, mai=par('mai'), w=.25, h=.25) {
+    
+    dww <- sum(mai[c(2,4)]) + w*ncol(x$p.value)
+    dhh <- sum(mai[c(1,3)]) + h*nrow(x$p.value)
+    list(W=dww, H=dhh)
+}
+
 #' Switch between plot devices
 #' @param file.name file name without suffix (.png, etc)
 #' @param type plot type: png, jpeg, eps, pdf, tiff or svg
 #' @param width figure width in inches
 #' @param height figure height in inches
-#' @param res resolution in ppi (pixels per inch), only for 'png' and 'tiff'
+#' @param res resolution in ppi (pixels per inch), only for 'png' and
+#'     'tiff'
 #' @param bg background color
+#' @param mai optional par("mai") setting, used for automatic plot
+#'     dimensions
+#' @param overlap an object of class clusterOverlaps from which plot
+#'     dimensions are calculated; useful for plotOverlaps and dotplot
 #' @export
 plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
-                    bg="white") {
+                    bg="white", mai, overlap, w=.25, h=.2, verb=0) {
+
+
+    ## calculate dimensions from overlap object (clusterOverlaps)
+    if ( !missing(overlap) ) {
+        if ( missing(mai) ) mai <- par("mai")
+        dims <- sizeOverlaps(overlap, mai = mai, w=w, h=h)
+        width <- dims$W
+        height <- dims$H
+        if ( verb >0 )
+            cat(paste("width and height from clusterOverlaps object\n"))
+    }
+    
     file.name <- paste(file.name, type, sep=".")
     ##if ( type=="cairopdf" )
     ##    file.name <- sub("\\.cairopdf$", ".pdf", file.name)
-  if ( type == "png" )
-      grDevices::png(file.name, width=width, height=height, units="in",
-                     res=res, bg=bg)
-  if ( type == "eps" )
-    grDevices::postscript(file.name, width=height, height=width,paper="special",
-                          horizontal = FALSE, onefile = FALSE)
-  ## NOTE 20240425: added cairopdf to allow fonts
-  ## this may change pdf output of older scripts!!
-  if ( type == "pdf" ) 
-    grDevices::cairo_pdf(file.name, width=width, height=height, bg=bg)
-  if ( type == "tiff" )
-      grDevices::tiff(file.name, width=width, height=height, units="in",
-                      res=res, bg=bg)
+    if ( type == "png" )
+        grDevices::png(file.name, width=width, height=height, units="in",
+                       res=res, bg=bg)
+    if ( type == "eps" )
+        grDevices::postscript(file.name, width=height, height=width,paper="special",
+                              horizontal = FALSE, onefile = FALSE)
+    ## NOTE 20240425: added cairopdf to allow fonts
+    ## this may change pdf output of older scripts!!
+    if ( type == "pdf" ) 
+        grDevices::cairo_pdf(file.name, width=width, height=height, bg=bg)
+    if ( type == "tiff" )
+        grDevices::tiff(file.name, width=width, height=height, units="in",
+                        res=res, bg=bg)
   if ( type == "svg" )
-    grDevices::svg(file.name, width=width, height=height)
-  if ( type == "jpeg" )
-      grDevices::jpeg(file.name, width=width, height=height, units="in",
-                      res=res, bg=bg)
+      grDevices::svg(file.name, width=width, height=height)
+    if ( type == "jpeg" )
+        grDevices::jpeg(file.name, width=width, height=height, units="in",
+                        res=res, bg=bg)
+    
+    ## optionally setup mai
+    if ( !missing(mai) )
+        par(mai=mai)
+
+    invisible(list(W=width, H=height))
 }
 
 
