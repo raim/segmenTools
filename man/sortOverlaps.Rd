@@ -11,7 +11,8 @@ sortOverlaps(
   cut = FALSE,
   srt,
   sign = 0,
-  symmetric = "no"
+  symmetric = "no",
+  verb = 0
 )
 }
 \arguments{
