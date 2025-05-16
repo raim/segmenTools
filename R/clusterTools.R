@@ -330,11 +330,13 @@ clusterCluster <- function(query, target, q.srt, t.srt, na.string="na",
     ## TODO: add total numbers as result$num.query/total
     ## TODO: align with nomenclature in segmentOverlaps and plotOverlaps
     
-    num.target <- t(sapply(t.srt, function(x) sum(target==x, na.rm=TRUE)))
-    num.query <- sapply(q.srt, function(x) sum(query==x, na.rm=TRUE))
+    num.target <- t(sapply(unname(t.srt),
+                           function(x) sum(target==x, na.rm=TRUE)))
+    num.query <- sapply(unname(q.srt), function(x) sum(query==x, na.rm=TRUE))
     result$num.target <- num.target
-    result$num.query <- num.query
-    
+    result$num.query <- as.matrix(num.query, ncol=1)
+
+
     class(result) <- "clusterOverlaps"
     return(result)
 }
@@ -779,7 +781,7 @@ t.clusterOverlaps <- function(x) {
 #'     with \code{symmetric="upper"} or \code{symmetric="lower"}.
 #' @export
 sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
-                         sign=0, symmetric="no") {
+                         sign=0, symmetric="no", verb=0) {
 
     
     ## handle triangle matrix
@@ -864,6 +866,9 @@ sortOverlaps <- function(ovl, axis=2, p.min=.05, cut=FALSE, srt,
     m <- ncol(pvl)
     for ( i in 1:length(ovl) )
         if ( inherits(ovl[[i]], "matrix") ) {
+            if ( verb>0 )
+                cat(paste("transposing", names(ovl)[i],":",
+                          paste0(new.srt,collapse=';'), "\n"))
             ## check if matrix is of same dim and if rows are >1
             ## to avoid clash of num.target when new.srt is only of length 1
             if ( nrow(ovl[[i]])==n & nrow(ovl[[i]])>1 )  {
