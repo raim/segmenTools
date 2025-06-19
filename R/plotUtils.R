@@ -253,6 +253,7 @@ plotCor <- function(x, y, outliers,
         if ( length(outliers)>0 ) {
             xyo <- xy[outliers,]
             xy <- xy[-outliers,]
+            if ( !missing(col) ) col <- col[-outliers]
         }
     }
     ## clean data from NA
