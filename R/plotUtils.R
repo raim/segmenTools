@@ -470,6 +470,35 @@ logaxis <- function(side, lat=-10:10, base=10, labels, ...) {
     }
 }
 
+
+## chatGPT; TODO: test and fix
+logaxis2 <- function(side, lat = -10:10, base = 10, labels, ...) {
+  if (missing(labels)) 
+    labels <- base^lat
+  if (is.logical(labels)) 
+    if (labels) 
+      labels <- base^lat
+  
+  for (ax in side) {
+    # Major ticks
+    axis(ax, at = lat, labels = labels, ...)
+    
+    # Minor ticks
+    if (base > 1) {
+      # Create minor ticks between each pair of major ticks
+      minor_per_decade <- base - 1
+      minor_ticks <- c()
+      for (i in lat) {
+        minors <- log(base^i * (1:(base - 1)), base = base)
+        minor_ticks <- c(minor_ticks, minors)
+      }
+      axis(ax, at = minor_ticks, tcl = par("tcl") / 2, labels = FALSE, ...)
+    } else {
+      warning("Base must be > 1 for log scale")
+    }
+  }
+}
+
 #' 2D density heatmap plot
 #'
 #' Uses base R's \code{\link[grDevices:densCols]{densCols}} to
