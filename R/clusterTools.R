@@ -2515,12 +2515,12 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
             avg <- "mean"
             warning("average avg='mean' enforced, since sd, var and stderr subtraction only make sense for mean.")
         }
-        qf <- get(q, mode="function")
+        qf <- get(q, mode = "function")
     }
 
     ## get requested average functions
     if ( mode(avg)!="function" )
-        avg <- get(avg, mode="function")
+        avg <- get(avg, mode = "function")
     
     
     ## rm Inf, eg.
@@ -2528,23 +2528,24 @@ clusterAverages <- function(ts, cls, cls.srt, avg="median", q=.9, rm.inf=TRUE) {
     
     for ( cl in cls.srt ) {
         ## average and deviation
-        clavg[cl,] <- apply(ts[cls==cl,,drop=FALSE],2,
-                            function(x) avg(x,na.rm=T))
+        clavg[cl,] <- apply(ts[cls==cl,, drop=FALSE], 2,
+                            function(x) avg(x, na.rm = TRUE))
         if ( is.numeric(q) ) {
             ## upper/lower quantiles
-            cllow[cl,]<- apply(ts[cls==cl,,drop=FALSE],2,
-                               function(x) quantile(x,  qf,na.rm=T))
-            clhig[cl,]<- apply(ts[cls==cl,,drop=FALSE],2,
-                               function(x) quantile(x,1-qf,na.rm=T))
+            cllow[cl,]<- apply(ts[cls==cl,, drop=FALSE], 2,
+                               function(x) quantile(x,  qf, na.rm = TRUE))
+            clhig[cl,]<- apply(ts[cls==cl,, drop=FALSE], 2,
+                               function(x) quantile(x, 1-qf, na.rm = TRUE))
         } else  {
-            df <- apply(ts[cls==cl,,drop=FALSE],2, function(x) qf(x,na.rm=T))
+            df <- apply(ts[cls==cl,,drop=FALSE],2, function(x)
+                qf(x, na.rm = TRUE))
             cllow[cl,] <- clavg[cl,] - df
             clhig[cl,] <- clavg[cl,] + df
         }
         #cat(paste(cl,"\n"))
     }
-    res <- list(avg=clavg, low=cllow, high=clhig,
-                functions=list(average=avg, q=q))
+    res <- list(avg = clavg, low = cllow, high = clhig,
+                functions = list(average = avg, q = q))
     class(res) <- "clusteraverages"
     res
 }
@@ -2701,6 +2702,12 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     invisible(avg)
 }
 
+## TODO: clean up mess between plotClusters, plot.clusteraverages and this
+## * plot.clusteraverages should become a function of plotClusters,
+##   and clusterAverages can be a private function!
+## * make function `timeseriesPlot' or `clusterPlot', that takes
+##  either tset/cset or matrix/vector
+
 #' plots cluster averages 
 #'
 #' plots average time series of clusters as calculated by
@@ -2806,12 +2813,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #'     legends; the names should correspond to the rownames of
 #'     clusterings in \code{cls}
 #' @param ... further arguments to the basic setup call to
-#'     \code{\link[graphics:plot]{plot}} ## TODO: clean up mess
-#'     between plot.clustering, plot.clusteraverages and this ##
-#'     plot.clusteraverages should become a function of
-#'     plot.clustering, ## and clusterAverages can be a private
-#'     function!  ## make function `timeseriesPlot' or `clusterPlot',
-#'     that takes ## either tset/cset or matrix/vector
+#'     \code{\link[graphics:plot]{plot}} 
 #' @export
 plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                          fill=TRUE, border=0,
