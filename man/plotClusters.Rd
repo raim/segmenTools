@@ -193,12 +193,7 @@ dissolved oxygen traces}
 \item{ref.log}{logarithmic axis for reference data}
 
 \item{...}{further arguments to the basic setup call to
-\code{\link[graphics:plot]{plot}} ## TODO: clean up mess
-between plot.clustering, plot.clusteraverages and this ##
-plot.clusteraverages should become a function of
-plot.clustering, ## and clusterAverages can be a private
-function!  ## make function `timeseriesPlot' or `clusterPlot',
-that takes ## either tset/cset or matrix/vector}
+\code{\link[graphics:plot]{plot}}}
 }
 \description{
 plots average time series of clusters as calculated by

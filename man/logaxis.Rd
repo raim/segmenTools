@@ -4,7 +4,7 @@
 \alias{logaxis}
 \title{Logarithmic axis ticks}
 \usage{
-logaxis(side, lat = -10:10, base = 10, labels, ...)
+logaxis(side, lat = -10:10, base = 10, labels, verb = 0, ...)
 }
 \arguments{
 \item{side}{an integer specifying which side of the plot the axis is
@@ -23,6 +23,8 @@ as the exponents of \code{log(y, base=base)}}
     If this is not logical, \code{at} should also be supplied and of the
     same length.  If \code{labels} is of length zero after coercion,
     it has the same effect as supplying \code{TRUE}.}
+
+\item{verb}{verbosity level}
 
 \item{...}{other \link[graphics]{graphical parameters} may also be passed as
     arguments to this function, particularly, \code{cex.axis}, \code{col.axis}

@@ -443,8 +443,9 @@ plotCor <- function(x, y, outliers,
 #' @param lat as argument \code{at} of \link[graphics:axis]{axis} but
 #'     as the exponents of \code{log(y, base=base)}
 #' @param base base of the logarithm
+#' @param verb verbosity level
 #' @export
-logaxis <- function(side, lat=-10:10, base=10, labels, ...) {
+logaxis <- function(side, lat=-10:10, base=10, labels, verb=0, ...) {
 
     ## handle lables argument
     if ( missing(labels) ) labels <- base^lat
@@ -464,8 +465,8 @@ logaxis <- function(side, lat=-10:10, base=10, labels, ...) {
                           base=10)
             axis(ax, at=lticks,
                  tcl=par('tcl')/2, labels=FALSE, ...)
-        } else {
-            warning('minor ticks marks only implement for log-base 10')
+        } else if ( verb>0) {
+            cat(paste('minor ticks marks only implement for log-base 10\n'))
         }
     }
 }
