@@ -115,10 +115,14 @@ testbc <- function(tset, lambda=.9, cycle=2, col) {
 
 #' moving average using \code{\link[stats]{filter}}
 #' @param x data vector along which a moving average will be calculated
-#' @param n moving average window size
+#' @param n moving average window size (integer!)
 #' @param circular logical see help of function \code{\link[stats]{filter}}
 #' @export
 ma <- function(x, n=5, circular=FALSE) {
+    if ( as.integer(n)!=n ) {
+        n <- floor(n)
+        warning('taking floor of non-integer window size')
+    }
     stats::filter(x,rep(1/n,n), sides=2, circular=circular)
 }
 

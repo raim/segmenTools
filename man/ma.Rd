@@ -9,7 +9,7 @@ ma(x, n = 5, circular = FALSE)
 \arguments{
 \item{x}{data vector along which a moving average will be calculated}
 
-\item{n}{moving average window size}
+\item{n}{moving average window size (integer!)}
 
 \item{circular}{logical see help of function \code{\link[stats]{filter}}}
 }
