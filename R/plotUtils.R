@@ -436,6 +436,55 @@ plotCor <- function(x, y, outliers,
 }
 
 
+#' Nicely formated date axis over three date ranges.
+#' @param side axis side.
+#' @param xlim x-axis limits (as.POSIXct), used to calculate  appropriate ticks.
+#' @export
+dateaxis <- function(side=1, xlim) {
+
+    require(lubridate)
+
+
+    ## from/to 1st of January
+    if ( missing(xlim) ) {
+        rng <- c(as.Date(paste0("0000-01-01")),
+                 as.Date(paste0("2100-01-01")))
+        xlim <- rng
+    } else {
+        if ( !inherits(xlim, "POSIXct") )
+            xlim <- as.POSIXct(xlim)
+        rng <- c(as.Date(sprintf("%04d-01-01",year(min(xlim)))),
+                 as.Date(sprintf("%04d-01-01",year(max(xlim))+1)))
+        xlim <- range(xlim)
+    }
+    
+    ranges <- c("day","week","month","year")
+    formats <- c("%m/%d","%m/%d","%m/%d","%Y")
+
+    dt <- list()
+    dt[[1]] <- seq(from=rng[1], to=rng[2],by="day")
+    dt[[2]] <- seq(from=rng[1], to=rng[2],by="week")
+    dt[[3]] <- seq(from=rng[1], to=rng[2],by="month")
+    dt[[4]] <- seq(from=rng[1], to=rng[2],by="year")
+
+    ## select scale based on diff
+    ## 1: day/week/month
+    ## 2: week/month/year
+    dw <- as.numeric(difftime(xlim[2],xlim[1],unit="weeks"))
+    ## select label format
+    ##idx <- tail((1:5)[dw>c(0,1.5*5*10^c(0:2))],3)
+    idx <- 2:4
+    if ( dw<53) idx <- 1:3
+    if ( dw<5) idx <- 1:2
+    if ( dw<1) idx <- 1
+    tcl <- par("tcl")
+    for ( i in idx ) {
+        frmt <- ifelse(i==tail(idx,1), formats[i], NA)
+        axis.POSIXct(side, at=dt[[i]], format=frmt, labels=!is.na(frmt),
+                     tcl=which(idx==i)*tcl/length(idx))
+    }
+}
+
 ## TODO: fix labels for base=exp(1)!!
 ##
 #' Logarithmic axis ticks
