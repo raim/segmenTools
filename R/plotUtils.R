@@ -77,9 +77,11 @@ plotdev <- function(file.name="test", type="png", width=5, height=5, res=100,
 #' @param region add to a figure, plot or device
 #' @param pos position key, as in \code{legend}
 #' @param cex label size
+#' @param shadow use \code{\link{shadowtext}} to get background colors
 #' @param ... additional parameters for call to \code{text}
 #' @export
-figlabel <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
+figlabel <- function(text, region="figure", pos="topleft", cex=NULL,
+                     shadow=FALSE, ...) {
 
   region <- match.arg(region, c("figure", "plot", "device"))
   pos <- match.arg(pos, c("topleft", "top", "topright", 
@@ -139,7 +141,8 @@ figlabel <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
   old.par <- par(xpd=NA)
   on.exit(par(old.par))
 
-  text(x1, y1, text, cex=cex, ...)
+    if ( shadow ) shadowtext(x1, y1, text, cex=cex, ...)
+    else text(x1, y1, text, cex=cex, ...)
   return(invisible(c(x,y)))
 }
 

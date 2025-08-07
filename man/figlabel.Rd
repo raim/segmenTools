@@ -4,7 +4,14 @@
 \alias{figlabel}
 \title{Add sub-figure label to corners of plots}
 \usage{
-figlabel(text, region = "figure", pos = "topleft", cex = NULL, ...)
+figlabel(
+  text,
+  region = "figure",
+  pos = "topleft",
+  cex = NULL,
+  shadow = FALSE,
+  ...
+)
 }
 \arguments{
 \item{text}{figure label}
@@ -14,6 +21,8 @@ figlabel(text, region = "figure", pos = "topleft", cex = NULL, ...)
 \item{pos}{position key, as in \code{legend}}
 
 \item{cex}{label size}
+
+\item{shadow}{use \code{\link{shadowtext}} to get background colors}
 
 \item{...}{additional parameters for call to \code{text}}
 }
