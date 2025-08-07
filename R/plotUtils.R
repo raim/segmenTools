@@ -10,6 +10,14 @@ sizeOverlaps <- function(x, mai=par('mai'), w=.25, h=.25) {
     list(W=dww, H=dhh)
 }
 
+#' Sanitize file names.
+#' @param string to sanitize
+#'@export
+fsanitize <- function(str) 
+    gsub("\\(","o",gsub("\\]", "c", fs::path_sanitize(str)))
+
+
+
 #' Switch between plot devices
 #' @param file.name file name without suffix (.png, etc)
 #' @param type plot type: png, jpeg, eps, pdf, tiff or svg
