@@ -238,7 +238,7 @@ selectColors <- function(x, mn, mx, q=.1, colf=grDevices::gray.colors,
         image_matrix(x=lbrk, z=t(cdat), breaks=cbrk,
                      col=cols, axis=1, ylab="color", xlab=xlab, xlim=xlim)
     }
-    list(breaks=cbrk, col=cols, x.cut=x.cut, x.col=x.cols, xlim=xlim)
+    invisible(list(breaks=cbrk, col=cols, x.cut=x.cut, x.col=x.cols, xlim=xlim))
 }
 
 #' plot multiple cumulative distribution functions
