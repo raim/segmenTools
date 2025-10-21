@@ -22,7 +22,7 @@ plotCor(
   axes = TRUE,
   legpos,
   legbg = "#FFFFFF99",
-  legcex = cex,
+  legcex = 1,
   signif = 1,
   round = 2,
   density = TRUE,

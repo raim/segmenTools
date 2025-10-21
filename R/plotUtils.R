@@ -252,7 +252,7 @@ plotCor <- function(x, y, outliers,
                     cor.legend=TRUE, line.legend=FALSE,
                     title=FALSE,
                     line.col=c(1,2), pch=20, cex=1, axes=TRUE,
-                    legpos, legbg="#FFFFFF99", legcex=cex,
+                    legpos, legbg="#FFFFFF99", legcex=1,
                     signif=1, round=2, density=TRUE, col, ...) {
 
     xy <- data.frame(x=x, y=y)
@@ -530,6 +530,7 @@ logaxis <- function(side, lat=-10:10, base=10, labels, verb=0, ...) {
         }
     }
 }
+
 
 
 ## chatGPT; TODO: test and fix

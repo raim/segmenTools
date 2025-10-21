@@ -3302,3 +3302,65 @@ add_alphas <- function(col, alpha=rep(1,length(col))){
     col
 }
 
+#' Classify trends in short vectors.
+#'
+#' Classifies each vector into increasing, decreasing, flat, unimodal
+#' (one peak or trough), or complex; and nodata (n<4), or nofit (fit
+#' error), using \link[stats:smooth.spline]{smooth.spline} error
+#' classes. Note that this was generated with the help of chatGPT,
+#' and has not been optimized.
+#' 
+#' @param x x-values.
+#' @param y y-values.
+#' @param min_n minimum number of data points to be considered.
+#' @param smooth_df degrees of freedom for
+#'     \link[stats:smooth.spline]{smooth.spline}.
+#' @param slope_tol threshold for ignoring small slopes.
+#' @export
+classify_trend <- function(y, x, min_n = 4, smooth_df = 4, slope_tol = 0.01) {
+
+    
+    ## require minimum number of values.
+    nna <- sum(!is.na(y))
+    if ( nna<= min_n )
+        return(list(type = paste0("nodata"),#, as.character(nna)),
+                    pos = NA))
+   
+    fit <- try(smooth.spline(x, y, df = smooth_df), silent = TRUE)
+    if (inherits(fit, "try-error")) 
+        return(list(type = "nofit", pos = NA))
+
+    ## Derivative (slope)
+    dP <- predict(fit, x, deriv = 1)$y
+    dP[abs(dP) < slope_tol] <- 0  # suppress noise
+    
+    s <- sign(dP)
+    changes <- which(diff(s) != 0)
+    
+    pos <- NA
+    if (length(changes) == 0) {
+        ## purely monotonic
+        if (mean(dP) > 0) {
+            type <- "increasing"
+        } else if (mean(dP) < 0) {
+            type <-  "decreasing"
+        } else {
+            type <- "flat"
+        }
+        
+    } else if (length(changes) == 1) {
+        ## one extremum → peak or trough
+        idx <- changes[1]
+        if (s[idx] > s[idx + 1]) {
+            type <- "peak"
+        } else {
+            type <- "trough"
+        }
+        pos <- mean(x[idx:(idx + 1)])
+        
+    } else {
+        type <- "complex"
+    }
+    
+  return(list(type = type,  pos = pos))
+}
