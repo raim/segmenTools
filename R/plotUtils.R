@@ -496,6 +496,31 @@ dateaxis <- function(side=1, xlim) {
     }
 }
 
+#' Draw axis for arcsinh transformed data
+#' @inheritParams graphics::axis
+#' @param ... parameters passed on to \link[graphics:axis]{axis}
+##xs <- c(-1e4, -10:10, 1e3)
+##plot(xs, ash(xs))
+##ashaxis(4)
+#' @export
+ashaxis <- function(side, at = c(-10^(7:1), 0, 10^(1:7)), ...) {
+
+    for ( ax in side ) {
+
+        ## axis with tick labels
+        axis(ax, at = ash(at), labels = at, ...)
+        ## select small ticks w/o labels
+        ## TODO: select appropriate range for small ticks,
+        ## as in logaxis
+        if ( FALSE ) {
+            n <- 20
+            rng <- ash(ceiling(par('usr')[3:4]))
+            lat <- seq(rng[1], rng[2], length.out=n)
+            axis(ax, at = lat, labels=FALSE, tcl=par('tcl')/2)
+        }
+    }
+}
+
 ## TODO: fix labels for base=exp(1)!!
 ##
 #' Logarithmic axis ticks
