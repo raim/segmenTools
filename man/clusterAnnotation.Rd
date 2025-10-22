@@ -18,22 +18,25 @@ clusterAnnotation(
 \arguments{
 \item{cls}{a character or numeric vector with the main clustering}
 
-\item{data}{a string, numeric or logical matrix with other categorizations
-of genes. Data rows must correspond to clustering in argument \code{cls}}
+\item{data}{a string, numeric or logical matrix with other
+categorizations of genes, e.g. GO terms. Data rows must
+correspond to clustering in argument \code{cls}}
 
 \item{p}{p-value threshold reporting overlaps}
 
-\item{cls.srt}{a numeric ar string vector indicating a cluster sorting,
-allows also to analyze only a subset of clusters in argument \code{cls}}
+\item{cls.srt}{a numeric ar string vector indicating a cluster
+sorting, allows also to analyze only a subset of clusters in
+argument \code{cls}}
 
 \item{terms}{optional map of annotation key to descriptions}
 
 \item{replace.terms}{replace annotation terms by the descriptions
 in argument \code{terms}}
 
-\item{bin.filter}{string, indicating bins (categories in \code{data})
-to be globally omitted; useful eg. for logical data to omit
-all enrichments with category "FALSE" (indicating deprivement)}
+\item{bin.filter}{string, indicating bins (categories in
+\code{data}) to be globally omitted; useful eg. for logical
+data to omit all enrichments with category "FALSE" (indicating
+deprivement)}
 
 \item{verbose}{print progress messages}
 }
@@ -42,10 +45,10 @@ Scans for overlap enrichments of a clustering in a matrix of
 clusterings, potentially simply a TRUE/FALSE table, eg. indicating
 annotation with a specific Gene Ontology or other term. This input
 table can be generated eg. with \code{\link{parseAnnotation}} or
-\code{\link{parseAnnotationList}}. The function reports
-tables of all overlap sizes and their enrichment p-values. The
-function is a wrapper around \code{\link{clusterCluster}}, which
-performs cumulative hypergeometric distribution tests between
-two clusterings. The result object can be used with
+\code{\link{parseAnnotationList}}. The function reports tables of
+all overlap sizes and their enrichment p-values. The function is a
+wrapper around \code{\link{clusterCluster}}, which performs
+cumulative hypergeometric distribution tests between two
+clusterings. The result object can be used with
 \code{\link{sortOverlaps}} and \code{\link{plotOverlaps}}.
 }

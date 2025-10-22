@@ -1088,6 +1088,124 @@ clusterFlow <- function (clusters, srt, cls.col,
     invisible(rval)
 }
 
+#' Generate a gene ontology (GO) table from a table containing
+#' a column with gene IDs and a column with a list of GO terms.
+#'
+#' @param genes a table of gene annotations containing two columns, one providing gene IDs and another providing a list of GO terms.
+#' @param cols column names with gene IDs and GO term lists.
+#' @param sep separator used in the GO term list column.
+#' @inheritParams parseOBO
+#' @export
+parseGO <- function(genes, obo.file, cols = c('ID','GO'), sep=",",
+                    short.names = TRUE, add.roots = TRUE,
+                    rm.obsolete = FALSE, minimal.set = FALSE) {
+
+    ## generate GO TRUE/FALSE table
+    got <- parseAnnotationList(genes[,cols], sep=sep)
+
+    ## get GO term descriptions
+    obo <- parseOBO(file=obo.file, terms=colnames(got), add.roots = add.roots,
+                    rm.obsolete = rm.obsolete, minimal.set = minimal.set)
+    roots <- obo$roots
+    terms <- obo$terms
+
+    ## filter some errors
+    terms[grep("Term ID is not in ontology", terms)] <- "term not found"
+
+    ## REMOVE TERMS NOT IN OBO LIST
+    if ( !all(colnames(got)%in%names(terms)) )
+        cat(paste("removing", sum(!colnames(got)%in%names(terms)),
+                  "GO terms not found in annotation\n"))
+    got <- got[, names(terms)]
+
+    ## shorter GO descriptions
+    if ( short.names ) {
+        cat(paste("abbreviating some long GO descriptions\n"))
+        ## REPLACE LONG NAMES
+        terms <-##sub("mitochondrial", "mito.",
+            sub("small subunit","SSU",
+                sub("large subunit","LSU",
+                    sub("small ribosomal subunit","ribosome - SSU",
+                        sub("large ribosomal subunit","ribosome - LSU",
+                            sub("amino acid", "AA",
+                                sub("endoplasmic reticulum", "ER", terms))))))
+    }
+
+    list(table=got, terms=terms, roots=roots)
+}
+
+#' Get GO (gene ontology) term descriptions from the ontology
+#' definition file (.obo), using the ontologyIndex library.
+#'
+#' @param file gene ontology definition file (.obo).
+#' @param terms GO terms for which descriptions should be searched.
+#' @param add.roots find roots and add to result.
+#' @param rm.obsolete remove terms tagged as obsolete in the
+#'     desription.
+#' @param minimal.set reduce GO terms to a minimal set of
+#'     non-redundant terms via
+#'     \link[ontologyIndex:minimal_set]{ontologyIndex::minimal_set}.
+parseOBO <- function(file, terms, add.roots = FALSE, rm.obsolete = FALSE,
+                     minimal.set = FALSE) {
+
+    ## parse obo file
+    obo <- ontologyIndex::get_ontology(file)
+
+    ## get GO term descriptions
+    terms <- sapply(terms, function(x)
+        try(unname(ontologyIndex::get_term_property(obo, "name", term = x)),
+            silent = TRUE))
+
+    ## report number of errors and obsolete terms.
+    errs <- grep("Error", terms)
+    if ( length(errs) )
+        cat(paste("found", length(errs), "errors;",
+                  "terms likely not present in obo file.\n"))
+    obs <- grep("^obsolete", terms)
+    if ( length(obs) ) {
+        cat(paste("found", length(obs), "obsolete terms."))
+        if ( rm.obsolete ) {
+            cat(paste(" - REMOVED\n"))
+            terms <- terms[-obs]
+        } else cat("\n")
+    }
+
+    ## reduce to a minimal set
+    if ( minimal.set )  {
+        olen <- length(terms)
+        terms <- terms[ontologyIndex::minimal_set(obo, names(terms))]
+        cat(paste("REMOVING", olen - length(terms), "REDUNDANT GO TERMS\n"))
+    }
+
+    roots <- NULL
+    if ( add.roots ) {
+
+        ## add root annotation via get_ancestors(obo,x)
+        ## get ALL roots: note 2025: more than 3, perhaps due to keeping
+        ## errors and obsolete terms
+        tmp <- sapply(names(terms),
+                      function(x)
+                          try(ontologyIndex::get_ancestors(obo,x)[1]))
+        tmp <- unique(unlist(tmp))
+        ## remove NA results
+        tmp <- tmp[!is.na(tmp)]
+        
+        root <- sapply(tmp, function(x)
+            unname(ontologyIndex::get_term_property(obo,"name",x)))
+        names(root) <- tmp
+        
+        ## classify terms by root
+        tmp <- sapply(names(terms),
+                      function(x) {
+                          anc <- ontologyIndex::get_ancestors(obo,x)[1]
+                          which(names(root)==anc)})
+        tmp <- unlist(tmp)
+        roots <- names(root[tmp])
+        names(roots) <- names(tmp)
+    }
+
+    list(terms=terms, roots=roots)
+}
 
 #' Parse a matrix of ID/annotation mappings
 #' 
@@ -1159,40 +1277,48 @@ parseAnnotation <- function(got, idcol=1, keycol=6, termcol, rm.empty=TRUE) {
 }
 
 
+## TODO : re-activate and align usage with contStatTable for continuous data
+## TODO 2017: move away from T/F table, use simple ;-sep string of
+## annotation terms instead;
+## * generalize T/F table usage
+## provide pval table for image_matrix
+
 #' Cluster annotation enrichment scan
 #' 
 #' Scans for overlap enrichments of a clustering in a matrix of
 #' clusterings, potentially simply a TRUE/FALSE table, eg. indicating
 #' annotation with a specific Gene Ontology or other term. This input
 #' table can be generated eg. with \code{\link{parseAnnotation}} or
-#' \code{\link{parseAnnotationList}}. The function reports
-#' tables of all overlap sizes and their enrichment p-values. The
-#' function is a wrapper around \code{\link{clusterCluster}}, which
-#' performs cumulative hypergeometric distribution tests between
-#' two clusterings. The result object can be used with
+#' \code{\link{parseAnnotationList}}. The function reports tables of
+#' all overlap sizes and their enrichment p-values. The function is a
+#' wrapper around \code{\link{clusterCluster}}, which performs
+#' cumulative hypergeometric distribution tests between two
+#' clusterings. The result object can be used with
 #' \code{\link{sortOverlaps}} and \code{\link{plotOverlaps}}.
-## TODO : re-activate and align usage with contStatTable for continuous data
-## TODO 2017: move away from T/F table, use simple ;-sep string of
-## annotation terms instead;
-## * generalize T/F table usage
-## provide pval table for image_matrix
+#'
 #' @param cls a character or numeric vector with the main clustering
-#' @param cls.srt a numeric ar string vector indicating a cluster sorting,
-#' allows also to analyze only a subset of clusters in argument \code{cls}
-#' @param data a string, numeric or logical matrix with other categorizations
-#' of genes. Data rows must correspond to clustering in argument \code{cls}
+#' @param cls.srt a numeric ar string vector indicating a cluster
+#'     sorting, allows also to analyze only a subset of clusters in
+#'     argument \code{cls}
+#' @param data a string, numeric or logical matrix with other
+#'     categorizations of genes, e.g. GO terms. Data rows must
+#'     correspond to clustering in argument \code{cls}
 #' @param p p-value threshold reporting overlaps
 #' @param terms optional map of annotation key to descriptions
 #' @param replace.terms replace annotation terms by the descriptions
-#' in argument \code{terms}
-#' @param bin.filter string, indicating bins (categories in \code{data})
-#' to be globally omitted; useful eg. for logical data to omit
-#' all enrichments with category "FALSE" (indicating deprivement)
+#'     in argument \code{terms}
+#' @param bin.filter string, indicating bins (categories in
+#'     \code{data}) to be globally omitted; useful eg. for logical
+#'     data to omit all enrichments with category "FALSE" (indicating
+#'     deprivement)
 #' @param verbose print progress messages
 #' @export
 clusterAnnotation <- function(cls, data, p=1,
                               cls.srt, terms=NULL, replace.terms=FALSE,
                               bin.filter, verbose=TRUE) {
+
+    if ( any(is.na(data)) )
+        stop("NA values in annotation data are not allowed")
 
     ## sorted list of clusters!
     if ( missing(cls.srt) ) {
@@ -1417,9 +1543,9 @@ clusterAnnotation <- function(cls, data, p=1,
     num.target <- t(as.matrix(table(cls)[cls.srt]))
     ## NOTE: only works for logical
     ## TODO: find good alternative
-    if ( logic )
+    if ( logic ) {
         num.query <- as.matrix(apply(data,2,function(x) sum(x)))
-    else num.query <- as.matrix(setNames(rep(NA, nrow(pvalues)),
+    } else num.query <- as.matrix(setNames(rep(NA, nrow(pvalues)),
                                          rownames(pvalues)))
 
     ## filter those reported in p.values/overlap tables
