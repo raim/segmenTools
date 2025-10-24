@@ -202,6 +202,10 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param y the y coordinates of the points in the plot.
 #' @param outliers vector of indices or logical vector of x,y values
 #'     to exclude from correlation analysis.
+#' @param log a character string which contains ‘"x"’ if the x axis is
+#'     to be logarithmic, ‘"y"’ if the y axis is to be logarithmic
+#'     (base 10) and ‘"xy"’ or ‘"yx"’ if both axes are to be
+#'     logarithmic.
 #' @param na.rm remove NA values from x and y.
 #' @param cor.method method to calculate correlation and p-value via
 #'     \code{\link[stats:cor.test]{cor.test}}.
@@ -214,10 +218,11 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param line.col colors of the regression lines drawn with
 #'     \code{line.methods}.  ## @param line.type line types of the
 #'     regression lines drawn with ## \code{line.methods}.
-#' @param circular treat data as circular, NOT fully implemented/tested.
-#' @param circular.jitter hack for equispaced phases (for circular=TRUE),
-#'     adds jitter to x or y (arguments circular.jitter=c('x','y')) to
-#'     avoid NA in cor.circular.
+#' @param circular treat data as circular, NOT fully
+#'     implemented/tested.
+#' @param circular.jitter hack for equispaced phases (for
+#'     circular=TRUE), adds jitter to x or y (arguments
+#'     circular.jitter=c('x','y')) to avoid NA in cor.circular.
 #' @param title plot correlation parameters (as in legend) on the top
 #'     of the plot.
 #' @param cor.legend plot correlation, p-value and slope (TLS) as a
@@ -247,6 +252,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 plotCor <- function(x, y, outliers,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
+                    log="",
                     na.rm=TRUE,
                     circular=FALSE, circular.jitter='',
                     cor.legend=TRUE, line.legend=FALSE,
@@ -256,6 +262,18 @@ plotCor <- function(x, y, outliers,
                     signif=1, round=2, density=TRUE, col, ...) {
 
     xy <- data.frame(x=x, y=y)
+
+    logaxis <- FALSE
+    if ( length(grep("x", log))>0 ) {
+        xy$x <- log10(xy$x)
+        logaxis <- axes
+        axes <- FALSE
+    }
+    if ( length(grep("y", log))>0 ) {
+        xy$y <- log10(xy$y)
+        logaxis <- axes | logaxis
+        axes <- FALSE
+    }
 
     xyo <- NULL
     if ( !missing(outliers) ) {
@@ -321,6 +339,7 @@ plotCor <- function(x, y, outliers,
         cr <- round(crt$cor, round)
         pv <- signif(crt$p.value, signif)
     } else {
+        
         ## lin.reg (OLS)
         if ( "ols" %in% line.methods )
             lfit <- lm(y ~ x, data=xy)
@@ -383,6 +402,15 @@ plotCor <- function(x, y, outliers,
 
     if ( !missing(outliers) )
         points(xyo$x, xyo$y, col=2, pch=4, cex=cex, ...)
+
+    if ( logaxis ) {
+        if ( length(grep("x", log))>0 ) {
+            logaxis(1)
+        } else axis(1)
+        if ( length(grep("y", log))>0 ) {
+            logaxis(2)
+        } else axis(2)
+    }
 
     ## TODO: replace line legend by TLS and OLS
     if ( cor.legend ) {

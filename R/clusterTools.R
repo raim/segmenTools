@@ -1109,8 +1109,9 @@ parseGO <- function(genes, obo.file, cols = c('ID','GO'), sep=",",
     roots <- obo$roots
     terms <- obo$terms
 
-    ## filter some errors
-    terms[grep("Term ID is not in ontology", terms)] <- "term not found"
+    ## replace errors with GO terms
+    notfound <- grep("Term ID is not in ontology", terms)
+    terms[notfound] <- names(terms)[notfound]
 
     ## REMOVE TERMS NOT IN OBO LIST
     if ( !all(colnames(got)%in%names(terms)) )
