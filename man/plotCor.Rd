@@ -8,6 +8,7 @@ plotCor(
   x,
   y,
   outliers,
+  classes,
   cor.method = c("pearson", "kendall", "spearman"),
   line.methods = c("ols", "tls"),
   log = "",
@@ -38,6 +39,9 @@ plotCor(
 
 \item{outliers}{vector of indices or logical vector of x,y values
 to exclude from correlation analysis.}
+
+\item{classes}{classification of all values (length(x)), for which
+correlations are calculated separateley.}
 
 \item{cor.method}{method to calculate correlation and p-value via
 \code{\link[stats:cor.test]{cor.test}}.}

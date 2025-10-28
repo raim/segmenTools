@@ -202,6 +202,8 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param y the y coordinates of the points in the plot.
 #' @param outliers vector of indices or logical vector of x,y values
 #'     to exclude from correlation analysis.
+#' @param classes classification of all values (length(x)), for which
+#'     correlations are calculated separateley.
 #' @param log a character string which contains ‘"x"’ if the x axis is
 #'     to be logarithmic, ‘"y"’ if the y axis is to be logarithmic
 #'     (base 10) and ‘"xy"’ or ‘"yx"’ if both axes are to be
@@ -249,7 +251,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{plot}} or, if \code{density=TRUE},
 #'     \code{\link{dense2d}}.
 #' @export
-plotCor <- function(x, y, outliers,
+plotCor <- function(x, y, outliers, classes,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
                     log="",
@@ -289,16 +291,16 @@ plotCor <- function(x, y, outliers,
     if ( na.rm ) {
         rmna <- apply(xy,1, function(x) any(is.na(x)))
         if ( sum(rmna)>0 )
-            warning("removing ", sum(rmna), " of ",nrow(xy),
-                    " rows with NA values")
+            cat(paste("removing ", sum(rmna), " of ",nrow(xy),
+                      " rows with NA values\n"))
         xy <- xy[!rmna,]
         if ( !missing(col) )
            col <- col[!rmna]
 
         rminf <- apply(xy, 1, function(x) any(is.infinite(x)))
         if ( sum(rminf)>0 )
-            warning("removing ", sum(rminf), " of ",nrow(xy),
-                    " rows with INF values")
+            cat(paste("removing ", sum(rminf), " of ",nrow(xy),
+                      " rows with INF values\n"))
         xy <- xy[!rminf,]
         if ( !missing(col) )
             col <- col[!rminf]
@@ -339,6 +341,8 @@ plotCor <- function(x, y, outliers,
         cr <- round(crt$cor, round)
         pv <- signif(crt$p.value, signif)
     } else {
+
+        if ( missing(classes) ) {}
         
         ## lin.reg (OLS)
         if ( "ols" %in% line.methods )
@@ -558,7 +562,7 @@ ashaxis <- function(side, at = c(-10^(7:1), 0, 10^(1:7)), ...) {
 #' @param base base of the logarithm
 #' @param verb verbosity level
 #' @export
-logaxis <- function(side, lat=-10:10, base=10, labels, verb=0, ...) {
+logaxis <- function(side, lat=-100:100, base=10, labels, verb=0, ...) {
 
     ## handle lables argument
     if ( missing(labels) ) labels <- base^lat

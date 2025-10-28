@@ -4,7 +4,7 @@
 \alias{logaxis}
 \title{Logarithmic axis ticks}
 \usage{
-logaxis(side, lat = -10:10, base = 10, labels, verb = 0, ...)
+logaxis(side, lat = -100:100, base = 10, labels, verb = 0, ...)
 }
 \arguments{
 \item{side}{an integer specifying which side of the plot the axis is
