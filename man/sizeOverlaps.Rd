@@ -2,10 +2,10 @@
 % Please edit documentation in R/plotUtils.R
 \name{sizeOverlaps}
 \alias{sizeOverlaps}
-\title{calculate plot device dimensions for an overlap object}
+\title{calculate plot device dimensions for any matrix or an overlap object}
 \usage{
 sizeOverlaps(x, mai = par("mai"), w = 0.25, h = 0.25)
 }
 \description{
-calculate plot device dimensions for an overlap object
+calculate plot device dimensions for any matrix or an overlap object
 }

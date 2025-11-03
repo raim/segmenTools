@@ -1,12 +1,16 @@
 ### PLOT UTILS
 
-#' calculate plot device dimensions for an overlap object
+#' calculate plot device dimensions for any matrix or an overlap object
 #' 
 #' @export
 sizeOverlaps <- function(x, mai=par('mai'), w=.25, h=.25) {
+
+    ## catch our genera
+    if ( inherits(x, "clusterOverlaps") )
+        x <- x$p.value
     
-    dww <- sum(mai[c(2,4)]) + w*ncol(x$p.value)
-    dhh <- sum(mai[c(1,3)]) + h*nrow(x$p.value)
+    dww <- sum(mai[c(2,4)]) + w*ncol(x)
+    dhh <- sum(mai[c(1,3)]) + h*nrow(x)
     list(W=dww, H=dhh)
 }
 
@@ -209,6 +213,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     (base 10) and ‘"xy"’ or ‘"yx"’ if both axes are to be
 #'     logarithmic.
 #' @param na.rm remove NA values from x and y.
+#' @param verb verbosity level: report removed NAs?
 #' @param cor.method method to calculate correlation and p-value via
 #'     \code{\link[stats:cor.test]{cor.test}}.
 #' @param line.methods regression line methods, where \code{"ols"} is
@@ -255,7 +260,7 @@ plotCor <- function(x, y, outliers, classes,
                     cor.method=c("pearson", "kendall", "spearman"),
                     line.methods=c("ols","tls"),
                     log="",
-                    na.rm=TRUE,
+                    na.rm=TRUE, verb=0,
                     circular=FALSE, circular.jitter='',
                     cor.legend=TRUE, line.legend=FALSE,
                     title=FALSE,
@@ -290,7 +295,7 @@ plotCor <- function(x, y, outliers, classes,
     ## clean data from NA
     if ( na.rm ) {
         rmna <- apply(xy,1, function(x) any(is.na(x)))
-        if ( sum(rmna)>0 )
+        if ( sum(rmna)>0 & verb>0 )
             cat(paste("removing ", sum(rmna), " of ",nrow(xy),
                       " rows with NA values\n"))
         xy <- xy[!rmna,]

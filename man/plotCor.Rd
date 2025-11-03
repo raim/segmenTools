@@ -13,6 +13,7 @@ plotCor(
   line.methods = c("ols", "tls"),
   log = "",
   na.rm = TRUE,
+  verb = 0,
   circular = FALSE,
   circular.jitter = "",
   cor.legend = TRUE,
@@ -59,6 +60,8 @@ to be logarithmic, ‘"y"’ if the y axis is to be logarithmic
 logarithmic.}
 
 \item{na.rm}{remove NA values from x and y.}
+
+\item{verb}{verbosity level: report removed NAs?}
 
 \item{circular}{treat data as circular, NOT fully
 implemented/tested.}
