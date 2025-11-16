@@ -1882,7 +1882,7 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
 #' @export
 cor_matrix <- function(x, n = 100,
                        cols = colorRampPalette(c("blue","white","red"))(n),
-                       breaks = seq(-1,1, length=n+1),
+                       breaks = seq(-1,1, length.out = n+1),
                        min.cor = .5, round.cor = 1,
                        diagonal = FALSE, upper = FALSE, lower = TRUE, ...) {
 
