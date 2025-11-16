@@ -1862,7 +1862,46 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
                      cex.axis=axis.cex)
             else axis(4)
     }
-} 
+}
+
+
+#' Plot correlation matrices.
+#' @param x a correlation matrix, values in [0,1].
+#' @param n number of colors.
+#' @param cols color vector (length n).
+#' @param breaks breaks (length n+1).
+#' @param min.cor minimal absolute correlation above which text
+#'     (correlation) is plotted in white text.
+#' @param round.cor number of decimals to which the correlation (text)
+#'     should be rounded.
+#' @param diagnol show the diagonal (should be correlations of 1)
+#'     instead of blanking it.
+#' @param upper show the upper triangle of the correlation matrix.
+#' @param lower show the lower triangle of the correlation matrix.
+#' @param ... arguments passed on to \link{image_matrix}.
+#' @export
+cor_matrix <- function(x, n = 100,
+                       cols = colorRampPalette(c("blue","white","red"))(n),
+                       breaks = seq(-1,1, length=n+1),
+                       min.cor = .5, round.cor = 1,
+                       diagonal = FALSE, upper = FALSE, lower = TRUE, ...) {
+
+    if ( !diagonal )
+        diag(x) <- NA
+    if ( !upper )
+        x[upper.tri(x)] <- NA
+    if ( !lower )
+        x[lower.tri(x)] <- NA
+    
+    ttxt <- round(x, round.cor)
+    ttxt[is.na(ttxt)] <- ''
+    ttxt.col <- ttxt
+    ttxt.col[] <- 'black'
+    ttxt.col[abs(x)>min.cor] <- 'white'
+    
+    image_matrix(x, col=cols, breaks=breaks, text=ttxt, text.col=ttxt.col,
+                 ...)
+}
 
 ### CLUSTERING OBJECT UTILS
 
