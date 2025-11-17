@@ -1897,10 +1897,13 @@ cor_matrix <- function(x, n = 100,
     ttxt[is.na(ttxt)] <- ''
     ttxt.col <- ttxt
     ttxt.col[] <- 'black'
-    ttxt.col[abs(x)>min.cor] <- 'white'
+    ttxt.col[abs(round(x, round.cor))>=min.cor] <- 'white'
     
     image_matrix(x, col=cols, breaks=breaks, text=ttxt, text.col=ttxt.col,
                  ...)
+
+    if ( !diagonal ) abline(a=nrow(x)+1, b=-1)
+ 
 }
 
 ### CLUSTERING OBJECT UTILS
