@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotUtils.R
 \name{plotCor}
 \alias{plotCor}
-\title{scatter plot with correlation statistics}
+\title{Scatter plot with correlation statistics.}
 \usage{
 plotCor(
   x,
@@ -113,5 +113,5 @@ values in the plot legend (argument \code{digits} to
 \code{\link{dense2d}}.}
 }
 \description{
-scatter plot with correlation statistics
+Scatter plot with correlation statistics.
 }

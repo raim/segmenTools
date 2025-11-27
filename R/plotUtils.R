@@ -200,7 +200,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
                            length.out=length(pal)+1), all.inside=TRUE)]
 }
 
-#' scatter plot with correlation statistics
+#' Scatter plot with correlation statistics.
 #'
 #' @param x the x coordinates of the points in the plot.
 #' @param y the y coordinates of the points in the plot.
@@ -270,6 +270,9 @@ plotCor <- function(x, y, outliers, classes,
 
     xy <- data.frame(x=x, y=y)
 
+    ## store eliminated data
+    kept <- 1:nrow(xy)
+
     logaxis <- FALSE
     if ( length(grep("x", log))>0 ) {
         xy$x <- log10(xy$x)
@@ -289,6 +292,7 @@ plotCor <- function(x, y, outliers, classes,
         if ( length(outliers)>0 ) {
             xyo <- xy[outliers,]
             xy <- xy[-outliers,]
+            kept <- kept[-outliers]
             if ( !missing(col) ) col <- col[-outliers]
         }
     }
@@ -299,6 +303,7 @@ plotCor <- function(x, y, outliers, classes,
             cat(paste("removing ", sum(rmna), " of ",nrow(xy),
                       " rows with NA values\n"))
         xy <- xy[!rmna,]
+        kept <- kept[!rmna]
         if ( !missing(col) )
            col <- col[!rmna]
 
@@ -307,6 +312,7 @@ plotCor <- function(x, y, outliers, classes,
             cat(paste("removing ", sum(rminf), " of ",nrow(xy),
                       " rows with INF values\n"))
         xy <- xy[!rminf,]
+        kept <- kept[!rminf]
         if ( !missing(col) )
             col <- col[!rminf]
     }
@@ -347,7 +353,7 @@ plotCor <- function(x, y, outliers, classes,
         pv <- signif(crt$p.value, signif)
     } else {
 
-        if ( missing(classes) ) {}
+        if ( !missing(classes) ) {}
         
         ## lin.reg (OLS)
         if ( "ols" %in% line.methods )
@@ -393,13 +399,15 @@ plotCor <- function(x, y, outliers, classes,
                                 r == .(cr)*","~
                                     p == .(pv))
         }
-            
+
+    ## DATA
     if ( density )
         dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, axes=axes, ...)
     else {
         if ( missing(col) ) col <- "#000000AA"
         plot(xy$x, xy$y, pch=pch, cex=cex, col=col, axes=axes, ...)
     }
+    ## FIT LINES
     if ( !circular ) {
         if ( "ols"%in%line.methods )
             abline(lfit, col=line.col[1])
@@ -409,9 +417,11 @@ plotCor <- function(x, y, outliers, classes,
         points(as.numeric(xy$x), fline, col=1, pch=19, cex=.3)
     }
 
+    ## indicated outliers
     if ( !missing(outliers) )
         points(xyo$x, xyo$y, col=2, pch=4, cex=cex, ...)
 
+    ## axes
     if ( logaxis ) {
         if ( length(grep("x", log))>0 ) {
             logaxis(1)
@@ -479,10 +489,58 @@ plotCor <- function(x, y, outliers, classes,
         mtext(titl,3,0, cex=.9)
     }
         
-    invisible(list(xy=xy, n=nrow(xy), r=cr, p=pv, 
+    invisible(list(xy=xy, n=nrow(xy), kept=kept, r=cr, p=pv, 
                    cor=crt, fit=lfit, tls=tls))
 }
 
+#' Plot linear regressions for subsets (clusters) of data
+#'
+#' @param x the x coordinates of the points in the plot.
+#' @param y the y coordinates of the points in the plot.
+#' @param cls a vector of cluster labels for the xy data.
+#' @param cls.col a named vector of cluster label colors.
+#' @param cls.srt a sorting and sub-selection of cluster labels.
+#' @param alpha color alpha level applied to cluster colors of the
+#'     plotted points.
+#' @param method method used to calculate the correlations.
+#' @param ... arguments to \link{plotCor}.
+#' @export
+plotCorMulti <- function(x, y, cls, cls.col, cls.srt,
+                         alpha = 0.5, method = 'pearson', ...) {
+
+
+     if ( missing(cls.srt) ) 
+        cls.srt <- unique(cls)
+
+    cols <- add_alphas(cls.col[cls], alpha=alpha)
+    cols[!cls%in%cls.srt] <- NA
+    
+    fit <- plotCor(x, y, 
+                   cor.legend=FALSE, title=FALSE,
+                   density=FALSE, line.methods='',
+                   col=cols, ...)
+    
+    ## filter clustering my eliminated data
+    cls <- cls[fit$kept]
+    
+    ## correlations for each cluster
+    xy <- fit$xy
+    isn <- !is.na(xy$x) & !is.na(xy$y) ##& is.finite(xy$x) & is.finite(xy$y)
+
+
+    fits <- list()
+    for ( cl in cls.srt ) {
+        
+        ft <- lm(xy$y[cls==cl & isn] ~ xy$x[cls==cl & isn])
+        cr <- cor.test(xy$y[cls==cl & isn], xy$x[cls==cl & isn],
+                       method = method)
+        fits[[cl]] <- list(fit=ft, cor=cr)
+
+        abline(ft, col=cls.col[cl])
+
+    }
+    invisible(fits)
+}
 
 #' Nicely formated date axis over three date ranges.
 #' @param side axis side.

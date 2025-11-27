@@ -3460,6 +3460,9 @@ shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
 #' providing new alpha values from 0 to 1
 #' @export
 add_alphas <- function(col, alpha=rep(1,length(col))){
+
+    if ( length(alpha)==1 ) alpha <- rep(alpha, length(col))
+    
     nms <- names(col)
     nacol <- which(is.na(col))
     lcol <- lapply(col, function(x) c(col2rgb(x)/255))
