@@ -497,6 +497,7 @@ plotCor <- function(x, y, outliers, classes,
 #'
 #' @param x the x coordinates of the points in the plot.
 #' @param y the y coordinates of the points in the plot.
+#' @param col point colors; if not provided cls.col will be used.
 #' @param cls a vector of cluster labels for the xy data.
 #' @param cls.col a named vector of cluster label colors.
 #' @param cls.srt a sorting and sub-selection of cluster labels.
@@ -505,20 +506,33 @@ plotCor <- function(x, y, outliers, classes,
 #' @param method method used to calculate the correlations.
 #' @param ... arguments to \link{plotCor}.
 #' @export
-plotCorMulti <- function(x, y, cls, cls.col, cls.srt,
-                         alpha = 0.5, method = 'pearson', ...) {
+plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
+                         alpha = 0.5, method = 'pearson', line='ols',
+                         leg.pos='bottomright', ...) {
 
 
      if ( missing(cls.srt) ) 
-        cls.srt <- unique(cls)
+         cls.srt <- unique(cls)
 
-    cols <- add_alphas(cls.col[cls], alpha=alpha)
-    cols[!cls%in%cls.srt] <- NA
+    if ( missing(col) ) {
+        col <- add_alphas(cls.col[cls], alpha=alpha)
+        col[!cls%in%cls.srt] <- NA
+    } 
+
+    ## filter all non-plotted cohorts
+    keep <- cls%in%cls.srt
+    if ( any(!keep) ) {
+        x <- x[keep]
+        y <- y[keep]
+        col <- col[keep]        
+        cls <- cls[keep]
+    }
+
     
     fit <- plotCor(x, y, 
                    cor.legend=FALSE, title=FALSE,
                    density=FALSE, line.methods='',
-                   col=cols, ...)
+                   col=col, ...)
     
     ## filter clustering my eliminated data
     cls <- cls[fit$kept]
@@ -530,14 +544,39 @@ plotCorMulti <- function(x, y, cls, cls.col, cls.srt,
 
     fits <- list()
     for ( cl in cls.srt ) {
+
+        set <- cls==cl & isn
         
-        ft <- lm(xy$y[cls==cl & isn] ~ xy$x[cls==cl & isn])
-        cr <- cor.test(xy$y[cls==cl & isn], xy$x[cls==cl & isn],
-                       method = method)
+        cat(paste('fitting', cl, '\n'))
+        if ( sum(set)<2 ) {
+            cat(paste('not enough data for cluster', cl, '\n'))
+            next
+        }
+
+        ## correlation
+        cr <- cor.test(xy$y[set], xy$x[set], method = method)
+        ## linear regression (ordinary least squares)
+        ft <- lm(xy$y[set] ~ xy$x[set])
+        ## total least squares
+        v <- eigen(cov(xy[set,]))$vectors
+        beta <- v[2,1]/v[1,1] # slope
+        alpha <- mean(xy$y[set]) - beta*mean(xy$x[set]) # intercept
         fits[[cl]] <- list(fit=ft, cor=cr)
+        
+        if ( 'ols'%in%line ) {
+            abline(ft, col=cls.col[cl], lwd=2)
+        } 
+        if ( 'tls'%in%line ) {
+            abline(a=alpha, b=beta, col=cls.col[cl], lwd=2)
+        }
+   
 
-        abline(ft, col=cls.col[cl])
-
+    }
+    if ( !missing(leg.pos) ) {
+        rhos <- sapply(fits, function(x) unname(x$cor$estimate))
+        legend(leg.pos, legend=paste0(names(rhos),": ", round(rhos,2)),
+               seg.len=.75, 
+               col=cls.col[names(rhos)], lty=1, bg='#ffffff77', box.col=NA)
     }
     invisible(fits)
 }
