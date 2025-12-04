@@ -4,12 +4,26 @@
 \alias{plotCorMulti}
 \title{Plot linear regressions for subsets (clusters) of data}
 \usage{
-plotCorMulti(x, y, cls, cls.col, cls.srt, alpha = 0.5, method = "pearson", ...)
+plotCorMulti(
+  x,
+  y,
+  col,
+  cls,
+  cls.col,
+  cls.srt,
+  alpha = 0.5,
+  method = "pearson",
+  line = "ols",
+  leg.pos = "bottomright",
+  ...
+)
 }
 \arguments{
 \item{x}{the x coordinates of the points in the plot.}
 
 \item{y}{the y coordinates of the points in the plot.}
+
+\item{col}{point colors; if not provided cls.col will be used.}
 
 \item{cls}{a vector of cluster labels for the xy data.}
 

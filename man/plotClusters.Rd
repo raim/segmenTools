@@ -46,6 +46,7 @@ plotClusters(
   vl_lty = 1,
   ref.xy,
   ref.col = "#C0C0C080",
+  ref.fill = TRUE,
   ref.ylab = "",
   ref.log = FALSE,
   ...
@@ -187,6 +188,8 @@ data to be plotted in the background, e.g. light/dark phases or
 dissolved oxygen traces}
 
 \item{ref.col}{color for reference data plot}
+
+\item{ref.fill}{reference data polygon}
 
 \item{ref.ylab}{y-axis label (right y-axis) for reference data}
 

@@ -2976,6 +2976,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
 #'     data to be plotted in the background, e.g. light/dark phases or
 #'     dissolved oxygen traces
 #' @param ref.col color for reference data plot
+#' @param ref.fill reference data polygon
 #' @param ref.ylab y-axis label (right y-axis) for reference data
 #' @param ref.log logarithmic axis for reference data
 #' @param leg.ids a named vector providing alternative IDs for
@@ -2999,7 +3000,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                          plot.legend=FALSE, leg.xy="topleft", leg.ids,
                          sample.ticks=TRUE,
 			 vline='',vl_col = 0,vl_lwd=3,vl_lty = 1,
-                         ref.xy, ref.col="#C0C0C080", ref.ylab="",
+                         ref.xy, ref.col="#C0C0C080",
+                         ref.fill = TRUE, ref.ylab="",
                          ref.log=FALSE, ...) 
 {
 
@@ -3125,14 +3127,15 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
              plot(ref.xy,type="l",lty=1,lwd=2,col=ref.col,
                   axes=FALSE,xlab=NA,ylab=NA,
                   ylim=rlm,xlim=xlim, log=ylog)
-             polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
-                    y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
-                    col=ref.col,border=NA)
+             if ( ref.fill )
+                 polygon(x=c(ref.xy[1,1],ref.xy[,1],ref.xy[nrow(ref.xy),1]),
+                         y=c(min(ref.xy[,2]),ref.xy[,2],min(ref.xy[,2])),
+                         col=ref.col,border=NA)
              if ( axes ) {
                  if ( ylog=="y" )
                      axis(4,labels=FALSE, las=2,
                           col=ref.col, col.ticks=ref.col, col.axis=ref.col)
-                 axis(4,at=rlm,las=2,
+                 axis(4, at=rlm, las=2,
                       col=ref.col, col.ticks=ref.col, col.axis=ref.col)
                  mtext(ref.ylab, 4, .35, col=ref.col)
              }
