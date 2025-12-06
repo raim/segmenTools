@@ -4,10 +4,10 @@
 \alias{classify_trend}
 \title{Classify trends in short vectors.}
 \usage{
-classify_trend(y, x, min_n = 4, smooth_df = 4, slope_tol = 0.01)
+classify_trend(Y, x, min_n = 4, smooth_df = 4, slope_tol = 0.01)
 }
 \arguments{
-\item{y}{y-values.}
+\item{Y}{matrix of y-values.}
 
 \item{x}{x-values.}
 

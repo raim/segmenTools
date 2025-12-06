@@ -3486,56 +3486,81 @@ add_alphas <- function(col, alpha=rep(1,length(col))){
 #' and has not been optimized.
 #' 
 #' @param x x-values.
-#' @param y y-values.
+#' @param Y matrix of y-values.
 #' @param min_n minimum number of data points to be considered.
 #' @param smooth_df degrees of freedom for
 #'     \link[stats:smooth.spline]{smooth.spline}.
 #' @param slope_tol threshold for ignoring small slopes.
 #' @export
-classify_trend <- function(y, x, min_n = 4, smooth_df = 4, slope_tol = 0.01) {
+classify_trend <- function(Y, x, min_n = 4, smooth_df = 4, slope_tol = 0.01) {
 
-    
-    ## require minimum number of values.
-    nna <- sum(!is.na(y))
-    if ( nna<= min_n )
-        return(list(type = paste0("nodata"),#, as.character(nna)),
-                    pos = NA))
-   
-    fit <- try(smooth.spline(x, y, df = smooth_df), silent = TRUE)
-    if (inherits(fit, "try-error")) 
-        return(list(type = "nofit", pos = NA))
 
-    ## Derivative (slope)
-    dP <- predict(fit, x, deriv = 1)$y
-    dP[abs(dP) < slope_tol] <- 0  # suppress noise
-    
-    s <- sign(dP)
-    changes <- which(diff(s) != 0)
-    
-    pos <- NA
-    if (length(changes) == 0) {
-        ## purely monotonic
-        if (mean(dP) > 0) {
-            type <- "increasing"
-        } else if (mean(dP) < 0) {
-            type <-  "decreasing"
+    classify <- function(y, x) {
+        ## require minimum number of values.
+        nna <- sum(!is.na(y))
+        if ( nna<= min_n )
+            return(list(type = paste0("nodata"),#, as.character(nna)),
+                        pos = NA))
+        
+        fit <- try(smooth.spline(x, y, df = smooth_df), silent = TRUE)
+        if (inherits(fit, "try-error")) 
+            return(list(type = "nofit", pos = NA))
+        
+        ## Derivative (slope)
+        dP <- predict(fit, x, deriv = 1)$y
+        dP[abs(dP) < slope_tol] <- 0  # suppress noise
+        
+        s <- sign(dP)
+        changes <- which(diff(s) != 0)
+        
+        pos <- NA
+        if (length(changes) == 0) {
+            ## purely monotonic
+            if (mean(dP) > 0) {
+                type <- "increasing"
+            } else if (mean(dP) < 0) {
+                type <-  "decreasing"
+            } else {
+                type <- "flat"
+            }
+            
+        } else if (length(changes) == 1) {
+            ## one extremum → peak or trough
+            idx <- changes[1]
+            if (s[idx] > s[idx + 1]) {
+                type <- "peak"
+            } else {
+                type <- "trough"
+            }
+            pos <- mean(x[idx:(idx + 1)])
+            
         } else {
-            type <- "flat"
+            type <- "complex"
         }
         
-    } else if (length(changes) == 1) {
-        ## one extremum → peak or trough
-        idx <- changes[1]
-        if (s[idx] > s[idx + 1]) {
-            type <- "peak"
-        } else {
-            type <- "trough"
-        }
-        pos <- mean(x[idx:(idx + 1)])
-        
-    } else {
-        type <- "complex"
+        return(list(type = type,  pos = pos))
     }
-    
-  return(list(type = type,  pos = pos))
+    class <- apply(Y, 1, classify, x = x)
+    do.call(rbind.data.frame, class)
+}
+
+#' Linear regression and correlation test, reporting
+#' alpha, beta, the correlation and a p-value
+#' @param x x vector
+#' @param Y matrix of y vectors, with ncol(y)==length(x).
+#' @export
+linreg <- function(x, Y, method='pearson') {
+
+    slope <- apply(Y, 1,
+                   function(y) {
+                       if ( sum(!is.na(y))<3 ) return(rep(NA,2))
+                       fit <- lm(y ~ x)
+                       alpha <- unname(fit$coeff[1])
+                       beta <- unname(fit$coeff[2])
+                       cr <- cor.test(x, y, method = method)
+                       r <- cr$estimate
+                       p <- cr$p.value
+                       return(list(alpha=alpha, beta=beta, r=r, p=p))}
+                   )
+    do.call(rbind.data.frame, slope)
 }
