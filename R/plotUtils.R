@@ -504,11 +504,14 @@ plotCor <- function(x, y, outliers, classes,
 #' @param alpha color alpha level applied to cluster colors of the
 #'     plotted points.
 #' @param method method used to calculate the correlations.
+#' @param legend add a legend showing correlations for each cluster.
+#' @param leg.pos position of the legend.
+#' @param verb verbosity level.
 #' @param ... arguments to \link{plotCor}.
 #' @export
 plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
                          alpha = 0.5, method = 'pearson', line='ols',
-                         leg.pos='bottomright', ...) {
+                         legend=TRUE, leg.pos='bottomright', verb = 1, ...) {
 
 
      if ( missing(cls.srt) ) 
@@ -547,11 +550,14 @@ plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
 
         set <- cls==cl & isn
         
-        cat(paste('fitting', cl, '\n'))
+        if ( verb>0 )
+            cat(paste('fitting', cl))
         if ( sum(set)<2 ) {
-            cat(paste('not enough data for cluster', cl, '\n'))
+            if ( verb>0 )
+                cat(paste(':\tnot enough data\n'))
             next
-        }
+        } else if ( verb>0 )
+            cat(paste('\n'))
 
         ## correlation
         cr <- cor.test(xy$y[set], xy$x[set], method = method)
@@ -572,7 +578,7 @@ plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
    
 
     }
-    if ( !missing(leg.pos) ) {
+    if ( legend ) {
         rhos <- sapply(fits, function(x) unname(x$cor$estimate))
         legend(leg.pos, legend=paste0(names(rhos),": ", round(rhos,2)),
                seg.len=.75, 

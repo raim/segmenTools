@@ -14,7 +14,9 @@ plotCorMulti(
   alpha = 0.5,
   method = "pearson",
   line = "ols",
+  legend = TRUE,
   leg.pos = "bottomright",
+  verb = 1,
   ...
 )
 }
@@ -35,6 +37,12 @@ plotCorMulti(
 plotted points.}
 
 \item{method}{method used to calculate the correlations.}
+
+\item{legend}{add a legend showing correlations for each cluster.}
+
+\item{leg.pos}{position of the legend.}
+
+\item{verb}{verbosity level.}
 
 \item{...}{arguments to \link{plotCor}.}
 }
