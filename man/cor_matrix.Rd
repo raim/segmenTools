@@ -6,6 +6,8 @@
 \usage{
 cor_matrix(
   x,
+  method = "pearson",
+  use = "pairwise.complete",
   n = 100,
   cols = colorRampPalette(c("blue", "white", "red"))(n),
   breaks = seq(-1, 1, length.out = n + 1),
@@ -14,6 +16,7 @@ cor_matrix(
   diagonal = FALSE,
   upper = FALSE,
   lower = TRUE,
+  axis = 1:2,
   ...
 )
 }
@@ -35,6 +38,8 @@ should be rounded.}
 \item{upper}{show the upper triangle of the correlation matrix.}
 
 \item{lower}{show the lower triangle of the correlation matrix.}
+
+\item{axis}{which axes to annotate.}
 
 \item{...}{arguments passed on to \link{image_matrix}.}
 

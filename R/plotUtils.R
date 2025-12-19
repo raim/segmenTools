@@ -263,12 +263,18 @@ plotCor <- function(x, y, outliers, classes,
                     na.rm=TRUE, verb=0,
                     circular=FALSE, circular.jitter='',
                     cor.legend=TRUE, line.legend=FALSE,
-                    title=FALSE,
+                    title=FALSE, xlab, ylab,
                     line.col=c(1,2), pch=20, cex=1, axes=TRUE,
                     legpos, legbg="#FFFFFF99", legcex=1,
                     signif=1, round=2, density=TRUE, col, ...) {
 
+    
+    
     xy <- data.frame(x=x, y=y)
+
+    ## default xlabel: variable name
+    if ( missing('xlab') ) xlab <- deparse(substitute(x))
+    if ( missing('ylab') ) xlab <- deparse(substitute(y))
 
     ## store eliminated data
     kept <- 1:nrow(xy)
@@ -405,7 +411,8 @@ plotCor <- function(x, y, outliers, classes,
         dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, axes=axes, ...)
     else {
         if ( missing(col) ) col <- "#000000AA"
-        plot(xy$x, xy$y, pch=pch, cex=cex, col=col, axes=axes, ...)
+        plot(xy$x, xy$y, pch=pch, cex=cex, col=col, axes=axes,
+             xlab = xlab, ylab = ylab, ...)
     }
     ## FIT LINES
     if ( !circular ) {
@@ -634,6 +641,58 @@ dateaxis <- function(side=1, xlim) {
         axis.POSIXct(side, at=dt[[i]], format=frmt, labels=!is.na(frmt),
                      tcl=which(idx==i)*tcl/length(idx))
     }
+}
+
+## TODO: test this chatGPT-generated wrapper for base R's plot and
+## matplot that can use ashaxis and logaxis
+
+
+#' A wrapper for base R's plot.default that catches the log and adds an
+#' ash argument, transforms data by log10 or arsinh, but plots the
+#' original scale as logarithmic axes.
+#' @inheritParams graphics::plot.default
+#' @param ash used as the log argument in base R's plot.default, but
+#'     using arcsinh transform instead of log.
+#'@export
+lplot <- function(x, y = NULL, ..., log = "",  ash = "") {
+
+    axes_log <- unique(strsplit(log, "")[[1]])
+    axes_ash <- unique(strsplit(ash, "")[[1]])
+    if (length(intersect(axes_log, axes_ash))) {
+        stop("Axis specified in both 'log' and 'ash'", call. = FALSE)
+    }
+    
+    dots <- list(...)
+    if (!is.null(dots$log)) log <- dots$log 
+    dots$log <- NULL  # remove it so plot() never sees it
+
+    ## Extract x/y if supplied via formula or list
+    xy <- xy.coords(x, y)
+    x <- xy$x
+    y <- xy$y
+
+    ## Transform data
+    if (grepl("x", log)) x <- log10(x)
+    if (grepl("y", log)) y <- log10(y)
+    if (grepl("x", ash)) x <- ash(x)
+    if (grepl("y", ash)) y <- ash(y)
+
+    ## Draw plot without log scaling
+    plot.default(
+        x, y,
+        log = "",
+        axes = FALSE,
+        ...
+    )
+
+    ## Custom axes
+    if (grepl("x", log)) logaxis(1)
+    else if (grepl("x", ash)) ashaxis(1) 
+    else axis(1)
+    if (grepl("y", log)) logaxis(2)
+    else if (grepl("y", ash)) ashaxis(2) 
+    else axis(2)
+
 }
 
 #' Draw axis for arcsinh transformed data

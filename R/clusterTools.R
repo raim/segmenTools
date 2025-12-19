@@ -1878,14 +1878,18 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
 #'     instead of blanking it.
 #' @param upper show the upper triangle of the correlation matrix.
 #' @param lower show the lower triangle of the correlation matrix.
+#' @param axis which axes to annotate.
 #' @param ... arguments passed on to \link{image_matrix}.
 #' @export
-cor_matrix <- function(x, n = 100,
+cor_matrix <- function(x, method = 'pearson', use = 'pairwise.complete',
+                       n = 100, 
                        cols = colorRampPalette(c("blue","white","red"))(n),
                        breaks = seq(-1,1, length.out = n+1),
                        min.cor = .5, round.cor = 1,
-                       diagonal = FALSE, upper = FALSE, lower = TRUE, ...) {
+                       diagonal = FALSE, upper = FALSE, lower = TRUE,
+                       axis=1:2, ...) {
 
+    
     if ( !diagonal )
         diag(x) <- NA
     if ( !upper )
@@ -1900,7 +1904,7 @@ cor_matrix <- function(x, n = 100,
     ttxt.col[abs(round(x, round.cor))>=min.cor] <- 'white'
     
     image_matrix(x, col=cols, breaks=breaks, text=ttxt, text.col=ttxt.col,
-                 ...)
+                 axis = axis, xlab = NA, ylab = NA, ...)
 
     if ( !diagonal ) abline(a=nrow(x)+1, b=-1)
  

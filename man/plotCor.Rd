@@ -19,6 +19,8 @@ plotCor(
   cor.legend = TRUE,
   line.legend = FALSE,
   title = FALSE,
+  xlab,
+  ylab,
   line.col = c(1, 2),
   pch = 20,
   cex = 1,
