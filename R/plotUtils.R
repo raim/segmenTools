@@ -269,12 +269,11 @@ plotCor <- function(x, y, outliers, classes,
                     signif=1, round=2, density=TRUE, col, ...) {
 
     
-    
     xy <- data.frame(x=x, y=y)
 
     ## default xlabel: variable name
-    if ( missing('xlab') ) xlab <- deparse(substitute(x))
-    if ( missing('ylab') ) xlab <- deparse(substitute(y))
+    if ( missing(xlab) ) xlab <- deparse(substitute(x))
+    if ( missing(ylab) ) ylab <- deparse(substitute(y))
 
     ## store eliminated data
     kept <- 1:nrow(xy)
