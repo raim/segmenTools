@@ -257,16 +257,16 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{dense2d}}.
 #' @export
 plotCor <- function(x, y, outliers, classes,
-                    cor.method=c("pearson", "kendall", "spearman"),
-                    line.methods=c("ols","tls"),
+                    cor.method = c("pearson", "kendall", "spearman"),
+                    line.methods = c("ols","tls"),
                     log="",
-                    na.rm=TRUE, verb=0,
-                    circular=FALSE, circular.jitter='',
-                    cor.legend=TRUE, line.legend=FALSE,
-                    title=FALSE, xlab, ylab,
-                    line.col=c(1,2), pch=20, cex=1, axes=TRUE,
-                    legpos, legbg="#FFFFFF99", legcex=1,
-                    signif=1, round=2, density=TRUE, col, ...) {
+                    na.rm = TRUE, verb=0,
+                    circular = FALSE, circular.jitter = '',
+                    cor.legend = TRUE, line.legend = FALSE,
+                    title = FALSE, xlab, ylab,
+                    line.col = c(1,2), pch = 20, cex = 1, axes = TRUE,
+                    legpos, legbg = "#FFFFFF99", legcex = 1,
+                    signif = 1, round = 2, density = TRUE, col, ...) {
 
     
     xy <- data.frame(x=x, y=y)
@@ -313,7 +313,7 @@ plotCor <- function(x, y, outliers, classes,
            col <- col[!rmna]
 
         rminf <- apply(xy, 1, function(x) any(is.infinite(x)))
-        if ( sum(rminf)>0 )
+        if ( sum(rminf)>0 & verb>0 )
             cat(paste("removing ", sum(rminf), " of ",nrow(xy),
                       " rows with INF values\n"))
         xy <- xy[!rminf,]
