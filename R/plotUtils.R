@@ -701,7 +701,7 @@ lplot <- function(x, y = NULL, ..., log = "",  ash = "") {
 ##plot(xs, ash(xs))
 ##ashaxis(4)
 #' @export
-ashaxis <- function(side, at = c(-10^(7:1), 0, 10^(1:7)), ...) {
+ashaxis <- function(side, at = c(-10^(7:0), 0, 10^(0:7)), ...) {
 
     for ( ax in side ) {
 
@@ -710,6 +710,11 @@ ashaxis <- function(side, at = c(-10^(7:1), 0, 10^(1:7)), ...) {
         ## select small ticks w/o labels
         ## TODO: select appropriate range for small ticks,
         ## as in logaxis
+        lat <- -100:100
+        base <- 10
+        lticks <- ash(rep(1:base, length(lat)) * base^rep(lat-1, each=base))
+        axis(ax, at=c(-lticks, lticks),
+             tcl=par('tcl')/2, labels=FALSE, ...)
         if ( FALSE ) {
             n <- 20
             rng <- ash(ceiling(par('usr')[3:4]))

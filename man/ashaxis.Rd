@@ -4,7 +4,7 @@
 \alias{ashaxis}
 \title{Draw axis for arcsinh transformed data}
 \usage{
-ashaxis(side, at = c(-10^(7:1), 0, 10^(1:7)), ...)
+ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), ...)
 }
 \arguments{
 \item{side}{an integer specifying which side of the plot the axis is
