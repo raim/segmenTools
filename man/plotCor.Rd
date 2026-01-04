@@ -11,6 +11,7 @@ plotCor(
   classes,
   cor.method = c("pearson", "kendall", "spearman"),
   line.methods = c("ols", "tls"),
+  force.zero = FALSE,
   log = "",
   na.rm = TRUE,
   verb = 0,
@@ -55,6 +56,8 @@ a linear regression (ordinary least squares) with R's
 squares) is calculated manually via
 \code{\link[base:eigen]{eigen}} and
 \code{\link[stats:cov]{cov}}.}
+
+\item{force.zero}{force origin in linear regression (line.method 'ols').}
 
 \item{log}{a character string which contains ‘"x"’ if the x axis is
 to be logarithmic, ‘"y"’ if the y axis is to be logarithmic

@@ -222,6 +222,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     squares) is calculated manually via
 #'     \code{\link[base:eigen]{eigen}} and
 #'     \code{\link[stats:cov]{cov}}.
+#' @param force.zero force origin in linear regression (line.method 'ols').
 #' @param line.col colors of the regression lines drawn with
 #'     \code{line.methods}.  ## @param line.type line types of the
 #'     regression lines drawn with ## \code{line.methods}.
@@ -259,6 +260,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 plotCor <- function(x, y, outliers, classes,
                     cor.method = c("pearson", "kendall", "spearman"),
                     line.methods = c("ols","tls"),
+                    force.zero = FALSE,
                     log="",
                     na.rm = TRUE, verb=0,
                     circular = FALSE, circular.jitter = '',
@@ -361,8 +363,10 @@ plotCor <- function(x, y, outliers, classes,
         if ( !missing(classes) ) {}
         
         ## lin.reg (OLS)
-        if ( "ols" %in% line.methods )
-            lfit <- lm(y ~ x, data=xy)
+        if ( "ols" %in% line.methods ) {
+            if ( force.zero ) lfit <- lm(y ~ x+0, data=xy)
+            else lfit <- lm(y ~ x, data=xy)
+        }
         ## TLS, via eigen(cov)
         if ( "tls" %in% line.methods ) {
             v <- eigen(cov(xy))$vectors
@@ -517,6 +521,7 @@ plotCor <- function(x, y, outliers, classes,
 #' @export
 plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
                          alpha = 0.5, method = 'pearson', line='ols',
+                         force.zero = FALSE,
                          legend=TRUE, leg.pos='bottomright', verb = 1, ...) {
 
 
@@ -568,7 +573,9 @@ plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
         ## correlation
         cr <- cor.test(xy$y[set], xy$x[set], method = method)
         ## linear regression (ordinary least squares)
-        ft <- lm(xy$y[set] ~ xy$x[set])
+        if ( force.zero ) 
+            ft <- lm(xy$y[set] ~ xy$x[set] + 0 )
+        else ft <- lm(xy$y[set] ~ xy$x[set])
         ## total least squares
         v <- eigen(cov(xy[set,]))$vectors
         beta <- v[2,1]/v[1,1] # slope
@@ -695,13 +702,15 @@ lplot <- function(x, y = NULL, ..., log = "",  ash = "") {
 }
 
 #' Draw axis for arcsinh transformed data
+#' @inheritParams logaxis
 #' @inheritParams graphics::axis
 #' @param ... parameters passed on to \link[graphics:axis]{axis}
 ##xs <- c(-1e4, -10:10, 1e3)
 ##plot(xs, ash(xs))
 ##ashaxis(4)
 #' @export
-ashaxis <- function(side, at = c(-10^(7:0), 0, 10^(0:7)), ...) {
+ashaxis <- function(side, at = c(-10^(7:0), 0, 10^(0:7)),
+                    lat = 0:100, ...) {
 
     for ( ax in side ) {
 
@@ -710,7 +719,6 @@ ashaxis <- function(side, at = c(-10^(7:0), 0, 10^(0:7)), ...) {
         ## select small ticks w/o labels
         ## TODO: select appropriate range for small ticks,
         ## as in logaxis
-        lat <- -100:100
         base <- 10
         lticks <- ash(rep(1:base, length(lat)) * base^rep(lat-1, each=base))
         axis(ax, at=c(-lticks, lticks),

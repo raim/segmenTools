@@ -28,6 +28,7 @@ NULL # this just ends the global package documentation
 #' @return log(x+sqrt(x^2+1))
 #' @export
 ash <- function(x) log(x+sqrt(x^2+1))
+
 #' log trafo handling zeros by adding 1
 #' @param x data to be transformed
 #' @return log(x+1)

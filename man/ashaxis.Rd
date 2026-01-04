@@ -4,7 +4,7 @@
 \alias{ashaxis}
 \title{Draw axis for arcsinh transformed data}
 \usage{
-ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), ...)
+ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), lat = 0:100, ...)
 }
 \arguments{
 \item{side}{an integer specifying which side of the plot the axis is
@@ -15,6 +15,9 @@ ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), ...)
     (infinite, \code{NaN} or \code{NA}) values are omitted.  By default
     (when \code{NULL}) tickmark locations are computed, see
     \sQuote{Details} below.}
+
+\item{lat}{as argument \code{at} of \link[graphics:axis]{axis} but
+as the exponents of \code{log(y, base=base)}}
 
 \item{...}{parameters passed on to \link[graphics:axis]{axis}}
 }

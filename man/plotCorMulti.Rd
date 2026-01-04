@@ -14,6 +14,7 @@ plotCorMulti(
   alpha = 0.5,
   method = "pearson",
   line = "ols",
+  force.zero = FALSE,
   legend = TRUE,
   leg.pos = "bottomright",
   verb = 1,
