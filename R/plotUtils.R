@@ -411,7 +411,8 @@ plotCor <- function(x, y, outliers, classes,
 
     ## DATA
     if ( density )
-        dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, axes=axes, ...)
+        dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, axes=axes,
+                xlab = xlab, ylab = ylab, ...)
     else {
         if ( missing(col) ) col <- "#000000AA"
         plot(xy$x, xy$y, pch=pch, cex=cex, col=col, axes=axes,
