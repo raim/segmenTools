@@ -3111,7 +3111,7 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
                       ylim[2]+diff(ylim)*ylim.scale)
         }
         else if ( ylim=="all" ) {
-            ylim <- range(ts, na.rm=TRUE)
+            ylim <- range(ts[is.finite(ts)], na.rm=TRUE)
         }
     }
 
