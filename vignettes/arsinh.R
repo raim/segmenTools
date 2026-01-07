@@ -54,7 +54,7 @@ par(mai=rep(.5, 4), mgp = c(1.3, .3, 0), tcl = -.25)
 lplot(log10(x), ash(x), xlab = 'log10-scaled x',
       ylab = 'arscinh-scaled x', ylim=c(0, ash(max(x))))
 axis(1)
-axis(1, at=seq(0,10,.5), labels=FALSE)
+axis(2, at=seq(0,10,.5), labels=FALSE)
 axis(2)
 ashaxis(4)
 logaxis(3)
