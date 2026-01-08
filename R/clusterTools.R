@@ -1882,7 +1882,7 @@ image_matrix <- function(z, x, y, text, text.col, text.cex=1,
 #' @param ... arguments passed on to \link{image_matrix}.
 #' @export
 cor_matrix <- function(x, method = 'pearson', use = 'pairwise.complete',
-                       n = 100, 
+                       n = 100, xlab = NA, ylab = NA, 
                        cols = colorRampPalette(c("blue","white","red"))(n),
                        breaks = seq(-1,1, length.out = n+1),
                        min.cor = .5, round.cor = 1,
@@ -1904,7 +1904,7 @@ cor_matrix <- function(x, method = 'pearson', use = 'pairwise.complete',
     ttxt.col[abs(round(x, round.cor))>=min.cor] <- 'white'
     
     image_matrix(x, col=cols, breaks=breaks, text=ttxt, text.col=ttxt.col,
-                 axis = axis, xlab = NA, ylab = NA, ...)
+                 axis = axis, xlab = xlab, ylab = ylab, ...)
 
     if ( !diagonal ) abline(a=nrow(x)+1, b=-1)
  
@@ -2825,14 +2825,19 @@ plotBIC <- function(cls, norm=FALSE, legend="right", ...) {
 #' @export
 plotSingles <- function(x, cls, goi, grep=FALSE,
                         each=TRUE, plot.legend=each, lwd=2,
-                        leg.xy="topleft", y.intersp=1, ...) {
+                        leg.xy="topleft", leg.cex = 1, y.intersp=1, ...) {
+
     ## TODO: set all genes
     ## in cls$cluster to "-1"
 
+    cls.orig <- cls
+    if ( inherits(cls, "clustering") ) 
+        cls <- setNames(cls$clusters, rownames(cls$clusters))
+
     ## rm none-present goi
-    rm <- !goi%in%rownames(cls$clusters)
+    rm <- !goi%in%names(cls)
     if ( grep )
-      rm <- sapply(goi, function(x) length(grep(x, rownames(cls$clusters)))==0)
+      rm <- sapply(goi, function(x) length(grep(x, names(cls)))==0)
     if ( sum(rm) )
       cat(paste(paste(goi[rm],collapse=";"),"not found\n"))
     goi <- goi[!rm]
@@ -2843,10 +2848,14 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     }
 
     ## get goi and set all other clusterings to -1
-    kp <- which(rownames(cls$clusters)%in%goi)
+    kp <- which(names(cls)%in%goi)
     if ( grep )
-      kp <- unlist(sapply(goi, grep, rownames(cls$clusters)))
-    cls$clusters[-kp,] <- -1
+      kp <- unlist(sapply(goi, grep, names(cls)))
+    cls[-kp] <- -1
+
+    if ( !inherits(cls.orig, "clustering") ) 
+        cls.orig <- cls
+    else cls.orig$clusters[-kp,] <- -1
 
     ## remap goi names to use for legend ids
     if ( is.null(names(goi)) )
@@ -2854,7 +2863,7 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     leg.ids <- names(goi)
     names(leg.ids) <- goi
     
-    avg <- plotClusters(x, cls, avg.col=NA, lwd=lwd, avg.lwd=0, each=each,
+    avg <- plotClusters(x, cls.orig, avg.col=NA, lwd=lwd, avg.lwd=0, each=each,
                         alpha=1, use.lty=TRUE, type=c("all"),
                         plot.legend=each&plot.legend,
                         leg.xy=leg.xy, leg.ids=leg.ids, ...)
@@ -2869,8 +2878,8 @@ plotSingles <- function(x, cls, goi, grep=FALSE,
     ## TODO: auto-select y-intersp if too many goi
     if ( !each & plot.legend )
       legend(leg.xy, legend=leg[,"id"],
-             lty=leg[,"lty"], col=leg[,"col"], lwd=lwd,
-             bg="#FFFFFFAA",bty="o", y.intersp=y.intersp)
+             lty=leg[,"lty"], col=leg[,"col"], lwd=lwd, box.col = NA,
+             bg="#FFFFFF77", cex = leg.cex, y.intersp=y.intersp)
     avg$legend <- leg
     invisible(avg)
 }

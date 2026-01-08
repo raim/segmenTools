@@ -523,7 +523,7 @@ plotCor <- function(x, y, outliers, classes,
 plotCorMulti <- function(x, y, col, cls, cls.col, cls.srt,
                          alpha = 0.5, method = 'pearson', line='ols',
                          force.zero = FALSE,
-                         legend=TRUE, leg.pos='bottomright', verb = 1, ...) {
+                         legend=TRUE, leg.pos='bottomright', verb = 0, ...) {
 
 
      if ( missing(cls.srt) ) 

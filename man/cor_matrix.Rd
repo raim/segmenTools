@@ -9,6 +9,8 @@ cor_matrix(
   method = "pearson",
   use = "pairwise.complete",
   n = 100,
+  xlab = NA,
+  ylab = NA,
   cols = colorRampPalette(c("blue", "white", "red"))(n),
   breaks = seq(-1, 1, length.out = n + 1),
   min.cor = 0.5,

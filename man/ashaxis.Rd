@@ -4,7 +4,7 @@
 \alias{ashaxis}
 \title{Draw axis for arcsinh transformed data}
 \usage{
-ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), lat = 0:100, ...)
+ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), lat = 0:100, labels, ...)
 }
 \arguments{
 \item{side}{an integer specifying which side of the plot the axis is
@@ -18,6 +18,14 @@ ashaxis(side, at = c(-10^(7:0), 0, 10^(0:7)), lat = 0:100, ...)
 
 \item{lat}{as argument \code{at} of \link[graphics:axis]{axis} but
 as the exponents of \code{log(y, base=base)}}
+
+\item{labels}{this can either be a logical value specifying whether
+    (numerical) annotations are to be made at the tickmarks, or a
+    character or expression vector of labels to be placed at the
+    tickpoints.  (Other objects are coerced by \code{\link{as.graphicsAnnot}}.)
+    If this is not logical, \code{at} should also be supplied and of the
+    same length.  If \code{labels} is of length zero after coercion,
+    it has the same effect as supplying \code{TRUE}.}
 
 \item{...}{parameters passed on to \link[graphics:axis]{axis}}
 }

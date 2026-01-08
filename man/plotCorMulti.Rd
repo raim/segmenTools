@@ -17,7 +17,7 @@ plotCorMulti(
   force.zero = FALSE,
   legend = TRUE,
   leg.pos = "bottomright",
-  verb = 1,
+  verb = 0,
   ...
 )
 }

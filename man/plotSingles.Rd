@@ -13,6 +13,7 @@ plotSingles(
   plot.legend = each,
   lwd = 2,
   leg.xy = "topleft",
+  leg.cex = 1,
   y.intersp = 1,
   ...
 )
