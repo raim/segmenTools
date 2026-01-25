@@ -292,6 +292,10 @@ plotCor <- function(x, y, outliers, classes,
         axes <- FALSE
     }
 
+    ## expand color vector
+    if ( !missing(col) )
+        if ( length(col)==1 ) col <- rep(col, nrow(xy))
+
     xyo <- NULL
     if ( !missing(outliers) ) {
         if ( is.logical(outliers) )
