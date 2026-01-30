@@ -212,6 +212,8 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     to be logarithmic, ‘"y"’ if the y axis is to be logarithmic
 #'     (base 10) and ‘"xy"’ or ‘"yx"’ if both axes are to be
 #'     logarithmic.
+#' @param ash used as the log argument in base R's plot.default, but
+#'     using arcsinh transform instead of log.
 #' @param na.rm remove NA values from x and y.
 #' @param verb verbosity level: report removed NAs?
 #' @param cor.method method to calculate correlation and p-value via
@@ -261,7 +263,7 @@ plotCor <- function(x, y, outliers, classes,
                     cor.method = c("pearson", "kendall", "spearman"),
                     line.methods = c("ols","tls"),
                     force.zero = FALSE,
-                    log="",
+                    log="", ash="",
                     na.rm = TRUE, verb=0,
                     circular = FALSE, circular.jitter = '',
                     cor.legend = TRUE, line.legend = FALSE,
@@ -280,18 +282,23 @@ plotCor <- function(x, y, outliers, classes,
     ## store eliminated data
     kept <- 1:nrow(xy)
 
-    logaxis <- FALSE
     if ( length(grep("x", log))>0 ) {
         xy$x <- log10(xy$x)
-        logaxis <- axes
         axes <- FALSE
     }
     if ( length(grep("y", log))>0 ) {
         xy$y <- log10(xy$y)
-        logaxis <- axes | logaxis
         axes <- FALSE
     }
-
+    if ( grepl("x", ash) ) {
+        xy$x <- ash(xy$x)
+        axes <- FALSE
+    }
+    if ( grepl("y", ash) ) {
+        xy$y <- ash(xy$y)
+        axes <- FALSE
+    }
+    
     ## expand color vector
     if ( !missing(col) )
         if ( length(col)==1 ) col <- rep(col, nrow(xy))
@@ -437,14 +444,20 @@ plotCor <- function(x, y, outliers, classes,
         points(xyo$x, xyo$y, col=2, pch=4, cex=cex, ...)
 
     ## axes
-    if ( logaxis ) {
-        if ( length(grep("x", log))>0 ) {
-            logaxis(1)
-        } else axis(1)
-        if ( length(grep("y", log))>0 ) {
-            logaxis(2)
-        } else axis(2)
-    }
+    ##if ( logaxis ) {
+    ##    if ( length(grep("x", log))>0 ) {
+    ##        logaxis(1)
+    ##    } else axis(1)
+    ##    if ( length(grep("y", log))>0 ) {
+    ##        logaxis(2)
+    ##    } else axis(2)
+    ##}
+    if (grepl("x", log)) logaxis(1)
+    else if (grepl("x", ash)) ashaxis(1) 
+    else axis(1)
+    if (grepl("y", log)) logaxis(2)
+    else if (grepl("y", ash)) ashaxis(2) 
+    else axis(2)
 
     ## TODO: replace line legend by TLS and OLS
     if ( cor.legend ) {

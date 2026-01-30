@@ -13,6 +13,7 @@ plotCor(
   line.methods = c("ols", "tls"),
   force.zero = FALSE,
   log = "",
+  ash = "",
   na.rm = TRUE,
   verb = 0,
   circular = FALSE,
@@ -63,6 +64,9 @@ squares) is calculated manually via
 to be logarithmic, ‘"y"’ if the y axis is to be logarithmic
 (base 10) and ‘"xy"’ or ‘"yx"’ if both axes are to be
 logarithmic.}
+
+\item{ash}{used as the log argument in base R's plot.default, but
+using arcsinh transform instead of log.}
 
 \item{na.rm}{remove NA values from x and y.}
 
