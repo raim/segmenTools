@@ -1903,7 +1903,8 @@ cor_matrix <- function(x, method = 'pearson', use = 'pairwise.complete',
     ttxt.col[] <- 'black'
     ttxt.col[abs(round(x, round.cor))>=min.cor] <- 'white'
     
-    image_matrix(x, col=cols, breaks=breaks, text=ttxt, text.col=ttxt.col,
+    image_matrix(x, col = cols, breaks = breaks,
+                 text = ttxt, text.col = ttxt.col,
                  axis = axis, xlab = xlab, ylab = ylab, ...)
 
     if ( !diagonal ) abline(a=nrow(x)+1, b=-1)
@@ -3229,7 +3230,8 @@ plotClusters <- function(x, cls, k, each=TRUE, type="rng",
             
             ## store for external legend (eg. plotSingles with each=FALSE)
             used.pars[[cl]] <- data.frame(id=rownames(ts)[idx],
-                                          lty=lty,col=all.col[idx],
+                                          lty=lty,
+                                          col=all.col[idx],
                                           stringsAsFactors=FALSE)
             if ( plot.legend ) {
                 nms <- rownames(ts)[idx]

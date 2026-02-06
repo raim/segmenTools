@@ -454,10 +454,8 @@ plotCor <- function(x, y, outliers, classes,
     ##}
     if (grepl("x", log)) logaxis(1)
     else if (grepl("x", ash)) ashaxis(1) 
-    else axis(1)
     if (grepl("y", log)) logaxis(2)
     else if (grepl("y", ash)) ashaxis(2) 
-    else axis(2)
 
     ## TODO: replace line legend by TLS and OLS
     if ( cor.legend ) {
