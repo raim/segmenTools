@@ -282,21 +282,25 @@ plotCor <- function(x, y, outliers, classes,
     ## store eliminated data
     kept <- 1:nrow(xy)
 
-    logaxes <- axes
+    logaxes <- FALSE # TODO: make this simpler, currently to avoid double axis
     if ( length(grep("x", log))>0 ) {
         xy$x <- log10(xy$x)
+        logaxes <- axes
         axes <- FALSE
     }
     if ( length(grep("y", log))>0 ) {
         xy$y <- log10(xy$y)
+        logaxes <- axes
         axes <- FALSE
     }
     if ( grepl("x", ash) ) {
         xy$x <- ash(xy$x)
+        logaxes <- axes
         axes <- FALSE
     }
     if ( grepl("y", ash) ) {
         xy$y <- ash(xy$y)
+        logaxes <- axes
         axes <- FALSE
     }
     
