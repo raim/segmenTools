@@ -9,6 +9,8 @@ plotCor(
   y,
   outliers,
   classes,
+  xlim,
+  ylim,
   cor.method = c("pearson", "kendall", "spearman"),
   line.methods = c("ols", "tls"),
   force.zero = FALSE,
@@ -47,6 +49,10 @@ to exclude from correlation analysis.}
 
 \item{classes}{classification of all values (length(x)), for which
 correlations are calculated separateley.}
+
+\item{xlim}{optional x-axis limits.}
+
+\item{ylim}{optional y-axis limits.}
 
 \item{cor.method}{method to calculate correlation and p-value via
 \code{\link[stats:cor.test]{cor.test}}.}

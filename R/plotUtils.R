@@ -206,6 +206,8 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #' @param y the y coordinates of the points in the plot.
 #' @param outliers vector of indices or logical vector of x,y values
 #'     to exclude from correlation analysis.
+#' @param xlim optional x-axis limits.
+#' @param ylim optional y-axis limits.
 #' @param classes classification of all values (length(x)), for which
 #'     correlations are calculated separateley.
 #' @param log a character string which contains ‘"x"’ if the x axis is
@@ -260,6 +262,7 @@ num2col <- function(x, limits, q, pal, colf=viridis::viridis, n=100){
 #'     \code{\link{dense2d}}.
 #' @export
 plotCor <- function(x, y, outliers, classes,
+                    xlim, ylim,
                     cor.method = c("pearson", "kendall", "spearman"),
                     line.methods = c("ols","tls"),
                     force.zero = FALSE,
@@ -286,37 +289,51 @@ plotCor <- function(x, y, outliers, classes,
     if ( length(grep("x", log))>0 ) {
         xy$x <- log10(xy$x)
         logaxes <- axes
-        axes <- FALSE
+        ##axes <- FALSE
     }
     if ( length(grep("y", log))>0 ) {
         xy$y <- log10(xy$y)
         logaxes <- axes
-        axes <- FALSE
+        ##axes <- FALSE
     }
     if ( grepl("x", ash) ) {
         xy$x <- ash(xy$x)
         logaxes <- axes
-        axes <- FALSE
+        ##axes <- FALSE
     }
     if ( grepl("y", ash) ) {
         xy$y <- ash(xy$y)
         logaxes <- axes
-        axes <- FALSE
+        ##axes <- FALSE
     }
+    if ( logaxes ) axes <- FALSE
     
     ## expand color vector
     if ( !missing(col) )
         if ( length(col)==1 ) col <- rep(col, nrow(xy))
+
+    ## axis ranges should include outliers!
+    if ( missing(xlim) ) 
+        xlim <- range(xy$x[is.finite(xy$x)], na.rm=TRUE)
+    if ( missing(ylim) )
+        ylim <- range(xy$y[is.finite(xy$x)], na.rm=TRUE)
+
+    ##cat(paste(paste0(xlim, collapse='-'), '\n'))
+    ##cat(paste(paste0(ylim, collapse='-'), '\n'))
 
     xyo <- NULL
     if ( !missing(outliers) ) {
         if ( is.logical(outliers) )
             outliers <- which(outliers)
         if ( length(outliers)>0 ) {
+
             xyo <- xy[outliers,]
             xy <- xy[-outliers,]
             kept <- kept[-outliers]
-            if ( !missing(col) ) col <- col[-outliers]
+            if ( !missing(col) ) {
+                colo <- col[outliers]
+                col <- col[-outliers]
+            } else colo <- 1
         }
     }
     ## clean data from NA
@@ -428,11 +445,11 @@ plotCor <- function(x, y, outliers, classes,
     ## DATA
     if ( density )
         dense2d(xy$x, xy$y, circular=circular, cex=cex, pch=pch, axes=axes,
-                xlab = xlab, ylab = ylab, ...)
+                xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, ...)
     else {
         if ( missing(col) ) col <- "#000000AA"
         plot(xy$x, xy$y, pch=pch, cex=cex, col=col, axes=axes,
-             xlab = xlab, ylab = ylab, ...)
+             xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, ...)
     }
     ## FIT LINES
     if ( !circular ) {
@@ -445,9 +462,12 @@ plotCor <- function(x, y, outliers, classes,
     }
 
     ## indicated outliers
-    if ( !missing(outliers) )
-        points(xyo$x, xyo$y, col=2, pch=4, cex=cex, ...)
-
+    if ( !missing(outliers) ) {
+        if ( !exists("colo") ) colo <- "#000000AA"
+        points(xyo$x, xyo$y, col=colo, pch=pch, cex=cex, ...)
+        points(xyo$x, xyo$y, col=2, pch=4, cex=1.1*cex, ...)
+    }
+    
     ## axes
     ##if ( logaxis ) {
     ##    if ( length(grep("x", log))>0 ) {
